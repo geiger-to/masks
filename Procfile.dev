@@ -1,0 +1,6 @@
+web: npm run rails
+docs: npm run docs
+site: npm run site
+js: npm run build:js:watch
+css: npm run build:css:watch
+

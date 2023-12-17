@@ -1,0 +1,31 @@
+{
+  "name": "masks",
+  "private": "true",
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.2",
+    "@hotwired/turbo-rails": "^7.3.0",
+    "daisyui": "^4.4.6",
+    "postcss": "^8.4.32",
+    "postcss-import": "^16.0.0",
+    "esbuild": "^0.19.5"
+  },
+  "scripts": {
+    "fmt": "prettier --write .",
+    "dev": "foreman start -f Procfile.dev",
+    "site": "bundle exec jekyll serve",
+    "docs": "yard server --reload -o _site/api",
+    "rails": "bin/rails s -p 3000",
+    "build": "esbuild app/assets/javascripts/*.* --bundle --sourcemap --outdir=app/assets/builds/masks",
+    "build:js:watch": "esbuild app/assets/javascripts/*.* --bundle --sourcemap --outdir=app/assets/builds/masks --watch",
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.css -o ./app/assets/builds/masks/application.css --minify",
+    "build:css:watch": "tailwindcss -i ./app/assets/stylesheets/application.css -o ./app/assets/builds/masks/application.css --minify --watch"
+  },
+  "devDependencies": {
+    "@prettier/plugin-ruby": "^4.0.4",
+    "@tailwindcss/typography": "^0.5.10",
+    "autoprefixer": "^10.4.16",
+    "cssnano": "^6.0.2",
+    "prettier": "^3.1.1",
+    "tailwindcss": "^3.4.0"
+  }
+}

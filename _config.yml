@@ -1,0 +1,37 @@
+title: masks
+email: masks@geiger.to
+description: >-
+  masks is an access control framework for ruby/rails.
+baseurl: ""
+url: "https://masks.geiger.to"
+github_username: geiger-to
+source: site
+
+plugins:
+  - jekyll-feed
+  - jekyll-postcss
+  - jekyll-toc
+
+postcss:
+  cache: false
+
+collections:
+  docs:
+    output: true
+
+toc:
+  min_level: 2
+  max_level: 3
+  ordered_list: false
+  no_toc_section_class: no_toc_section
+  list_id: toc
+  list_class: menu
+  sublist_class: ""
+  item_class: ""
+  item_prefix: toc-
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"

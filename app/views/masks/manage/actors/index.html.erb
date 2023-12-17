@@ -1,0 +1,40 @@
+<h1 class="text-sm font-bold mb-4 mt-0 divider">
+  actors
+</h1>
+
+<div class="overflow-x-auto">
+  <table class="table bg-base-100">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th>name</th>
+        <th>last login</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @actors.each do |actor| %>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="avatar">
+                <div class="mask mask-squircle w-6 h-6 p-0.5 bg-neutral box-border">
+                  <%= lucide_icon('user', class: 'w-5 h-5') %>
+                </div>
+              </div>
+              <div class="font-bold"><%= actor.nickname %></div>
+            </div>
+          </td>
+          <td class="text-xs whitespace-nowrap">
+            <%= time_ago_in_words(actor.last_login_at) %> ago
+          </td>
+          <td class="text-right">
+            <a href="<%= actor_path(actor) %>" class="btn btn-ghost btn-xs">manage</a>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%== pagy_nav(@pagy) %>

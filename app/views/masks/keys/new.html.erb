@@ -1,0 +1,127 @@
+<div data-controller="keys">
+  <div class="flex items-center gap-4 mb-4">
+    <div class="flex flex-col">
+      <h3 class="font-bold">
+        <%= t(".heading") %>
+      </h3>
+      <span class="text-xs">
+        <%= t(".added") %>
+      </span>
+    </div>
+  </div>
+
+  <% if flash[:key] %>
+    <div role="alert" class="alert alert-success shadow-lg mb-4 flex items-center gap-4 text-left">
+      <%= lucide_icon('check') %>
+      <div>
+        <h3 class="font-bold">created "<%= flash[:key]['name'] %>"</h3>
+        <div class="text-xs">keep the secret somewhere safe:<br /><span class="font-mono"><%= flash[:key]['secret'] %></span></div>
+      </div>
+    </div>
+  <% elsif flash[:notice] %>
+    <div class="alert alert-info shadow-lg mb-4 flex items-center gap-4 text-left">
+      <%= lucide_icon('info') %>
+      <span>
+        <%= flash[:notice] %>
+      </span>
+    </div>
+  <% elsif flash[:error] %>
+      <div class="alert alert-error shadow-lg mb-4 flex items-center gap-2 text-left">
+        <%= lucide_icon('x-circle') %>
+        <span>
+          <%= flash[:error] %>
+        </span>
+      </div>
+  <% end %>
+
+  <%= form_with(url: keys_path, method: :post, class: 'join join-vertical w-full') do |form| %>
+    <div class="p-4 bg-base-100 join-item rounded-xl flex gap-3 items-center max-w-full">
+      <div class="w-4 h-4 flex items-center">
+        <%= lucide_icon('key') %>
+      </div>
+
+      <input type="text" name="key[name]" placeholder="<%= t('.placeholder.name') %>" class="input input-bordered input-sm w-full" />
+
+      <button class="w-4 h-4 flex items-center" data-action="keys#toggleSettings">
+        <%= lucide_icon('settings-2') %>
+      </button>
+
+      <%= form.submit t('.add'), class: 'btn btn-sm'  %>
+    </div>
+
+    <div class="bg-base-200 join-item p-4 max-h-[260px] overflow-auto <%= @actor.keys.any? ? 'hidden' : '' %>" data-keys-target="settings">
+      <div class="font-bold text-sm mb-2">
+        secret
+      </div>
+      <input type="password" name="key[secret]" placeholder="<%= t('.placeholder.secret') %>" class="input input-bordered input-sm w-full" />
+
+      <% if @actor.scopes.any? %>
+        <div class="font-bold text-sm my-4 mb-2">
+          scopes
+        </div>
+        <% @actor.scopes.each do |scope| %>
+          <div class="form-control w-full">
+            <label class="cursor-pointer label">
+              <span class="label-text font-mono"><%= scope %></span>
+              <input type="checkbox" class="toggle toggle-success toggle-sm" name="key[scopes][]" value="<%= scope %>" />
+            </label>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end%>
+
+  <% if @actor.keys.any? %>
+    <div class="">
+      <table class="table">
+        <tbody>
+        <% @actor.keys.latest.each do |key| %>
+          <tr>
+            <td>
+              <div class="dropdown dropdown-start mr-1">
+                <div tabindex="0" role="button flex items-center gap-1">
+                  <span class="inline-block underline decoration-wavy truncate md:max-w-full max-w-[150px] cursor-help"><%= key.name %></span>
+
+                  <% if key.scopes&.any? %>
+                    <span class="inline-block text-xs">(<%= key.scopes.length %>)</span>
+                  <% end %>
+                </div>
+                <div tabindex="0" class="card compact dropdown-content z-[1] shadow bg-base-100 rounded-box">
+                  <div tabindex="0" class="card-body">
+                    <% if key.scopes&.any? %>
+                      <p class="font-bold text-sm mb-2">scopes</p>
+
+                      <ul class="text-left">
+                        <% key.scopes.each do |scope| %>
+                          <li class="font-mono"><%= scope %></li>
+                        <% end %>
+                      </ul>
+                      <div class="divider my-0"></div>
+                    <% end %>
+
+                    <h2 class="whitespace-nowrap card-title font-normal italic text-sm">created <%= time_ago_in_words(key.created_at) %> ago</h2>
+                  </div>
+                </div>
+              </div>
+            </td>
+            <td class="w-full whitespace-nowrap">
+              <span class="text-xs"><%= time_ago_in_words(key.created_at) %> ago</span>
+            </td>
+            <td class="whitespace-nowrap">
+              <%= form_with(url: keys_path, method: :delete) do |form| %>
+                <input type="hidden" name="id" value="<%= key.id %>" />
+
+                <button class="btn btn-circle btn-ghost btn-xs" type="submit">
+                  <span class="flex items-center w-4 h-4">
+                    <%= lucide_icon('trash-2') %>
+                  </span>
+                </button>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+</div>

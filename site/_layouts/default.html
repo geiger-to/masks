@@ -1,0 +1,82 @@
+<!doctype html>
+<html class="h-full" lang="en" data-theme="docs">
+  <head>
+    <meta charset="utf-8" />
+    <title>{{ page.title }} - masks</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="h-full">
+    {% unless page.standalone %}
+    <div class="w-full h-[20px] overflow-hidden">
+      <img
+        src="/static/masks.jpg"
+        class="lg:object-top object-bottom object-none w-full"
+      />
+    </div>
+
+    <div class="navbar bg-base-100 box-border">
+      <div class="navbar-start">
+        <div class="dropdown">
+          <div tabindex="0" role="button" class="btn btn-ghost lg:hidden">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M4 6h16M4 12h8m-8 6h16"
+              />
+            </svg>
+          </div>
+
+          <div
+            class="dropdown-content z-10 shadow overflow-hidden bg-neutral rounded mt-2 pb-2 pr-2"
+          >
+            {% include menu.html %}
+          </div>
+        </div>
+
+        <a href="/" class="text-xl hover:underline font-bold pl-2 lg:pl-4"
+          >masks</a
+        >
+      </div>
+    </div>
+    {% endunless %}
+
+    <div class="lg:flex mb-12">
+      {% if page.collection == 'docs' %}
+      <div class="order-1 lg:block hidden">{% include menu.html %}</div>
+
+      {% if page.toc %}
+      <div id="table-of-contents" class="order-3">
+        <div class="collapse lg:collapse-open">
+          <input type="checkbox" class="min-h-0" />
+          <div class="collapse-title font-sm menu-title ml-2 !min-h-0">
+            <span class="font-mono text-neutral font-normal">#</span>
+            <span class="underline">Table of contents</span>
+          </div>
+          <div class="collapse-content">{% toc %}</div>
+        </div>
+      </div>
+      {% endif %}
+
+      <section class="h-full px-6 lg:px-4 prose order-2">
+        <h1 class="mb-0">{{ page.title }}</h1>
+        <h2 class="mt-2 text-base font-normal text-base-300 italic">
+          {{ page.description }}...
+        </h2>
+        {{ content }}
+      </section>
+      {% else %}
+      <section class="h-full px-4 flex flex-col gap-4 mx-auto">
+        {{ content }}
+      </section>
+      {% endif %}
+    </div>
+  </body>
+</html>

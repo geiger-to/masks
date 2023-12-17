@@ -1,0 +1,126 @@
+<div class="flex flex-col gap-1 mb-4">
+  <div class="flex items-center gap-2">
+              <div class="avatar">
+                <div class="mask mask-squircle w-6 h-6 p-0.5 bg-neutral box-border">
+                  <%= lucide_icon('user', class: 'w-5 h-5') %>
+                </div>
+              </div>
+
+    <div class="text-xl font-bold">
+      <%= @actor.nickname %>
+    </div>
+  </div>
+
+
+</div>
+
+<div class="bg-base-300 flex flex-col gap-4 p-4 rounded-xl mb-4">
+  <div class="flex items-center gap-4">
+    <%= lucide_icon('log-in', class: 'w-4 h-4') %>
+    <% if @actor.last_login_at %>
+      <div class="text-sm flex-grow">
+        <b class="text-neutral-content">last login</b> <%= time_ago_in_words(@actor.last_login_at) %> ago
+      </div>
+      <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+        <input type="submit" class="btn hover:btn-error btn-xs" name="logout" value="logout">
+      <% end %>
+    <% else %>
+      <div class="text-sm">
+        never logged in
+      </div>
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <%= lucide_icon('unlock', class: 'w-4 h-4') %>
+      <div class="text-sm flex-grow">
+    <% if @actor.changed_password_at %>
+        <b class="text-neutral-content">password</b> changed <%= time_ago_in_words(@actor.changed_password_at) %> ago
+    <% else %>
+        <b class="text-neutral-content">password</b> never changed
+    <% end %>
+      </div>
+
+    <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+      <input type="submit" class="btn hover:btn-error btn-xs" name="reset_password" value="reset">
+    <% end %>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <%= lucide_icon('key-square', class: 'w-4 h-4') %>
+    <div class="text-sm flex-grow">
+      <b class="text-neutral-content">secondary</b> credentials <span class="italic <%= @actor.factor2? ? 'text-success' : "text-error" %>"><%= @actor.factor2? ? 'enabled' : 'disabled' %></span>
+
+    </div>
+    <% if @actor.factor2? %>
+      <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+        <input type="submit" class="btn hover:btn-error btn-xs" name="remove_factor2" value="remove">
+      <% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="mb-4">
+  <div class="overflow-x-auto max-h-96 rounded-xl">
+    <table class="table table-pin-rows bg-base-300">
+      <thead>
+        <tr class="">
+          <th class="py-2 w-full">emails</th>
+          <th class="py-2"><%= @actor.emails.any? ? 'verified?' : '' %></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if @actor.emails.any? %>
+          <% @actor.emails.each do |email| %>
+            <tr>
+              <td class="w-full whitespace-nowrap"><%= email.email %></td>
+              <td class=""><%= lucide_icon(email.verified? ? 'check' : 'x', class: 'w-4 h-4') %></td>
+            </tr>
+          <% end %>
+        <% else %>
+            <tr>
+              <td class="italic" colspan="2">no emails added...</td>
+            </tr>
+        <% end%>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+  <div class="overflow-x-auto max-h-96 rounded-xl">
+    <table class="table table-pin-rows bg-base-300">
+      <thead>
+        <tr class="">
+          <th class="py-2 w-full">scopes</th>
+          <th class="py-2"></th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+            <td colspan="2">
+                <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+              <div class="flex items-center gap-2">
+                  <%= lucide_icon('plus-square', class: 'text-base-300-content') %>
+                  <input type="text" name="add_scope" class="flex-grow input input-sm" placeholder="add a scope..." />
+                  <input type="submit" class="btn btn-sm" value="add" />
+              </div>
+                 <% end %>
+            </td>
+          </tr>
+        <% @actor.scopes.each do |scope| %>
+          <tr>
+            <td class="font-mono w-full"><%= scope %></td>
+            <td class="">
+              <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+                <input type="hidden" name="remove_scope" value="<%= scope %>">
+
+                <button type="submit" class="btn btn-ghost btn-error hover:btn-outline btn-xs">
+                  <%= lucide_icon('x', class: 'w-4 h-4') %>
+                </button>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>

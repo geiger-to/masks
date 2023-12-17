@@ -1,0 +1,58 @@
+<div class="space-y-3">
+  <div class="flex flex-col">
+    <span class="font-bold">
+      your password
+    </span>
+    <span class="text-xs">
+      last changed
+      <% if @actor.changed_password_at %>
+        <%= time_ago_in_words(@actor.changed_password_at) %>
+        ago
+      <% else %>
+        <span class="italic">
+          never
+        </span>
+      <% end %>
+    </span>
+  </div>
+  <% if flash[:errors]&.any? %>
+    <div role="alert" class="alert mb-2">
+      <div class="flex items-center gap-4">
+        <%= lucide_icon("x", class: "stroke-error") %>
+        <span><%= flash[:errors][0] %></span>
+      </div>
+    </div>
+  <% end %>
+
+  <%= form_with url: password_path, method: :post, class: 'pt-2 flex flex-col gap-2', data: { password_target: 'add' } do |form| %>
+    <label class="flex gap-3 items-center">
+      <%= lucide_icon("shield-plus") %>
+      <input
+        type="password"
+        data-password-target="code"
+        data-action="password#updateChanged"
+        placeholder="<%= t('.placeholder.change') %>"
+        name="password[change]"
+        class="input w-full"
+      />
+    </label>
+    <div class="flex items-center gap-2">
+      <label class="flex gap-3 items-center">
+        <%= lucide_icon("shield-check") %>
+        <input
+          type="password"
+          data-password-target="password"
+          data-action="password#updatePassword"
+          placeholder="<%= t('.placeholder.password') %>"
+          name="session[password]"
+          class="input w-full"
+        />
+      </label>
+      <%= form.submit t(".submit"),
+                  class: "btn btn-secondary",
+                  data: {
+                    password_target: "submit",
+                  } %>
+    </div>
+  <% end %>
+</div>

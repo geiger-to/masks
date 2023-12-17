@@ -1,0 +1,150 @@
+<div data-controller="one_time_code">
+  <div class="flex items-center gap-4">
+    <div class="flex flex-col">
+      <h3 class="font-bold">
+        <%= t(".heading") %>
+      </h3>
+      <span class="text-xs">
+        <%= t(".tfa") %>
+        —
+        <span class="italic">
+          <%= @actor.totp_secret ? t(".enabled") : t(".disabled") %>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <% if !@actor.totp_secret %>
+    <div class='divider my-2 mb-4'></div>
+    <div class="">
+      <div class="">
+        <div class="flex gap-4">
+          <div class="w-[125px] h-[125px] rounded-md overflow-hidden">
+            <%= totp_svg(@actor.totp_uri, module_size: 2.35, fill: "fff", offset: 5) %>
+          </div>
+          <div class="max-w-[175px] space-y-3 mb-2">
+            <div>
+              <%= t(".enable_qr") %>
+            </div>
+            <div class="text-sm">
+              <%= t(".enable_manual") %>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-sm flex items-center gap-3 mt-3">
+          <span class="font-bold text-xs">
+            <%= t(".secret") %>
+          </span>
+          <span class="flex-grow">
+            <input
+              class="input input-xs w-full"
+              name="secret"
+              value="<%= @actor.random_totp_secret %>"
+            />
+          </span>
+        </div>
+        <div class='divider mt-3 mb-2 text-xs'></div>
+      </div>
+      <div class="mb-4 flex items-center">
+        next, enter your password and the one-time code shown in your
+        authenticator app.
+      </div>
+
+      <% if flash[:errors]&.any? %>
+        <div role="alert" class="alert mb-2">
+          <div class="flex items-center gap-4">
+            <%= lucide_icon("x", class: "stroke-error") %>
+            <span><%= flash[:errors][0] %></span>
+          </div>
+        </div>
+      <% end %>
+
+      <%= form_with url: one_time_code_path, method: :post, class: 'pt-2 flex flex-col gap-2', data: { one_time_code_target: 'add' } do |form| %>
+        <input
+          type="hidden"
+          name="one_time_code[secret]"
+          value="<%= @actor.random_totp_secret %>"
+        />
+        <label class="flex gap-3 items-center">
+          <%= lucide_icon("shield-check") %>
+          <input
+            type="password"
+            data-one-time-password-target="password"
+            data-action="one_time_code#updatePassword"
+            placeholder="<%= t('.placeholder.password') %>"
+            name="session[password]"
+            class="input w-full"
+          />
+        </label>
+        <div class="flex items-center gap-2">
+          <label class="flex gap-3 items-center">
+            <%= lucide_icon("key-square") %>
+            <input
+              type="password"
+              data-one-time-password-target="code"
+              data-action="one_time_code#updateCode"
+              placeholder="<%= t('.placeholder.otp') %>"
+              name="one_time_code[code]"
+              class="input w-full"
+            />
+          </label>
+          <%= form.submit t(".submit"),
+                      class: "btn btn-secondary",
+                      data: {
+                        one_time_code_target: "submit",
+                      } %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="join join-vertical">
+      <div class="join-item alert bg-neutral mt-4">
+        <%= lucide_icon("check", class: "stroke-success") %>
+        <h3>
+          after login you will be asked to enter a one-time code, a backup
+          code, or use a different secondary credential.
+        </h3>
+      </div>
+      <div
+        class="join-item card bg-base-100 pt-2 pb-3 px-4 w-full text-right"
+        role="alert"
+      >
+        <a href="<%= backup_codes_path %>" class="text-sm underline">
+          <%= t(@actor.should_save_backup_codes? ? ".backup_codes" : ".reset_codes") %>
+        </a>
+      </div>
+    </div>
+
+    <div class='divider my-4 text-xs'><%= t(".delete_div") %></div>
+
+    <%= form_with url: one_time_code_path, method: :delete, class: '', data: { one_time_code_target: 'add' } do |form| %>
+      <input
+        type="hidden"
+        name="one_time_code[secret]"
+        value="<%= @actor.random_totp_secret %>"
+      />
+
+      <div class="alert py-2">
+        <%= lucide_icon("shield-check") %>
+        <label class="flex gap-3 items-center flex-grow">
+          <input
+            type="password"
+            data-one-time-password-target="password"
+            data-action="one_time_code#updatePassword"
+            placeholder="<%= t('.placeholder.delete') %>"
+            name="session[password]"
+            class="input input-sm input-bordered w-full"
+          />
+        </label>
+        <div>
+          <%= form.submit t(".delete"),
+                      class: "btn hover:btn-error btn-outline btn-sm",
+                      data: {
+                        one_time_code_target: "submit",
+                      } %>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+</div>

@@ -1,0 +1,12 @@
+{% assign docs = site.docs | group_by: 'category' %} {% for doc in docs %}
+<ul class="menu">
+  <li>
+    <h2 class="menu-title">{{ doc.name | capitalize }}</h2>
+    <ul>
+      {% assign items = doc.items | sort: 'order' %} {% for item in items %}
+      <li><a href="{{ item.url }}">{{ item.title }}</a></li>
+      {% endfor %}
+    </ul>
+  </li>
+</ul>
+{% endfor %}
