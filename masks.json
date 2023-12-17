@@ -1,0 +1,274 @@
+{
+  "name": "masks",
+  "url": "http://localhost:3000",
+  "title": "masks",
+  "signups": true,
+  "nickname": {
+    "format": "^[\\w]+$",
+    "length": { "min": 5, "max": 36 }
+  },
+  "password": {
+    "length": { "min": 8, "max": 128 }
+  },
+  "masks": [
+    {
+      "skip": true,
+      "request": {
+        "method": "get",
+        "path": ["/assets/*", "/debug"]
+      }
+    },
+    {
+      "type": "anon",
+      "request": {
+        "method": "get",
+        "path": "/anon"
+      },
+      "anon": true,
+      "fail": false
+    },
+    {
+      "type": "api",
+      "request": {
+        "path": ["*"],
+        "header": "Authorization"
+      }
+    },
+    {
+      "type": "authenticate",
+      "request": {
+        "method": "post",
+        "path": "/session"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": ["get", "delete"],
+        "path": "/session"
+      },
+      "fail": false
+    },
+    {
+      "type": "recovery",
+      "request": {
+        "method": ["get", "post"],
+        "path": ["/recovery", "/recover"]
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post"],
+        "path": "/emails"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": ["delete", "patch"],
+        "path": "/emails"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": "get",
+        "path": "/email/*/verify"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post", "delete"],
+        "path": "/one-time-codes"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post"],
+        "path": "/backup-codes"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "access": ["actor.password"],
+      "request": {
+        "method": ["get"],
+        "path": "/password"
+      }
+    },
+    {
+      "type": "sudo",
+      "access": ["actor.password"],
+      "request": {
+        "method": ["post"],
+        "path": "/password"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "/cable",
+        "method": "get"
+      }
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "/private"
+      }
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": "patch",
+        "path": "/actor"
+      }
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": "post",
+        "path": "/session",
+        "param": "sudo"
+      }
+    },
+    {
+      "type": "manage",
+      "request": {
+        "path": ["/actors", "/actors/*"]
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "*"
+      },
+      "fail": "/session"
+    },
+    {
+      "name": "cli",
+      "type": "masquerade",
+      "access": ["actor.signup", "actor.password", "actor.scopes"]
+    },
+    {
+      "access": "actor.signup"
+    },
+    {
+      "access": "actor.password"
+    }
+  ],
+  "types": {
+    "anon": {
+      "checks": null,
+      "credentials": null
+    },
+    "public": {
+      "checks": {
+        "actor": {
+          "lifetime": "P1M",
+          "optional": true
+        }
+      },
+      "credentials": ["Session"]
+    },
+    "authenticate": {
+      "checks": {
+        "actor": {
+          "lifetime": "PT12H"
+        },
+        "password": {
+          "lifetime": "PT12H"
+        },
+        "factor2": {
+          "lifetime": "PT12H",
+          "optional": true
+        },
+        "device": {}
+      },
+      "credentials": [
+        "Email",
+        "Nickname",
+        "Session",
+        "Password",
+        "BackupCode",
+        "OneTimeCode",
+        "LastLogin",
+        "Device"
+      ]
+    },
+    "sudo": {
+      "checks": {
+        "actor": {
+          "lifetime": "PT12H"
+        },
+        "password": {},
+        "device": {}
+      },
+      "credentials": ["Session", "Password", "Device"]
+    },
+    "session": {
+      "checks": {
+        "actor": {
+          "lifetime": "PT12H"
+        },
+        "password": {
+          "lifetime": "PT12H"
+        },
+        "factor2": {
+          "lifetime": "PT12H",
+          "optional": true
+        },
+        "device": {}
+      },
+      "credentials": ["Session", "Device"]
+    },
+    "manage": {
+      "checks": {
+        "actor": {
+          "lifetime": "PT12H"
+        },
+        "password": {
+          "lifetime": "PT12H"
+        },
+        "factor2": {
+          "lifetime": "PT12H",
+          "optional": true
+        },
+        "device": {}
+      },
+      "credentials": ["Session", "Device"],
+      "scopes": "masks:manager"
+    },
+    "recovery": {
+      "checks": {
+        "recovery": {}
+      },
+      "credentials": ["Session", "Recovery", "Device"]
+    },
+    "api": {
+      "checks": {
+        "key": {},
+        "device": {}
+      },
+      "credentials": ["Key", "Device"]
+    },
+    "masquerade": {
+      "checks": {
+        "actor": {}
+      },
+      "credentials": ["Masquerade"]
+    }
+  }
+}

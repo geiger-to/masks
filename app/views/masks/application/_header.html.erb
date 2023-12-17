@@ -1,0 +1,31 @@
+<div class="navbar gap-2 px-1">
+  <div class="flex-1">
+    <% if @config.site_url %>
+      <a
+        href="<%=@config.site_url%>"
+        class="text-xl flex items-center gap-3 hover:underline"
+      >
+        <% if @config.site_logo %>
+          <div class="w-7 h-7 overflow-hidden">
+            <img src="<%=@config.site_logo%>"/>
+          </div>
+        <% else %>
+          <%= lucide_icon("lock") %>
+        <% end %>
+        <span class="font-bold">
+          <%= @config.site_name %>
+        </span>
+      </a>
+    <% else %>
+      <span class="text-2xl"><%= @config.site_name %></span>
+    <% end %>
+  </div>
+  <% if logged_in? %>
+    <span class="whitespace-nowrap text-sm italic">
+      <%= t(".logged_in") %>
+      <a href="<%= current_path %>" class="not-italic underline pl-1">
+        <%= @session.actor.nickname %>
+      </a>
+    </span>
+  <% end %>
+</div>

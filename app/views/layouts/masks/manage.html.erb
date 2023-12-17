@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html class="h-full bg-base-200" data-theme="luxury">
+  <head>
+    <title><%= t(".meta.title") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "masks/application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
+  </head>
+  <body class="h-full">
+    <div class="navbar my-2 join box-border px-6">
+      <div class="flex items-center gap-1 bg-accent rounded px-2 py-1.5 join-item">
+        <%= image_tag "masks.png", class: 'w-5 h-5 rounded-full border-black border' %>
+      </div>
+      <div class="flex items-center bg-base-100 rounded px-2 py-1.5 join-item">
+        <a href="<%= actors_path %>" class="text-sm text-accent-content opacity-75 hover:opacity-100 hover:underline focus:underline font-mono">/manage</a>
+      </div>
+    </div>
+
+    <div class="w-full px-6 box-border">
+      <%= yield %>
+    </div>
+  </body>
+</html>

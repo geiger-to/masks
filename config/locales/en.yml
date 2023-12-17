@@ -1,0 +1,286 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+en:
+  layouts:
+    masks:
+      application:
+        meta:
+          title: masks
+      manage:
+        meta:
+          title: masks
+  masks:
+    application:
+      header:
+        logged_in: welcome
+    actor_mailer:
+      recover_credentials:
+        recover: reset password
+        nickname: your nickname
+        subheading: hey there, you recently requested help recovering your credentials...
+        call_to_action: your username is listed above. you can reset your password if you forgot it.
+        sign_off: reply to this email if you need more help. cheers
+      verify_email:
+        subject: verify your email - things
+        heading: verify your email
+        subheading: |
+          hey there, you recently added this email to your account. you must verify it's yours by pressing the button below...
+        subheading_plain: |
+          hey there, you recently added this email to your account. you must verify it's yours by visiting the link below...
+        call_to_action: once verified, this email will be usable future logins and account recovery.
+        sign_off: thanks
+        verify: "verify"
+        verify_plain: "verify here — "
+        added: added
+    actors:
+      current:
+        emails:
+          zero: no emails found
+          one: "%{email}"
+          other: "%{email}"
+        add_email: add...
+        add_more_email: add more...
+        change_password: change your password...
+        credentials: credentials
+        password: password
+        one_time_codes: one-time code
+        backup_codes: backup codes
+        created: created
+        manage: manage...
+        enable: enable...
+        logout: logout
+        never_logged_in: never...
+        last_accessed: last accessed
+        last_login: last login
+        ago: ago
+        devices: devices
+        change: change...
+        keys: keys
+        add_key: add...
+        add_more_key: add more...
+
+    passwords:
+      edit:
+        placeholder:
+          password: your current password...
+          change: your new password...
+        submit: change
+    one_time_code:
+      new:
+        tfa: secondary credential
+        disabled: disabled
+        enabled: enabled
+        enable_qr: to enable, scan this qr code into your authenticator app.
+        enable_manual: you can also enter the secret manually.
+        heading: one-time code
+        empty_detail: you must enable two-factor authentication to use backup codes.
+        disabled_heading: add a one-time password
+        placeholder:
+          otp: one-time code...
+          password: your password...
+          delete: enter your password...
+        secret: secret
+        submit: enable
+        delete: disable
+        delete_div: disable one-time code
+        backup_codes: save backup codes...
+        reset_codes: view backup codes...
+    backup_codes:
+      new:
+        tfa: secondary credential
+        disabled: disabled
+        enabled: enabled
+        heading: backup codes
+        empty_detail: backup codes are available once you add a secondary credential, like a one-time code.
+        disabled_heading: backup codes are disabled
+        save_codes: save your 10-digit backup codes somewhere safe, then press enable to use them as another secondary credential...
+        reset_codes: press delete to disable backup codes. afterward you can generate a new set of codes.
+        download: download
+        enable: enable
+        delete: delete
+        placeholder:
+          password: enter your password...
+    emails:
+      verify:
+        verified: verified!
+        verification_expired: email verification link expired
+        card_title: how verified emails work...
+        details: |
+          you can use your newly verified email:
+        list_html: |
+          <li>instead of your nickname during login
+          <li>for password-less login via email links
+          <li>to recover your nickname or password
+        privacy: your emails will never be shared.
+        manage: to manage it and others...
+        manage_expired: to try again...
+        added: manage it in
+        emails: view your emails
+      new:
+        page: your email
+        placeholder:
+          email:
+            zero: enter a new email address...
+            one: enter another email address...
+            other: enter another email address...
+          password: enter your password...
+        heading: no emails found
+        no_emails: no emails added
+        no_emails_detail: your email can act as an alternate way to access and recover your account.
+        heading_new:
+          zero: no emails found
+          one: your email
+          other: your emails
+        help_title: how it works
+        help_body: if you enter valid information you will be contacted with instructions to recover your credentials.
+        help_more: need more help?
+        help_contact: contact support
+        help_button: "help"
+        support_url:
+        submit: add
+        back: go back...
+        email_verified: verified %{ago} ago
+        email_taken: email already taken.
+        pending_verification: awaiting verification...
+        expired_verification: verification expired.
+        add: add an email...
+    keys:
+      new:
+        heading: your keys
+        added: allow automated tools to act on your behalf...
+        page: your key
+        placeholder:
+          name: enter a name...
+          password: enter your password...
+          secret: leave blank to generate a secret...
+        no_keys_detail: keys allow automated tools to act on your behalf...
+        heading_new:
+          zero: no keys found
+          one: your key
+          other: your keys
+        help_title: how it works
+        help_body: if you enter valid information you will be contacted with instructions to recover your credentials.
+        help_more: need more help?
+        help_contact: contact support
+        help_button: "help"
+        support_url:
+        submit: make key
+        back: go back...
+        key_verified: verified %{ago} ago
+        key_taken: key already taken.
+        pending_verification: awaiting verification...
+        expired_verification: verification expired.
+        add: add key
+    recoveries:
+      password:
+        placeholder: new password...
+        heading: reset your password
+        heading_success: password reset
+        heading_expired: password reset expired
+        subheading: enter a new password. you can use it to login to your account after it's changed...
+        subheading_success: your password has been changed. you can login using the password you just entered.
+        subheading_expired: this password reset link is expired or invalid.
+        help_title: how it works
+        help_body: if you enter valid information you will be contacted with instructions to recover your credentials.
+        help_more: need more help?
+        help_contact: contact support
+        help_button: "help"
+        support_url:
+        submit: reset
+        login: back to login
+      new:
+        placeholder: nickname, email or phone...
+        heading: recover your credentials
+        subheading: enter a nickname, email, or phone number associated with your account to recover your credentials...
+        help_title: how it works
+        help_body: if you enter valid information you will be contacted with instructions to recover your credentials.
+        help_more: need more help?
+        help_contact: contact support
+        help_button: "help"
+        support_url:
+        submit: recover
+        back: go back...
+        submitted:
+          heading: check your notifications...
+          description: if you have an account with us you'll receive an email or message on your phone with instructions on how to recover your account.
+    sessions:
+      new:
+        submit: continue
+        remember_me: remember me
+        start_over:
+          text: or
+          link: start over...
+        or_start_over: or
+        recover_credentials: "forgot your credentials?"
+        enter_factor2: enter a secondary credential to continue...
+        enter_credentials: "enter your credentials to continue..."
+        enter_password: "enter your password to continue..."
+        continue: "press continue to access things..."
+        one_time_code: enter a 6-digit one-time code from your authenticator app...
+        backup_code: enter one of your saved 10-digit backup codes...
+        logged_in: welcome!
+        tab:
+          one_time_code: one-time code
+          backup_code: backup code
+        placeholder:
+          nickname: nickname, email, or phone number...
+          password: password...
+          one_time_code: one-time code...
+          backup_code: backup code...
+  activerecord:
+    attributes:
+      masks/rails/actor:
+        nickname: nickname
+        password: password
+        signup: invalid
+      masks/rails/email:
+        email: email
+      masks/rails/key:
+        name: name
+        secret: secret
+        scopes: scopes
+    errors:
+      models:
+        masks/rails/actor:
+          format: is invalid
+          attributes:
+            signup:
+              disabled: credentials...
+  activemodel:
+    attributes:
+      masks/credentials/password:
+        password: password
+      masks/credentials/nickname:
+        nickname: nickname
+    errors:
+      models:
+        masks/session:
+          credentials: invalid credentials...
+          access: invalid access...

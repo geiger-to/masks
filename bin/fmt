@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -xe
+
+npm run fmt:prettier
+npm run fmt:rubocop

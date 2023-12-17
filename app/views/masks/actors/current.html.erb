@@ -1,0 +1,152 @@
+<div class="space-y-3">
+  <div class="join join-vertical w-full">
+    <div class="join-item alert bg-neutral flex items-center rounded-box">
+      <%= lucide_icon("user") %>
+      <div class="flex items-center gap-4 text-left w-full">
+        <div class="flex flex-col flex-grow">
+          <span class="font-bold">
+            <%= @actor.nickname %>
+          </span>
+
+          <span class="text-xs">
+            <% if @actor.last_login_at %>
+            <%= t(".last_login") %>
+              <%= time_ago_in_words(@actor.last_login_at) %> <%= t('.ago') %>&hellip;
+              <% else %>
+            <%= t(".created") %>
+              <%= time_ago_in_words(@actor.created_at) %> <%= t('.ago') %>&hellip;
+              <% end %>
+          </span>
+        </div>
+
+        <ul class="menu menu-horizontal p-0">
+          <li>
+            <details>
+              <summary class="font-bold">manage</summary>
+              <ul>
+                <li>
+                  <%= form_with url: session_path, method: :delete do |form| %>
+                    <%= form.submit t(".logout") %>
+                  <% end %>
+                </li>
+              </ul>
+            </details>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="join-item alert text-left flex items-center gap-4 <%= @actor.emails.any? ? 'bg-neutral' : 'bg-base-100' %>">
+      <%= lucide_icon("mail") %>
+      <span class="flex-grow">
+        <%= t(
+          ".emails",
+          count: @actor.email_addresses.length,
+          email: @actor.email_addresses[0],
+        ) %>
+      </span>
+
+      <a href="<%= emails_path %>" class="btn btn-sm btn-ghost hover:btn-info">
+        <%= t(@actor.emails.empty? ? ".add_email" : ".add_more_email") %>
+      </a>
+    </div>
+  </div>
+
+
+  <div class="divider text-xs">
+    <%= t(".credentials") %>
+  </div>
+
+  <div class="alert text-left bg-neutral flex items-center gap-4">
+    <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+
+    <span class="flex-grow">
+      <%= t(".password") %>
+    </span>
+    <a
+      href="<%=  password_path %>"
+      class="btn btn-sm btn-ghost hover:btn-secondary"
+    >
+      <%= t(".change") %>
+    </a>
+  </div>
+
+  <div class="alert text-left flex items-center gap-4 <%= @actor.totp_secret ? 'bg-neutral' : 'bg-base-100' %>">
+    <% if @actor.totp_secret %>
+      <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+    <% else %>
+      <%= lucide_icon("minus-circle") %>
+    <% end %>
+
+    <span class="flex-grow">
+      <%= t(".one_time_codes") %>
+    </span>
+    <a
+      href="<%= one_time_codes_path %>"
+      class="btn btn-sm btn-ghost hover:btn-secondary"
+    >
+      <%= @actor.totp_secret ? t(".manage") : t(".enable") %>
+    </a>
+  </div>
+
+  <% if @actor.factor2? %>
+    <div
+      class="alert text-left flex items-center gap-4 <%= @actor.saved_backup_codes? ? 'bg-neutral' : 'bg-base-100' %>"
+    >
+      <% if @actor.saved_backup_codes? %>
+        <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+      <% else %>
+        <%= lucide_icon("minus-circle") %>
+      <% end %>
+      <span class="flex-grow">
+        <%= t(".backup_codes") %>
+      </span>
+      <a
+        href="<%= backup_codes_path %>"
+        class="btn btn-sm btn-ghost hover:btn-secondary"
+      >
+        <%= @actor.saved_backup_codes? ? t(".manage") : t(".enable") %>
+      </a>
+    </div>
+  <% end %>
+
+    <div
+      class="alert text-left flex items-center gap-4 <%= @actor.keys.any? ? 'bg-neutral' : 'bg-base-100' %>"
+    >
+      <% if @actor.keys.any? %>
+        <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+      <% else %>
+        <%= lucide_icon("minus-circle") %>
+      <% end %>
+      <span class="flex-grow">
+        <%= t(".keys") %>
+      </span>
+      <a
+        href="<%= keys_path %>"
+        class="btn btn-sm btn-ghost hover:btn-secondary"
+      >
+        <%= @actor.keys.any? ? t(".add_more_key") : t(".add_key") %>
+      </a>
+    </div>
+
+  <div class="divider text-xs"><%= t('.devices') %></div>
+
+  <% @actor.devices.each do |device| %>
+    <div class="flex items-center gap-4">
+      <%= lucide_icon(device_icon(device)) %>
+
+      <span class="flex-grow flex flex-col">
+        <span class="">
+          <%= device.name %> @ <span class="font-mono"><%= device.ip_address %></span>
+        </span>
+        <span class="text-xs">
+          <%= t('.last_accessed') %> <%= time_ago_in_words(device.accessed_at) %> <%= t('.ago') %>
+        </span>
+      </span>
+
+      <%= form_with url: device_path(key: device.key), method: :update do |form| %>
+        <%= form.submit t(".logout"), name: 'reset', class: 'btn btn-xs hover:btn-error focus:btn-error' %>
+      <% end %>
+    </div>
+  <% end %>
+</div>

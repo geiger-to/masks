@@ -1,0 +1,6 @@
+# Ignore artifacts:
+build
+coverage
+app/assets/builds
+dummy/db/schema.rb
+.ruby-lsp

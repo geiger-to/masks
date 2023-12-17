@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html class="h-full bg-base-100" data-theme="<%= Masks.configuration.theme %>">
+  <head>
+    <title><%= t(".meta.title") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "masks/application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
+  </head>
+  <body class="h-screen flex px-2">
+    <div class="m-auto w-full max-w-screen-sm p-6 md:p-10 md:pt-8 pt-4 bg-base-300 rounded-2xl shadow">
+      <%= render "header" %>
+      <%= yield %>
+    </div>
+  </body>
+</html>
