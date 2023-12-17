@@ -1,0 +1,8 @@
+<%= t('.subheading_plain') %>
+> <%= @email.email %>
+> <%= t('.added') %> <%= @email.created_at.strftime("on %B%e, %Y") %>
+
+<%= t('.verify_plain') %><%= email_verify_url(email: @email)%>
+
+<%= t('.call_to_action') %>
+<%= t('.sign_off') %>

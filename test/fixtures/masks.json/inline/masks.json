@@ -1,0 +1,20 @@
+{
+  "name": "inline",
+  "masks": [
+    {
+      "name": "test-param",
+      "type": "default",
+      "inline": true
+    }
+  ],
+  "types": {
+    "default": {
+      "checks": {
+        "param": {
+          "duration": "P1M"
+        }
+      },
+      "credentials": ["Masks::TestCredentials::Param"]
+    }
+  }
+}

@@ -1,0 +1,51 @@
+<div>
+  <% if !@email || @email.expired? %>
+    <div class="alert alert-error text-error-content mb-2" role="alert">
+      <%= lucide_icon("mail-x") %>
+      <div>
+        <h3>
+          <%= t(".verification_expired") %>
+        </h3>
+        <h3 class="flex items-center gap-4 text-xs">
+          <span>
+            <a class="underline" href="<%= emails_path %>"><%= t(".emails") %></a>
+            <%= t(".manage_expired") %>
+          </span>
+        </h3>
+      </div>
+    </div>
+  <% elsif @email %>
+    <div class="alert alert-success mb-2" role="alert">
+      <%= lucide_icon("mail-check") %>
+      <div>
+        <h3 class="mb-1"><span class="font-mono"><%= @email.email %></span>
+          <%= t(".verified") %>
+        </h3>
+        <h3 class="flex items-center gap-4 text-xs">
+          <span>
+            <a class="underline" href="<%= emails_path %>"><%= t(".emails") %></a>
+            <%= t(".manage") %>
+          </span>
+        </h3>
+      </div>
+    </div>
+    <div class="card bg-base-100">
+      <div class="card-body">
+        <div class="card-title">
+          <%= t(".card_title") %>
+        </div>
+        <div>
+          <p class="mb-4 text-sm flex items-center gap-3">
+            <%= t(".details") %>
+          </p>
+          <ul class="text-sm list-disc pl-4 space-y-2 mb-4">
+            <%= t(".list_html") %>
+          </ul>
+          <p class="text-sm">
+            <%= t(".privacy") %>
+          </p>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

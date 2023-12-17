@@ -1,0 +1,14 @@
+/.bundle/
+/doc/
+/log/*.log
+/pkg/
+/tmp/
+/dummy/db/*.sqlite3
+/dummy/db/*.sqlite3-*
+/dummy/log/*.log
+/dummy/storage/
+/dummy/tmp/
+.byebug*
+/node_modules/**/*
+masks*.gem
+.yardoc

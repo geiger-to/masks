@@ -1,0 +1,89 @@
+<div class="space-y-3">
+  <div class="alert bg-neutral">
+    <%= lucide_icon("user") %>
+    <div class="flex flex-col">
+      <span class="font-bold">
+        <%= @actor.nickname %>
+      </span>
+      <a href="<%= password_path %>" class="underline text-sm">
+        <%= t(".change_password") %>
+      </a>
+    </div>
+  </div>
+
+  <div class="alert <%= @actor.emails.any? ? 'bg-neutral' : 'bg-base-100' %>">
+    <%= lucide_icon("mail") %>
+    <span>
+      <%= t(
+        ".emails",
+        count: @actor.email_addresses.length,
+        email: @actor.email_addresses[0],
+      ) %>
+    </span>
+
+    <a href="<%= emails_path %>" class="btn btn-sm btn-outline hover:btn-info">
+      <%= t(@actor.emails.empty? ? ".add_email" : ".add_more_email") %>
+    </a>
+  </div>
+
+  <div class="divider text-xs">
+    <%= t(".secondary_credentials") %>
+  </div>
+
+  <div class="alert <%= @actor.totp_secret ? 'bg-neutral' : 'bg-base-100' %>">
+    <% if @actor.totp_secret %>
+      <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+    <% else %>
+      <%= lucide_icon("minus-circle") %>
+    <% end %>
+
+    <span>
+      <%= t(".one_time_codes") %>
+    </span>
+    <a
+      href="<%= one_time_codes_path %>"
+      class="btn btn-sm btn-outline hover:btn-secondary"
+    >
+      <%= @actor.totp_secret ? t(".manage") : t(".enable") %>
+    </a>
+  </div>
+
+  <% if @actor.factor2? %>
+    <div
+      class="alert <%= @actor.saved_backup_codes? ? 'bg-neutral' : 'bg-base-100' %>"
+    >
+      <% if @actor.saved_backup_codes? %>
+        <%= lucide_icon("check-circle-2", class: "stroke-success") %>
+      <% else %>
+        <%= lucide_icon("minus-circle") %>
+      <% end %>
+      <span>
+        <%= t(".backup_codes") %>
+      </span>
+      <a
+        href="<%= backup_codes_path %>"
+        class="btn btn-sm btn-outline hover:btn-secondary"
+      >
+        <%= @actor.saved_backup_codes? ? t(".manage") : t(".enable") %>
+      </a>
+    </div>
+  <% end %>
+
+  <div class="divider text-xs"></div>
+
+  <%= form_with url: session_path, method: :delete do |form| %>
+    <div class="flex items-center gap-4">
+      <span class="text-sm flex-grow">
+        <%= t(".last_login") %>
+        <% if @actor.last_login_at %>
+          <%= time_ago_in_words(@actor.last_login_at) %>&hellip;
+        <% else %>
+          <span class="italic"><%= t(".never_logged_in") %></span>
+        <% end %>
+      </span>
+
+      <%= form.submit t(".logout"), class: "font-bold underline text-sm cursor-pointer" %>
+    </div>
+
+  <% end %>
+</div>

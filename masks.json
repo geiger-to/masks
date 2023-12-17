@@ -1,0 +1,274 @@
+{
+  "name": "things",
+  "logo": "https://avatars.githubusercontent.com/u/4009793?v=4",
+  "url": "http://localhost:3000",
+  "title": "things",
+  "lifetimes": {
+    "email_verification": "86400"
+  },
+  "nickname": {
+    "length": { "min": 5, "max": 36 },
+    "format": "@[\\w]+",
+    "prefix": "@"
+  },
+  "password": {
+    "length": { "min": 8, "max": 128 }
+  },
+  "masks": [
+    {
+      "skip": true,
+      "request": {
+        "method": "get",
+        "path": "/assets/*"
+      }
+    },
+    {
+      "type": "anon",
+      "request": {
+        "method": "get",
+        "path": "/anon"
+      },
+      "anon": true,
+      "fail": false
+    },
+    {
+      "type": "public",
+      "request": {
+        "method": "get",
+        "path": ["/public", "/masks/session"]
+      },
+      "anon": true,
+      "fail": false
+    },
+    {
+      "type": "authenticate",
+      "request": {
+        "method": "post",
+        "path": "/masks/session",
+        "param": "session"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": "delete",
+        "path": "/masks/session"
+      },
+      "fail": false
+    },
+    {
+      "type": "recovery",
+      "request": {
+        "method": ["get", "post"],
+        "path": "/masks/recovery"
+      },
+      "fail": false
+    },
+    {
+      "type": "recovery",
+      "request": {
+        "method": "get",
+        "path": "/masks/recover"
+      },
+      "fail": false
+    },
+    {
+      "type": "recovery",
+      "request": {
+        "method": "post",
+        "path": "/masks/recover"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post"],
+        "path": "/masks/emails"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": ["delete", "patch"],
+        "path": "/masks/emails"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": "get",
+        "path": "/masks/email/*/verify"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post", "delete"],
+        "path": "/masks/one-time-codes"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": ["post"],
+        "path": "/masks/backup-codes"
+      },
+      "fail": false
+    },
+    {
+      "type": "sudo",
+      "access": [
+        "actor.password"
+      ],
+      "request": {
+        "method": ["post"],
+        "path": "/masks/password"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "/cable",
+        "method": "get"
+      }
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "/private"
+      }
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": "patch",
+        "path": "/masks/actor"
+      }
+    },
+    {
+      "type": "sudo",
+      "request": {
+        "method": "post",
+        "path": "/masks/session",
+        "param": "sudo"
+      }
+    },
+    {
+      "type": "token",
+      "request": {
+        "header": "Authorization"
+      }
+    },
+    {
+      "type": "session",
+      "request": {
+        "path": "*"
+      },
+      "fail": "/masks/session"
+    },
+    {
+      "name": "cli",
+      "type": "masquerade",
+      "access": [
+        "actor.signup",
+        "actor.password"
+      ],
+      "anon": true
+    }
+  ],
+  "types": {
+    "anon": {
+      "checks": null,
+      "credentials": null
+    },
+    "public": {
+      "checks": {
+        "actor": {
+          "duration": "P1M",
+          "optional": true
+        }
+      },
+      "credentials": ["Session"]
+    },
+    "authenticate": {
+      "checks": {
+        "actor": {
+          "duration": "P1W"
+        },
+        "password": {
+          "duration": "P1D"
+        },
+        "factor2": {
+          "duration": "PT12H",
+          "optional": true
+        }
+      },
+      "credentials": [
+        "Email",
+        "Nickname",
+        "Session",
+        "Password",
+        "BackupCode",
+        "OneTimeCode",
+        "LastLogin"
+      ]
+    },
+    "sudo": {
+      "checks": {
+        "actor": {
+          "duration": "P1W"
+        },
+        "password": {
+          "duration": "request"
+        }
+      },
+      "credentials": ["Session", "Password"]
+    },
+    "session": {
+      "checks": {
+        "actor": {
+          "duration": "P1W"
+        },
+        "password": {
+          "duration": "P1D"
+        },
+        "factor2": {
+          "duration": "PT12H",
+          "optional": true
+        }
+      },
+      "credentials": ["Session"]
+    },
+    "recovery": {
+      "checks": {
+        "recovery": {
+          "duration": "request"
+        }
+      },
+      "credentials": ["Session", "Recovery"]
+    },
+    "token": {
+      "checks": {
+        "token": {
+          "duration": "request"
+        }
+      },
+      "credentials": ["BearerToken"]
+    },
+    "masquerade": {
+      "checks": {
+        "actor": {
+          "duration": "request"
+        }
+      },
+      "credentials": ["Masquerade"]
+    }
+  }
+}

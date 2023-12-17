@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title><%= t(".site-title") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "masks/application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
+  </head>
+  <body class="h-full">
+    <div class="flex justify-center items-center h-full w-full bg-base-300">
+      <div class="w-[350px] flex flex-col">
+        <%= render "header" %>
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

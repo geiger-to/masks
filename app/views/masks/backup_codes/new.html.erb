@@ -1,0 +1,103 @@
+<div>
+  <div class="flex items-center gap-4 mb-2">
+    <div class="flex flex-col">
+      <h3 class="font-bold">
+        <%= t(".heading") %>
+      </h3>
+      <span class="text-xs">
+        <%= t(".tfa") %>
+        —
+        <span class="italic">
+          <%= @actor.saved_backup_codes? ? t(".enabled") : t(".disabled") %>
+        </span>
+      </span>
+    </div>
+  </div>
+
+  <% if !@actor.backup_codes %>
+    <div class="card bg-neutral p-4 mt-4 mb-3 flex flex-col gap-2">
+      <span class="font-bold flex items-center gap-4">
+        <%= lucide_icon("alert-triangle", class: "stroke-warning") %>
+        <span class="text-sm font-normal">
+          <%= t(".empty_detail") %>
+        </span>
+      </span>
+    </div>
+  <% elsif @actor.should_save_backup_codes? %>
+    <div class="divider mt-2 mb-0.5"></div>
+    <div class="flex gap-3 mb-4">
+      <span class="">
+        <%= t(".save_codes") %>
+      </span>
+    </div>
+
+    <div class="grid grid-cols-3 bg-base-100 p-4 my-3 mb-0 rounded-md shadow-inner">
+      <% @actor.backup_codes.each do |code, enabled| %>
+        <% if enabled %>
+          <span class="font-mono text-sm">
+            <%= code %>
+          </span>
+        <% end %>
+      <% end %>
+    </div>
+
+    <%= form_with url: backup_codes_path, method: :post, class: 'w-full'  do |form| %>
+      <div class="divider my-2"></div>
+      <div class="flex items-center mb-2 gap-4">
+        <%= lucide_icon("shield-check") %>
+        <div class="flex items-center gap-4">
+          <input
+            type="password"
+            name="session[password]"
+            placeholder="<%= t('.placeholder.password') %>"
+            class="input w-full"
+          />
+          <%= form.submit t(".enable"),
+                      name: "backup_codes[enable]",
+                      class: "btn btn-secondary",
+                      data: {
+                        one_time_code_target: "submit",
+                      } %>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="alert bg-neutral my-4">
+      <%= lucide_icon("download", class: "stroke-success") %>
+
+      <span>
+        saved
+        <%= time_ago_in_words @actor.saved_backup_codes_at %>
+        ago...
+      </span>
+    </div>
+
+    <div class="join join-vertical">
+      <div class="join-item bg-base-100 flex gap-3 alert">
+        <span class="text-sm">
+          <%= t(".reset_codes") %>
+        </span>
+      </div>
+
+      <%= form_with url: backup_codes_path, method: :post, class: 'w-full'  do |form| %>
+        <div class="alert join-item flex items-center gap-4">
+          <%= lucide_icon("shield-check") %>
+          <div class="flex items-center gap-4">
+            <input
+              type="password"
+              name="session[password]"
+              placeholder="<%= t('.placeholder.password') %>"
+              class="input input-sm w-full"
+            />
+            <%= form.submit t(".delete"),
+                        name: "backup_codes[reset]",
+                        class: "btn btn-sm btn-outline hover:btn-error",
+                        data: {
+                          one_time_code_target: "submit",
+                        } %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

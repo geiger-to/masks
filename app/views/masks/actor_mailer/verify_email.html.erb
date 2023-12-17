@@ -1,0 +1,34 @@
+<div class="flex flex-col gap-4">
+  <div role="alert" class="flex gap-4 items-center">
+    <%= t(".subheading") %>
+  </div>
+  <div class="card bg-neutral">
+    <div class="p-5">
+      <div class="flex items-center gap-4">
+        <div class="flex-grow flex flex-col">
+          <span class="font-mono font-bold">
+            <%= @email.email %>
+          </span>
+          <span class="text-xs">
+            <%= t(".added") %>
+            <%= @email.created_at.strftime("on %B%e, %Y") %>
+          </span>
+        </div>
+        <a
+          role="button"
+          href="<%= email_verify_url(email: @email, approve: true)%>"
+          class="btn"
+        >
+          <%= lucide_icon("mail-check", class: "stroke-success") %>
+          <%= t(".verify") %>
+        </a>
+      </div>
+    </div>
+  </div>
+  <div>
+    <%= t(".call_to_action") %>
+  </div>
+  <div>
+    <%= t(".sign_off") %>
+  </div>
+</div>
