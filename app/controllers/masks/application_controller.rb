@@ -8,6 +8,8 @@ module Masks
 
     skip_before_action :verify_authenticity_token, if: :json_request?
 
+    protect_from_forgery with: :exception
+
     private
 
     def json_request?
@@ -21,9 +23,9 @@ module Masks
     end
 
     def require_sudo(redirect)
-      return if current_mask.type == "sudo" && passed?
+      return if current_mask.type == 'sudo' && passed?
 
-      flash[:errors] = ["enter a valid password"]
+      flash[:errors] = ['enter a valid password']
 
       redirect_to redirect
     end
