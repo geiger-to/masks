@@ -9,7 +9,7 @@ GIT
 PATH
   remote: .
   specs:
-    masks (0.1.0)
+    masks (1.0.0)
       alba
       bcrypt (~> 3.1)
       cssbundling-rails (~> 1.3)
