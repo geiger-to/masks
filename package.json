@@ -4,7 +4,7 @@
   "dependencies": {
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo-rails": "^7.3.0",
-    "daisyui": "^4.4.6",
+    "daisyui": "^4.7.2",
     "postcss": "^8.4.32",
     "postcss-import": "^16.0.0",
     "esbuild": "^0.19.5",
