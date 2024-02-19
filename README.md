@@ -40,11 +40,11 @@ also build custom credentials, checks, models, and more...
 
 #### an example `masks.json`
 
-    {
-      "name": "example",
-      "url": "http://example.com",
-      "logo": "...",
-      "extend": "masks"
-    }
-
-This abstraction is designed to make it easy to use masks in many different contexts.
+```json
+{
+  "name": "example",
+  "url": "http://example.com",
+  "logo": "...",
+  "extend": "masks"
+}
+```
