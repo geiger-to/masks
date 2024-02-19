@@ -16,9 +16,12 @@
     "tailwindcss": "^3.4.0"
   },
   "scripts": {
-    "fmt": "bin/fmt",
+    "fmt": "bin/lint --fix",
+    "lint": "bin/lint",
     "fmt:prettier": "prettier --write .",
     "fmt:rubocop": "bundle exec rubocop -A",
+    "lint:prettier": "prettier --check .",
+    "lint:rubocop": "bundle exec rubocop",
     "dev": "foreman start -f Procfile.dev",
     "site": "bundle exec jekyll serve",
     "docs": "yard server --reload -o _site/api",

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+ if [ "$1" =  "--fix" ]
+   then
+    npm run fmt:prettier
+    npm run fmt:rubocop
+ else
+    npm run lint:prettier
+    npm run lint:rubocop
+ fi
+
