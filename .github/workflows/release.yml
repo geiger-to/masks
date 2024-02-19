@@ -12,6 +12,9 @@ name: release-please
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    env:
+      # The name of your gem/package.
+      GEM_NAME: 'masks'
     steps:
       - uses: google-github-actions/release-please-action@v4
         with:

@@ -1,5 +1,7 @@
 {
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
+  "package-name": "masks",
+  "version-file": "lib/masks/version.rb",
   ".": "0.1.1"
 }
