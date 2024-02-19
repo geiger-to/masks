@@ -6,7 +6,7 @@
     "@hotwired/turbo-rails": "^8.0.2",
     "daisyui": "^4.7.2",
     "postcss": "^8.4.32",
-    "postcss-import": "^16.0.0",
+    "postcss-import": "^16.0.1",
     "esbuild": "^0.20.1",
     "@prettier/plugin-ruby": "^4.0.4",
     "@tailwindcss/typography": "^0.5.10",
