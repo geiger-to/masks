@@ -1,5 +1,9 @@
 {
-  "bump-minor-pre-major": true,
-  "bump-patch-for-minor-pre-major": true,
-  ".": "0.1.1"
+  "release-type": "ruby",
+  "packages": {
+    ".": {
+      "release-type": "ruby",
+      "package-name": "masks"
+    }
+  }
 }
