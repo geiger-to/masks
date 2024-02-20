@@ -7,6 +7,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  id-token: write
 
 name: release-please
 
@@ -19,20 +20,13 @@ jobs:
     steps:
       - uses: google-github-actions/release-please-action@v4
         id: release
-      - uses: actions/checkout@v2
-        if: ${{ steps.release.outputs.release_created }}
-      - uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.1
+      - uses: actions/checkout@v3
         if: ${{ steps.release.outputs.release_created }}
       - name: setup ruby
         uses: ruby/setup-ruby@v1
         with:
           bundler-cache: true
-          ruby-version: 3.1.4
-        if: ${{ steps.release.outputs.release_created }}
-      - name: checkout code
-        uses: actions/checkout@v3
+          ruby-version: ruby-3.1
         if: ${{ steps.release.outputs.release_created }}
       - uses: rubygems/release-gem@v1
         if: ${{ steps.release.outputs.release_created }}
