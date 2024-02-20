@@ -3,4 +3,6 @@ build
 coverage
 app/assets/builds
 dummy/db/schema.rb
+.release-please-manifest.json
+CHANGELOG.md
 .ruby-lsp
