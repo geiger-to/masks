@@ -9,7 +9,7 @@ gemspec
 
 gem "puma"
 gem "sqlite3"
-gem "yard", "~> 0.9.34"
+gem "yard", "~> 0.9.35"
 
 # Start debugger with binding.b [https://github.com/ruby/debug]
 gem "byebug"
