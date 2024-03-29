@@ -14,28 +14,24 @@ the `masks:install` generator.
 
 If masks detects a file named `masks.json` in the current working directory or in `ENV['MASKS_DIR']` then it will be used as defaults.
 
-<details>
+#### example masks.json
 
-<summary>example masks.json</summary>
-
-{% highlight json %}
+```json
 {
-"name": "my-app",
-"url": "http://localhost:3000",
-"extend": "masks",
-"masks": [
-{
-"skip": true,
-"request": {
-"method": "get",
-"path": "/assets/*"
+  "name": "my-app",
+  "url": "http://localhost:3000",
+  "extend": "masks",
+  "masks": [
+    {
+      "skip": true,
+      "request": {
+        "method": "get",
+        "path": "/assets/*"
+      }
+    }
+  ]
 }
-}
-]
-}
-{% endhighlight %}
-
-</details>
+```
 
 ## Masks.configure
 
@@ -50,20 +46,16 @@ abilities outlined in the [API docs](/api).
   </span>
 </div>
 
-<details>
+#### example Masks.configure
 
-<summary>example masks initializer</summary>
-
-{% highlight ruby %}
+```ruby
 Masks.configure do |config|
-config.name = "my-app"
-config.masks = [
-...
-]
+  config.name = "my-app"
+  config.masks = [
+    # supports the same data structure as masks.json
+  ]
 end
-{% endhighlight %}
-
-</details>
+```
 
 Generally speaking, configuration specified using `Masks.configure` will overwrite whatever is
 in `masks.json`.
