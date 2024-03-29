@@ -54,6 +54,6 @@ gem "syntax_tree-rbs", "~> 1.0"
 
 gem "brakeman", "~> 6.1"
 
-gem "rubocop", "~> 1.60"
+gem "rubocop", "~> 1.62"
 
 gem "bundler-audit", "~> 0.9.1"
