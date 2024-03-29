@@ -7,7 +7,7 @@
     "daisyui": "^4.8.0",
     "postcss": "^8.4.32",
     "postcss-import": "^16.0.1",
-    "esbuild": "^0.20.1",
+    "esbuild": "^0.20.2",
     "@prettier/plugin-ruby": "^4.0.4",
     "@tailwindcss/typography": "^0.5.10",
     "autoprefixer": "^10.4.16",
