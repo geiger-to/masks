@@ -148,7 +148,7 @@
       "request": {
         "path": ["/actors", "/actors/*"]
       },
-      "fail": false
+      "fail": "/session"
     },
     {
       "type": "session",
@@ -167,6 +167,9 @@
     },
     {
       "access": "actor.password"
+    },
+    {
+      "access": "actor.scopes"
     }
   ],
   "types": {
