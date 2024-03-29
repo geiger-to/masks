@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.homepage = "https://masks.geiger.to"
   spec.summary = "mask ruby applications with auth"
   spec.description =
-    "masks is a ruby library and rails engine that adds simple, extensible auth to most applications."
+    "masks is a ruby library and rails engine that adds simple, extensible auth to most applications. DO NOT USE"
   spec.license = "MIT"
   spec.required_ruby_version = "~> 3.1"
 

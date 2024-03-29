@@ -13,7 +13,7 @@ standalone: true
 <div class="hero rounded">
   <div class="hero-content text-center">
     <div class="max-w-md">
-      <h1 class="text-5xl font-bold text-white">masks <span class="text-2xl text-base-content font-normal font-mono">v0.1</span></h1>
+      <h1 class="text-5xl font-bold text-white">masks <span class="text-2xl text-base-content font-normal font-mono">{% version %}</span></h1>
       <p class="py-6">masks is an access control framework for Ruby/Rails apps.</p>
       <div class="flex items-center justify-center">
         <a href="/docs" class="btn btn-primary">Read the guides</a>
