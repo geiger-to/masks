@@ -37,8 +37,9 @@ namespace :masks do
       exit 1
     end
 
+    scopes = args[:scopes].split(';')
     access = cli_access("actor.scopes", as: args[:actor])
-    access&.assign_scopes(args[:scopes].split(";"))
+    access&.assign_scopes(scopes)
 
     if !access
       puts "could not find actor..."
@@ -46,7 +47,7 @@ namespace :masks do
       puts "failed to assign scopes to '#{access.actor.nickname}'"
       puts "error: #{access.actor.errors.full_messages.join(", ")}"
     else
-      puts "assigned scopes to '#{access.actor.nickname}'"
+      puts "assigned scopes '#{scopes.join(', ')}' to '#{access.actor.nickname}'"
     end
   end
 
