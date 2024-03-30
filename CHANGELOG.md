@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.2](https://github.com/geiger-to/masks/compare/masks/v0.3.1...masks/v0.3.2) (2024-03-29)
+
+
+### Bug Fixes
+
+* add rules to allow rake masks:assign_scopes ([44d10e5](https://github.com/geiger-to/masks/commit/44d10e5731276012aaa3276be3a76a1ed694563f))
+* redirect to /session on failed manager access ([5151a25](https://github.com/geiger-to/masks/commit/5151a25c87c769ab1451943be491058acc4ca947))
+
 ## [0.3.1](https://github.com/geiger-to/masks/compare/masks/v0.3.0...masks/v0.3.1) (2024-03-29)
 
 
