@@ -17,7 +17,7 @@ gem "debug", ">= 1.0.0"
 gem "mocha"
 
 gem "htmlbeautifier", "~> 1.4"
-gem "letter_opener", "~> 1.8"
+gem "letter_opener", "~> 1.10"
 gem "lucide-rails",
     "~> 0.2.0",
     github: "zest-ui/lucide-rails",
