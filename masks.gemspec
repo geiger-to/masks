@@ -35,6 +35,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "device_detector"
   spec.add_dependency "fuzzyurl", "~> 0.9.0"
   spec.add_dependency "jsbundling-rails", "~> 1.2"
+  spec.add_dependency "openid_connect", "~> 2.3"
   spec.add_dependency "pagy"
   spec.add_dependency "phonelib"
   spec.add_dependency "premailer-rails", "~> 1"
@@ -45,6 +46,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sprockets-rails"
   spec.add_dependency "stimulus-rails", "~> 1.3"
   spec.add_dependency "turbo-rails", ">= 1.5", "< 3.0"
-  spec.add_dependency "valid_email"
+  spec.add_dependency "valid_email", "~> 0.2"
   spec.metadata["rubygems_mfa_required"] = "true"
 end

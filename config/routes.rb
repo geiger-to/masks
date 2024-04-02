@@ -39,6 +39,11 @@ Masks::Engine.routes.draw do
   get "backup-codes", to: "backup_codes#new", as: :backup_codes
   post "backup-codes", to: "backup_codes#create"
 
+  # OAuth/OpenID support
+  get 'authorize', to: "openid/authorizations#new", as: :openid_authorization
+  post 'authorize', to: "openid/authorizations#create"
+  post 'token', to: proc { |env| Masks::OpenID::Token.new.call(env) }
+
   # managers-only section
   get "actors", to: "manage/actors#index", as: :actors
   get "actors/:actor", to: "manage/actor#show", as: :actor

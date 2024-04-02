@@ -153,6 +153,21 @@
     {
       "type": "session",
       "request": {
+        "method": "get",
+        "path": "/authorize"
+      },
+      "fail": false
+    },
+    {
+      "skip": true,
+      "request": {
+        "method": "post",
+        "path": "/token"
+      }
+    },
+    {
+      "type": "session",
+      "request": {
         "path": "*"
       },
       "fail": "/session"

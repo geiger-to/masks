@@ -1,0 +1,46 @@
+<div>
+  <%= form_with url: request.url, method: :post, data: { turbo: false } do |form| %>
+    <div class="hero">
+      <div class="hero-content text-left">
+        <div class="">
+          <h1 class="text-4xl font-bold mb-4 text-black dark:text-white">
+            <%= t(".authorize_client", name: @authorization.client.name) %>
+          </h1>
+
+          <p class="mb-4 text-left">
+            <% if @authorization.scopes.any? %>
+              <%= t('.authorize_scoped', name: @authorization.client.name) %>
+            <% else %>
+              <%= t('.authorize_account', name: @authorization.client.name) %>
+            <% end%>
+          </p>
+
+          <% if @authorization.scopes.any? %>
+            <div class="divider my-0"></div>
+
+            <table class="table">
+              <tbody>
+                <% @authorization.scopes.each do |scope| %>
+                  <tr>
+                    <th><%= t("scope.#{scope}_name") %></td>
+                    <td>
+                      <%= t("scope.#{scope}_desc") %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+
+            <div class="divider mt-0 mb-4"></div>
+          <% end %>
+
+          <div class="flex items-center gap-4 justify-center">
+            <input type="submit" name="approve" value="<%= t('.approve') %>" class="btn btn-success btn-sm">
+            <span>or</span>
+            <input type="submit" name="deny" value="<%= t('.deny') %>" class="btn btn-error btn-sm">
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

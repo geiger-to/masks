@@ -32,6 +32,15 @@ module Masks
       has_many :keys,
                class_name: Masks.configuration.models[:key],
                autosave: true
+      has_many :openid_authorizations,
+               class_name: Masks.configuration.models[:openid_authorization],
+               autosave: true
+      has_many :openid_access_tokens,
+               class_name: Masks.configuration.models[:openid_access_token],
+               autosave: true
+      has_many :openid_id_tokens,
+               class_name: Masks.configuration.models[:openid_id_token],
+               autosave: true
 
       has_secure_password
 

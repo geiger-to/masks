@@ -21,7 +21,7 @@ module Masks
           path =
             (
               if masked_session.passed?
-                masked_session.mask.pass ||
+                session.delete(:return_to) || masked_session.mask.pass ||
                   Masks.configuration.site_links[:after_login]
               else
                 masked_session.mask.fail ||
