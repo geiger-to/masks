@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 module Masks
   module Rails
     module OpenID
       class Client < ApplicationRecord
-        self.table_name = 'openid_clients'
+        self.table_name = "openid_clients"
 
         validates :name, presence: true
 
@@ -12,15 +13,21 @@ module Masks
         serialize :redirect_uris, coder: JSON
         serialize :response_types, coder: JSON
 
-        validates :subject_type, inclusion: { in: Masks.configuration.openid[:subject_types] }, presence: true
+        validates :subject_type,
+                  inclusion: {
+                    in: Masks.configuration.openid[:subject_types]
+                  },
+                  presence: true
         validates :response_types, presence: true
         validates :redirect_uris, presence: true
         validates :scopes, presence: true
 
-        has_many :access_tokens, class_name: Masks.configuration.models[:openid_access_token], 
-inverse_of: :openid_client
-        has_many :authorizations, class_name: Masks.configuration.models[:openid_authorization], 
-inverse_of: :openid_client
+        has_many :access_tokens,
+                 class_name: Masks.configuration.models[:openid_access_token],
+                 inverse_of: :openid_client
+        has_many :authorizations,
+                 class_name: Masks.configuration.models[:openid_authorization],
+                 inverse_of: :openid_client
 
         def private_key
           OpenSSL::PKey::RSA.new(rsa_private_key)
@@ -31,7 +38,9 @@ inverse_of: :openid_client
         end
 
         def subject(actor)
-          Digest::SHA256.hexdigest([sector_identifier, actor.actor_id, pairwise_salt].join('/'))
+          Digest::SHA256.hexdigest(
+            [sector_identifier, actor.actor_id, pairwise_salt].join("/")
+          )
         end
 
         def issuer
@@ -47,7 +56,7 @@ inverse_of: :openid_client
         end
 
         def pairwise_subject?
-          sector_identifier && subject_type == 'pairwise'
+          sector_identifier && subject_type == "pairwise"
         end
 
         private
@@ -59,7 +68,7 @@ inverse_of: :openid_client
           self.response_types ||= Masks.configuration.openid[:response_types]
           self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
           self.pairwise_salt ||= SecureRandom.uuid
-          self.subject_type ||= 'public'
+          self.subject_type ||= "public"
         end
 
         def sector_identifier

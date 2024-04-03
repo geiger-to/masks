@@ -1,16 +1,17 @@
+# frozen_string_literal: true
 class SupportOpenID < ActiveRecord::Migration[7.1]
   def change
     create_table :openid_clients do |t|
-      t.string  :name
-      t.string  :key
-      t.string  :secret
-      t.string  :pairwise_salt
-      t.string  :sector_identifier_uri
-      t.text    :scopes
-      t.string  :subject_type
-      t.text    :response_types
-      t.text    :redirect_uris
-      t.text    :rsa_private_key
+      t.string :name
+      t.string :key
+      t.string :secret
+      t.string :pairwise_salt
+      t.string :sector_identifier_uri
+      t.text :scopes
+      t.string :subject_type
+      t.text :response_types
+      t.text :redirect_uris
+      t.text :rsa_private_key
       t.boolean :consent
 
       t.timestamps

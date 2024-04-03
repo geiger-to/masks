@@ -1,18 +1,21 @@
+# frozen_string_literal: true
 module Masks
   module Rails
     module OpenID
       class IdToken < ApplicationRecord
-        self.table_name = 'openid_id_tokens'
+        self.table_name = "openid_id_tokens"
 
         belongs_to :actor, class_name: Masks.configuration.models[:actor]
-        belongs_to :openid_client, class_name: Masks.configuration.models[:openid_client]
+        belongs_to :openid_client,
+                   class_name: Masks.configuration.models[:openid_client]
 
         def to_response_object(with = {})
-          subject = if openid_client.pairwise_subject?
-            openid_client.subject_for(actor)
-          else
-            actor.actor_id
-          end
+          subject =
+            if openid_client.pairwise_subject?
+              openid_client.subject_for(actor)
+            else
+              actor.actor_id
+            end
 
           claims = {
             sub: subject,
@@ -20,7 +23,7 @@ module Masks
             aud: openid_client.audience,
             exp: expires_at.to_i,
             iat: created_at.to_i,
-            nonce:,
+            nonce:
           }
 
           id_token = OpenIDConnect::ResponseObject::IdToken.new(claims)

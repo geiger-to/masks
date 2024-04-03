@@ -72,10 +72,10 @@ module Masks
     # @return [String]
     def openid
       {
-        scopes: ['openid', 'profile', 'email', 'address', 'phone'],
-        subject_types: ['public', 'pairwise'],
-        response_types: ['code', 'token', 'id_token'],
-        pairwise_salt: "masks",
+        scopes: %w[openid profile email address phone],
+        subject_types: %w[public pairwise],
+        response_types: %w[code token id_token],
+        pairwise_salt: "masks"
       }.merge(super || data.fetch(:openid, {}))
     end
 

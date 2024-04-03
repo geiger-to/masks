@@ -266,7 +266,7 @@ en:
     openid:
       authorizations:
         new:
-          authorize_client: 'authorize %{name}?'
+          authorize_client: "authorize %{name}?"
           authorize_account: "%{name} wants access to your account."
           authorize_scoped: "%{name} wants access to your account and the following data:"
           approve: approve

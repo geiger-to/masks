@@ -1,3 +1,2 @@
-ActiveSupport::Inflector.inflections(:en) do |inflect|
-  inflect.acronym "OpenID"
-end
+# frozen_string_literal: true
+ActiveSupport::Inflector.inflections(:en) { |inflect| inflect.acronym "OpenID" }

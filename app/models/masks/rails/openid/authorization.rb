@@ -1,13 +1,15 @@
+# frozen_string_literal: true
 module Masks
   module Rails
     module OpenID
       class Authorization < ApplicationRecord
-        self.table_name = 'openid_authorizations'
+        self.table_name = "openid_authorizations"
 
         scope :valid, -> { where("expires_at >= ?", Time.now.utc) }
 
         belongs_to :actor, class_name: Masks.configuration.models[:actor]
-        belongs_to :openid_client, class_name: Masks.configuration.models[:openid_client]
+        belongs_to :openid_client,
+                   class_name: Masks.configuration.models[:openid_client]
 
         serialize :scopes, coder: JSON
 
@@ -23,7 +25,8 @@ module Masks
         end
 
         def access_token
-          @access_token ||= update_attribute!(:expires_at, Time.now) && generate_access_token!
+          @access_token ||=
+            update_attribute!(:expires_at, Time.now) && generate_access_token!
         end
 
         def generate_access_token!

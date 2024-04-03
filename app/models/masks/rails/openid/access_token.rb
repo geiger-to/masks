@@ -1,11 +1,15 @@
+# frozen_string_literal: true
 module Masks
   module Rails
     module OpenID
       class AccessToken < ApplicationRecord
-        self.table_name = 'openid_access_tokens'
+        self.table_name = "openid_access_tokens"
 
-        belongs_to :actor, class_name: Masks.configuration.models[:actor], optional: true
-        belongs_to :openid_client, class_name: Masks.configuration.models[:openid_client]
+        belongs_to :actor,
+                   class_name: Masks.configuration.models[:actor],
+                   optional: true
+        belongs_to :openid_client,
+                   class_name: Masks.configuration.models[:openid_client]
 
         serialize :scopes, coder: JSON
 
@@ -16,9 +20,7 @@ module Masks
         validates :expires_at, presence: true
 
         def scoped?(*scopes)
-          scopes.all? do |scope|
-            self.scopes.include?(scope)
-          end
+          scopes.all? { |scope| self.scopes.include?(scope) }
         end
 
         def to_bearer_token

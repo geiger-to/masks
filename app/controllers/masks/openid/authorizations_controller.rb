@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Masks
   module OpenID
     class AuthorizationsController < ApplicationController
@@ -29,12 +30,12 @@ module Masks
 
         _status, header, = @authorization.response
 
-        if header['WWW-Authenticate'].present?
-          headers['WWW-Authenticate'] = header['WWW-Authenticate']
+        if header["WWW-Authenticate"].present?
+          headers["WWW-Authenticate"] = header["WWW-Authenticate"]
         end
 
-        if header['Location']
-          redirect_to header['Location']
+        if header["Location"]
+          redirect_to header["Location"]
         else
           render :new
         end
