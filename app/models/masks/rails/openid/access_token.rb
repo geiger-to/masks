@@ -3,7 +3,11 @@ module Masks
   module Rails
     module OpenID
       class AccessToken < ApplicationRecord
+        include Masks::Scoped
+
         self.table_name = "openid_access_tokens"
+
+        scope :valid, -> { where("expires_at >= ?", Time.now.utc) }
 
         belongs_to :actor,
                    class_name: Masks.configuration.models[:actor],
@@ -19,8 +23,16 @@ module Masks
         validates :token, presence: true, uniqueness: true
         validates :expires_at, presence: true
 
-        def scoped?(*scopes)
-          scopes.all? { |scope| self.scopes.include?(scope) }
+        def scopes
+          value = self[:scopes]
+
+          return [] unless value
+
+          value & ((actor&.scopes || []) + openid_client.scopes)
+        end
+
+        def roles(*args, **opts)
+          (actor || openid_client).roles(*args, **opts)
         end
 
         def to_bearer_token

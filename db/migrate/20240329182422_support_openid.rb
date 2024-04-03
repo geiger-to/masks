@@ -5,6 +5,7 @@ class SupportOpenID < ActiveRecord::Migration[7.1]
       t.string :name
       t.string :key
       t.string :secret
+      t.text :grant_types
       t.string :pairwise_salt
       t.string :sector_identifier_uri
       t.text :scopes

@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 module Masks
   module OpenID
+    # Implementation of the Token Endpoint in OIDC.
+    #
+    # Technically speaking, this conforms to the rack interface
+    # so it can be used directly for managing requests for access
+    # tokens.
     class Token
       attr_accessor :app
 
@@ -28,7 +33,7 @@ module Masks
               access_token = authorization.access_token
               res.access_token = access_token.to_bearer_token
 
-              if access_token.scoped?("openid")
+              if access_token.scope?("openid")
                 res.id_token =
                   access_token
                     .actor

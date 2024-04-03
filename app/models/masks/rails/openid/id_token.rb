@@ -34,7 +34,7 @@ module Masks
 
         def to_jwt(with = {})
           to_response_object(with).to_jwt(openid_client.private_key) do |jwt|
-            jwt.kid = openid_client.private_key_id
+            jwt.kid = openid_client.kid
           end
         end
       end

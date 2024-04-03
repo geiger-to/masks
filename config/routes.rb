@@ -40,9 +40,25 @@ Masks::Engine.routes.draw do
   post "backup-codes", to: "backup_codes#create"
 
   # OAuth/OpenID support
+  get "client/:id/.well-known/openid-configuration",
+      to: "openid/discoveries#new",
+      as: :openid_discovery
+  get "client/:id/jwks.json", to: "openid/discoveries#jwks", as: :openid_jwks
+  get "client/:id",
+      to:
+        redirect { |params, _|
+          "client/#{params[:id]}/.well-known/openid-configuration"
+        },
+      as: :openid_issuer
   get "authorize", to: "openid/authorizations#new", as: :openid_authorization
   post "authorize", to: "openid/authorizations#create"
-  post "token", to: proc { |env| Masks::OpenID::Token.new.call(env) }
+  post "token",
+       to: proc { |env| Masks::OpenID::Token.new.call(env) },
+       as: :openid_token
+  match "userinfo",
+        to: "openid/userinfo#show",
+        via: %i[get post],
+        as: :openid_userinfo
 
   # managers-only section
   get "actors", to: "manage/actors#index", as: :actors

@@ -75,6 +75,12 @@ module Masks
         scopes: %w[openid profile email address phone],
         subject_types: %w[public pairwise],
         response_types: %w[code token id_token],
+        grant_types: %w[
+          client_credentials
+          authorization_code
+          implicit
+          refresh_token
+        ],
         pairwise_salt: "masks"
       }.merge(super || data.fetch(:openid, {}))
     end

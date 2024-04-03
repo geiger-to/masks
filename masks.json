@@ -28,13 +28,6 @@
       "fail": false
     },
     {
-      "type": "api",
-      "request": {
-        "path": ["*"],
-        "header": "Authorization"
-      }
-    },
-    {
       "type": "authenticate",
       "request": {
         "method": "post",
@@ -159,10 +152,24 @@
       "fail": false
     },
     {
+      "type": "access_token",
+      "request": {
+        "method": ["get", "post"],
+        "path": "/userinfo"
+      }
+    },
+    {
       "skip": true,
       "request": {
         "method": "post",
         "path": "/token"
+      }
+    },
+    {
+      "skip": true,
+      "request": {
+        "method": "get",
+        "path": "/client/*"
       }
     },
     {
@@ -274,6 +281,13 @@
         "recovery": {}
       },
       "credentials": ["Session", "Recovery", "Device"]
+    },
+    "access_token": {
+      "checks": {
+        "access_token": {},
+        "device": {}
+      },
+      "credentials": ["AccessToken", "Device"]
     },
     "api": {
       "checks": {

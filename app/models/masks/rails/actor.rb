@@ -61,6 +61,10 @@ module Masks
 
       serialize :backup_codes, coder: JSON
 
+      def primary_email
+        emails.where(verified: true).first
+      end
+
       def email_addresses
         emails.pluck(:email)
       end

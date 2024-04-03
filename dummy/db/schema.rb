@@ -108,6 +108,7 @@ ActiveRecord::Schema[7.1].define(version: 20_240_329_182_422) do
     t.string "name"
     t.string "key"
     t.string "secret"
+    t.text "grant_types"
     t.string "pairwise_salt"
     t.string "sector_identifier_uri"
     t.text "scopes"
