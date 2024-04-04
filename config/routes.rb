@@ -61,7 +61,17 @@ Masks::Engine.routes.draw do
         as: :openid_userinfo
 
   # managers-only section
-  get "actors", to: "manage/actors#index", as: :actors
-  get "actors/:actor", to: "manage/actor#show", as: :actor
-  patch "actors/:actor", to: "manage/actor#update"
+  namespace :manage do
+    get "/", to: "dashboard#index"
+
+    # manage clients
+    get "clients", to: "clients#index", as: :clients
+    get "clients/:id", to: "client#show", as: :client
+    patch "clients/:id", to: "client#update"
+
+    # manage actors
+    get "actors", to: "actors#index", as: :actors
+    get "actors/:actor", to: "actor#show", as: :actor
+    patch "actors/:actor", to: "actor#update"
+  end
 end

@@ -1,17 +1,11 @@
 <div class="flex flex-col gap-1 mb-4">
   <div class="flex items-center gap-2">
-              <div class="avatar">
-                <div class="mask mask-squircle w-6 h-6 p-0.5 bg-neutral box-border">
-                  <%= lucide_icon('user', class: 'w-5 h-5') %>
-                </div>
-              </div>
+    <%= lucide_icon('user', class: 'w-5 h-5') %>
 
     <div class="text-xl font-bold">
       <%= @actor.nickname %>
     </div>
   </div>
-
-
 </div>
 
 <div class="bg-base-300 flex flex-col gap-4 p-4 rounded-xl mb-4">
@@ -21,7 +15,7 @@
       <div class="text-sm flex-grow">
         <b class="text-neutral-content">last login</b> <%= time_ago_in_words(@actor.last_login_at) %> ago
       </div>
-      <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+      <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
         <input type="submit" class="btn hover:btn-error btn-xs" name="logout" value="logout">
       <% end %>
     <% else %>
@@ -41,7 +35,7 @@
     <% end %>
       </div>
 
-    <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+    <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
       <input type="submit" class="btn hover:btn-error btn-xs" name="reset_password" value="reset">
     <% end %>
   </div>
@@ -53,7 +47,7 @@
 
     </div>
     <% if @actor.factor2? %>
-      <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+      <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
         <input type="submit" class="btn hover:btn-error btn-xs" name="remove_factor2" value="remove">
       <% end %>
     <% end %>
@@ -98,7 +92,7 @@
       <tbody>
           <tr>
             <td colspan="2">
-                <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+                <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
               <div class="flex items-center gap-2">
                   <%= lucide_icon('plus-square', class: 'text-base-300-content') %>
                   <input type="text" name="add_scope" class="flex-grow input input-sm" placeholder="add a scope..." />
@@ -111,7 +105,7 @@
           <tr>
             <td class="font-mono w-full"><%= scope %></td>
             <td class="">
-              <%= form_with url: actor_path(@actor), method: :patch do |form| %>
+              <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
                 <input type="hidden" name="remove_scope" value="<%= scope %>">
 
                 <button type="submit" class="btn btn-ghost btn-error hover:btn-outline btn-xs">

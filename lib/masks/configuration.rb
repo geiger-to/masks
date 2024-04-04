@@ -73,7 +73,7 @@ module Masks
     def openid
       {
         scopes: %w[openid profile email address phone],
-        subject_types: %w[public pairwise],
+        subject_types: %w[nickname email pairwise],
         response_types: %w[code token id_token],
         grant_types: %w[
           client_credentials

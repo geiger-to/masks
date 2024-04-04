@@ -17,7 +17,7 @@ module Masks
 
         serialize :scopes, coder: JSON
 
-        after_initialize :generate_token
+        before_validation :generate_token
 
         validates :openid_client, presence: true
         validates :token, presence: true, uniqueness: true
@@ -46,7 +46,7 @@ module Masks
 
         def generate_token
           self.token ||= SecureRandom.uuid
-          self.expires_at ||= 1.day.from_now
+          self.expires_at ||= openid_client.token_expires_at
           self.scopes ||= []
         end
       end

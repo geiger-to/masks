@@ -29,7 +29,9 @@ module Masks
                    claims_parameter_supported: false,
                    request_parameter_supported: false,
                    request_uri_parameter_supported: false,
-                   subject_types_supported: [client.subject_type],
+                   subject_types_supported: [
+                     client.pairwise_subject? ? "pairwise" : "public"
+                   ],
                    id_token_signing_alg_values_supported: [:RS256],
                    token_endpoint_auth_methods_supported: %w[
                      client_secret_basic

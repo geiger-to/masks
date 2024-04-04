@@ -12,6 +12,7 @@ require "alba"
 require "pagy"
 require "device_detector"
 require "active_model"
+require "chronic_duration"
 
 # Top-level module for masks.
 #

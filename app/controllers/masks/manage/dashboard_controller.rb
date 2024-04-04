@@ -3,11 +3,10 @@
 module Masks
   # @visibility private
   module Manage
-    class ActorsController < BaseController
-      section :actors
+    class DashboardController < BaseController
+      section :dashboard
 
       def index
-        @pagy, @actors = pagy(Masks::Rails::Actor.all)
       end
     end
   end

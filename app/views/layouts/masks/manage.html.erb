@@ -9,12 +9,29 @@
     <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
   </head>
   <body class="h-full">
-    <div class="navbar my-2 join box-border px-6">
-      <div class="flex items-center gap-1 bg-accent rounded px-2 py-1.5 join-item">
-        <%= image_tag "masks.png", class: 'w-5 h-5 rounded-full border-black border' %>
+    <div class="navbar bg-base-100 mb-6">
+      <div class="navbar-start">
+        <div class="dropdown">
+          <div tabindex="0" role="button" class="btn btn-ghost text-lg">
+            masks
+          </div>
+          <ul tabindex="0" class="menu  dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 gap-1">
+            <li><a class="<%= section == :dashboard ? 'active' : ''%>" href="<%=manage_path%>"%>Dashboard</a></li>
+            <li><a class="<%= section == :actors ? 'active' : ''%>" href="<%=manage_actors_path%>"%>Actors</a></li>
+            <li><a class="<%= section == :clients ? 'active' : ''%>" href="<%=manage_clients_path%>"%>Clients</a></li>
+            <li><a>Settings</a></li>
+          </ul>
+        </div>
       </div>
-      <div class="flex items-center bg-base-100 rounded px-2 py-1.5 join-item">
-        <a href="<%= actors_path %>" class="text-sm text-accent-content opacity-75 hover:opacity-100 hover:underline focus:underline font-mono">/manage</a>
+
+      <div class="navbar-end pr-2">
+        <a href="<%= manage_actor_path(current_actor) %>">
+          <div class="avatar placeholder">
+            <div class="bg-neutral text-neutral-content rounded-full w-10">
+              <span class="text-base"><%= current_actor.nickname.slice(0, 1).upcase %></span>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
 

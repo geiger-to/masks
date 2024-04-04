@@ -16,14 +16,18 @@ module Masks
         serialize :response_types, coder: JSON
         serialize :grant_types, coder: JSON
 
+        validates :key, :secret, :scopes, :redirect_uris, presence: true
+        validates :client_type,
+                  inclusion: {
+                    in: %w[public confidential]
+                  },
+                  presence: true
         validates :subject_type,
                   inclusion: {
                     in: Masks.configuration.openid[:subject_types]
                   },
                   presence: true
-        validates :response_types, presence: true
-        validates :redirect_uris, presence: true
-        validates :scopes, presence: true
+        validate  :validate_expiries
 
         has_many :access_tokens,
                  class_name: Masks.configuration.models[:openid_access_token],
@@ -34,6 +38,28 @@ module Masks
         has_many :saved_roles,
                  class_name: Masks.configuration.models[:role],
                  autosave: true
+
+        def to_param
+          key
+        end
+
+        def response_types
+          case client_type
+          when "confidential"
+            ["code"]
+          when "public"
+            %w[token id_token]
+          end
+        end
+
+        def grant_types
+          case client_type
+          when "confidential"
+            %w[refresh_token authorization_code client_credentials]
+          else
+            []
+          end
+        end
 
         def scopes
           self[:scopes]
@@ -68,9 +94,20 @@ module Masks
         delegate :public_key, to: :private_key
 
         def subject(actor)
-          Digest::SHA256.hexdigest(
-            [sector_identifier, actor.actor_id, pairwise_salt].join("/")
-          )
+          case subject_type
+          when "nickname"
+            actor.nickname
+          when "email"
+            actor.primary_email
+          else
+            Digest::SHA256.hexdigest(
+              [
+                sector_identifier,
+                actor.actor_id,
+                Masks.configuration.openid[:pairwise_salt]
+              ].join("/")
+            )
+          end
         end
 
         def audience
@@ -85,25 +122,51 @@ module Masks
           sector_identifier && subject_type == "pairwise"
         end
 
+        def assign_scopes!(*scopes)
+          self.scopes = [*scopes, *self.scopes].uniq.compact
+          save!
+        end
+
+        def remove_scopes!(*scopes)
+          scopes.each { |scope| self.scopes.delete(scope) }
+
+          save!
+        end
+
+        def code_expires_at
+          Time.now + ChronicDuration.parse(code_expires_in)
+        end
+
+        def token_expires_at
+          Time.now + ChronicDuration.parse(token_expires_in)
+        end
+
+        def refresh_expires_at
+          Time.now + ChronicDuration.parse(refresh_expires_in)
+        end
+
         private
 
         def generate_credentials
           self.key ||= name.parameterize
           self.secret ||= SecureRandom.uuid
+          self.client_type ||= "confidential"
+          self.subject_type ||= "nickname"
           self.scopes ||= Masks.configuration.openid[:scopes] || []
-          self.grant_types ||= Masks.configuration.openid[:grant_types]
-          self.response_types ||= Masks.configuration.openid[:response_types]
           self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
-          self.pairwise_salt ||= SecureRandom.uuid
-          self.subject_type ||= "public"
+          self.sector_identifier ||=
+            URI.parse(Masks.configuration.site_url).host
+          self.code_expires_in ||= "5 minutes"
+          self.token_expires_in ||= "1 day"
+          self.refresh_expires_in ||= "1 week"
         end
 
-        def sector_identifier
-          return unless sector_identifier_uri
-
-          URI.parse(sector_identifier_uri).host
-        rescue URI::InvalidURIError
-          nil
+        def validate_expiries
+          %i[code_expires_in token_expires_in refresh_expires_in].each do |param|
+            unless ChronicDuration.parse(send(param))
+              errors.add(param, :invalid)
+            end
+          end
         end
       end
     end

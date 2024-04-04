@@ -31,6 +31,7 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "alba"
   spec.add_dependency "bcrypt", "~> 3.1"
+  spec.add_dependency "chronic_duration", "~> 0.10"
   spec.add_dependency "cssbundling-rails", "~> 1.3"
   spec.add_dependency "device_detector"
   spec.add_dependency "fuzzyurl", "~> 0.9.0"

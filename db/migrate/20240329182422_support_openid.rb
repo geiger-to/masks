@@ -5,15 +5,16 @@ class SupportOpenID < ActiveRecord::Migration[7.1]
       t.string :name
       t.string :key
       t.string :secret
-      t.text :grant_types
-      t.string :pairwise_salt
-      t.string :sector_identifier_uri
-      t.text :scopes
-      t.string :subject_type
-      t.text :response_types
+      t.string :client_type
       t.text :redirect_uris
-      t.text :rsa_private_key
+      t.text :scopes
       t.boolean :consent
+      t.string :subject_type
+      t.string :sector_identifier
+      t.string :code_expires_in
+      t.string :token_expires_in
+      t.string :refresh_expires_in
+      t.text :rsa_private_key
 
       t.timestamps
 

@@ -61,6 +61,10 @@ module Masks
 
       serialize :backup_codes, coder: JSON
 
+      def to_param
+        nickname
+      end
+
       def primary_email
         emails.where(verified: true).first
       end

@@ -13,7 +13,7 @@ module Masks
 
         serialize :scopes, coder: JSON
 
-        after_initialize :generate_code
+        before_validation :generate_code
 
         validates :actor, presence: true
         validates :openid_client, presence: true
@@ -36,10 +36,8 @@ module Masks
         private
 
         def generate_code
-          return if code
-
-          self.code = SecureRandom.uuid
-          self.expires_at = 5.minutes.from_now
+          self.code ||= SecureRandom.uuid
+          self.expires_at ||= openid_client.code_expires_at
         end
       end
     end
