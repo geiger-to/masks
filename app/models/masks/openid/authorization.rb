@@ -21,6 +21,9 @@ module Masks
               session.config.model(:openid_client).find_by(key: req.client_id)
 
             req.bad_request!(:client_id, "not found") unless @client
+            unless req.redirect_uri
+              req.invalid_request!('"redirect_uri" missing')
+            end
             res.redirect_uri = req.verify_redirect_uri!(@client.redirect_uris)
 
             @scopes = req.scope & @client.scopes
@@ -28,12 +31,6 @@ module Masks
             if res.protocol_params_location == :fragment && req.nonce.blank?
               req.invalid_request! "nonce required"
             end
-
-            # @request_object = if (@_request_ = req.request).present?
-            #   OpenIDConnect::RequestObject.decode req.request, nil # @client.secret
-            # elsif (@request_uri = req.request_uri).present?
-            #   OpenIDConnect::RequestObject.fetch req.request_uri, nil # @client.secret
-            # end
 
             if @client.response_types.include?(
                  Array(req.response_type).collect(&:to_s).join(" ")

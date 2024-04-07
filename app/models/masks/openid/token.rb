@@ -20,6 +20,8 @@ module Masks
                 .model(:openid_client)
                 .find_by(key: req.client_id) || req.invalid_client!
             client.secret == req.client_secret || req.invalid_client!
+            client.grant_types.include?(req.grant_type.to_s) ||
+              req.unsupported_grant_type!
 
             case req.grant_type
             when :client_credentials

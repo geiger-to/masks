@@ -22,12 +22,6 @@ module Masks
         # TODO: support incoming id_token request object + max_age parameter
         @authorization = Authorization.perform(request.env, **opts)
 
-        unless @authorization.actor
-          session[:return_to] = request.url
-
-          return redirect_to session_path
-        end
-
         _status, header, = @authorization.response
 
         if header["WWW-Authenticate"].present?
@@ -35,10 +29,16 @@ module Masks
         end
 
         if header["Location"]
-          redirect_to header["Location"]
-        else
-          render :new
+          return redirect_to header["Location"], allow_other_host: true
         end
+
+        unless @authorization.actor
+          session[:return_to] = request.url
+
+          return redirect_to session_path
+        end
+
+        render :new
       end
     end
   end

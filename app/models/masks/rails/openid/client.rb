@@ -27,7 +27,7 @@ module Masks
                     in: Masks.configuration.openid[:subject_types]
                   },
                   presence: true
-        validate  :validate_expiries
+        validate :validate_expiries
 
         has_many :access_tokens,
                  class_name: Masks.configuration.models[:openid_access_token],
@@ -48,7 +48,7 @@ module Masks
           when "confidential"
             ["code"]
           when "public"
-            %w[token id_token]
+            ["token", "id_token", "id_token token"]
           end
         end
 
@@ -97,8 +97,6 @@ module Masks
           case subject_type
           when "nickname"
             actor.nickname
-          when "email"
-            actor.primary_email
           else
             Digest::SHA256.hexdigest(
               [
@@ -162,7 +160,11 @@ module Masks
         end
 
         def validate_expiries
-          %i[code_expires_in token_expires_in refresh_expires_in].each do |param|
+          %i[
+            code_expires_in
+            token_expires_in
+            refresh_expires_in
+          ].each do |param|
             unless ChronicDuration.parse(send(param))
               errors.add(param, :invalid)
             end
