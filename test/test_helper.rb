@@ -166,6 +166,10 @@ module Masks
            }
     end
 
+    def add_client(name: "test", redirect_uris: "https://example.com", **opts)
+      Masks::Rails::OpenID::Client.create!(name:, redirect_uris:, **opts)
+    end
+
     def refute_logged_in
       get "/private"
       assert_equal 401, status

@@ -20,6 +20,7 @@ module Masks
     attribute :site_links
     attribute :site_logo
     attribute :lifetimes
+    attribute :openid
     attribute :masks
     attribute :models
     attribute :version
@@ -67,6 +68,23 @@ module Masks
       super || data.fetch(:url, nil)
     end
 
+    # Returns a string to use as the "issuer" for various secrets—TOTP, JWT, etc.
+    # @return [String]
+    def openid
+      {
+        scopes: %w[openid profile email address phone],
+        subject_types: %w[nickname email pairwise],
+        response_types: %w[code token id_token],
+        grant_types: %w[
+          client_credentials
+          authorization_code
+          implicit
+          refresh_token
+        ],
+        pairwise_salt: "masks"
+      }.merge(super || data.fetch(:openid, {}))
+    end
+
     # A hash of links—urls to various places on the frontend.
     #
     # These default to generated rails routes, but can be overridden
@@ -103,14 +121,6 @@ module Masks
 
     # A hash of default models the app relies on.
     #
-    # The following keys are available:
-    #
-    #   actor: +Masks::Rails::Actor+
-    #   role: +Masks::Rails::Role+
-    #   scope: +Masks::Rails::Scope+
-    #   email: +Masks::Rails::Email+
-    #   recovery: +Masks::Rails::Recovery+
-    #
     # This makes it easy to provide a substitute for key models
     # while still relying on the base active record implementation.
     #
@@ -124,6 +134,10 @@ module Masks
         recovery: "Masks::Rails::Recovery",
         device: "Masks::Rails::Device",
         key: "Masks::Rails::Key",
+        openid_client: "Masks::Rails::OpenID::Client",
+        openid_access_token: "Masks::Rails::OpenID::AccessToken",
+        openid_id_token: "Masks::Rails::OpenID::IdToken",
+        openid_authorization: "Masks::Rails::OpenID::Authorization",
         session_json: "Masks::SessionResource",
         request: "Masks::Sessions::Request",
         inline: "Masks::Sessions::Inline",
@@ -145,7 +159,6 @@ module Masks
     def mask(type)
       config = data.dig(:types, type.to_sym)
       raise Masks::Error::InvalidConfiguration, type unless config
-
       config
     end
 

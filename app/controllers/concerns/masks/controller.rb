@@ -85,7 +85,7 @@ module Masks
     # @return [Masks::Actor]
     # @visibility public
     def current_actor
-      masked_session.scoped
+      masked_session.actor
     end
 
     # Returns the mask for the request.

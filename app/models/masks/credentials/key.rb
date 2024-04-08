@@ -31,7 +31,7 @@ module Masks
       end
 
       def backup
-        session.scoped.touch(:accessed_at) if session&.passed? && accessed
+        session.extra(:key).touch(:accessed_at) if session&.passed? && accessed
       end
     end
   end

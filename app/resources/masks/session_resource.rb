@@ -9,7 +9,7 @@ module Masks
     attribute :authorized, &:passed?
 
     attribute :actor do |session|
-      ActorResource.new(session.actor).to_h
+      ActorResource.new(session.actor).to_h if session.actor
     end
   end
 end

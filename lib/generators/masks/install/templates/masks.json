@@ -2,5 +2,8 @@
   "name": "<%= Rails.application.name %>",
   "url": "http://localhost:3000",
   "extend": "masks",
-  "masks": []
+  "masks": [],
+  "openid": {
+    "pairwise_salt": "<%= SecureRandom.uuid %>"
+  }
 }

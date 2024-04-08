@@ -39,8 +39,39 @@ Masks::Engine.routes.draw do
   get "backup-codes", to: "backup_codes#new", as: :backup_codes
   post "backup-codes", to: "backup_codes#create"
 
+  # OAuth/OpenID support
+  get "client/:id/.well-known/openid-configuration",
+      to: "openid/discoveries#new",
+      as: :openid_discovery
+  get "client/:id/jwks.json", to: "openid/discoveries#jwks", as: :openid_jwks
+  get "client/:id",
+      to:
+        redirect { |params, _|
+          "client/#{params[:id]}/.well-known/openid-configuration"
+        },
+      as: :openid_issuer
+  get "authorize", to: "openid/authorizations#new", as: :openid_authorization
+  post "authorize", to: "openid/authorizations#create"
+  post "token",
+       to: proc { |env| Masks::OpenID::Token.new.call(env) },
+       as: :openid_token
+  match "userinfo",
+        to: "openid/userinfo#show",
+        via: %i[get post],
+        as: :openid_userinfo
+
   # managers-only section
-  get "actors", to: "manage/actors#index", as: :actors
-  get "actors/:actor", to: "manage/actor#show", as: :actor
-  patch "actors/:actor", to: "manage/actor#update"
+  namespace :manage do
+    get "/", to: "dashboard#index"
+
+    # manage clients
+    get "clients", to: "clients#index", as: :clients
+    get "clients/:id", to: "client#show", as: :client
+    patch "clients/:id", to: "client#update"
+
+    # manage actors
+    get "actors", to: "actors#index", as: :actors
+    get "actors/:actor", to: "actor#show", as: :actor
+    patch "actors/:actor", to: "actor#update"
+  end
 end

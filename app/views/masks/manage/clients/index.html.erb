@@ -1,8 +1,8 @@
 <div class="mb-6 flex items-center gap-2">
-  <%= lucide_icon('user', class: 'w-5 h-5') %>
+  <%= lucide_icon('handshake', class: 'w-5 h-5') %>
 
   <h1 class="font-bold flex-grow">
-    actors
+    clients
   </h1>
 
   <a href="" class="btn btn-sm btn-ghost btn-primary">
@@ -20,23 +20,19 @@
     <thead>
       <tr>
         <th>name</th>
-        <th>last login</th>
         <th></th>
       </tr>
     </thead>
     <tbody>
-      <% @actors.each do |actor| %>
+      <% @clients.each do |client| %>
         <tr>
           <td>
             <div class="flex items-center gap-3">
-              <div class="font-bold"><%= actor.nickname %></div>
+              <div class="font-bold"><%= client.name %></div>
             </div>
           </td>
-          <td class="text-xs whitespace-nowrap">
-            <%= time_ago_in_words(actor.last_login_at) %> ago
-          </td>
           <td class="text-right">
-            <a href="<%= manage_actor_path(actor) %>" class="btn btn-ghost btn-xs">manage</a>
+            <a href="<%= manage_client_path(client) %>" class="btn btn-ghost btn-xs">manage</a>
           </td>
         </tr>
       <% end %>

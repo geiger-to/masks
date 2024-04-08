@@ -53,7 +53,7 @@ module Masks
       def actor
         raise Masks::Error::InvalidSession unless session
 
-        session.scoped || session.actor
+        session.actor
       end
 
       delegate :configuration,

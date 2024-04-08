@@ -19,7 +19,7 @@ module Masks
             flash[:info] = "removed second factor authentication"
           end
 
-          redirect_to actor_path(@actor)
+          redirect_to manage_actor_path(@actor)
         end
 
         @actor
@@ -28,7 +28,7 @@ module Masks
       private
 
       def find_actor
-        @actor = Masks::Rails::Actor.find(params[:actor])
+        @actor = Masks::Rails::Actor.find_by(nickname: params[:actor])
       end
     end
   end

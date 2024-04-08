@@ -28,6 +28,15 @@
 #       enabled: "ON"
 
 en:
+  scope:
+    openid_name: account
+    openid_desc: your account identifier
+    profile_name: profile
+    profile_desc: your name, email, and other personal details
+    phone_name: phone
+    phone_desc: your phone number
+    address_name: address
+    address_desc: your physical address
   layouts:
     masks:
       application:
@@ -242,7 +251,7 @@ en:
         enter_factor2: enter a secondary credential to continue...
         enter_credentials: "enter your credentials to continue..."
         enter_password: "enter your password to continue..."
-        continue: "press continue to access things..."
+        continue: "press continue to authorize..."
         one_time_code: enter a 6-digit one-time code from your authenticator app...
         backup_code: enter one of your saved 10-digit backup codes...
         logged_in: welcome!
@@ -254,6 +263,18 @@ en:
           password: password...
           one_time_code: one-time code...
           backup_code: backup code...
+    openid:
+      authorizations:
+        new:
+          authorize_client: "authorize %{name}?"
+          authorize_account: "%{name} wants access to your account."
+          authorize_scoped: "%{name} wants access to your account and the following data:"
+          approve: approve
+          deny: deny
+        error:
+          title: authorization failed
+          description: an unrecoverable error occurred during authorization...
+          home: go home
   activerecord:
     attributes:
       masks/rails/actor:

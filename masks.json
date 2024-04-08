@@ -28,9 +28,30 @@
       "fail": false
     },
     {
+      "type": "access_token",
+      "request": {
+        "method": ["get", "post"],
+        "path": "/userinfo"
+      }
+    },
+    {
+      "skip": true,
+      "request": {
+        "method": "post",
+        "path": "/token"
+      }
+    },
+    {
+      "skip": true,
+      "request": {
+        "method": "get",
+        "path": "/client/*"
+      }
+    },
+    {
       "type": "api",
       "request": {
-        "path": ["*"],
+        "path": "*",
         "header": "Authorization"
       }
     },
@@ -153,6 +174,14 @@
     {
       "type": "session",
       "request": {
+        "method": "get",
+        "path": "/authorize"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
         "path": "*"
       },
       "fail": "/session"
@@ -259,6 +288,13 @@
         "recovery": {}
       },
       "credentials": ["Session", "Recovery", "Device"]
+    },
+    "access_token": {
+      "checks": {
+        "access_token": {},
+        "device": {}
+      },
+      "credentials": ["AccessToken", "Device"]
     },
     "api": {
       "checks": {
