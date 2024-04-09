@@ -17,10 +17,18 @@
 @tailwind components;
 @tailwind utilities;
 
-.pagination {
+.pagy {
   @apply flex gap-2 items-center justify-center p-4;
-}
 
-.pagination .page {
-  @apply btn btn-sm;
+  a:not(.gap) {
+    @apply btn btn-sm;
+
+    &:not([href]) {
+      @apply btn-disabled;
+    }
+
+    &.current {
+      @apply btn-neutral;
+    }
+  }
 }
