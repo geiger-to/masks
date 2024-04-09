@@ -7,6 +7,42 @@ module Masks
   class AuthorizeCodeTest < ActionDispatch::IntegrationTest
     include Masks::TestHelper
 
+    test "GET authorize assigns the first redirect_uri if none is configured" do
+      client = add_client(redirect_uris: [])
+
+      signup_as "admin" do
+        get "/authorize",
+            params: {
+              response_type: "code",
+              client_id: client.key,
+              redirect_uri: "https://example.com"
+            }
+
+        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+
+        assert_authorization(admin)
+
+        client.reload
+
+        assert_equal ["https://example.com"], client.reload.redirect_uris
+      end
+    end
+
+    test "GET authorize does not assign the first redirect_uri if the request is not approved" do
+      client = add_client(redirect_uris: [])
+
+      get "/authorize",
+          params: {
+            response_type: "code",
+            client_id: client.key,
+            redirect_uri: "https://example.com"
+          }
+
+      client.reload
+
+      assert client.reload.redirect_uris.blank?
+    end
+
     test "GET authorize redirects to login if not authenticated" do
       client = add_client
 

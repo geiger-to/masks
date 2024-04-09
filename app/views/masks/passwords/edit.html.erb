@@ -25,28 +25,41 @@
   <% end %>
 
   <%= form_with url: password_path, method: :post, class: 'pt-2 flex flex-col gap-2', data: { password_target: 'add' } do |form| %>
-    <label class="flex gap-3 items-center">
+    <label class="flex gap-3 items-center input input-bordered" data-controller="password-visibility">
       <%= lucide_icon("shield-plus") %>
       <input
         type="password"
         data-password-target="code"
         data-action="password#updateChanged"
+        data-password-visibility-target="input"
+        spellcheck="false"
         placeholder="<%= t('.placeholder.change') %>"
         name="password[change]"
-        class="input w-full"
-      />
+        class="w-full">
+
+      <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+        <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+        <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+      </button>
     </label>
-    <div class="flex items-center gap-2">
-      <label class="flex gap-3 items-center">
+    <div class="flex items-center gap-2" data-controller="password-visibility">
+      <label class="flex gap-3 items-center w-full flex-grow input input-bordered">
         <%= lucide_icon("shield-check") %>
+
         <input
           type="password"
           data-password-target="password"
           data-action="password#updatePassword"
+          data-password-visibility-target="input"
+          spellcheck="false"
           placeholder="<%= t('.placeholder.password') %>"
           name="session[password]"
-          class="input w-full"
-        />
+          class="w-full flex-grow">
+
+        <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+          <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+          <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+        </button>
       </label>
       <%= form.submit t(".submit"),
                   class: "btn btn-secondary",

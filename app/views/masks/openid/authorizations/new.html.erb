@@ -12,7 +12,7 @@
               <%= t('.authorize_scoped', name: @authorization.client.name) %>
             <% else %>
               <%= t('.authorize_account', name: @authorization.client.name) %>
-            <% end%>
+            <% end %>
           </p>
 
           <% if @authorization.scopes.any? %>

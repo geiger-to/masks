@@ -15,7 +15,7 @@
       <%= lucide_icon('check') %>
       <div>
         <h3 class="font-bold">created "<%= flash[:key]['name'] %>"</h3>
-        <div class="text-xs">keep the secret somewhere safe:<br /><span class="font-mono"><%= flash[:key]['secret'] %></span></div>
+        <div class="text-xs">keep the secret somewhere safe:<br><span class="font-mono"><%= flash[:key]['secret'] %></span></div>
       </div>
     </div>
   <% elsif flash[:notice] %>
@@ -40,20 +40,20 @@
         <%= lucide_icon('key') %>
       </div>
 
-      <input type="text" name="key[name]" placeholder="<%= t('.placeholder.name') %>" class="input input-bordered input-sm w-full" />
+      <input type="text" name="key[name]" placeholder="<%= t('.placeholder.name') %>" class="input input-bordered input-sm w-full">
 
       <button class="w-4 h-4 flex items-center" data-action="keys#toggleSettings">
         <%= lucide_icon('settings-2') %>
       </button>
 
-      <%= form.submit t('.add'), class: 'btn btn-sm'  %>
+      <%= form.submit t('.add'), class: 'btn btn-sm' %>
     </div>
 
     <div class="bg-base-200 join-item p-4 max-h-[260px] overflow-auto <%= @actor.keys.any? ? 'hidden' : '' %>" data-keys-target="settings">
       <div class="font-bold text-sm mb-2">
         secret
       </div>
-      <input type="password" name="key[secret]" placeholder="<%= t('.placeholder.secret') %>" class="input input-bordered input-sm w-full" />
+      <input type="password" name="key[secret]" placeholder="<%= t('.placeholder.secret') %>" class="input input-bordered input-sm w-full">
 
       <% if @actor.scopes.any? %>
         <div class="font-bold text-sm my-4 mb-2">
@@ -63,13 +63,13 @@
           <div class="form-control w-full">
             <label class="cursor-pointer label">
               <span class="label-text font-mono"><%= scope %></span>
-              <input type="checkbox" class="toggle toggle-success toggle-sm" name="key[scopes][]" value="<%= scope %>" />
+              <input type="checkbox" class="toggle toggle-success toggle-sm" name="key[scopes][]" value="<%= scope %>">
             </label>
           </div>
         <% end %>
       <% end %>
     </div>
-  <% end%>
+  <% end %>
 
   <% if @actor.keys.any? %>
     <div class="">
@@ -109,7 +109,7 @@
             </td>
             <td class="whitespace-nowrap">
               <%= form_with(url: keys_path, method: :delete) do |form| %>
-                <input type="hidden" name="id" value="<%= key.id %>" />
+                <input type="hidden" name="id" value="<%= key.id %>">
 
                 <button class="btn btn-circle btn-ghost btn-xs" type="submit">
                   <span class="flex items-center w-4 h-4">

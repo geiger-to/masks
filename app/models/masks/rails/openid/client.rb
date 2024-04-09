@@ -10,13 +10,15 @@ module Masks
         validates :name, presence: true
 
         after_initialize :generate_credentials
+        before_validation :generate_key, on: :create
 
         serialize :scopes, coder: JSON
         serialize :redirect_uris, coder: JSON
         serialize :response_types, coder: JSON
         serialize :grant_types, coder: JSON
 
-        validates :key, :secret, :scopes, :redirect_uris, presence: true
+        validates :key, :secret, :scopes, presence: true
+        validates :key, uniqueness: true
         validates :client_type,
                   inclusion: {
                     in: %w[public confidential]
@@ -146,7 +148,6 @@ module Masks
         private
 
         def generate_credentials
-          self.key ||= name.parameterize
           self.secret ||= SecureRandom.uuid
           self.client_type ||= "confidential"
           self.subject_type ||= "nickname"
@@ -157,6 +158,15 @@ module Masks
           self.code_expires_in ||= "5 minutes"
           self.token_expires_in ||= "1 day"
           self.refresh_expires_in ||= "1 week"
+        end
+
+        def generate_key
+          return unless name
+
+          key = name.parameterize
+          count = self.class.where("key LIKE ?", "#{key}%").count
+
+          self.key = count.positive? ? "#{key}-#{count + 1}" : key
         end
 
         def validate_expiries

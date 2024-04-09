@@ -1,43 +1,93 @@
-<div class="mb-6 flex items-center gap-2">
-  <%= lucide_icon('handshake', class: 'w-5 h-5') %>
+<div data-controller="dialog" data-action="click->dialog#backdropClose">
+  <div class="mb-4 flex items-center gap-2">
+    <%= lucide_icon('handshake', class: 'w-5 h-5') %>
 
-  <h1 class="font-bold flex-grow">
-    clients
-  </h1>
+    <h1 class="font-bold flex-grow">
+      clients
+    </h1>
 
-  <a href="" class="btn btn-sm btn-ghost btn-primary">
-    <span class="">
-      <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
-    </span>
+    <button class="btn btn-sm btn-ghost btn-primary"  data-action="dialog#open">
+      <span class="">
+        <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
+      </span>
 
-    new
-  </a>
-</div>
+      new
+    </button>
+  </div>
 
-<div class="overflow-x-auto">
-  <table class="table bg-base-100">
-    <!-- head -->
-    <thead>
-      <tr>
-        <th>name</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @clients.each do |client| %>
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
-              <div class="font-bold"><%= client.name %></div>
-            </div>
-          </td>
-          <td class="text-right">
-            <a href="<%= manage_client_path(client) %>" class="btn btn-ghost btn-xs">manage</a>
-          </td>
-        </tr>
+  <dialog class="modal" data-dialog-target="dialog">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"><%= lucide_icon('x') %></button>
+      </form>
+
+      <h3 class="mb-4 ml-1 font-bold flex items-center gap-2">
+        <%= lucide_icon('plus-square', size: 16) %>
+        new client
+      </h3>
+      <%= form_with url: manage_clients_path, method: :post do |form| %>
+        <label class="form-control input input-bordered flex flex-row gap-4 items-center flex-grow mb-4">
+          name
+
+          <input placeholder="enter a name for the client..." type="text" name="name" class="grow" />
+        </label>
+
+        <div class="modal-actions">
+          <input type="submit" class="btn btn-sm btn-success" value="add" />
+        </div>
       <% end %>
-    </tbody>
-  </table>
-</div>
+    </div>
+  </dialog>
 
-<%== pagy_nav(@pagy) %>
+  <% if flash[:errors]&.any? %>
+    <div role="alert" class="alert alert-error mb-4 mt-0">
+      <%= lucide_icon('x-circle') %>
+      <div>
+        <h3 class="font-bold">failed to add client...</h3>
+        <ul class="list-disc pl-4">
+          <% flash[:errors].each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <% if flash[:destroyed] %>
+    <div role="alert" class="alert alert-error mb-4 mt-0 flex items-center">
+      <%= lucide_icon('trash-2') %>
+      <div>
+        <h3 class="font-bold">"<%= flash[:destroyed] %>" deleted...</h3>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="overflow-x-auto">
+    <table class="table table-fixed md:table-auto bg-base-100">
+      <!-- head -->
+      <thead>
+        <tr>
+          <th>name</th>
+          <th class="text-right">created</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @clients.each do |client| %>
+          <tr data-action="click->table#click" data-controller="table" class="cursor-pointer">
+            <td>
+              <a data-table-target="url" href="<%= manage_client_path(client) %>" class="flex flex-col">
+                <span class="font-bold truncate"><%= client.name %></span>
+                <span class="font-mono text-xs truncate"><%= client.key %></span>
+              </a>
+            </td>
+            <td class="text-right text-xs">
+              <%= time_ago_in_words(client.created_at) %> ago
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%== pagy_nav(@pagy) %>
+</div>

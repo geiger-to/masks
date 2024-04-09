@@ -5021,7 +5021,7 @@
   function setFormMode(mode) {
     session.setFormMode(mode);
   }
-  var Turbo = /* @__PURE__ */ Object.freeze({
+  var Turbo2 = /* @__PURE__ */ Object.freeze({
     __proto__: null,
     navigator: navigator$1,
     session,
@@ -5718,7 +5718,7 @@
       element = element.parentElement;
     }
   })();
-  window.Turbo = { ...Turbo, StreamActions };
+  window.Turbo = { ...Turbo2, StreamActions };
   start();
 
   // node_modules/@hotwired/turbo-rails/app/javascript/turbo/cable.js
@@ -8291,8 +8291,78 @@
 
   // app/assets/javascripts/controllers/application.js
   var application = Application.start();
-  application.debug = false;
+  application.debug = true;
   window.Stimulus = application;
+
+  // node_modules/@stimulus-components/password-visibility/dist/stimulus-password-visibility.mjs
+  var _PasswordVisibility = class _PasswordVisibility2 extends Controller {
+    connect() {
+      this.hidden = this.inputTarget.type === "password", this.class = this.hasHiddenClass ? this.hiddenClass : "hidden";
+    }
+    toggle(e) {
+      e.preventDefault(), this.inputTarget.type = this.hidden ? "text" : "password", this.hidden = !this.hidden, this.iconTargets.forEach((icon) => icon.classList.toggle(this.class));
+    }
+  };
+  _PasswordVisibility.targets = ["input", "icon"], _PasswordVisibility.classes = ["hidden"];
+  var PasswordVisibility = _PasswordVisibility;
+
+  // node_modules/@stimulus-components/reveal/dist/stimulus-reveal-controller.mjs
+  var _Reveal = class _Reveal2 extends Controller {
+    connect() {
+      this.class = this.hasHiddenClass ? this.hiddenClass : "hidden";
+    }
+    toggle() {
+      this.itemTargets.forEach((item) => {
+        item.classList.toggle(this.class);
+      });
+    }
+    show() {
+      this.itemTargets.forEach((item) => {
+        item.classList.remove(this.class);
+      });
+    }
+    hide() {
+      this.itemTargets.forEach((item) => {
+        item.classList.add(this.class);
+      });
+    }
+  };
+  _Reveal.targets = ["item"], _Reveal.classes = ["hidden"];
+  var Reveal = _Reveal;
+
+  // node_modules/@stimulus-components/dialog/dist/stimulus-dialog.mjs
+  var _Dialog = class _Dialog2 extends Controller {
+    initialize() {
+      this.forceClose = this.forceClose.bind(this);
+    }
+    connect() {
+      this.openValue && this.open(), document.addEventListener("turbo:before-render", this.forceClose);
+    }
+    disconnect() {
+      document.removeEventListener("turbo:before-render", this.forceClose);
+    }
+    open() {
+      this.dialogTarget.showModal();
+    }
+    close() {
+      this.dialogTarget.setAttribute("closing", ""), Promise.all(this.dialogTarget.getAnimations().map((animation) => animation.finished)).then(() => {
+        this.dialogTarget.removeAttribute("closing"), this.dialogTarget.close();
+      });
+    }
+    backdropClose(event) {
+      event.target === this.dialogTarget && this.close();
+    }
+    forceClose() {
+      this.dialogTarget.close();
+    }
+  };
+  _Dialog.targets = ["dialog"], _Dialog.values = {
+    open: {
+      type: Boolean,
+      default: false
+    }
+  };
+  var Dialog = _Dialog;
 
   // app/assets/javascripts/controllers/session_controller.js
   var session_controller_default = class extends Controller {
@@ -8444,12 +8514,29 @@
     }
   };
 
+  // app/assets/javascripts/controllers/table_controller.js
+  var table_controller_default = class extends Controller {
+    static get targets() {
+      return ["url"];
+    }
+    get href() {
+      return this.urlTarget.href;
+    }
+    click(e) {
+      Turbo.visit(this.href);
+    }
+  };
+
   // app/assets/javascripts/controllers/index.js
   application.register("session", session_controller_default);
   application.register("recover", recover_controller_default);
   application.register("recover-password", recover_password_controller_default);
   application.register("emails", emails_controller_default);
   application.register("keys", keys_controller_default);
+  application.register("table", table_controller_default);
+  application.register("password-visibility", PasswordVisibility);
+  application.register("reveal", Reveal);
+  application.register("dialog", Dialog);
 })();
 /*! Bundled license information:
 

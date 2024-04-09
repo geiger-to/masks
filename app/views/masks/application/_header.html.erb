@@ -2,12 +2,11 @@
   <div class="flex-1">
     <% if @config.site_url %>
       <a
-        href="<%=@config.site_url%>"
-        class="text-xl flex items-center gap-3 hover:underline"
-      >
+        href="<%= @config.site_url %>"
+        class="text-xl flex items-center gap-3 hover:underline">
         <% if @config.site_logo %>
           <div class="w-7 h-7 overflow-hidden">
-            <img src="<%=@config.site_logo%>"/>
+            <img src="<%= @config.site_logo %>">
           </div>
         <% else %>
           <%= lucide_icon("lock") %>

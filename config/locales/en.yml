@@ -118,7 +118,7 @@ en:
         secret: secret
         submit: enable
         delete: disable
-        delete_div: disable one-time code
+        delete_div: disable one-time codes
         backup_codes: save backup codes...
         reset_codes: view backup codes...
     backup_codes:

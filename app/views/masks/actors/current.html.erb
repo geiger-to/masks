@@ -52,7 +52,6 @@
     </div>
   </div>
 
-
   <div class="divider text-xs">
     <%= t(".credentials") %>
   </div>
@@ -64,9 +63,8 @@
       <%= t(".password") %>
     </span>
     <a
-      href="<%=  password_path %>"
-      class="btn btn-sm btn-ghost hover:btn-secondary"
-    >
+      href="<%= password_path %>"
+      class="btn btn-sm btn-ghost hover:btn-secondary">
       <%= t(".change") %>
     </a>
   </div>
@@ -83,16 +81,14 @@
     </span>
     <a
       href="<%= one_time_codes_path %>"
-      class="btn btn-sm btn-ghost hover:btn-secondary"
-    >
+      class="btn btn-sm btn-ghost hover:btn-secondary">
       <%= @actor.totp_secret ? t(".manage") : t(".enable") %>
     </a>
   </div>
 
   <% if @actor.factor2? %>
     <div
-      class="alert text-left flex items-center gap-4 <%= @actor.saved_backup_codes? ? 'bg-neutral' : 'bg-base-100' %>"
-    >
+      class="alert text-left flex items-center gap-4 <%= @actor.saved_backup_codes? ? 'bg-neutral' : 'bg-base-100' %>">
       <% if @actor.saved_backup_codes? %>
         <%= lucide_icon("check-circle-2", class: "stroke-success") %>
       <% else %>
@@ -103,16 +99,14 @@
       </span>
       <a
         href="<%= backup_codes_path %>"
-        class="btn btn-sm btn-ghost hover:btn-secondary"
-      >
+        class="btn btn-sm btn-ghost hover:btn-secondary">
         <%= @actor.saved_backup_codes? ? t(".manage") : t(".enable") %>
       </a>
     </div>
   <% end %>
 
     <div
-      class="alert text-left flex items-center gap-4 <%= @actor.keys.any? ? 'bg-neutral' : 'bg-base-100' %>"
-    >
+      class="alert text-left flex items-center gap-4 <%= @actor.keys.any? ? 'bg-neutral' : 'bg-base-100' %>">
       <% if @actor.keys.any? %>
         <%= lucide_icon("check-circle-2", class: "stroke-success") %>
       <% else %>
@@ -123,8 +117,7 @@
       </span>
       <a
         href="<%= keys_path %>"
-        class="btn btn-sm btn-ghost hover:btn-secondary"
-      >
+        class="btn btn-sm btn-ghost hover:btn-secondary">
         <%= @actor.keys.any? ? t(".add_more_key") : t(".add_key") %>
       </a>
     </div>

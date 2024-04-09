@@ -44,25 +44,32 @@
     <%= form_with url: backup_codes_path, method: :post, class: 'w-full'  do |form| %>
       <div class="divider my-2"></div>
       <div class="flex items-center mb-2 gap-4">
-        <%= lucide_icon("shield-check") %>
-        <div class="flex items-center gap-4">
+        <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
+          <%= lucide_icon("shield-check") %>
+
           <input
             type="password"
-            name="session[password]"
+            data-password-visibility-target="input"
+            spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
-            class="input w-full"
-          />
+            name="session[password]"
+            class="w-full flex-grow">
+
+          <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+          </button>
+        </label>
           <%= form.submit t(".enable"),
                       name: "backup_codes[enable]",
                       class: "btn btn-secondary",
                       data: {
                         one_time_code_target: "submit",
                       } %>
-        </div>
       </div>
     <% end %>
   <% else %>
-    <div class="alert bg-neutral my-4">
+    <div class="alert bg-neutral my-4 flex items-center gap-4">
       <%= lucide_icon("download", class: "stroke-success") %>
 
       <span>
@@ -74,28 +81,35 @@
 
     <div class="join join-vertical">
       <div class="join-item bg-base-100 flex gap-3 alert">
-        <span class="text-sm">
+        <span class="text-sm text-left">
           <%= t(".reset_codes") %>
         </span>
       </div>
 
       <%= form_with url: backup_codes_path, method: :post, class: 'w-full'  do |form| %>
         <div class="alert join-item flex items-center gap-4">
-          <%= lucide_icon("shield-check") %>
-          <div class="flex items-center gap-4">
+          <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
+            <%= lucide_icon("shield-check") %>
+
             <input
               type="password"
-              name="session[password]"
+              data-password-visibility-target="input"
+              spellcheck="false"
               placeholder="<%= t('.placeholder.password') %>"
-              class="input input-sm w-full"
-            />
-            <%= form.submit t(".delete"),
-                        name: "backup_codes[reset]",
-                        class: "btn btn-sm btn-outline hover:btn-error",
-                        data: {
-                          one_time_code_target: "submit",
-                        } %>
-          </div>
+              name="session[password]"
+              class="w-full flex-grow">
+
+            <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+              <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+              <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+            </button>
+          </label>
+          <%= form.submit t(".delete"),
+                      name: "backup_codes[reset]",
+                      class: "btn btn-sm btn-outline hover:btn-error",
+                      data: {
+                        one_time_code_target: "submit",
+                      } %>
         </div>
       <% end %>
     </div>
