@@ -16,9 +16,8 @@
         </div>
         <a
           role="button"
-          href="<%= email_verify_url(email: @email, approve: true)%>"
-          class="btn"
-        >
+          href="<%= email_verify_url(email: @email, approve: true) %>"
+          class="btn">
           <%= lucide_icon("mail-check", class: "stroke-success") %>
           <%= t(".verify") %>
         </a>

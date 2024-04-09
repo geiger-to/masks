@@ -37,7 +37,7 @@
               <% elsif email.expired? %>
                 <%= t(".expired_verification") %>
                 <%= form_with url: emails_path, method: :patch do |form| %>
-                  <input type="hidden" name="email[value]" value="<%= email.email %>"/>
+                  <input type="hidden" name="email[value]" value="<%= email.email %>">
                   <button type="submit" class="underline">
                     <%= t(".resend") %>
                   </button>
@@ -48,7 +48,7 @@
             </span>
           </span>
           <%= form_with url: emails_path, method: :delete, class: 'flex items-center gap-4' do |form| %>
-            <input type="hidden" name="email[value]" value="<%= email.email %>"/>
+            <input type="hidden" name="email[value]" value="<%= email.email %>">
             <button type="submit">
               <%= lucide_icon("x", class: "stroke-error") %>
             </button>
@@ -76,8 +76,7 @@
           data-action="emails#updateEmail"
           placeholder="<%= t('.placeholder.email', count: @emails.length) %>"
           name="email[value]"
-          class="w-full"
-        />
+          class="w-full">
       </label>
       <div class="flex items-center gap-2">
         <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
@@ -91,8 +90,7 @@
             spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
             name="session[password]"
-            class="w-full flex-grow"
-          />
+            class="w-full flex-grow">
 
           <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
             <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>

@@ -56,3 +56,5 @@ gem "rubocop", "~> 1.62"
 gem "bundler-audit", "~> 0.9.1"
 
 gem "openid_connect", "~> 2.3"
+
+gem "erb_lint", "~> 0.5.0"

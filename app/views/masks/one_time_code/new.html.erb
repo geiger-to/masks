@@ -40,8 +40,7 @@
             <input
               class="input input-xs w-full"
               name="secret"
-              value="<%= @actor.random_totp_secret %>"
-            />
+              value="<%= @actor.random_totp_secret %>">
           </span>
         </div>
         <div class='divider mt-3 mb-2 text-xs'></div>
@@ -64,8 +63,7 @@
         <input
           type="hidden"
           name="one_time_code[secret]"
-          value="<%= @actor.random_totp_secret %>"
-        />
+          value="<%= @actor.random_totp_secret %>">
         <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
           <%= lucide_icon("shield-check") %>
 
@@ -77,8 +75,7 @@
             spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
             name="session[password]"
-            class="w-full flex-grow"
-          />
+            class="w-full flex-grow">
 
           <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
             <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
@@ -97,8 +94,7 @@
               data-password-visibility-target="input"
               spellcheck="false"
               name="one_time_code[code]"
-              class="w-full flex-grow"
-            />
+              class="w-full flex-grow">
 
             <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
               <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
@@ -124,8 +120,7 @@
       </div>
       <div
         class="join-item card bg-base-100 pt-2 pb-3 px-4 w-full text-right"
-        role="alert"
-      >
+        role="alert">
         <a href="<%= backup_codes_path %>" class="text-sm underline">
           <%= t(@actor.should_save_backup_codes? ? ".backup_codes" : ".reset_codes") %>
         </a>
@@ -138,8 +133,7 @@
       <input
         type="hidden"
         name="one_time_code[secret]"
-        value="<%= @actor.random_totp_secret %>"
-      />
+        value="<%= @actor.random_totp_secret %>">
 
       <div class="flex gap-2">
         <label class="flex gap-3 items-center flex-grow input input-sm input-bordered" data-controller="password-visibility">
@@ -152,8 +146,7 @@
             spellcheck="false"
             placeholder="<%= t('.placeholder.delete') %>"
             name="session[password]"
-            class="w-full flex-grow"
-          />
+            class="w-full flex-grow">
 
           <button data-action="password-visibility#toggle" class="btn btn-xs btn-ghost -mr-2">
             <span data-password-visibility-target="icon"><%= lucide_icon('eye', size: 16) %></span>

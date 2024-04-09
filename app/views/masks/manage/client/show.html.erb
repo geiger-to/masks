@@ -2,8 +2,8 @@
   <div class="flex items-center gap-2 mb-6">
     <%= lucide_icon('handshake', class: 'w-5 h-5') %>
 
-    <input name="name" type="text" class="input input-sm input-ghost font-bold flex-grow" value="<%= @client.name%>" />
-    <input type="submit" name="submit" value="save" class="btn btn-sm btn-success" />
+    <input name="name" type="text" class="input input-sm input-ghost font-bold flex-grow" value="<%= @client.name %>">
+    <input type="submit" name="submit" value="save" class="btn btn-sm btn-success">
   </div>
 
   <% if flash[:errors]&.any? %>
@@ -34,7 +34,7 @@
 
     <div class="form-control pl-2 mb-1">
       <label class="flex items-center gap-4">
-        <input name="consent" type="checkbox" class="toggle toggle-sm" <%= @client.consent ? 'checked' : '' %> />
+        <input name="consent" type="checkbox" class="toggle toggle-sm" <%= @client.consent ? 'checked' : '' %>>
 
         <span class="label-text">require consent when authorizing this client</span>
       </label>
@@ -47,12 +47,12 @@
 
       <label class="input input-bordered flex items-center gap-4 mb-2 text-sm">
         key
-        <input name="key" class="text-base" type="text" class="grow" value="<%= @client.key %>" disabled />
+        <input name="key" class="text-base" type="text" class="grow" value="<%= @client.key %>" disabled>
       </label>
 
       <label class="input input-bordered flex items-center gap-4 text-sm" data-controller="password-visibility">
         secret
-        <input name="secret" class="text-base flex-grow" type="password"  value="<%= @client.secret %>" data-password-visibility-target="input" spellcheck="false" />
+        <input name="secret" class="text-base flex-grow" type="password" value="<%= @client.secret %>" data-password-visibility-target="input" spellcheck="false">
         <button data-action="password-visibility#toggle">
           <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
           <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
@@ -87,17 +87,17 @@
 
       <label class="input input-bordered flex items-center gap-4 mb-2 text-sm">
         auth codes
-        <input name="code_expires_in" type="text" class="grow" value="<%= @client.code_expires_in %>" />
+        <input name="code_expires_in" type="text" class="grow" value="<%= @client.code_expires_in %>">
       </label>
 
       <label class="input input-bordered flex items-center gap-4 text-sm mb-2">
         access tokens
-        <input name="token_expires_in" type="text" class="grow" value="<%= @client.token_expires_in %>" />
+        <input name="token_expires_in" type="text" class="grow" value="<%= @client.token_expires_in %>">
       </label>
 
       <label class="input input-bordered flex items-center gap-4 text-sm">
         refresh tokens
-        <input name="refresh_expires_in" type="text" class="grow" value="<%= @client.refresh_expires_in %>" />
+        <input name="refresh_expires_in" type="text" class="grow" value="<%= @client.refresh_expires_in %>">
       </label>
     </div>
   </div>
@@ -117,8 +117,8 @@
                 <%= form_with url: manage_client_path(@client), method: :patch do |form| %>
               <div class="flex items-center gap-2">
                   <%= lucide_icon('plus-square', class: 'text-base-300-content') %>
-                  <input type="text" name="add_scope" class="flex-grow input input-sm" placeholder="add a scope..." />
-                  <input type="submit" class="btn btn-sm" value="add" />
+                  <input type="text" name="add_scope" class="flex-grow input input-sm" placeholder="add a scope...">
+                  <input type="submit" class="btn btn-sm" value="add">
               </div>
                  <% end %>
             </td>
