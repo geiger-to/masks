@@ -21,9 +21,16 @@ module Masks
               session.config.model(:openid_client).find_by(key: req.client_id)
 
             req.bad_request!(:client_id, "not found") unless @client
+
             unless req.redirect_uri
               req.invalid_request!('"redirect_uri" missing')
             end
+
+            unless @client.redirect_uris.any?
+              @client.redirect_uris = [req.redirect_uri.to_s]
+              @client.save || req.invalid_request!('"redirect_uri" invalid')
+            end
+
             res.redirect_uri = req.verify_redirect_uri!(@client.redirect_uris)
 
             @scopes = req.scope & @client.scopes

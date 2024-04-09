@@ -16,7 +16,7 @@ module Masks
         serialize :response_types, coder: JSON
         serialize :grant_types, coder: JSON
 
-        validates :key, :secret, :scopes, :redirect_uris, presence: true
+        validates :key, :secret, :scopes, presence: true
         validates :client_type,
                   inclusion: {
                     in: %w[public confidential]

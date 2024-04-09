@@ -93,7 +93,12 @@ module Masks
     end
 
     test "POST /userinfo returns pairwise subjects with a custom sector_identifier" do
-      client = add_client(client_type: "public", subject_type: "pairwise", sector_identifier: 'example.com')
+      client =
+        add_client(
+          client_type: "public",
+          subject_type: "pairwise",
+          sector_identifier: "example.com"
+        )
 
       signup_as "admin" do
         get "/authorize",
@@ -116,7 +121,8 @@ module Masks
         assert_equal 200, status
         assert_equal(
           {
-            "sub" => "c72360bf19ea6ce4011b1df9e6332856f131702e6854117382aee1eb745885a3"
+            "sub" =>
+              "c72360bf19ea6ce4011b1df9e6332856f131702e6854117382aee1eb745885a3"
           },
           response.parsed_body
         )
