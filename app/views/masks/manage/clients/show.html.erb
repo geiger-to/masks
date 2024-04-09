@@ -2,7 +2,7 @@
   <div class="flex items-center gap-2 mb-6">
     <%= lucide_icon('handshake', class: 'w-5 h-5') %>
 
-    <input name="name" type="text" class="input input-sm input-ghost font-bold flex-grow" value="<%= @client.name %>">
+    <input name="name" type="text" class="input input-sm text-lg input-ghost font-bold flex-grow" value="<%= @client.name %>">
     <input type="submit" name="submit" value="save" class="btn btn-sm btn-success">
   </div>
 
@@ -65,7 +65,7 @@
         <span class="label-text">redirect uri(s)</span>
       </div>
 
-      <textarea name="redirect_uris" class="textarea textarea-bordered h-24" placeholder="separate by a newline..."><%= @client.redirect_uris.join("\n") %></textarea>
+      <textarea name="redirect_uris" class="textarea textarea-bordered h-24" placeholder="separate by a newline..."><%= @client.redirect_uris&.join("\n") %></textarea>
     </label>
 
     <div class="form-control w-full">
@@ -140,3 +140,17 @@
       </tbody>
     </table>
   </div>
+
+<%= form_with url: manage_client_path(@client), method: :delete  do |form| %>
+  <div class="border border-error bg-base-300 flex gap-2 p-4 rounded-xl mb-4 items-center">
+    <p class="text-error">
+      <%= lucide_icon('trash-2') %>
+    </p>
+
+    <p class="flex-grow text-error">
+      <span class="font-bold">permanently</span> delete this client...
+    </p>
+
+    <input type="submit" class="btn btn-sm btn-error" value="delete" />
+  </div>
+<% end %>

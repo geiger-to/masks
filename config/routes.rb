@@ -66,8 +66,10 @@ Masks::Engine.routes.draw do
 
     # manage clients
     get "clients", to: "clients#index", as: :clients
-    get "clients/:id", to: "client#show", as: :client
-    patch "clients/:id", to: "client#update"
+    post "clients", to: "clients#create"
+    get "clients/:id", to: "clients#show", as: :client
+    patch "clients/:id", to: "clients#update"
+    delete "clients/:id", to: "clients#destroy"
 
     # manage actors
     get "actors", to: "actors#index", as: :actors
