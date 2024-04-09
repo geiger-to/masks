@@ -28,6 +28,21 @@ module Masks
       end
     end
 
+    test "GET authorize does not assign the first redirect_uri if the request is not approved" do
+      client = add_client(redirect_uris: [])
+
+      get "/authorize",
+          params: {
+            response_type: "code",
+            client_id: client.key,
+            redirect_uri: "https://example.com"
+          }
+
+      client.reload
+
+      assert client.reload.redirect_uris.blank?
+    end
+
     test "GET authorize redirects to login if not authenticated" do
       client = add_client
 

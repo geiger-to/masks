@@ -28,7 +28,7 @@ module Masks
 
             unless @client.redirect_uris.any?
               @client.redirect_uris = [req.redirect_uri.to_s]
-              @client.save || req.invalid_request!('"redirect_uri" invalid')
+              @client.valid? || req.invalid_request!('"redirect_uri" invalid')
             end
 
             res.redirect_uri = req.verify_redirect_uri!(@client.redirect_uris)
@@ -44,6 +44,8 @@ module Masks
                )
               if actor
                 if opts[:approved] || client.auto_consent?
+                  @client.save if @client.redirect_uris_changed?
+
                   approved! req, res
                 elsif opts.key?(:approved)
                   req.access_denied!
