@@ -68,7 +68,7 @@
   <% end %>
   <div class=" <%= @emails.empty? ? 'mt-2' : '' %>">
     <%= form_with url: emails_path, method: :post, class: 'pt-2 flex flex-col gap-2', data: { emails_target: 'add' } do |form| %>
-      <label class="flex gap-4 items-center">
+      <label class="flex gap-4 items-center input input-bordered">
         <%= lucide_icon("mail-plus") %>
         <input
           type="text"
@@ -76,20 +76,28 @@
           data-action="emails#updateEmail"
           placeholder="<%= t('.placeholder.email', count: @emails.length) %>"
           name="email[value]"
-          class="input w-full"
+          class="w-full"
         />
       </label>
       <div class="flex items-center gap-2">
-        <label class="flex gap-4 items-center">
+        <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
           <%= lucide_icon("shield-check") %>
+
           <input
             type="password"
             data-emails-target="password"
             data-action="emails#updatePassword"
+            data-password-visibility-target="input"
+            spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
             name="session[password]"
-            class="input w-full"
+            class="w-full flex-grow"
           />
+
+          <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+          </button>
         </label>
         <%= form.submit t(".submit"),
                     class: "btn btn-info",

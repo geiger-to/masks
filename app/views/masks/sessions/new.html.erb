@@ -100,24 +100,31 @@
             class="input input-bordered w-full"
           />
         </label>
-        <label class="form-control w-full">
+        <label class="form-control input input-bordered w-full flex flex-row items-center gap-2" data-controller="password-visibility">
           <input
             type="password"
             data-action="session#updatePassword"
             data-session-target="password"
+            data-password-visibility-target="input"
+            spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
             name="session[password]"
-            class="input input-bordered w-full"
+            class="flex-grow"
           />
-          <% if @config.site_links[:recover] %>
-            <div class="label">
-              <span class="label-text-alt opacity-60 hover:opacity-100"><a
-                  class="hover:underline"
-                  href="<%= @config.site_links[:recover] %>"
-                ><%= t(".recover_credentials") %></a></span>
-            </div>
-          <% end %>
+
+          <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+          </button>
         </label>
+        <% if @config.site_links[:recover] %>
+          <div class="label">
+            <span class="label-text-alt opacity-60 hover:opacity-100"><a
+                class="hover:underline"
+                href="<%= @config.site_links[:recover] %>"
+              ><%= t(".recover_credentials") %></a></span>
+          </div>
+        <% end %>
       </div>
     <% end %>
 

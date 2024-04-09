@@ -17,12 +17,12 @@
   <% if !@actor.totp_secret %>
     <div class='divider my-2 mb-4'></div>
     <div class="">
-      <div class="">
-        <div class="flex gap-4">
-          <div class="w-[125px] h-[125px] rounded-md overflow-hidden">
-            <%= totp_svg(@actor.totp_uri, module_size: 2.35, fill: "fff", offset: 5) %>
+      <div>
+        <div class="flex gap-4 mb-3">
+          <div class="w-[125px] h-[125px]  overflow-hidden">
+            <%= totp_svg(@actor.totp_uri, module_size: 2.25, fill: "fff", offset: 5) %>
           </div>
-          <div class="max-w-[175px] space-y-3 mb-2">
+          <div class="max-w-[175px] max-w-[250px] space-y-3 mb-2">
             <div>
               <%= t(".enable_qr") %>
             </div>
@@ -66,28 +66,44 @@
           name="one_time_code[secret]"
           value="<%= @actor.random_totp_secret %>"
         />
-        <label class="flex gap-3 items-center">
+        <label class="flex gap-3 items-center w-full flex-grow input input-bordered" data-controller="password-visibility">
           <%= lucide_icon("shield-check") %>
+
           <input
             type="password"
             data-one-time-password-target="password"
             data-action="one_time_code#updatePassword"
+            data-password-visibility-target="input"
+            spellcheck="false"
             placeholder="<%= t('.placeholder.password') %>"
             name="session[password]"
-            class="input w-full"
+            class="w-full flex-grow"
           />
+
+          <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+          </button>
         </label>
         <div class="flex items-center gap-2">
-          <label class="flex gap-3 items-center">
+          <label class="flex gap-3 items-center input input-bordered flex-grow" data-controller="password-visibility">
             <%= lucide_icon("key-square") %>
+
             <input
               type="password"
               data-one-time-password-target="code"
               data-action="one_time_code#updateCode"
               placeholder="<%= t('.placeholder.otp') %>"
+              data-password-visibility-target="input"
+              spellcheck="false"
               name="one_time_code[code]"
-              class="input w-full"
+              class="w-full flex-grow"
             />
+
+            <button data-action="password-visibility#toggle" class="btn btn-sm btn-ghost -mr-2">
+              <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+              <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+            </button>
           </label>
           <%= form.submit t(".submit"),
                       class: "btn btn-secondary",
@@ -125,18 +141,26 @@
         value="<%= @actor.random_totp_secret %>"
       />
 
-      <div class="alert py-2">
-        <%= lucide_icon("shield-check") %>
-        <label class="flex gap-3 items-center flex-grow">
+      <div class="flex gap-2">
+        <label class="flex gap-3 items-center flex-grow input input-sm input-bordered" data-controller="password-visibility">
+          <%= lucide_icon("shield-check") %>
           <input
             type="password"
             data-one-time-password-target="password"
             data-action="one_time_code#updatePassword"
+            data-password-visibility-target="input"
+            spellcheck="false"
             placeholder="<%= t('.placeholder.delete') %>"
             name="session[password]"
-            class="input input-sm input-bordered w-full"
+            class="w-full flex-grow"
           />
+
+          <button data-action="password-visibility#toggle" class="btn btn-xs btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye', size: 16) %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off', size: 16) %></span>
+          </button>
         </label>
+
         <div>
           <%= form.submit t(".delete"),
                       class: "btn hover:btn-error btn-outline btn-sm",

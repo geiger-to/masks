@@ -50,9 +50,13 @@
         <input name="key" class="text-base" type="text" class="grow" value="<%= @client.key %>" disabled />
       </label>
 
-      <label class="input input-bordered flex items-center gap-4 text-sm">
+      <label class="input input-bordered flex items-center gap-4 text-sm" data-controller="password-visibility">
         secret
-        <input name="secret" class="text-base" type="password" class="grow" value="<%= @client.secret %>" />
+        <input name="secret" class="text-base flex-grow" type="password"  value="<%= @client.secret %>" data-password-visibility-target="input" spellcheck="false" />
+        <button data-action="password-visibility#toggle">
+          <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+          <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+        </button>
       </label>
     </div>
 

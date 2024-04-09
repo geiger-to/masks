@@ -8291,8 +8291,20 @@
 
   // app/assets/javascripts/controllers/application.js
   var application = Application.start();
-  application.debug = false;
+  application.debug = true;
   window.Stimulus = application;
+
+  // node_modules/@stimulus-components/password-visibility/dist/stimulus-password-visibility.mjs
+  var _PasswordVisibility = class _PasswordVisibility2 extends Controller {
+    connect() {
+      this.hidden = this.inputTarget.type === "password", this.class = this.hasHiddenClass ? this.hiddenClass : "hidden";
+    }
+    toggle(e) {
+      e.preventDefault(), this.inputTarget.type = this.hidden ? "text" : "password", this.hidden = !this.hidden, this.iconTargets.forEach((icon) => icon.classList.toggle(this.class));
+    }
+  };
+  _PasswordVisibility.targets = ["input", "icon"], _PasswordVisibility.classes = ["hidden"];
+  var PasswordVisibility = _PasswordVisibility;
 
   // app/assets/javascripts/controllers/session_controller.js
   var session_controller_default = class extends Controller {
@@ -8450,6 +8462,7 @@
   application.register("recover-password", recover_password_controller_default);
   application.register("emails", emails_controller_default);
   application.register("keys", keys_controller_default);
+  application.register("password-visibility", PasswordVisibility);
 })();
 /*! Bundled license information:
 
