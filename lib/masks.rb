@@ -36,6 +36,29 @@ module Masks
       configuration.access(name).fetch(:cls).build(session)
     end
 
+    # Returns the value for a setting.
+    #
+    # Setting values are stored in the database, but fallback to what is found in Masks.configuration.data.
+    #
+    # @param [Symbol|String] name
+    # @return [String|Number|Array|Hash|nil]
+    def setting(name)
+      setting = model(:setting).find_by(name:)
+      setting ? setting.value : Masks.configuration.data[name.to_sym]
+    end
+
+    # Returns a hash of settings.
+    #
+    # @return [Hash]
+    def settings
+      cls = model(:setting)
+      map = cls::NAMES.map do |name|
+        [name, setting(name)]
+      end
+
+      map.to_h
+    end
+
     # Returns a masked session based on the request passed.
     #
     # @param [ActionDispatch::Request] request
@@ -76,6 +99,8 @@ module Masks
     def configuration
       @configuration ||= Masks::Configuration.new(data: config.dup)
     end
+
+    delegate :model, to: :configuration
 
     # @visibility private
     def event(name, **opts, &block)
