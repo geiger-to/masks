@@ -167,7 +167,7 @@
     {
       "type": "manage",
       "request": {
-        "path": ["/actors", "/actors/*"]
+        "path": ["/manage", "/manage/*"]
       },
       "fail": "/session"
     },
@@ -281,7 +281,7 @@
         "device": {}
       },
       "credentials": ["Session", "Device"],
-      "scopes": "masks:manager"
+      "scopes": ["masks:manage"]
     },
     "recovery": {
       "checks": {
