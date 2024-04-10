@@ -69,7 +69,8 @@
         "method": ["get", "delete"],
         "path": "/session"
       },
-      "fail": false
+      "fail": false,
+      "return_to": false
     },
     {
       "type": "recovery",
@@ -264,7 +265,7 @@
         },
         "device": {}
       },
-      "credentials": ["Session", "Device"]
+      "credentials": ["Session", "Device", "ReturnTo"]
     },
     "manage": {
       "checks": {
@@ -280,7 +281,7 @@
         },
         "device": {}
       },
-      "credentials": ["Session", "Device"],
+      "credentials": ["Session", "Device", "ReturnTo"],
       "scopes": ["masks:manage"]
     },
     "recovery": {

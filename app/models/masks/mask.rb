@@ -66,6 +66,10 @@ module Masks
     #   Whether or not to save results of masks
     #   @return [Boolean]
     attribute :backup, default: true
+    # @!attribute [rw] extras
+    #   Extra attributes and configuration accessible on the mask
+    #   @return [Hash]
+    attribute :extras, default: -> { {} }
 
     # @visibility private
     attribute :config
@@ -77,7 +81,14 @@ module Masks
         attrs = type.deep_merge(**attrs)
       end
 
-      super(attrs)
+      # required for `attribute_names` to work
+      super({})
+
+      extras = attrs.except(*attribute_names.map(&:to_sym))
+      attrs = attrs.slice(*attribute_names.map(&:to_sym))
+      attrs[:extras] = extras.deep_symbolize_keys
+
+      assign_attributes(**attrs)
     end
 
     # Returns the class name expected for any actor attached to this session.

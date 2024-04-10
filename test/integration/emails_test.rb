@@ -18,12 +18,6 @@ module Masks
       assert_equal 302, status
     end
 
-    test "GET /emails does not set a session id" do
-      get "/emails"
-
-      refute session["session_id"]
-    end
-
     test "GET /emails is available to logged in participants" do
       signup_as "admin" do
         get "/emails"
