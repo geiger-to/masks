@@ -1,0 +1,86 @@
+<div class="mb-6 flex items-center gap-2">
+  <%= lucide_icon('cog', class: 'w-5 h-5') %>
+
+  <h1 class="font-bold flex-grow">
+    settings
+  </h1>
+</div>
+
+  <h3 class="text-xs divider">
+    frontend
+  </h3>
+
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="text-sm">name</span>
+      <input name="name" type="text" value="<%= @settings['name'] %>" />
+    </label>
+  </div>
+
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="text-sm">title</span>
+      <input name="title" type="text" value="<%= @settings['title'] %>" />
+    </label>
+  </div>
+
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="text-sm">logo</span>
+      <input name="title" type="text" value="<%= @settings['logo'] %>" />
+    </label>
+  </div>
+
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="text-sm">favicon</span>
+      <input name="title" type="text" value="<%= @settings['favicon'] %>" />
+    </label>
+  </div>
+
+  <h3 class="text-xs divider">
+    actors
+  </h3>
+
+  <div class="form-control pl-2 mb-2">
+    <label class="flex items-center gap-4">
+      <span class="text-sm">signups</span>
+      <input name="signups" type="checkbox" class="toggle toggle-sm" <%= @settings['signups'] ? 'checked' : '' %>>
+
+      <% if @settings['signups'] %>
+        <span class="label-text">allowed</span>
+      <% else %>
+        <span class="label-text">disabled</span>
+      <% end%>
+    </label>
+  </div>
+
+  <h3 class="text-xs divider">
+    sessions
+  </h3>
+
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="text-sm">version</span>
+      <input name="title" type="text" class="font-mono" value="<%= @settings['version'] %>" />
+    </label>
+  </div>
+
+<div class="overflow-x-auto">
+  <table class="table bg-base-100">
+    <!-- head -->
+    <tbody>
+      <% @settings.each do |setting, value| %>
+        <tr>
+          <td>
+            <div class="flex items-center gap-3">
+              <div class="font-bold"><%= setting %></div>
+            </div>
+          </td>
+          <td class="text-right">
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

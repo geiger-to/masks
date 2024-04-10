@@ -127,6 +127,7 @@ module Masks
     # @return [Hash{Symbol => String}]
     def models
       {
+        setting: "Masks::Rails::Setting",
         actor: "Masks::Rails::Actor",
         scope: "Masks::Rails::Scope",
         role: "Masks::Rails::Role",

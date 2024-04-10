@@ -1,4 +1,3 @@
-# frozen_string_literal: true
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -11,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 20_240_329_182_422) do
+ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
   create_table "actors", force: :cascade do |t|
     t.string "type"
     t.string "nickname"
@@ -157,8 +156,7 @@ ActiveRecord::Schema[7.1].define(version: 20_240_329_182_422) do
     t.datetime "updated_at", null: false
     t.index ["actor_type", "actor_id"], name: "index_roles_on_actor"
     t.index ["record_type", "record_id"], name: "index_roles_on_record"
-    t.index ["type", "actor_id", "actor_type", "record_id", "record_type"], 
-name: "idx_on_type_actor_id_actor_type_record_id_record_ty_8325f57a0b", unique: true
+    t.index ["type", "actor_id", "actor_type", "record_id", "record_type"], name: "idx_on_type_actor_id_actor_type_record_id_record_ty_8325f57a0b", unique: true
   end
 
   create_table "scopes", force: :cascade do |t|
@@ -169,6 +167,14 @@ name: "idx_on_type_actor_id_actor_type_record_id_record_ty_8325f57a0b", unique: 
     t.datetime "updated_at", null: false
     t.index ["actor_type", "actor_id"], name: "index_scopes_on_actor"
     t.index ["name", "actor_id"], name: "index_scopes_on_name_and_actor_id", unique: true
+  end
+
+  create_table "settings", force: :cascade do |t|
+    t.string "name"
+    t.text "value"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_settings_on_name", unique: true
   end
 
 end

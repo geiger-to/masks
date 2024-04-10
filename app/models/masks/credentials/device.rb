@@ -27,8 +27,8 @@ module Masks
         session_key = session.data[:device_key]
 
         # ensure devices match across sessions, which would only happen if a
-        # session cookie happened is shared across machines. this destroys
-        # the entire session and cleans up everything involved.
+        # session cookie is shared across machines. this destroys the entire
+        # session and cleans up everything involved.
         if session_key && device.session_key != session_key
           raise "invalid device"
         end

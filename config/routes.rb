@@ -80,5 +80,9 @@ Masks::Engine.routes.draw do
     # manage devices
     get "devices", to: "devices#index", as: :devices
     patch "device/:id", to: "devices#logout", as: :device
+
+    # manage settings
+    get "settings", to: "settings#index", as: :settings
+    post "settings", to: "settings#upsert"
   end
 end
