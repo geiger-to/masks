@@ -7,6 +7,8 @@ module Masks
       section :dashboard
 
       def index
+        @clients = Masks.configuration.model(:openid_client).count
+        @actors = Masks.configuration.model(:actor).count
       end
     end
   end
