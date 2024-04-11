@@ -79,5 +79,6 @@ Masks::Engine.routes.draw do
 
     # manage devices
     get "devices", to: "devices#index", as: :devices
+    patch "device/:id", to: "devices#logout", as: :device
   end
 end

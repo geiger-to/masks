@@ -10,13 +10,14 @@ module Masks
       belongs_to :actor, class_name: Masks.configuration.models[:actor]
 
       validates :key, presence: true, uniqueness: { scope: :actor_id }
-      validates :known?, presence: true
+      validates :known?, presence: true, if: :session
+      validates :ip_address, ip: true
 
       after_initialize :reset_version, unless: :version
       before_validation :copy_session, if: :session
 
       def known?
-        session.device&.known?
+        session&.device&.known?
       end
 
       def session_key
@@ -25,6 +26,11 @@ module Masks
 
       def reset_version
         self.version = SecureRandom.hex
+      end
+
+      def reset_version!
+        reset_version
+        save!
       end
 
       delegate :name, :device_type, :device_name, :os_name, to: :detected

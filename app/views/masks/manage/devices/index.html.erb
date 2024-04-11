@@ -1,47 +1,22 @@
-<div class="mb-6 flex items-center gap-2">
+<div class="mb-4 flex items-center gap-2">
   <%= lucide_icon('monitor-smartphone', class: 'w-5 h-5') %>
 
-  <h1 class="font-bold flex-grow">
+  <h1 class="font-bold">
     devices
   </h1>
+
+  <%= form_with url: manage_devices_path, method: :get, class: 'flex-grow ml-2 flex gap-2 items-center' do |f| %>
+    <label class="input input-bordered input-sm flex items-center gap-2 flex-grow">
+      <input type="text" name="q" class="w-full flex-grow" placeholder="search by actor or ip address..." value="<%= params[:q] %>" />
+      <button type="submit" class="btn btn-ghost btn-xs -mr-2" value="search">
+        <%= lucide_icon('search', size: 16) %>
+      </button>
+    </label>
+  <% end %>
 </div>
 
 <div class="overflow-x-auto">
-  <table class="table bg-base-100">
-    <!-- head -->
-    <thead>
-      <tr>
-        <th class="w-10"></th>
-        <th>browser</th>
-        <th>os</th>
-        <th>ip address</th>
-        <th class="text-right">owner</th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @devices.each do |device| %>
-        <tr>
-        <td class="w-10">
-          <%= lucide_icon(device_icon(device), size: 16) %>
-        </td>
-          <td class="truncate">
-            <%= device.name %>
-          </td>
-          <td class="text-xs whitespace-nowrap">
-            <%= device.os_name %>
-          </td>
-          <td class="text-xs whitespace-nowrap">
-            <%= device.ip_address %>
-          </td>
-          <td class="text-right">
-            <a class="underline" href="<%= manage_actor_path(device.actor) %>">
-              <%= device.actor&.nickname || 'unknown' %>
-            </a>
-          </td>
-        </tr>
-      <% end %>
-    </tbody>
-  </table>
+  <%= render 'list', devices: @devices, include_actor: true %>
 </div>
 
 <%== pagy_nav(@pagy) %>

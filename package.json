@@ -21,6 +21,7 @@
   "scripts": {
     "fmt": "bin/lint --fix",
     "lint": "bin/lint",
+    "test": "bin/rails test",
     "fmt:prettier": "prettier --write .",
     "fmt:rubocop": "bundle exec rubocop -A",
     "lint:prettier": "prettier --check .",
