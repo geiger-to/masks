@@ -6,7 +6,7 @@
       clients
     </h1>
 
-    <button class="btn btn-sm btn-ghost btn-primary"  data-action="dialog#open">
+    <button class="btn btn-sm btn-ghost btn-primary" data-action="dialog#open">
       <span class="">
         <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
       </span>
@@ -29,11 +29,11 @@
         <label class="form-control input input-bordered flex flex-row gap-4 items-center flex-grow mb-4">
           name
 
-          <input placeholder="enter a name for the client..." type="text" name="name" class="grow" />
+          <input placeholder="enter a name for the client..." type="text" name="name" class="grow">
         </label>
 
         <div class="modal-actions">
-          <input type="submit" class="btn btn-sm btn-success" value="add" />
+          <input type="submit" class="btn btn-sm btn-success" value="add">
         </div>
       <% end %>
     </div>
@@ -98,5 +98,5 @@
 
   <% if @pagy.pages > 1 %>
     <%== pagy_nav(@pagy) %>
-  <% end%>
+  <% end %>
 </div>
