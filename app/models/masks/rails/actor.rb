@@ -50,7 +50,7 @@ module Masks
 
       before_validation :reset_version, unless: :version
 
-      validates :nickname, uniqueness: { case_sensitive: false }
+      validates :nickname, presence: true, uniqueness: { case_sensitive: false }
       validates :totp_secret, presence: true, if: :totp_code
       validates :version, presence: true
       validate :validates_totp, if: :totp_code
@@ -82,6 +82,11 @@ module Masks
         saved_backup_codes_at
         self.totp_secret = nil
         self.backup_codes = nil
+        save!
+      end
+
+      def logout!
+        reset_version
         save!
       end
 

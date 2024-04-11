@@ -53,7 +53,7 @@
       <label class="input input-bordered flex items-center gap-4 text-sm" data-controller="password-visibility">
         secret
         <input name="secret" class="text-base flex-grow" type="password" value="<%= @client.secret %>" data-password-visibility-target="input" spellcheck="false">
-        <button data-action="password-visibility#toggle">
+        <button data-action="password-visibility#toggle" type="button">
           <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
           <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
         </button>

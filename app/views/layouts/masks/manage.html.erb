@@ -17,9 +17,9 @@
           </div>
           <ul tabindex="0" class="menu  dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52 gap-1">
             <li><a class="<%= section == :dashboard ? 'active' : '' %>" href="<%= manage_path %>">Dashboard</a></li>
-            <li><a class="<%= section == :actors ? 'active' : '' %>" href="<%= manage_actors_path %>">Actors</a></li>
             <li><a class="<%= section == :clients ? 'active' : '' %>" href="<%= manage_clients_path %>">Clients</a></li>
-            <li><a>Settings</a></li>
+            <li><a class="<%= section == :actors ? 'active' : '' %>" href="<%= manage_actors_path %>">Actors</a></li>
+            <li><a class="<%= section == :devices ? 'active' : '' %>" href="<%= manage_devices_path %>">Devices</a></li>
           </ul>
         </div>
       </div>

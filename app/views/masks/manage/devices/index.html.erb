@@ -1,0 +1,47 @@
+<div class="mb-6 flex items-center gap-2">
+  <%= lucide_icon('monitor-smartphone', class: 'w-5 h-5') %>
+
+  <h1 class="font-bold flex-grow">
+    devices
+  </h1>
+</div>
+
+<div class="overflow-x-auto">
+  <table class="table bg-base-100">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th class="w-10"></th>
+        <th>browser</th>
+        <th>os</th>
+        <th>ip address</th>
+        <th class="text-right">owner</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @devices.each do |device| %>
+        <tr>
+        <td class="w-10">
+          <%= lucide_icon(device_icon(device), size: 16) %>
+        </td>
+          <td class="truncate">
+            <%= device.name %>
+          </td>
+          <td class="text-xs whitespace-nowrap">
+            <%= device.os_name%>
+          </td>
+          <td class="text-xs whitespace-nowrap">
+            <%= device.ip_address %>
+          </td>
+          <td class="text-right">
+            <a class="underline" href="<%= manage_actor_path(device.actor) %>">
+              <%= device.actor&.nickname || 'unknown' %>
+            </a>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<%== pagy_nav(@pagy) %>

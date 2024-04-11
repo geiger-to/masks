@@ -69,7 +69,8 @@
         "method": ["get", "delete"],
         "path": "/session"
       },
-      "fail": false
+      "fail": false,
+      "return_to": false
     },
     {
       "type": "recovery",
@@ -167,8 +168,9 @@
     {
       "type": "manage",
       "request": {
-        "path": ["/actors", "/actors/*"]
+        "path": ["/manage", "/manage/*"]
       },
+      "access": ["actor.password", "actor.signup"],
       "fail": "/session"
     },
     {
@@ -264,7 +266,7 @@
         },
         "device": {}
       },
-      "credentials": ["Session", "Device"]
+      "credentials": ["Session", "Device", "ReturnTo"]
     },
     "manage": {
       "checks": {
@@ -280,8 +282,8 @@
         },
         "device": {}
       },
-      "credentials": ["Session", "Device"],
-      "scopes": "masks:manager"
+      "credentials": ["Session", "Device", "ReturnTo"],
+      "scopes": ["masks:manage"]
     },
     "recovery": {
       "checks": {

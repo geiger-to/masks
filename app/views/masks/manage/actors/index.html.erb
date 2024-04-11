@@ -1,47 +1,104 @@
-<div class="mb-6 flex items-center gap-2">
-  <%= lucide_icon('user', class: 'w-5 h-5') %>
+<div data-controller="dialog" data-action="click->dialog#backdropClose">
+  <div class="mb-6 flex items-center gap-2">
+    <%= lucide_icon('user', class: 'w-5 h-5') %>
 
-  <h1 class="font-bold flex-grow">
-    actors
-  </h1>
+    <h1 class="font-bold flex-grow">
+      actors
+    </h1>
+    <button class="btn btn-sm btn-ghost btn-primary"  data-action="dialog#open">
+      <span class="">
+        <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
+      </span>
 
-  <a href="" class="btn btn-sm btn-ghost btn-primary">
-    <span class="">
-      <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
-    </span>
+      new
+    </button>
+  </div>
 
-    new
-  </a>
-</div>
+  <% if flash[:errors]&.any? %>
+    <div role="alert" class="alert alert-error mb-4 mt-0">
+      <%= lucide_icon('x-circle') %>
+      <div>
+        <h3 class="font-bold">failed to add actor...</h3>
+        <ul class="list-disc pl-4">
+          <% flash[:errors].each do |error| %>
+            <li><%= error %></li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
 
-<div class="overflow-x-auto">
-  <table class="table bg-base-100">
-    <!-- head -->
-    <thead>
-      <tr>
-        <th>name</th>
-        <th>last login</th>
-        <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      <% @actors.each do |actor| %>
-        <tr>
-          <td>
-            <div class="flex items-center gap-3">
-              <div class="font-bold"><%= actor.nickname %></div>
-            </div>
-          </td>
-          <td class="text-xs whitespace-nowrap">
-            <%= time_ago_in_words(actor.last_login_at) %> ago
-          </td>
-          <td class="text-right">
-            <a href="<%= manage_actor_path(actor) %>" class="btn btn-ghost btn-xs">manage</a>
-          </td>
-        </tr>
+  <dialog class="modal" data-dialog-target="dialog">
+    <div class="modal-box">
+      <form method="dialog">
+        <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"><%= lucide_icon('x') %></button>
+      </form>
+
+      <h3 class="mb-4 ml-1 font-bold flex items-center gap-2">
+        <%= lucide_icon('user-plus', size: 16) %>
+        new actor
+      </h3>
+
+      <%= form_with url: manage_actors_path, method: :post do |form| %>
+        <label class="form-control input input-bordered flex flex-row gap-4 items-center flex-grow mb-2">
+          nickname
+
+          <input placeholder="enter a name for the client..." type="text" name="nickname" class="grow" />
+        </label>
+
+        <label class="form-control input input-bordered w-full flex flex-row items-center gap-4 mb-4" data-controller="password-visibility">
+          password
+
+          <input
+            type="password"
+            data-password-visibility-target="input"
+            spellcheck="false"
+            placeholder="enter a password..."
+            name="password"
+            class="flex-grow">
+
+          <button data-action="password-visibility#toggle" type="button" class="btn btn-sm btn-ghost -mr-2">
+            <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+            <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+          </button>
+        </label>
+
+        <div class="modal-actions">
+          <input type="submit" class="btn btn-sm btn-success" value="save" />
+        </div>
       <% end %>
-    </tbody>
-  </table>
-</div>
+    </div>
+  </dialog>
 
-<%== pagy_nav(@pagy) %>
+  <div class="overflow-x-auto">
+    <table class="table bg-base-100">
+      <!-- head -->
+      <thead>
+        <tr>
+          <th>name</th>
+          <th class="text-right">last login</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @actors.each do |actor| %>
+          <tr data-action="click->table#click" data-controller="table" class="cursor-pointer">
+            <td>
+              <a data-table-target="url" href="<%= manage_actor_path(actor) %>" class="font-bold"><%= actor.nickname %></a>
+            </td>
+            <td class="text-xs whitespace-nowrap text-right">
+              <% if actor.last_login_at %>
+                <%= time_ago_in_words(actor.last_login_at) %> ago
+              <% else %>
+                never logged in
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <% if @pagy.pages > 1 %>
+    <%== pagy_nav(@pagy) %>
+  <% end%>
+</div>

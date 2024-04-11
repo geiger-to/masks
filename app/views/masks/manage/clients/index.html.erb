@@ -64,7 +64,6 @@
 
   <div class="overflow-x-auto">
     <table class="table table-fixed md:table-auto bg-base-100">
-      <!-- head -->
       <thead>
         <tr>
           <th>name</th>
@@ -72,16 +71,24 @@
         </tr>
       </thead>
       <tbody>
-        <% @clients.each do |client| %>
-          <tr data-action="click->table#click" data-controller="table" class="cursor-pointer">
-            <td>
-              <a data-table-target="url" href="<%= manage_client_path(client) %>" class="flex flex-col">
-                <span class="font-bold truncate"><%= client.name %></span>
-                <span class="font-mono text-xs truncate"><%= client.key %></span>
-              </a>
-            </td>
-            <td class="text-right text-xs">
-              <%= time_ago_in_words(client.created_at) %> ago
+        <% if @clients.any? %>
+          <% @clients.each do |client| %>
+            <tr data-action="click->table#click" data-controller="table" class="cursor-pointer">
+              <td>
+                <a data-table-target="url" href="<%= manage_client_path(client) %>" class="flex flex-col">
+                  <span class="font-bold truncate"><%= client.name %></span>
+                  <span class="font-mono text-xs truncate"><%= client.key %></span>
+                </a>
+              </td>
+              <td class="text-right text-xs">
+                <%= time_ago_in_words(client.created_at) %> ago
+              </td>
+            </tr>
+          <% end %>
+        <% else %>
+          <tr>
+            <td colspan="2" class="text-center text-sm">
+                nothing found...
             </td>
           </tr>
         <% end %>
@@ -89,5 +96,7 @@
     </table>
   </div>
 
-  <%== pagy_nav(@pagy) %>
+  <% if @pagy.pages > 1 %>
+    <%== pagy_nav(@pagy) %>
+  <% end%>
 </div>
