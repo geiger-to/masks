@@ -8,6 +8,7 @@
 /dummy/log/*.log
 /dummy/storage/
 /dummy/tmp/
+/dummy/public/assets
 .byebug*
 /node_modules/**/*
 masks*.gem

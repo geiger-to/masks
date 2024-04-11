@@ -8,8 +8,6 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 gemspec
 
 gem "puma"
-gem "sqlite3"
-gem "yard", "~> 0.9.36"
 
 # Start debugger with binding.b [https://github.com/ruby/debug]
 gem "byebug"
@@ -22,7 +20,11 @@ gem "lucide-rails", "~> 0.4"
 
 gem "guard", "~> 2.18"
 gem "guard-shell", "~> 0.7.2"
-gem "jekyll", "~> 4.3"
+
+group :docs do
+  gem "jekyll", "~> 4.3"
+  gem "yard", "~> 0.9.36"
+end
 
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
@@ -55,6 +57,8 @@ gem "rubocop", "~> 1.63"
 
 gem "bundler-audit", "~> 0.9.1"
 
-gem "openid_connect", "~> 2.3"
-
 gem "erb_lint", "~> 0.5.0"
+
+gem "dockerfile-rails", ">= 1.6", group: :development
+
+gem "redis", "~> 5.1"
