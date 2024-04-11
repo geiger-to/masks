@@ -170,6 +170,7 @@
       "request": {
         "path": ["/manage", "/manage/*"]
       },
+      "access": ["actor.password", "actor.signup"],
       "fail": "/session"
     },
     {

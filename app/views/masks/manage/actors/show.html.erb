@@ -8,6 +8,24 @@
   </div>
 </div>
 
+<% if flash[:info] %>
+  <div role="alert" class="alert alert-info mb-4 mt-0 flex items-center">
+    <%= lucide_icon('info') %>
+    <div>
+      <h3 class="font-bold"><%= flash[:info] %></h3>
+    </div>
+  </div>
+<% end %>
+
+<% if flash[:error] %>
+  <div role="alert" class="alert alert-error mb-4 mt-0 flex items-center">
+    <%= lucide_icon('alert-triangle') %>
+    <div>
+      <h3 class="font-bold"><%= flash[:error] %></h3>
+    </div>
+  </div>
+<% end %>
+
 <div class="bg-base-300 flex flex-col gap-4 p-4 rounded-xl mb-4">
   <div class="flex items-center gap-4">
     <%= lucide_icon('log-in', class: 'w-4 h-4') %>
@@ -25,7 +43,7 @@
     <% end %>
   </div>
 
-  <div class="flex items-center gap-4">
+  <div class="flex items-center gap-4" data-controller="dialog" data-action="click->dialog#backdropClose">
     <%= lucide_icon('unlock', class: 'w-4 h-4') %>
       <div class="text-sm flex-grow">
     <% if @actor.changed_password_at %>
@@ -35,9 +53,43 @@
     <% end %>
       </div>
 
-    <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
-      <input type="submit" class="btn hover:btn-error btn-xs" name="reset_password" value="reset">
-    <% end %>
+    <button data-action="dialog#open" type="button" class="btn hover:btn-error btn-xs">
+      change
+    </button>
+
+    <dialog class="modal" data-dialog-target="dialog">
+      <div class="modal-box">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"><%= lucide_icon('x') %></button>
+        </form>
+
+        <h3 class="mb-4 font-bold flex items-center gap-2">
+          <%= lucide_icon('lock-keyhole', size: 16) %>
+          change password
+        </h3>
+
+        <%= form_with url: manage_actor_path(@actor), method: :patch do |form| %>
+          <label class="form-control input input-bordered w-full flex flex-row items-center gap-2 mb-4" data-controller="password-visibility">
+            <input
+              type="password"
+              data-password-visibility-target="input"
+              spellcheck="false"
+              placeholder="enter a new password..."
+              name="change_password"
+              class="flex-grow">
+
+            <button data-action="password-visibility#toggle" type="button" class="btn btn-sm btn-ghost -mr-2">
+              <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+              <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+            </button>
+          </label>
+
+          <div class="modal-actions">
+            <input type="submit" class="btn btn-sm btn-success" value="change" />
+          </div>
+        <% end %>
+      </div>
+    </dialog>
   </div>
 
   <div class="flex items-center gap-4">

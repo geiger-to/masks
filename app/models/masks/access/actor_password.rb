@@ -10,7 +10,8 @@ module Masks
 
       access "actor.password"
 
-      def change_password(password)
+      def change_password(password, **opts)
+        actor = opts[:actor] || self.actor
         actor.changed_password_at = Time.current
         actor.password = password
         actor.save if actor.valid?

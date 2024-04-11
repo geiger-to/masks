@@ -74,6 +74,7 @@ Masks::Engine.routes.draw do
     # manage actors
     get "actors", to: "actors#index", as: :actors
     get "actors/:actor", to: "actors#show", as: :actor
+    post "actors", to: "actors#create"
     patch "actors/:actor", to: "actors#update"
 
     # manage devices
