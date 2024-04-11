@@ -8,6 +8,10 @@ module Masks
 
       before_action :find_actor
 
+      rescue_from Pagy::OverflowError do
+        redirect_to manage_devices_path
+      end
+
       def index
         @pagy, @actors = pagy(actor_model.all)
       end

@@ -47,6 +47,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sprockets-rails"
   spec.add_dependency "stimulus-rails", "~> 1.3"
   spec.add_dependency "turbo-rails", ">= 1.5", "< 3.0"
+  spec.add_dependency "validates_host", "~> 1.3"
   spec.add_dependency "valid_email", "~> 0.2"
   spec.metadata["rubygems_mfa_required"] = "true"
 end
