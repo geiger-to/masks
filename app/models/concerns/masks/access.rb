@@ -56,7 +56,7 @@ module Masks
         session.actor
       end
 
-      delegate :configuration,
+      delegate :config,
                :roles,
                :role?,
                :role_records,

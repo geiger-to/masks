@@ -19,7 +19,7 @@ module Masks
       def matches_mask?(mask)
         return false unless mask.access == name.to_s
 
-        original.mask.access&.try(:include?, name.to_s) || original.mask.access
+        original.mask.access&.try(:include?, name.to_s) || original.mask.access == mask.access
       end
     end
   end
