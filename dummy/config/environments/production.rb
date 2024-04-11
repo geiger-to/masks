@@ -2,6 +2,12 @@
 
 require "active_support/core_ext/integer/time"
 
+def parse_bool(value)
+  return false if value.nil? || value == ""
+
+  ActiveModel::Type::Boolean.new.deserialize(value)
+end
+
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -51,7 +57,7 @@ Rails.application.configure do
   # config.assume_ssl = true
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = parse_bool(ENV.fetch("FORCE_SSL", true))
 
   # Log to STDOUT by default
   config.logger =
@@ -90,6 +96,7 @@ Rails.application.configure do
 
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
+  config.active_record.sqlite3_production_warning = false
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

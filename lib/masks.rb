@@ -13,6 +13,7 @@ require "pagy"
 require "device_detector"
 require "active_model"
 require "chronic_duration"
+require "openid_connect"
 
 # Top-level module for masks.
 #

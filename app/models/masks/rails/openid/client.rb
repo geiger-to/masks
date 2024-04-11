@@ -154,7 +154,11 @@ module Masks
           self.scopes ||= Masks.configuration.openid[:scopes] || []
           self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
           self.sector_identifier ||=
-            URI.parse(Masks.configuration.site_url).host
+            begin
+              URI.parse(Masks.configuration.site_url).host
+            rescue StandardError
+              "masks"
+            end
           self.code_expires_in ||= "5 minutes"
           self.token_expires_in ||= "1 day"
           self.refresh_expires_in ||= "1 week"
