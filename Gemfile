@@ -61,4 +61,4 @@ gem "erb_lint", "~> 0.5.0"
 
 gem "dockerfile-rails", ">= 1.6", group: :development
 
-gem "redis", "~> 5.1"
+gem "redis", "~> 5.2"
