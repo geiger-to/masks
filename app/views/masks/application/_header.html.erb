@@ -1,24 +1,14 @@
-<div class="navbar gap-2 px-1">
+<div class="navbar gap-2 px-1 mb-2" data-controller="theme">
   <div class="flex-1">
-    <% if @config.site_url %>
-      <a
-        href="<%= @config.site_url %>"
-        class="text-xl flex items-center gap-3 hover:underline">
-        <% if @config.site_logo %>
-          <div class="w-7 h-7 overflow-hidden">
-            <img src="<%= @config.site_logo %>">
-          </div>
-        <% else %>
-          <%= lucide_icon("lock") %>
-        <% end %>
-        <span class="font-bold">
-          <%= @config.site_name %>
-        </span>
-      </a>
+    <% if masks_settings[:logo] %>
+      <img src="<%= masks_settings[:logo] %>" class="h-7 md:h-8 -mt-1">
     <% else %>
-      <span class="text-2xl"><%= @config.site_name %></span>
+      <span class="text-xl font-bold">
+        <%= masks_settings[:name] %>
+      </span>
     <% end %>
   </div>
+
   <% if logged_in? %>
     <span class="whitespace-nowrap text-sm italic">
       <%= t(".logged_in") %>
@@ -26,5 +16,21 @@
         <%= @session.actor.nickname %>
       </a>
     </span>
+  <% end %>
+
+  <% if dark_mode_allowed? %>
+    <label class="cursor-pointer grid place-items-center ml-2">
+      <input type="checkbox"
+        <%= dark_mode? ? 'checked' : '' %>
+        autocomplete="off"
+        data-light="<%= masks_settings[:theme] %>"
+        data-dark="<%= masks_settings[:dark_theme] %>"
+        data-theme-target="toggle"
+        data-action="theme#toggle"
+        class="toggle bg-base-content row-start-1 col-start-1 col-span-2" />
+
+      <%= lucide_icon('sun', size: 12, class: 'col-start-1 row-start-1 fill-base-100 stroke-base-100') %>
+      <%= lucide_icon('moon', size: 12, class: 'col-start-2 row-start-1 fill-base-100 stroke-base-100') %>
+    </label>
   <% end %>
 </div>

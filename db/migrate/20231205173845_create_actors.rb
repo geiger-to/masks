@@ -3,11 +3,10 @@
 class CreateActors < ActiveRecord::Migration[7.1]
   def change
     create_table :actors do |t|
+      t.string :uuid
       t.string :type
-      t.string :nickname
       t.string :version
       t.string :password_digest
-      t.string :phone_number
       t.string :totp_secret
       t.text :backup_codes
 
@@ -18,8 +17,17 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.datetime :added_totp_secret_at
       t.datetime :saved_backup_codes_at
       t.datetime :notified_inactive_at
+    end
 
-      t.index :nickname, unique: true
+    create_table :actor_identifiers do |t|
+      t.string :value
+      t.string :type
+      t.references :actor
+
+      t.datetime :verified_at
+      t.timestamps
+
+      t.index :value, unique: true
     end
 
     create_table :scopes do |t|

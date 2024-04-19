@@ -1,0 +1,35 @@
+{
+  "name": "masks",
+  "logo": null,
+  "favicon": null,
+  "theme": "light",
+  "background": "linear-gradient(to right bottom, #00cdb7, #00c6d2, #00bcea, #00b0fb, #009fff, #2e8eef, #407dde, #4c6ccc, #365ca5, #294b7f, #233a5a, #1f2937)",
+  "dark_mode": {
+    "theme": "dark",
+    "background": null,
+    "logo": null
+  },
+  "signups": {
+    "disabled": false
+  },
+  "password": {
+    "minimum": "8",
+    "maximum": "64"
+  },
+  "nickname": {
+    "prefix": "@",
+    "allowed": true,
+    "required": true,
+    "minimum": "4",
+    "maximum": "16"
+  },
+  "email": {
+    "allowed": true,
+    "required": false,
+    "domains": []
+  },
+  "phone": {
+    "allowed": true,
+    "required": false
+  }
+}

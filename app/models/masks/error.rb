@@ -47,5 +47,12 @@ module Masks
         super("could not determine access class for #{name}")
       end
     end
+
+    # Thrown when Masks has failed its credential checks
+    class CheckFailed < Base
+      def initialize(cred)
+        super("failed checking #{cred.check} with #{cred.class}")
+      end
+    end
   end
 end

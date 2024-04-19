@@ -17,7 +17,7 @@ module Masks
     #
     # @return [String]
     def actor_id
-      nickname
+      uuid
     end
 
     # A session identifier for the actor.
@@ -27,6 +27,8 @@ module Masks
     #
     # @return [String]
     def session_key
+      return if new_record? && !valid?
+
       Digest::MD5.hexdigest(
         [Masks.configuration.version, version, actor_id].join("-")
       )

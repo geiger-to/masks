@@ -41,7 +41,7 @@ module Masks
     # Returns a site theme to use on the frontend.
     # @return [String]
     def theme
-      super || data.fetch(:theme, "dark")
+      super || data.fetch(:theme, "light")
     end
 
     # Returns the site logo, used for visual identification of the site.
@@ -66,6 +66,16 @@ module Masks
     # @return [String]
     def site_url
       super || data.fetch(:url, nil)
+    end
+
+    # Returns a list of identifier classes.
+    # @return [String[]]
+    def identifiers
+      [
+        Masks::Rails::Identifiers::Nickname,
+        Masks::Rails::Identifiers::Email,
+        Masks::Rails::Identifiers::Phone
+      ]
     end
 
     # Returns a string to use as the "issuer" for various secrets—TOTP, JWT, etc.
@@ -96,6 +106,8 @@ module Masks
         root: rails_url.try(:root_path) || "/",
         recover: rails_url.recover_path,
         login: rails_url.session_path,
+        signup: rails_url.signup_path,
+        after_signup: rails_url.signup_path,
         after_login: rails_url.session_path,
         after_logout: rails_url.session_path
       }.merge(super || data.fetch(:links, {}))
@@ -127,6 +139,10 @@ module Masks
     # @return [Hash{Symbol => String}]
     def models
       {
+        identifier: "Masks::Rails::Identifiers::Base",
+        nickname_id: "Masks::Rails::Identifiers::Nickname",
+        email_id: "Masks::Rails::Identifiers::Email",
+        phone_id: "Masks::Rails::Identifiers::Phone",
         setting: "Masks::Rails::Setting",
         actor: "Masks::Rails::Actor",
         scope: "Masks::Rails::Scope",
@@ -187,7 +203,6 @@ module Masks
     def access(name)
       defaults = Masks::Access.defaults(name)
       raise Masks::Error::UnknownAccess, name unless defaults
-
       defaults.deep_merge(access_types&.fetch(name, {}))
     end
 
