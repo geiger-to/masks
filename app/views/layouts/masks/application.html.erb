@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="h-full bg-base-100" data-theme="<%= Masks.configuration.theme %>">
+<html class="h-full bg-base-100" data-theme="<%= theme %>">
   <head>
     <title><%= t(".meta.title") %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,9 +7,22 @@
     <%= csp_meta_tag %>
     <%= stylesheet_link_tag "masks/application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
+    <% if masks_settings[:background] || masks_settings[:dark_background] %>
+      <style>
+          body {
+            background-image: <%= masks_settings.fetch(:dark_background, masks_settings[:background]) %>
+          }
+
+          @media (prefers-color-scheme: dark) {
+            body {
+              background-image: <%= masks_settings.fetch(:dark_background, masks_settings[:background]) %>
+            }
+          }
+      </style>
+    <% end %>
   </head>
-  <body class="h-screen flex px-2">
-    <div class="m-auto w-full max-w-screen-sm p-6 md:p-10 md:pt-8 pt-4 bg-base-300 rounded-2xl shadow">
+  <body class="h-screen flex px-2" style="background-image: <%= masks_settings[:background] %>">
+    <div class="m-auto w-full max-w-screen-sm p-6 md:p-10 md:pt-8 pt-4 bg-base-300 rounded-xl shadow-2xl">
       <%= render "header" %>
       <%= yield %>
     </div>

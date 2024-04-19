@@ -34,7 +34,7 @@ module Masks
         end
 
         # store devices that are found in a database of known devices
-        if device.known?
+        if device.known? && actor&.valid?
           session.data[:device_key] = device.session_key
           actor.devices << device
           approve!

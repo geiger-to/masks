@@ -4,15 +4,30 @@ module Masks
       self.table_name = 'settings'
 
       NAMES = %w[
+        url
         name
-        title
         logo
+        theme
+        background
         favicon
-        signups
-        version
+        signups.disabled
+        dark_mode.logo
+        dark_mode.theme
+        dark_mode.background
+        nickname.prefix
+        nickname.allowed
+        nickname.required
+        nickname.minimum
+        nickname.maximum
+        email.allowed
+        email.required
+        phone.allowed
+        phone.required
+        password.minimum
+        password.maximum
       ]
 
-      validates :name, presence: true, uniqueness: true
+      validates :name, presence: true, uniqueness: true, inclusion: { in: NAMES }
       serialize :value, coder: JSON
     end
   end

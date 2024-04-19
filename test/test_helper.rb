@@ -49,22 +49,36 @@ module Masks
       Masks.config_path = masks_json if masks_json
     end
 
+    def add_setting(name, value)
+      Masks::Rails::Setting.create!(name:, value:)
+    end
+
+    def assert_actor(nickname: nil)
+      assert Masks::Rails::Actor.includes(:identifiers).find_by(
+        identifiers: { value: nickname, type: Masks::Rails::Identifiers::Nickname.to_s }
+      )
+    end
+
     def new_device(&)
       open_session { |session| session.instance_exec(&) }
     end
 
     def signup_as(
-      actor_id,
+      nickname: nil,
+      email: nil,
+      phone: nil,
       password: "password",
       session: nil,
       status: 302,
       &block
     )
       session ||= self
-      session.post "/session",
+      session.post "/signup",
                    params: {
                      session: {
-                       nickname: actor_id,
+                       email:,
+                       nickname:,
+                       phone:,
                        password:
                      }
                    }
@@ -75,7 +89,7 @@ module Masks
     end
 
     def login_as(
-      actor_id,
+      identifier,
       password: "password",
       session: nil,
       status: 302,
@@ -85,7 +99,7 @@ module Masks
       session ||= self
       session.post "/session",
                    params: {
-                     session: { nickname: actor_id, password: }.merge(**params)
+                     session: { identifier:, password: }.merge(**params)
                    }
 
       assert_equal status, session.response.status
@@ -172,11 +186,14 @@ module Masks
 
     def refute_logged_in
       get "/private"
-      assert_equal 401, status
+
+      assert_equal 302, status
+      assert_includes headers['Location'], '/session'
     end
 
     def assert_logged_in
-      get "/private"
+      get "/me"
+
       assert_equal 200, status
     end
 

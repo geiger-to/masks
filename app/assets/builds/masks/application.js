@@ -1,13 +1,36 @@
 (() => {
+  var __create = Object.create;
   var __defProp = Object.defineProperty;
+  var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
   var __getOwnPropNames = Object.getOwnPropertyNames;
+  var __getProtoOf = Object.getPrototypeOf;
+  var __hasOwnProp = Object.prototype.hasOwnProperty;
   var __esm = (fn, res) => function __init() {
     return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  };
+  var __commonJS = (cb, mod) => function __require() {
+    return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
   var __export = (target, all) => {
     for (var name in all)
       __defProp(target, name, { get: all[name], enumerable: true });
   };
+  var __copyProps = (to, from, except, desc) => {
+    if (from && typeof from === "object" || typeof from === "function") {
+      for (let key of __getOwnPropNames(from))
+        if (!__hasOwnProp.call(to, key) && key !== except)
+          __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+    }
+    return to;
+  };
+  var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+    // If the importer is in node compatibility mode or this is not an ESM
+    // file that has been converted to a CommonJS file using a Babel-
+    // compatible transform (i.e. "__esModule" has not been set), then set
+    // "default" to the CommonJS "module.exports" for node compatibility.
+    isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+    mod
+  ));
 
   // node_modules/@rails/actioncable/src/adapters.js
   var adapters_default;
@@ -592,6 +615,132 @@
       init_subscription_guarantor();
       init_adapters();
       init_logger();
+    }
+  });
+
+  // node_modules/theme-change/index.js
+  var require_theme_change = __commonJS({
+    "node_modules/theme-change/index.js"(exports, module) {
+      function themeToggle() {
+        var toggleEl = document.querySelector("[data-toggle-theme]");
+        var dataKey = toggleEl ? toggleEl.getAttribute("data-key") : null;
+        (function(theme = localStorage.getItem(dataKey ? dataKey : "theme")) {
+          if (localStorage.getItem(dataKey ? dataKey : "theme")) {
+            document.documentElement.setAttribute("data-theme", theme);
+            if (toggleEl) {
+              [...document.querySelectorAll("[data-toggle-theme]")].forEach((el) => {
+                el.classList.add(toggleEl.getAttribute("data-act-class"));
+              });
+            }
+          }
+        })();
+        if (toggleEl) {
+          [...document.querySelectorAll("[data-toggle-theme]")].forEach((el) => {
+            el.addEventListener("click", function() {
+              var themesList = el.getAttribute("data-toggle-theme");
+              if (themesList) {
+                var themesArray = themesList.split(",");
+                if (document.documentElement.getAttribute("data-theme") == themesArray[0]) {
+                  if (themesArray.length == 1) {
+                    document.documentElement.removeAttribute("data-theme");
+                    localStorage.removeItem(dataKey ? dataKey : "theme");
+                  } else {
+                    document.documentElement.setAttribute("data-theme", themesArray[1]);
+                    localStorage.setItem(dataKey ? dataKey : "theme", themesArray[1]);
+                  }
+                } else {
+                  document.documentElement.setAttribute("data-theme", themesArray[0]);
+                  localStorage.setItem(dataKey ? dataKey : "theme", themesArray[0]);
+                }
+              }
+              [...document.querySelectorAll("[data-toggle-theme]")].forEach((el2) => {
+                el2.classList.toggle(this.getAttribute("data-act-class"));
+              });
+            });
+          });
+        }
+      }
+      function themeBtn() {
+        var btnEl = document.querySelector("[data-set-theme='']");
+        var dataKey = btnEl ? btnEl.getAttribute("data-key") : null;
+        (function(theme = localStorage.getItem(dataKey ? dataKey : "theme")) {
+          if (theme != void 0 && theme != "") {
+            if (localStorage.getItem(dataKey ? dataKey : "theme") && localStorage.getItem(dataKey ? dataKey : "theme") != "") {
+              document.documentElement.setAttribute("data-theme", theme);
+              var btnEl2 = document.querySelector("[data-set-theme='" + theme.toString() + "']");
+              if (btnEl2) {
+                [...document.querySelectorAll("[data-set-theme]")].forEach((el) => {
+                  el.classList.remove(el.getAttribute("data-act-class"));
+                });
+                if (btnEl2.getAttribute("data-act-class")) {
+                  btnEl2.classList.add(btnEl2.getAttribute("data-act-class"));
+                }
+              }
+            } else {
+              var btnEl2 = document.querySelector("[data-set-theme='']");
+              if (btnEl2.getAttribute("data-act-class")) {
+                btnEl2.classList.add(btnEl2.getAttribute("data-act-class"));
+              }
+            }
+          }
+        })();
+        [...document.querySelectorAll("[data-set-theme]")].forEach((el) => {
+          el.addEventListener("click", function() {
+            document.documentElement.setAttribute("data-theme", this.getAttribute("data-set-theme"));
+            localStorage.setItem(dataKey ? dataKey : "theme", document.documentElement.getAttribute("data-theme"));
+            [...document.querySelectorAll("[data-set-theme]")].forEach((el2) => {
+              el2.classList.remove(el2.getAttribute("data-act-class"));
+            });
+            if (el.getAttribute("data-act-class")) {
+              el.classList.add(el.getAttribute("data-act-class"));
+            }
+          });
+        });
+      }
+      function themeSelect() {
+        var selectEl = document.querySelector("select[data-choose-theme]");
+        var dataKey = selectEl ? selectEl.getAttribute("data-key") : null;
+        (function(theme = localStorage.getItem(dataKey ? dataKey : "theme")) {
+          if (localStorage.getItem(dataKey ? dataKey : "theme")) {
+            document.documentElement.setAttribute("data-theme", theme);
+            var optionToggler = document.querySelector("select[data-choose-theme] [value='" + theme.toString() + "']");
+            if (optionToggler) {
+              [...document.querySelectorAll("select[data-choose-theme] [value='" + theme.toString() + "']")].forEach((el) => {
+                el.selected = true;
+              });
+            }
+          }
+        })();
+        if (selectEl) {
+          [...document.querySelectorAll("select[data-choose-theme]")].forEach((el) => {
+            el.addEventListener("change", function() {
+              document.documentElement.setAttribute("data-theme", this.value);
+              localStorage.setItem(dataKey ? dataKey : "theme", document.documentElement.getAttribute("data-theme"));
+              [...document.querySelectorAll("select[data-choose-theme] [value='" + localStorage.getItem(dataKey ? dataKey : "theme") + "']")].forEach((el2) => {
+                el2.selected = true;
+              });
+            });
+          });
+        }
+      }
+      function themeChange2(attach = true) {
+        if (attach === true) {
+          document.addEventListener("DOMContentLoaded", function(event) {
+            themeToggle();
+            themeSelect();
+            themeBtn();
+          });
+        } else {
+          themeToggle();
+          themeSelect();
+          themeBtn();
+        }
+      }
+      if (typeof exports != "undefined") {
+        module.exports = { themeChange: themeChange2 };
+      } else {
+        themeChange2();
+      }
     }
   });
 
@@ -5997,6 +6146,9 @@
   window.Turbo = turbo_es2017_esm_exports;
   addEventListener("turbo:before-fetch-request", encodeMethodIntoRequestBody);
 
+  // app/assets/javascripts/controllers/application.js
+  var import_theme_change = __toESM(require_theme_change());
+
   // node_modules/@hotwired/stimulus/dist/stimulus.js
   var EventListener = class {
     constructor(eventTarget, eventName, eventOptions) {
@@ -8446,6 +8598,7 @@
   Controller.values = {};
 
   // app/assets/javascripts/controllers/application.js
+  (0, import_theme_change.themeChange)();
   var application = Application.start();
   application.debug = true;
   window.Stimulus = application;
@@ -8670,6 +8823,135 @@
     }
   };
 
+  // node_modules/js-cookie/dist/js.cookie.mjs
+  function assign(target) {
+    for (var i = 1; i < arguments.length; i++) {
+      var source = arguments[i];
+      for (var key in source) {
+        target[key] = source[key];
+      }
+    }
+    return target;
+  }
+  var defaultConverter = {
+    read: function(value) {
+      if (value[0] === '"') {
+        value = value.slice(1, -1);
+      }
+      return value.replace(/(%[\dA-F]{2})+/gi, decodeURIComponent);
+    },
+    write: function(value) {
+      return encodeURIComponent(value).replace(
+        /%(2[346BF]|3[AC-F]|40|5[BDE]|60|7[BCD])/g,
+        decodeURIComponent
+      );
+    }
+  };
+  function init(converter, defaultAttributes) {
+    function set(name, value, attributes) {
+      if (typeof document === "undefined") {
+        return;
+      }
+      attributes = assign({}, defaultAttributes, attributes);
+      if (typeof attributes.expires === "number") {
+        attributes.expires = new Date(Date.now() + attributes.expires * 864e5);
+      }
+      if (attributes.expires) {
+        attributes.expires = attributes.expires.toUTCString();
+      }
+      name = encodeURIComponent(name).replace(/%(2[346B]|5E|60|7C)/g, decodeURIComponent).replace(/[()]/g, escape);
+      var stringifiedAttributes = "";
+      for (var attributeName in attributes) {
+        if (!attributes[attributeName]) {
+          continue;
+        }
+        stringifiedAttributes += "; " + attributeName;
+        if (attributes[attributeName] === true) {
+          continue;
+        }
+        stringifiedAttributes += "=" + attributes[attributeName].split(";")[0];
+      }
+      return document.cookie = name + "=" + converter.write(value, name) + stringifiedAttributes;
+    }
+    function get(name) {
+      if (typeof document === "undefined" || arguments.length && !name) {
+        return;
+      }
+      var cookies = document.cookie ? document.cookie.split("; ") : [];
+      var jar = {};
+      for (var i = 0; i < cookies.length; i++) {
+        var parts = cookies[i].split("=");
+        var value = parts.slice(1).join("=");
+        try {
+          var found = decodeURIComponent(parts[0]);
+          jar[found] = converter.read(value, found);
+          if (name === found) {
+            break;
+          }
+        } catch (e) {
+        }
+      }
+      return name ? jar[name] : jar;
+    }
+    return Object.create(
+      {
+        set,
+        get,
+        remove: function(name, attributes) {
+          set(
+            name,
+            "",
+            assign({}, attributes, {
+              expires: -1
+            })
+          );
+        },
+        withAttributes: function(attributes) {
+          return init(this.converter, assign({}, this.attributes, attributes));
+        },
+        withConverter: function(converter2) {
+          return init(assign({}, this.converter, converter2), this.attributes);
+        }
+      },
+      {
+        attributes: { value: Object.freeze(defaultAttributes) },
+        converter: { value: Object.freeze(converter) }
+      }
+    );
+  }
+  var api = init(defaultConverter, { path: "/" });
+
+  // app/assets/javascripts/controllers/theme_controller.js
+  var theme_controller_default = class extends Controller {
+    static get targets() {
+      return ["toggle"];
+    }
+    changedColorScheme(e) {
+      if (this.toggleTarget) {
+        this.toggleTarget.checked = e.matches;
+      }
+    }
+    connect() {
+      this.prefersColorScheme = window.matchMedia("(prefers-color-scheme: dark)");
+      this.prefersColorScheme.addEventListener("change", this.changedColorScheme);
+      this.prefersColorScheme.addListener(this.changedColorScheme);
+    }
+    toggle(e) {
+      if (e.target.checked) {
+        api.set("default_theme", "dark", { sameSite: "strict" });
+        document.documentElement.setAttribute("data-theme", e.target.dataset.dark);
+      } else {
+        api.set("default_theme", "light", { sameSite: "strict" });
+        document.documentElement.setAttribute("data-theme", e.target.dataset.light);
+      }
+    }
+    // toggleSettings(e) {
+    //   this.settingsTarget.classList.toggle("hidden");
+    //   e.preventDefault();
+    //   e.stopPropagation();
+    // }
+  };
+
   // app/assets/javascripts/controllers/table_controller.js
   var table_controller_default = class extends Controller {
     static get targets() {
@@ -8693,6 +8975,7 @@
   application.register("password-visibility", PasswordVisibility);
   application.register("reveal", Reveal);
   application.register("dialog", Dialog);
+  application.register("theme", theme_controller_default);
 })();
 /*! Bundled license information:
 
@@ -8701,5 +8984,8 @@
   Turbo 8.0.10
   Copyright © 2024 37signals LLC
    *)
+
+js-cookie/dist/js.cookie.mjs:
+  (*! js-cookie v3.0.5 | MIT *)
 */
 //# sourceMappingURL=application.js.map

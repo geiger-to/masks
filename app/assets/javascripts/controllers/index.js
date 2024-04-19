@@ -8,6 +8,7 @@ import RecoverController from "./recover_controller";
 import RecoverPasswordController from "./recover_password_controller";
 import EmailsController from "./emails_controller";
 import KeysController from "./keys_controller";
+import ThemeController from "./theme_controller";
 import TableController from "./table_controller";
 
 application.register("session", SessionController);
@@ -19,3 +20,4 @@ application.register("table", TableController);
 application.register("password-visibility", PasswordVisibilityController);
 application.register("reveal", RevealController);
 application.register("dialog", DialogController);
+application.register("theme", ThemeController);

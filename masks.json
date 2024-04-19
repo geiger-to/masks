@@ -2,7 +2,6 @@
   "name": "masks",
   "url": "http://localhost:3000",
   "title": "masks",
-  "signups": true,
   "nickname": {
     "format": "^[\\w]+$",
     "length": { "min": 5, "max": 36 }
@@ -17,15 +16,6 @@
         "method": "get",
         "path": ["/assets/*", "/debug"]
       }
-    },
-    {
-      "type": "anon",
-      "request": {
-        "method": "get",
-        "path": "/anon"
-      },
-      "anon": true,
-      "fail": false
     },
     {
       "type": "access_token",
@@ -60,6 +50,23 @@
       "request": {
         "method": "post",
         "path": "/session"
+      },
+      "fail": false
+    },
+    {
+      "type": "session",
+      "request": {
+        "method": "get",
+        "path": "/signup"
+      },
+      "fail": false,
+      "return_to": false
+    },
+    {
+      "type": "signup",
+      "request": {
+        "method": "post",
+        "path": "/signup"
       },
       "fail": false
     },
@@ -145,12 +152,6 @@
       }
     },
     {
-      "type": "session",
-      "request": {
-        "path": "/private"
-      }
-    },
-    {
       "type": "sudo",
       "request": {
         "method": "patch",
@@ -232,10 +233,34 @@
         "device": {}
       },
       "credentials": [
-        "Email",
-        "Nickname",
+        "Identifier",
         "Session",
         "Password",
+        "BackupCode",
+        "OneTimeCode",
+        "LastLogin",
+        "Device"
+      ]
+    },
+    "signup": {
+      "checks": {
+        "actor": {
+          "lifetime": "PT12H"
+        },
+        "password": {
+          "lifetime": "PT12H"
+        },
+        "factor2": {
+          "lifetime": "PT12H",
+          "optional": true
+        },
+        "device": {}
+      },
+      "credentials": [
+        "Session",
+        "Signup",
+        "Password",
+        "LastLogin",
         "BackupCode",
         "OneTimeCode",
         "LastLogin",

@@ -11,12 +11,24 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
-  create_table "actors", force: :cascade do |t|
+  create_table "actor_identifiers", force: :cascade do |t|
+    t.string "value"
+    t.string "sha"
     t.string "type"
-    t.string "nickname"
+    t.integer "actor_id"
+    t.datetime "verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_actor_identifiers_on_actor_id"
+    t.index ["sha"], name: "index_actor_identifiers_on_sha", unique: true
+    t.index ["value"], name: "index_actor_identifiers_on_value", unique: true
+  end
+
+  create_table "actors", force: :cascade do |t|
+    t.string "uuid"
+    t.string "type"
     t.string "version"
     t.string "password_digest"
-    t.string "phone_number"
     t.string "totp_secret"
     t.text "backup_codes"
     t.datetime "created_at", null: false
@@ -27,7 +39,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
     t.datetime "added_totp_secret_at"
     t.datetime "saved_backup_codes_at"
     t.datetime "notified_inactive_at"
-    t.index ["nickname"], name: "index_actors_on_nickname", unique: true
   end
 
   create_table "devices", force: :cascade do |t|

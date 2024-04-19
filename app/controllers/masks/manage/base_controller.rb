@@ -7,14 +7,22 @@ module Masks
       layout "masks/manage"
 
       class << self
-        def section(name)
-          before_action { @section = name }
+        def section(section, subsection = nil)
+          before_action do
+            @section = [section, subsection].compact.join('-')
+          end
         end
       end
 
       helper_method :current_actor, :section
 
       attr_accessor :section
+
+      private
+
+      def version
+        Masks::VERSION
+      end
     end
   end
 end

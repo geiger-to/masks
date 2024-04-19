@@ -4,6 +4,8 @@ Masks::Engine.routes.draw do
   get "/debug", to: "debug#show" if Rails.env.development?
 
   # signup/login
+  get "signup", to: "signups#new", as: :signup
+  post "signup", to: "signups#create"
   get "session", to: "sessions#new", as: :session
   post "session", to: "sessions#create"
   delete "session", to: "sessions#destroy"
@@ -82,7 +84,8 @@ Masks::Engine.routes.draw do
     patch "device/:id", to: "devices#logout", as: :device
 
     # manage settings
-    get "settings", to: "settings#index", as: :settings
-    post "settings", to: "settings#upsert"
+    get "settings/general", to: "settings#general", as: :general_settings
+    get "settings/theme", to: "settings#theme", as: :theme_settings
+    patch "settings", to: "settings#upsert"
   end
 end

@@ -37,27 +37,23 @@ module Masks
         record
       end
 
-      def find_actor(session, **opts)
-        if opts[:email]
-          session
-            .mask
-            .actor_scope
-            .includes(:emails)
-            .find_by(emails: { email: opts[:email]&.downcase, verified: true })
-        elsif opts[:nickname]
-          session.mask.actor_scope.find_by(nickname: opts[:nickname])
-        end
+      def find_actor(session, identifier:, **opts)
+        session
+          .mask
+          .actor_scope
+          .includes(:identifiers)
+          .find_by(identifiers: { value: identifier.value, type: identifier.type })
       end
 
       def find_actors(session, ids)
-        session.mask.actor_scope.where(nickname: ids).to_a
+        session.mask.actor_scope.where(uuid: ids).to_a
       end
 
-      def build_actor(session, **opts)
-        opts[:session] = session
-        record =
-          session.mask.actor_scope.new(session:, nickname: opts[:nickname])
-        record.emails.build(email: opts[:email]) if opts[:email]
+      def build_actor(session, nickname: nil, email: nil, phone: nil, **opts)
+        record = session.mask.actor_scope.new(session:)
+        record.identifiers << nickname if nickname
+        record.identifiers << email if email
+        record.identifiers << phone if phone
         record
       end
 

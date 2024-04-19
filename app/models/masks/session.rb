@@ -201,6 +201,8 @@ module Masks
             end
 
             cred
+          rescue Masks::Error::CheckFailed
+            return nil
           end
 
         self.checks = load_checks(mask.checks)
@@ -420,6 +422,7 @@ module Masks
     def commit_to_session
       return unless mask&.backup?
       return unless actor&.backup?
+      return unless actor.session_key
 
       data[:masks] ||= {}
       data[:masks][actor.session_key] ||= {}

@@ -51,8 +51,8 @@ module Masks
         return unless actor && passed?
 
         session.data[:actors] ||= {}
-        session.data[:actors][actor.actor_id] = actor.session_key
-        session.data[:actor] = actor.actor_id
+        session.data[:actors][actor.uuid] = actor.session_key
+        session.data[:actor] = actor.uuid
       end
 
       def cleanup

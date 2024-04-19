@@ -43,20 +43,25 @@ module Masks
     # @param [Symbol|String] name
     # @return [String|Number|Array|Hash|nil]
     def setting(name)
-      setting = model(:setting).find_by(name:)
-      setting ? setting.value : Masks.configuration.data[name.to_sym]
+      settings[name]
     end
 
     # Returns a hash of settings.
     #
     # @return [Hash]
     def settings
-      cls = model(:setting)
-      map = cls::NAMES.map do |name|
-        [name, setting(name)]
-      end
+      ::Rails.cache.fetch('masks.settings', expires_in: 1.minute)  do
+        cls = model(:setting)
+        all = cls.all.map do |record|
+          [record.name, record.value]
+        end.to_h
 
-      map.to_h
+        map = cls::NAMES.map do |name|
+          [name, all.fetch(name, Masks.configuration.data.dig(*name.to_s.split('.').map(&:to_sym)))]
+        end
+
+        map.to_h.with_indifferent_access
+      end
     end
 
     # Returns a masked session based on the request passed.
@@ -114,8 +119,8 @@ module Masks
       @config ||=
         begin
           config = load_config(config_path)
-
-          defaults =
+          defaults = load_config(Pathname.new(File.dirname(__dir__)), 'masks.defaults.json')
+          extended =
             if config[:extend]
               # extend a "masks.json" from a gem
               load_config(gem_path(config[:extend]))
@@ -123,11 +128,12 @@ module Masks
               {}
             end
 
-          config = defaults.except(:masks).deep_merge(config)
-          config[:masks] = [*config[:masks], *defaults[:masks]] if defaults[
+          merged = defaults.deep_merge(extended)
+          merged = merged.except(:masks).deep_merge(config)
+          merged[:masks] = [*config[:masks], *extended[:masks]] if extended[
             :masks
           ]
-          config
+          merged
         end
     end
 
@@ -189,8 +195,8 @@ module Masks
       @configuration = @config = @config_path = nil
     end
 
-    def load_config(dir)
-      JSON.parse(File.read(dir.join("masks.json")), symbolize_names: true)
+    def load_config(dir, path = 'masks.json')
+      JSON.parse(File.read(dir.join(path)), symbolize_names: true)
     end
 
     def gem_path(gem_name)

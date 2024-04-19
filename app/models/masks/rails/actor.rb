@@ -16,6 +16,9 @@ module Masks
               )
             }
 
+      has_many :identifiers,
+               class_name: Masks.configuration.models[:identifier],
+               autosave: true, validate: false
       has_many :saved_scopes,
                class_name: Masks.configuration.models[:scope],
                autosave: true
@@ -48,21 +51,41 @@ module Masks
       attribute :session
       attribute :totp_code
 
+      after_initialize :generate_uuid, unless: :uuid
       before_validation :reset_version, unless: :version
 
-      validates :nickname, presence: true, uniqueness: { case_sensitive: false }
       validates :totp_secret, presence: true, if: :totp_code
       validates :version, presence: true
+      validates :identifiers, length: { minimum: 1 }
+      validates :password, length: {
+        minimum: -> { Masks.setting('password.minimum').to_i }, maximum: -> { Masks.setting('password.maximum').to_i }
+      }, if: :password
       validate :validates_totp, if: :totp_code
-      validate :validates_password, if: :password
       validate :validates_signup
+      validate :validates_identifiers
 
       before_save :regenerate_backup_codes
 
       serialize :backup_codes, coder: JSON
 
       def to_param
-        nickname
+        uuid
+      end
+
+      def identifier
+        identifiers.first
+      end
+
+      def nickname
+        identifiers.where(type: Masks.configuration.model(:nickname_id).to_s).first
+      end
+
+      def phone_number
+        identifiers.where(type: Masks.configuration.model(:phone_id).to_s).first
+      end
+
+      def email
+        identifiers.where(type: Masks.configuration.model(:email_id).to_s).first
       end
 
       def primary_email
@@ -91,7 +114,7 @@ module Masks
       end
 
       def totp_uri
-        (totp || random_totp).provisioning_uri(nickname)
+        (totp || random_totp).provisioning_uri(uuid)
       end
 
       def totp_svg(**opts)
@@ -172,26 +195,26 @@ module Masks
 
       private
 
+      def generate_uuid
+        self.uuid ||= SecureRandom.uuid
+      end
+
       def validates_totp
         errors.add(:totp_code, :invalid) unless totp.verify(totp_code)
       end
 
-      def validates_password
-        opts = Masks.configuration.dat.password&.length&.to_h
+      def validates_identifiers
+        identifiers.each do |identifier|
+          next if !identifier.changed? || identifier.valid?
 
-        return unless password && opts
-
-        if opts[:min] && password.length < opts[:min]
-          errors.add(:password, :too_short, count: opts[:min])
-        elsif opts[:max] && password.length > opts[:max]
-          errors.add(key, :too_long, count: opts[:max])
+          errors.add(:base, identifier.errors.full_messages.first)
         end
       end
 
       def validates_signup
-        return unless !persisted? && !Masks.configuration.signups? && signup
+        return unless signup && Masks.setting('signups.disabled')
+          errors.add(:signup, :disabled)
 
-        errors.add(:signup, :disabled)
       end
 
       def reset_version

@@ -239,6 +239,32 @@ en:
         submitted:
           heading: check your notifications...
           description: if you have an account with us you'll receive an email or message on your phone with instructions on how to recover your account.
+    signups:
+      new:
+        submit: get started
+        remember_me: remember me
+        start_over:
+          text: or
+          link: start over...
+        or_start_over: or
+        recover_credentials: "forgot your credentials?"
+        enter_factor2: enter a secondary credential to continue...
+        enter_credentials: "create an account to get started..."
+        enter_password: "enter your password to continue..."
+        continue: "press continue to authorize..."
+        one_time_code: enter a 6-digit one-time code from your authenticator app...
+        backup_code: enter one of your saved 10-digit backup codes...
+        logged_in: welcome!
+        tab:
+          one_time_code: one-time code
+          backup_code: backup code
+        placeholder:
+          nickname: enter a nickname...
+          email: enter an email address...
+          phone: enter a phone number...
+          password: enter a password...
+          one_time_code: one-time code...
+          backup_code: backup code...
     sessions:
       new:
         submit: continue
@@ -280,26 +306,36 @@ en:
       masks/rails/actor:
         nickname: nickname
         password: password
-        signup: invalid
+        signup: signups
       masks/rails/email:
         email: email
       masks/rails/key:
         name: name
         secret: secret
         scopes: scopes
+      masks/rails/identifiers/nickname:
+        value: nickname
+      masks/rails/identifiers/email:
+        value: email address
+      masks/rails/identifiers/phone:
+        value: phone number
     errors:
       models:
         masks/rails/actor:
           format: is invalid
           attributes:
             signup:
-              disabled: credentials...
+              disabled: are disabled
   activemodel:
     attributes:
       masks/credentials/password:
         password: password
       masks/credentials/nickname:
         nickname: nickname
+      masks/credentials/signup:
+        nickname: nickname
+        email: email address
+        phone: phone number
     errors:
       models:
         masks/session:

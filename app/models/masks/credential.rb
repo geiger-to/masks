@@ -126,6 +126,12 @@ module Masks
       check&.skip!(slug, **opts)
     end
 
+    def fail!(**opts)
+      deny!(**opts)
+
+      raise Masks::Error::CheckFailed, self
+    end
+
     def reset!
       check&.clear!(slug)
     end
