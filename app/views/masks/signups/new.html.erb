@@ -17,7 +17,7 @@
         </div>
         <div data-flash="enter-credentials" class="flex items-center gap-4">
           <%= lucide_icon("user-plus", class: "stroke-success") %>
-          <span><%= t(".enter_credentials") %></span>
+          <span><%= t(".enter_credentials_html", login: session_path) %></span>
         </div>
         <div data-flash="enter-password" class="hidden flex items-center gap-4">
           <%= lucide_icon("shield-ellipsis", class: "stroke-warning") %>
@@ -85,7 +85,7 @@
       </div>
     <% elsif !logged_in? %>
       <div class="flex flex-col gap-2">
-        <% if accepted? :nickname %>
+        <% if @identifiers[:nickname]%>
           <label class="form-control w-full">
             <input
               type="text"
@@ -96,7 +96,7 @@
           </label>
         <% end %>
 
-        <% if accepted? :email %>
+        <% if @identifiers[:email] %>
           <label class="form-control w-full">
             <input
               type="text"
@@ -107,7 +107,7 @@
           </label>
         <% end %>
 
-        <% if accepted? :phone  %>
+        <% if @identifiers[:phone] %>
           <label class="form-control w-full">
             <input
               type="text"

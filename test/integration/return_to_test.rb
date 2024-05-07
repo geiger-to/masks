@@ -10,7 +10,7 @@ module Masks
     include Masks::TestHelper
 
     test "actors are redirected to / post-auth by default" do
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       assert_equal "http://www.example.com/", headers["Location"]
     end
@@ -18,7 +18,7 @@ module Masks
     test "actors are redirected to their original location post-auth" do
       get "/me?testing=true"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       assert_equal "http://www.example.com/me?testing=true", headers["Location"]
     end
@@ -27,7 +27,7 @@ module Masks
       get "/me"
       get "/manage"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       assert_equal "http://www.example.com/manage", headers["Location"]
     end
@@ -35,7 +35,7 @@ module Masks
     test "GET /session is not a valid return_to location" do
       get "/session"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       assert_equal "http://www.example.com/", headers["Location"]
     end
@@ -44,7 +44,7 @@ module Masks
       get "/manage"
       post "/foo"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       assert_equal "http://www.example.com/manage", headers["Location"]
     end

@@ -16,7 +16,7 @@ module Masks
     end
 
     test "GET is only available to logged in participants" do
-      signup_as "admin", status: 302 do
+      signup_as nickname: "admin", status: 302 do
         get "/one-time-codes"
         assert_equal 200, status
       end
@@ -30,17 +30,17 @@ module Masks
     end
 
     test "POST requires a valid password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         post "/one-time-codes", params: { session: { password: "invalid" } }
         assert_equal 302, status
       end
 
-      actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      actor = find_actor("@admin")
       refute actor.factor2?
     end
 
     test "POST sets a totp_secret with a valid code" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         totp_secret = ROTP::Base32.random
         ROTP::TOTP.new(totp_secret).at(Time.current)
 
@@ -57,13 +57,13 @@ module Masks
         assert_equal 302, status
       end
 
-      actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      actor = find_actor("@admin")
       refute actor.factor2?
       refute actor.totp_secret
     end
 
     test "POST sets a totp_secret with a valid secret" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         totp_secret = ROTP::Base32.random
         totp_code = ROTP::TOTP.new(totp_secret).at(Time.current)
 
@@ -80,26 +80,26 @@ module Masks
         assert_equal 302, status
       end
 
-      actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      actor = find_actor("@admin")
       refute actor.factor2?
       refute actor.totp_secret
     end
 
     test "POST sets a totp_secret with a valid password, secret, and code" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
       end
 
-      actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      actor = find_actor("@admin")
       assert actor.factor2?
       assert actor.totp_secret
     end
 
     test "DELETE removes a totp_secret with a valid password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.factor2?
         assert actor.totp_secret
 
@@ -112,10 +112,10 @@ module Masks
     end
 
     test "DELETE keeps a totp_secret with an invalid password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.factor2?
         assert actor.totp_secret
 
@@ -128,7 +128,7 @@ module Masks
     end
 
     test "POST /session requires a one-time-code after enabling" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
       end
 
@@ -136,7 +136,7 @@ module Masks
         refute_logged_in
       end
 
-      actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+      actor = find_actor("@admin")
       actor.totp.at(Time.current)
 
       login_as "admin", one_time_code: actor.totp.at(Time.current) do
@@ -145,24 +145,20 @@ module Masks
     end
 
     test "POST /session does not require re-entering a username/password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
       end
 
       login_as "admin" do
         refute_logged_in
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         code = actor.totp.now
 
         post "/session", params: { session: { one_time_code: code } }
 
         assert_logged_in
       end
-    end
-
-    def dummy_app?
-      true
     end
   end
 end

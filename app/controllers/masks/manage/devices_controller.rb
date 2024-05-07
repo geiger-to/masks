@@ -11,12 +11,12 @@ module Masks
       end
 
       def index
-        scope = Masks.configuration.model(:device).includes(:actor)
+        scope = masks_config.model(:device).includes(actor: [:identifiers])
         scope =
           if search_query && ValidatesHost::Ip.new(search_query).valid?
             scope.where(ip_address: search_query)
           elsif search_query
-            scope.where(actor: { nickname: search_query })
+            scope.where(actor_identifiers: { value: search_query })
           else
             scope.all
           end

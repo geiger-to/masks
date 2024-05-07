@@ -20,10 +20,48 @@ module Masks
     attribute :site_links
     attribute :site_logo
     attribute :lifetimes
+    attribute :identifiers
     attribute :openid
     attribute :masks
     attribute :models
     attribute :version
+
+    # Returns a hash of saved settings.
+    #
+    # @return [Hash]
+    def saved_settings
+      ::Rails.cache.fetch('masks.saved_settings', expires_in: 1.minute) do
+        cls = model(:setting)
+        cls.where(name: cls::NAMES).to_h do |record|
+          [record.name, record.value]
+        end.with_indifferent_access
+      end
+    end
+
+    # Returns a hash of settings.
+    #
+    # @return [Hash]
+    def settings
+      ::Rails.cache.fetch('masks.settings', expires_in: 1.minute) do
+        cls = model(:setting)
+        cls::NAMES.to_h do |name|
+          value = ENV.fetch("masks.#{name}", nil)
+          value ||= saved_settings.fetch(name, data.dig(*name.to_s.split('.').map(&:to_sym)))
+
+          [name, value]
+        end.with_indifferent_access
+      end
+    end
+
+    # Returns the value for a setting.
+    #
+    # Setting values are stored in the database, but fallback to what is found in configuration files.
+    #
+    # @param [Symbol|String] name
+    # @return [String|Number|Array|Hash|nil]
+    def setting(name)
+      settings[name]
+    end
 
     # Returns all configuration data as +RecursiveOpenStruct+.
     #
@@ -69,13 +107,57 @@ module Masks
     end
 
     # Returns a list of identifier classes.
-    # @return [String[]]
+    #
+    # @return [HashWithIndifferentAccess]
     def identifiers
-      [
-        Masks::Rails::Identifiers::Nickname,
-        Masks::Rails::Identifiers::Email,
-        Masks::Rails::Identifiers::Phone
-      ]
+      (super || {
+        nickname: Masks::Rails::Identifiers::Nickname,
+        email: Masks::Rails::Identifiers::Email,
+        phone: Masks::Rails::Identifiers::Phone
+      }).to_h do |key, cls|
+        cls = case cls
+        when String
+          cls.constantize
+        else
+          cls
+        end
+
+        [key, cls]
+      end.with_indifferent_access
+    end
+
+    # Returns whether or not an identifier is allowed.
+    #
+    # @param [String] name
+    # @return [Bool]
+    def identifier?(name)
+      identifiers[name] && setting("#{name}.allowed")
+    end
+
+    # Returns whether or not an identifier is .
+    #
+    # @param [String] name
+    # @return [Bool]
+    def signup_identifier?(name)
+      identifier?("#{name}.allowed") && setting("#{name}.signups")
+    end
+
+    # Returns an identifier instance for
+    def identifier(key:, value:)
+      return unless value
+      return if key && !identifier?(key)
+
+      if key
+        identifiers[key].match(value:)
+      else
+        identifiers.each_value do |cls|
+          if (match = cls.match(value:))
+            return match
+          end
+        end
+
+        nil
+      end
     end
 
     # Returns a string to use as the "issuer" for various secrets—TOTP, JWT, etc.
@@ -104,7 +186,6 @@ module Masks
     def site_links
       {
         root: rails_url.try(:root_path) || "/",
-        recover: rails_url.recover_path,
         login: rails_url.session_path,
         signup: rails_url.signup_path,
         after_signup: rails_url.signup_path,
@@ -148,7 +229,6 @@ module Masks
         scope: "Masks::Rails::Scope",
         role: "Masks::Rails::Role",
         email: "Masks::Rails::Email",
-        recovery: "Masks::Rails::Recovery",
         device: "Masks::Rails::Device",
         key: "Masks::Rails::Key",
         openid_client: "Masks::Rails::OpenID::Client",
@@ -234,14 +314,8 @@ module Masks
     end
 
     delegate :find_key,
-             :find_actor,
-             :find_actors,
-             :build_actor,
              :find_device,
-             :find_recovery,
-             :build_recovery,
              :expire_actors,
-             :expire_recoveries,
              to: :adapt
 
     private

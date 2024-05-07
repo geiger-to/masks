@@ -35,21 +35,6 @@
         </ul>
       </div>
     </div>
-
-    <div class="join-item alert text-left flex items-center gap-4 bg-base-200">
-      <%= lucide_icon("mail") %>
-      <span class="flex-grow">
-        <%= t(
-          ".emails",
-          count: @actor.email_addresses.length,
-          email: @actor.email_addresses[0],
-        ) %>
-      </span>
-
-      <a href="<%= emails_path %>" class="btn btn-sm btn-ghost hover:btn-info">
-        <%= t(@actor.emails.empty? ? ".add_email" : ".add_more_email") %>
-      </a>
-    </div>
   </div>
 
   <div class="divider text-xs">

@@ -10,7 +10,7 @@ module Masks
     test "GET authorize assigns the first redirect_uri if none is configured" do
       client = add_client(redirect_uris: [])
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "code",
@@ -18,7 +18,7 @@ module Masks
               redirect_uri: "https://example.com"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
 
         assert_authorization(admin)
 
@@ -56,11 +56,11 @@ module Masks
       assert_equal 302, status
       assert_includes headers["Location"], "/session"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       follow_redirect!
 
-      admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+      admin = find_actor("@admin")
 
       assert_authorization(admin)
     end
@@ -68,7 +68,7 @@ module Masks
     test "GET authorize redirects to the RP if already authenticated" do
       client = add_client
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "code",
@@ -76,7 +76,7 @@ module Masks
               redirect_uri: "https://example.com"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
 
         assert_authorization(admin)
       end
@@ -88,7 +88,7 @@ module Masks
       authorization = nil
       admin = nil
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "code",
@@ -96,7 +96,7 @@ module Masks
               redirect_uri:
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
         authorization = assert_authorization(admin)
       end
 

@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="drawer-side">
+      <div class="drawer-side z-50">
         <label for="masks-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
           <ul class="menu p-4 w-[220px] min-h-full bg-base-100">
             <div class="flex items-center gap-2">
@@ -40,12 +40,6 @@
               </a>
             </div>
 
-            <li>
-              <a class="<%= section == :clients ? 'active' : '' %>" href="<%= manage_clients_path %>">
-                <%= lucide_icon('handshake', size: 16) %>
-                Clients
-              </a>
-            </li>
             <li>
               <a class="<%= section == :actors ? 'active' : '' %>" href="<%= manage_actors_path %>">
                 <%= lucide_icon('user', size: 16) %>
@@ -56,6 +50,12 @@
               <a class="<%= section == :devices ? 'active' : '' %>" href="<%= manage_devices_path %>">
                 <%= lucide_icon('monitor-smartphone', size: 16) %>
                 Devices
+              </a>
+            </li>
+            <li>
+              <a class="<%= section == :clients ? 'active' : '' %>" href="<%= manage_clients_path %>">
+                <%= lucide_icon('handshake', size: 16) %>
+                Clients
               </a>
             </li>
             <li>

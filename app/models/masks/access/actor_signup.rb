@@ -11,7 +11,11 @@ module Masks
       access "actor.signup"
 
       def signup(**opts)
-        actor = config.build_actor(session, **opts.slice(:nickname, :email))
+        actor = session.mask.actor_scope.new(session:, signup: true)
+        actor.identifiers = opts.map do |key, value|
+          config.identifier(key:, value:)
+        end.compact
+
         actor.password = opts[:password]
         actor.save if actor.valid?
         actor

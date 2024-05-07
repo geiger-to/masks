@@ -6,7 +6,7 @@ module Masks
     class ActorsController < BaseController
       section :actors
 
-      before_action :find_actor
+      before_action :find_actor, only: %i[show create update]
 
       rescue_from Pagy::OverflowError do
         redirect_to manage_devices_path
@@ -45,6 +45,38 @@ module Masks
           elsif params[:logout]
             @actor.logout!
             flash[:info] = "logged out of all devices"
+          elsif params[:verify_identifier]
+            identifier = @actor.identifiers.find_by(value: params[:verify_identifier])
+
+            if identifier
+              identifier.touch(:verified_at)
+              flash[:info] = "identifier verified"
+            end
+          elsif params[:unverify_identifier]
+            identifier = @actor.identifiers.find_by(value: params[:unverify_identifier])
+
+            if identifier
+              identifier.update_attribute(:verified_at, nil)
+              flash[:info] = "identifier un-verified"
+            end
+          elsif params[:remove_identifier]
+            identifier = @actor.identifiers.find_by(value: params[:remove_identifier])
+
+            if identifier && @actor.identifiers.count > 1
+              identifier.destroy
+              flash[:info] = "removed identifier \"#{identifier.value}\""
+            end
+          elsif params[:add_identifier]
+            identifier = masks_config.identifier(key: nil, value: params[:add_identifier])
+            identifier.actor = @actor if identifier
+
+            if identifier&.save
+              flash[:info] = "identifier added"
+            elsif identifier
+              flash[:error] = @identifier.errors.full_messages.first
+            else
+              flash[:error] = 'invalid identifier'
+            end
           elsif password_param
             password_access.change_password(password_param, actor: @actor)
 
@@ -64,7 +96,9 @@ module Masks
       private
 
       def find_actor
-        @actor = actor_model.find_by(nickname: params[:actor])
+        @actor = actor_model.includes(:identifiers).find_by!(identifiers: {value: params[:actor]})
+        @identifiers = @actor.identifiers.all
+        @identifier_count = @actor.identifiers.count
       end
 
       def actor_model

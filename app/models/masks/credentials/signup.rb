@@ -7,61 +7,16 @@ module Masks
       checks :actor
 
       def lookup
-        fail! if Masks.setting('signups.disabled')
+        return if actor || !config.setting('signups.enabled')
 
-        return if actor
-
-        config
-          .build_actor(session, nickname:, email:, phone:)
-          .tap do |actor|
-            actor.signup = true
-          end
+        access = session.access('actor.signup')
+        access.signup(**session_params.slice(:nickname, :email, :phone))
       end
 
       def maskup
-        approve! if actor&.valid?
-      end
+        return unless config.setting('signups.enabled')
 
-      private
-
-      def nickname
-        @nickname ||= if accepted?('nickname')
-          Masks.configuration.model(:nickname_id).new(value: session_params[:nickname])
-        end
-      end
-
-      def email
-        @email ||= if accepted?('email')
-          Masks.configuration.model(:email_id).new(value: session_params[:email])
-        end
-      end
-
-      def phone
-        @phone ||= if accepted?('phone')
-          Masks.configuration.model(:phone_id).new(value: session_params[:phone])
-        end
-      end
-
-      def accepted?(name)
-        Masks.setting("#{name}.allowed") && Masks.setting("#{name}.required")
-      end
-
-      def validates_params
-        # actor.validate
-        if accepted?('nickname') && !nickname.valid?
-          errors.add(:base, nickname.errors.full_messages.first)
-        end
-
-        nil
-
-        # if accepted?('email') && s
-        #   errors.add(:email, :blank
-        # end
-
-        # return unless accepted?('phone') && session_params[:phone]&.blank?
-        #   errors.add(:phone, :blank)
-
-        # TODO: validate lengths and values
+        approve! if actor&.valid? && actor&.signup
       end
     end
   end

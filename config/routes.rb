@@ -4,30 +4,15 @@ Masks::Engine.routes.draw do
   get "/debug", to: "debug#show" if Rails.env.development?
 
   # signup/login
-  get "signup", to: "signups#new", as: :signup
-  post "signup", to: "signups#create"
   get "session", to: "sessions#new", as: :session
   post "session", to: "sessions#create"
   delete "session", to: "sessions#destroy"
-
-  # recover credentials
-  get "recover", to: "recoveries#new", as: :recover
-  post "recover", to: "recoveries#create"
-  get "recovery", to: "recoveries#password", as: :recover_password
-  post "recovery", to: "recoveries#reset"
 
   # manage account details, password, etc
   get "me", to: "actors#current", as: :current
   get "password", to: "passwords#edit", as: :password
   post "password", to: "passwords#update"
   post "device/:key", to: "devices#update", as: :device
-
-  # manage emails
-  get "emails", to: "emails#new", as: :emails
-  post "emails", to: "emails#create"
-  patch "emails", to: "emails#notify"
-  delete "emails", to: "emails#delete"
-  get "email/:email/verify", to: "emails#verify", as: :email_verify
 
   # keys
   get "keys", to: "keys#new", as: :keys
@@ -75,9 +60,9 @@ Masks::Engine.routes.draw do
 
     # manage actors
     get "actors", to: "actors#index", as: :actors
-    get "actors/:actor", to: "actors#show", as: :actor
+    get "actors/:actor", to: "actors#show", as: :actor, constraints: { actor: /.*/ }
     post "actors", to: "actors#create"
-    patch "actors/:actor", to: "actors#update"
+    patch "actors/:actor", to: "actors#update", constraints: { actor: /.*/ }
 
     # manage devices
     get "devices", to: "devices#index", as: :devices

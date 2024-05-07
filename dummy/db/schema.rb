@@ -13,14 +13,12 @@
 ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
   create_table "actor_identifiers", force: :cascade do |t|
     t.string "value"
-    t.string "sha"
     t.string "type"
     t.integer "actor_id"
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_actor_identifiers_on_actor_id"
-    t.index ["sha"], name: "index_actor_identifiers_on_sha", unique: true
     t.index ["value"], name: "index_actor_identifiers_on_value", unique: true
   end
 
@@ -53,20 +51,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_devices_on_actor_id"
     t.index ["key", "actor_id"], name: "index_devices_on_key_and_actor_id", unique: true
-  end
-
-  create_table "emails", force: :cascade do |t|
-    t.string "email"
-    t.string "token"
-    t.integer "actor_id"
-    t.boolean "verified"
-    t.datetime "verified_at"
-    t.datetime "notified_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_emails_on_actor_id"
-    t.index ["email", "verified"], name: "index_emails_on_email_and_verified", unique: true
-    t.index ["token"], name: "index_emails_on_token", unique: true
   end
 
   create_table "keys", force: :cascade do |t|
@@ -142,19 +126,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_04_10_194651) do
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_openid_id_tokens_on_actor_id"
     t.index ["openid_client_id"], name: "index_openid_id_tokens_on_openid_client_id"
-  end
-
-  create_table "recoveries", force: :cascade do |t|
-    t.string "token"
-    t.string "nickname"
-    t.string "email"
-    t.string "phone"
-    t.integer "actor_id"
-    t.datetime "notified_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_recoveries_on_actor_id"
-    t.index ["token", "actor_id"], name: "index_recoveries_on_token_and_actor_id", unique: true
   end
 
   create_table "roles", force: :cascade do |t|

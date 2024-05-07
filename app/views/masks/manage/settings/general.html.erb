@@ -8,49 +8,7 @@
         <input name="name" type="text" value="<%= @settings['url'] %>" class="w-full" />
       </label>
       <div class="label">
-        <span class="label-text-alt">used for generating links to the site</span>
-      </div>
-    </div>
-
-    <div class="form-control">
-      <label class="flex items-center gap-4 input input-bordered">
-        <span class="text-sm">theme</span>
-        <input name="theme" type="text" value="<%= @settings['theme'] %>" placeholder="..." autocomplete="off" />
-      </label>
-      <div class="label">
-        <span class="label-text-alt">
-          any of the <a class="underline" href="https://daisyui.com/docs/themes/">daisyUI themes<a> are accepted
-        </span>
-      </div>
-    </div>
-
-    <div class="form-control">
-      <label class="flex items-center gap-4 input input-bordered">
-        <span class="text-sm">logo</span>
-        <input name="logo" type="text" value="<%= @settings['logo'] %>" placeholder="enter a url to an image..." class="w-full" />
-      </label>
-      <div class="label">
-        <span class="label-text-alt">shown on all pages and emails</span>
-      </div>
-    </div>
-
-    <div class="form-control">
-      <label class="flex items-center gap-4 input input-bordered">
-        <span class="text-sm">background</span>
-        <input name="background" type="text" value="<%= @settings['background'] %>" placeholder="enter a valid background-image property..." class="w-full" />
-      </label>
-      <div class="label">
-        <span class="label-text-alt">any value that can be passed to the css <span class="font-mono">background-image:</span> property is accepted</span>
-      </div>
-    </div>
-
-    <div class="form-control">
-      <label class="flex items-center gap-4 input input-bordered">
-        <span class="text-sm">favicon</span>
-        <input name="favicon" type="text" value="<%= @settings['favicon'] %>" placeholder="..." />
-      </label>
-      <div class="label">
-        <span class="label-text-alt">shown in the browser's title bar</span>
+        <span class="label-text-alt">used for generating links to masks</span>
       </div>
     </div>
 
@@ -59,22 +17,36 @@
     <h3 class="font-bold text-sm mt-2 mb-4 flex items-center gap-3">
       <%= lucide_icon('user-plus', size: 16) %>
       <span>
-        identifiers
+        signups
       </span>
     </h3>
 
     <div class="form-control mb-2 flex flex-row items-center gap-4"  class="<%= @settings['dark_mode'] ? '' : 'hidden' %>">
       <label class="label cursor-pointer gap-2">
-        <input name="signups_allowed" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings['signups_allowed'] ? 'checked' : '' %> autocomplete="off" />
-        <span data-reveal-target="item" class="label-text <%= @settings[:signups_allowed] ? '' : 'hidden' %>">email</span>
+        <input name="signups.enabled" type="hidden" value="" />
+        <input name="signups.enabled" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings['signups.enabled'] ? 'checked' : '' %> autocomplete="off" />
+
+        <span data-reveal-target="item" class="label-text <%= @settings['signups.enabled'] ? '' : 'opacity-75' %>">enabled</span>
       </label>
+    </div>
+
+    <% Masks.configuration.identifiers.each do |key, value| %>
+    <div class="form-control mb-2 flex flex-row items-center gap-4"  class="<%= @settings['dark_mode'] ? '' : 'hidden' %>">
       <label class="label cursor-pointer gap-2">
-        <input name="signups_allowed" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings['signups_allowed'] ? 'checked' : '' %> autocomplete="off" />
-        <span data-reveal-target="item" class="label-text <%= @settings[:signups_allowed] ? '' : 'hidden' %>">nickname</span>
+        <input name="<%= key %>.allowed" type="hidden" value="" />
+        <input name="s<%= key %>.allowed" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings["#{key}.allowed"] ? 'checked' : '' %> autocomplete="off" />
+
+        <span data-reveal-target="item" class="label-text <%= @settings["#{key}.allowed"] ? '' : 'opacity-75' %>"><%= key %></span>
       </label>
+    </div>
+    <% end %>
+
+    <div class="form-control mb-2 flex flex-row items-center gap-4"  class="<%= @settings['dark_mode'] ? '' : 'hidden' %>">
       <label class="label cursor-pointer gap-2">
-        <input name="signups_allowed" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings['signups_allowed'] ? 'checked' : '' %> autocomplete="off" />
-        <span data-reveal-target="item" class="label-text <%= @settings[:signups_allowed] ? '' : 'hidden' %>">phone number</span>
+        <input name="signups.enabled" type="hidden" value="" />
+        <input name="signups.enabled" type="checkbox" class="toggle toggle-info toggle-sm" <%= @settings['signups.enabled'] ? 'checked' : '' %> autocomplete="off" />
+
+        <span data-reveal-target="item" class="label-text <%= @settings['signups.enabled'] ? '' : 'opacity-75' %>">enabled</span>
       </label>
     </div>
 

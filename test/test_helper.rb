@@ -73,7 +73,7 @@ module Masks
       &block
     )
       session ||= self
-      session.post "/signup",
+      session.post "/session",
                    params: {
                      session: {
                        email:,
@@ -105,6 +105,10 @@ module Masks
       assert_equal status, session.response.status
 
       session.instance_exec(&block) if block
+    end
+
+    def find_actor(identifier)
+      Masks::Rails::Actor.includes(:identifiers).find_by!(identifiers: { value: identifier })
     end
 
     def add_email(
@@ -195,10 +199,6 @@ module Masks
       get "/me"
 
       assert_equal 200, status
-    end
-
-    def dummy_app?
-      false
     end
 
     def masks_json

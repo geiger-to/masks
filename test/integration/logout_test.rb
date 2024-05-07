@@ -17,14 +17,14 @@ module Masks
     end
 
     test "DELETE deletes existing sessions" do
-      signup_as "admin"
+      signup_as nickname: "admin"
       delete "/session"
 
       refute_logged_in
     end
 
     test "DELETE deletes allows login after logout" do
-      signup_as "admin"
+      signup_as nickname: "admin"
       assert_logged_in
       delete "/session"
       refute_logged_in
@@ -33,7 +33,7 @@ module Masks
     end
 
     test "DELETE /session allows logout during login (e.g. 2fa)" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
         delete "/session"
       end
@@ -43,7 +43,7 @@ module Masks
 
         delete "/session"
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         code = actor.totp.now
 
         post "/session", params: { session: { one_time_code: code } }

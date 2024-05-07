@@ -47,26 +47,11 @@
     },
     {
       "type": "authenticate",
+      "anon": true,
+      "access": ["actor.signup"],
       "request": {
         "method": "post",
         "path": "/session"
-      },
-      "fail": false
-    },
-    {
-      "type": "session",
-      "request": {
-        "method": "get",
-        "path": "/signup"
-      },
-      "fail": false,
-      "return_to": false
-    },
-    {
-      "type": "signup",
-      "request": {
-        "method": "post",
-        "path": "/signup"
       },
       "fail": false
     },
@@ -78,38 +63,6 @@
       },
       "fail": false,
       "return_to": false
-    },
-    {
-      "type": "recovery",
-      "request": {
-        "method": ["get", "post"],
-        "path": ["/recovery", "/recover"]
-      },
-      "fail": false
-    },
-    {
-      "type": "sudo",
-      "request": {
-        "method": ["post"],
-        "path": "/emails"
-      },
-      "fail": false
-    },
-    {
-      "type": "session",
-      "request": {
-        "method": ["delete", "patch"],
-        "path": "/emails"
-      },
-      "fail": false
-    },
-    {
-      "type": "session",
-      "request": {
-        "method": "get",
-        "path": "/email/*/verify"
-      },
-      "fail": false
     },
     {
       "type": "sudo",
@@ -195,7 +148,8 @@
       "access": ["actor.signup", "actor.password", "actor.scopes"]
     },
     {
-      "access": "actor.signup"
+      "access": "actor.signup",
+      "anon": true
     },
     {
       "access": "actor.password"
@@ -235,32 +189,8 @@
       "credentials": [
         "Identifier",
         "Session",
-        "Password",
-        "BackupCode",
-        "OneTimeCode",
-        "LastLogin",
-        "Device"
-      ]
-    },
-    "signup": {
-      "checks": {
-        "actor": {
-          "lifetime": "PT12H"
-        },
-        "password": {
-          "lifetime": "PT12H"
-        },
-        "factor2": {
-          "lifetime": "PT12H",
-          "optional": true
-        },
-        "device": {}
-      },
-      "credentials": [
-        "Session",
         "Signup",
         "Password",
-        "LastLogin",
         "BackupCode",
         "OneTimeCode",
         "LastLogin",
@@ -309,12 +239,6 @@
       },
       "credentials": ["Session", "Device", "ReturnTo"],
       "scopes": ["masks:manage"]
-    },
-    "recovery": {
-      "checks": {
-        "recovery": {}
-      },
-      "credentials": ["Session", "Recovery", "Device"]
     },
     "access_token": {
       "checks": {

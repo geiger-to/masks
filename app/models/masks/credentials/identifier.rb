@@ -19,12 +19,10 @@ module Masks
       private
 
       def identifier
-        @identifier ||= identifier_model.find_match(value: session_params[:identifier])
-
-      end
-
-      def identifier_model
-        Masks.configuration.model(:identifier)
+        @identifier ||= begin
+          match = config.identifier(key: nil, value: session_params[:identifier])
+          match ? config.model(:identifier).find_by(value: match.value, type: match.type) : nil
+        end
       end
     end
   end

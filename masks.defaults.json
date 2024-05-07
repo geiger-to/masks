@@ -10,7 +10,7 @@
     "logo": null
   },
   "signups": {
-    "disabled": false
+    "disabled": true
   },
   "password": {
     "minimum": "8",
@@ -19,17 +19,17 @@
   "nickname": {
     "prefix": "@",
     "allowed": true,
-    "required": true,
+    "signups": true,
     "minimum": "4",
     "maximum": "16"
   },
   "email": {
     "allowed": true,
-    "required": false,
+    "signups": false,
     "domains": []
   },
   "phone": {
     "allowed": true,
-    "required": false
+    "signups": false
   }
 }

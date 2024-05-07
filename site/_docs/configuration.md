@@ -195,7 +195,7 @@ You can create types to share common configuration across `Mask`s. This is an op
 {
   "types": {
     "session": {
-      "credentials": ["Nickname", "Session", "Password"],
+      "credentials": ["Identifier", "Session", "Password"],
       "checks": {
         "actor": {
           "duration": "P1D"
@@ -233,7 +233,6 @@ These values dictate how long certain information is retained by masks—inactiv
 
 | name                 | default    |
 | -------------------- | ---------- |
-| `recovery_email`     | 1 hour     |
 | `verification_email` | 1 hour     |
 | `passwordless_email` | 10 minutes |
 | `totp_drift`         | 60 seconds |

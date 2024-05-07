@@ -299,7 +299,6 @@ module Masks
       return true if mask&.skip?
       return false if !passed_checks? || errors.any?
       return false unless matches_mask?(mask)
-      return false unless actor
       return false unless mask.matches_session?(self)
       return false unless pass?
 
@@ -437,8 +436,9 @@ module Masks
 
       defaults
         .deep_merge(past.deep_symbolize_keys)
-        .to_h { |key, opts| [key, Check.new(opts.merge(key:))] }
-        .slice(*defaults.keys)
+        .to_h do |key, opts|
+          [key, Check.new(opts.merge(key:))]
+        end
     end
 
     def actor_checks

@@ -7,24 +7,13 @@ module Masks
   class NicknameTest < ActionDispatch::IntegrationTest
     include Masks::TestHelper
 
-    test "GET /signup returns a 404 if signups.disabled setting is true" do
-      add_setting('signups.disabled', true)
-
-      get '/signup'
-
-      assert_equal 404, status
+    setup do
+      add_setting('signups.enabled', true)
+      add_setting('nickname.signups', true)
+      add_setting('email.signups', false)
     end
 
-    test "POST /signup returns a 404 if signups.disabled setting is true" do
-      add_setting('signups.disabled', true)
-
-      post '/signup'
-
-      assert_equal 404, status
-      assert_equal 0, Masks::Rails::Actor.count
-    end
-
-    test "POST /signup requires an identifier" do
+    test "POST /session requires an identifier" do
       signup_as status: 200
 
       assert_equal 0, Masks::Rails::Actor.count
@@ -63,7 +52,7 @@ module Masks
       assert_match(/password is too long/, response.body)
     end
 
-    test "POST /signup requires a nickname + password by default" do
+    test "POST /session requires a nickname + password by default" do
       refute_logged_in
 
       signup_as nickname: 'admin'

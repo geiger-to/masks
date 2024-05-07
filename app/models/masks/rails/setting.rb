@@ -10,19 +10,19 @@ module Masks
         theme
         background
         favicon
-        signups.disabled
+        signups.enabled
         dark_mode.logo
         dark_mode.theme
         dark_mode.background
         nickname.prefix
         nickname.allowed
-        nickname.required
+        nickname.signups
         nickname.minimum
         nickname.maximum
         email.allowed
-        email.required
+        email.signups
         phone.allowed
-        phone.required
+        phone.signups
         password.minimum
         password.maximum
       ]

@@ -35,7 +35,9 @@ module Masks
     #
     # @return [Hash]
     def attempts
-      attempted.deep_merge(@attempts || {}).deep_stringify_keys
+      attempted.deep_merge(@attempts || {}).deep_stringify_keys.map do |id, opts|
+        [id, opts] unless expired?(opts)
+      end.compact.to_h
     end
 
     # Whether or not the check is optional.
@@ -57,7 +59,7 @@ module Masks
       return false if attempts.keys.empty?
 
       attempts.all? do |id, _opts|
-        attempt_approved?(id) || attempt_skipped?(id)
+        attempt_approved?(id)
       end
     end
 
@@ -68,7 +70,6 @@ module Masks
       opts = attempts.fetch(id.to_s, {})
 
       return approved unless lifetime
-      return false if opts["skipped_at"]
 
       time =
         case opts["approved_at"]
@@ -87,14 +88,6 @@ module Masks
       end
     end
 
-    # Returns true if a specific attempt was skipped.
-    # @param [String] id
-    # @return Boolean
-    def attempt_skipped?(id)
-      opts = attempts.fetch(id.to_s, {})
-      opts["skipped_at"] && optional
-    end
-
     # Approves an attempt.
     #
     # Additional metadata can be passed as keyword arguments, and it will be
@@ -108,24 +101,7 @@ module Masks
 
       merge_attempt(
         id,
-        opts.merge(approved_at: Time.current.iso8601, skipped_at: nil)
-      )
-    end
-
-    # Skips an attempt. Skips count as approvals.
-    #
-    # Additional metadata can be passed as keyword arguments, and it will be
-    # saved alongside the attempt data.
-    #
-    # @param [String] id
-    # @param [Hash] opts
-    # @return Boolean
-    def skip!(id, **opts)
-      self.skipped = true
-
-      merge_attempt(
-        id,
-        opts.merge(approved_at: nil, skipped_at: Time.current.iso8601)
+        opts.merge(approved_at: Time.current.iso8601)
       )
     end
 
@@ -140,7 +116,7 @@ module Masks
     def deny!(id, **opts)
       self.denied = true
 
-      merge_attempt(id, opts.merge(approved_at: nil, skipped_at: nil))
+      merge_attempt(id, opts.merge(approved_at: nil))
     end
 
     # Returns the time the check passed, if it did.
@@ -150,7 +126,7 @@ module Masks
 
       attempts
         .map do |_id, opts|
-          time = opts["approved_at"] || opts["skipped_at"]
+          time = opts["approved_at"]
           Time.try(:parse, time) if time
         end
         .compact
@@ -175,11 +151,31 @@ module Masks
 
     private
 
+    def expired?(opts)
+      return false unless lifetime
+
+      time =
+        case opts["approved_at"]
+        when nil
+          return false
+        when String
+          Time.try(:parse, opts["approved_at"])
+        else
+          time
+        end
+
+      if time
+        time + ActiveSupport::Duration.parse(lifetime) < Time.current
+      else
+        false
+      end
+    end
+
     def failed?
       return false if attempts.keys.empty?
 
       attempts.any? do |id, _opts|
-        !attempt_approved?(id) && !attempt_skipped?(id)
+        !attempt_approved?(id)
       end
     end
 

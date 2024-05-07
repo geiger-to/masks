@@ -30,6 +30,18 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.index :value, unique: true
     end
 
+    create_table :actor_keys do |t|
+      t.string :name
+      t.string :sha
+      t.text :scopes
+
+      t.references :actor
+      t.timestamps
+      t.datetime :accessed_at
+
+      t.index %i[sha], unique: true
+    end
+
     create_table :scopes do |t|
       t.string :name
       t.references :actor, polymorphic: true
@@ -48,31 +60,6 @@ class CreateActors < ActiveRecord::Migration[7.1]
               %i[type actor_id actor_type record_id record_type],
               unique: true
 
-    create_table :emails do |t|
-      t.string :email
-      t.string :token
-      t.references :actor
-      t.boolean :verified, null: true
-      t.datetime :verified_at
-      t.datetime :notified_at
-      t.timestamps
-
-      t.index %i[email verified], unique: true
-      t.index %i[token], unique: true
-    end
-
-    create_table :recoveries do |t|
-      t.string :token
-      t.string :nickname, null: true
-      t.string :email, null: true
-      t.string :phone, null: true
-      t.references :actor
-      t.datetime :notified_at
-      t.timestamps
-
-      t.index %i[token actor_id], unique: true
-    end
-
     create_table :devices do |t|
       t.string :key
       t.string :user_agent
@@ -85,18 +72,6 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.timestamps
 
       t.index %i[key actor_id], unique: true
-    end
-
-    create_table :keys do |t|
-      t.string :name
-      t.string :sha
-      t.text :scopes
-
-      t.references :actor
-      t.timestamps
-      t.datetime :accessed_at
-
-      t.index %i[sha], unique: true
     end
   end
 end

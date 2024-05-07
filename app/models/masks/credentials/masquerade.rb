@@ -17,15 +17,25 @@ module Masks
             Actors::Anonymous.new(session:) if session.mask&.allow_anonymous?
           when session.mask.actor_scope
             value
-          when ValidateEmail.valid?(value)
-            config.find_actor(session, email: value)
-          when String
-            config.find_actor(session, nickname: prefix_nickname(value))
+          else
+            find_actor(config.identifier(key: nil, value:))
           end
       end
 
       def maskup
         approve! if @loaded
+      end
+
+      private
+
+      def find_actor(identifier)
+        return unless identifier
+
+        session
+          .mask
+          .actor_scope
+          .includes(:identifiers)
+          .find_by(identifiers: { value: identifier.value, type: identifier.type })
       end
     end
   end

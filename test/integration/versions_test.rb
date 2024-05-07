@@ -11,11 +11,11 @@ module Masks
     include Masks::TestHelper
 
     test "changing Masks.configuration.version expires all sessions" do
-      signup_as "admin"
+      signup_as nickname: "admin"
       assert_logged_in
 
       new_device do
-        login_as "admin2"
+        signup_as nickname: "admin2"
         assert_logged_in
 
         Masks.configuration.version = "v2"
@@ -33,7 +33,7 @@ module Masks
     end
 
     test "changing the actor's version expires all of their sessions" do
-      signup_as "admin"
+      signup_as nickname: "admin"
       assert_logged_in
 
       new_device do
@@ -57,8 +57,8 @@ module Masks
       device1 = nil
       device2 = nil
 
-      signup_as "admin" do
-        device1 = Masks::Rails::Actor.find_by!(nickname: "admin").devices.first
+      signup_as nickname: "admin" do
+        device1 = find_actor("@admin").devices.first
 
         assert device1
         assert_logged_in
@@ -67,7 +67,7 @@ module Masks
       new_device do
         login_as "admin"
 
-        device2 = Masks::Rails::Actor.find_by!(nickname: "admin").devices.first
+        device2 = find_actor("@admin").devices.first
 
         assert_equal device1, device2
         assert_logged_in

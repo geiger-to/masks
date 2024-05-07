@@ -37,7 +37,7 @@ module Masks
     test "POST /userinfo accepts access tokens for actors" do
       client = add_client(client_type: "public")
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "token",
@@ -46,7 +46,7 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
         token =
           Masks::Rails::OpenID::AccessToken.find_by!(
             actor: admin,
@@ -56,14 +56,14 @@ module Masks
         post "/userinfo", params: { access_token: token.token }
 
         assert_equal 200, status
-        assert_equal({ "sub" => "admin" }, response.parsed_body)
+        assert_equal({ "sub" => "@admin" }, response.parsed_body)
       end
     end
 
     test "POST /userinfo returns pairwise subjects" do
       client = add_client(client_type: "public", subject_type: "pairwise")
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "token",
@@ -72,7 +72,8 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
+        admin.update_attribute(:uuid, '12345')
         token =
           Masks::Rails::OpenID::AccessToken.find_by!(
             actor: admin,
@@ -85,7 +86,7 @@ module Masks
         assert_equal(
           {
             "sub" =>
-              "4f1bf395fb5f2a4596f174edca6caeb89d33e75b2c19f81600c05fb0be2d5925"
+            "76cf21e9f269ef4910f14170bc88efb5233770c983ded132a38fc2f86e76958e"
           },
           response.parsed_body
         )
@@ -100,7 +101,7 @@ module Masks
           sector_identifier: "example.com"
         )
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "token",
@@ -109,7 +110,8 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
+        admin.update_attribute(:uuid, '12345')
         token =
           Masks::Rails::OpenID::AccessToken.find_by!(
             actor: admin,
@@ -122,7 +124,7 @@ module Masks
         assert_equal(
           {
             "sub" =>
-              "c72360bf19ea6ce4011b1df9e6332856f131702e6854117382aee1eb745885a3"
+            "a3b3bc413ae15241f764fb6bb073a7af22b8aebdfff323aca13bd889d4dc6ce3"
           },
           response.parsed_body
         )
