@@ -1,0 +1,100 @@
+<div class="mb-5 flex items-center gap-2">
+  <%= lucide_icon('key-square', class: 'w-5 h-5') %>
+
+  <h1 class="font-bold">
+    tokens
+  </h1>
+
+  <%= form_with url: admin_tokens_path, method: :get, class: 'flex-grow ml-2 flex gap-2 items-center' do |f| %>
+    <label class="input input-sm flex items-center gap-2 flex-grow">
+      <input type="text" name="q" class="w-full flex-grow" placeholder="search by actor, client, or token..." value="<%= params[:q] %>" />
+
+      <button type="submit" class="btn btn-ghost btn-xs -mr-2" value="search">
+        <%= lucide_icon('search', size: 16) %>
+      </button>
+    </label>
+  <% end %>
+</div>
+
+<% if @access_tokens.any? %>
+  <%= form_with(url: admin_tokens_path(q: params[:q]), method: :patch) do |f| %>
+    <% if @access_tokens.any? %>
+      <div class="flex text-sm mb-3 gap-4 items-baseline">
+        <p class="flex-grow">
+          <%= @access_tokens.count %> found
+        </p>
+        <button class="btn btn-xs btn-error btn-outline" type="submit">
+          expire checked
+        </button>
+      </div>
+    <% end %>
+
+  <div class="overflow-x-auto -mx-6 md:mx-0">
+    <table class="table bg-base-100 rounded-none md:rounded-lg md:table-sm table-xs [&_td]:py-3 [&_td]:px-4 [&_thead_td]:py-2">
+        <thead class="text-xs">
+        <tr>
+          <td>
+            token
+          </td>
+          <td>
+            actor
+          </td>
+          <td>
+            client
+          </td>
+          <td>
+            expires
+          </td>
+        </tr>
+        </thead>
+        <tbody>
+      <% @access_tokens.each do |access_token| %>
+        <tr>
+          <td>
+            <label class="font-mono cursor-pointer flex-grow  md:max-w-full max-w-[85px] flex items-center gap-2">
+              <input type="checkbox" name="expire_access_tokens" class="checkbox checkbox-xs" value="<%= access_token.id %>" autocomplete="off">
+              <p class="truncate">
+                <%= access_token.hidden_token %>
+              </p>
+            </label>
+          </td>
+          <td>
+            <div class="truncate flex items-center gap-2">
+              <a href="<%= admin_tokens_path(q: access_token.actor) %>" class="underline decoration-dotted">
+                <%= access_token.actor.identifier.value %>
+              </a>
+
+              <span class="opacity-75">on</span>
+
+              <a href="<%= admin_tokens_path(q: access_token.device.key) %>" class="underline decoration-dotted">
+                <%= lucide_icon(device_icon(access_token.device), size: 16) %>
+              </a>
+            </div>
+          </td>
+          <td>
+            <div class="truncate">
+              <a href="<%= admin_tokens_path(q: access_token.client) %>" class="underline decoration-dotted truncate">
+                <%= access_token.client.key %>
+              </a>
+            </div>
+          </td>
+          <td>
+              <div class="whitespace-nowrap">
+                <% if access_token.expires_at > Time.current %>
+                  in <%= time_ago_in_words(access_token.expires_at) %>
+                <% else %>
+                  <%= time_ago_in_words(access_token.expires_at) %> ago
+                <% end %>
+              </div>
+          </td>
+        </tr>
+      <% end %>
+      </tbody>
+      </table>
+    </div>
+  <% end %>
+<% else %>
+  <div class="flex border-2 border-dashed border-base-300 rounded-xl text-xl justify-center items-center p-10 w-full">
+    nothing found
+  </div>
+<% end %>

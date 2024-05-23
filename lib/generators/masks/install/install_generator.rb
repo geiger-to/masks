@@ -20,6 +20,7 @@ module Masks
     def add_migrations
       if yes?("generate migrations for masks?")
         rails_command "masks:install:migrations"
+        rails_command "masks:seed"
       else
         puts
         puts 'run "rails masks:install:migrations" to add them later on...'

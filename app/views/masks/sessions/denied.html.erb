@@ -1,0 +1,19 @@
+<%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
+  <input type="hidden" name="nonce" value="<%= login.nonce %>" />
+
+  <%= render('masks/input/openid',
+    icon: 'alert-triangle',
+    icon_class: 'text-error',
+    heading: t(login.signups_allowed? ? '.login_or_signup' : '.login'),
+    client: openid.client,
+    tenant:,
+  ) %>
+
+  <div class="flex items-center gap-8 alert">
+    <p>
+      <%= t(login.signups_allowed? ? '.login_or_signup_desc' : '.login_desc') %>
+    </p>
+
+    <%= form.submit t(".submit"), name: 'cancel', class: "btn btn-error btn-active" %>
+  </div>
+<% end %>

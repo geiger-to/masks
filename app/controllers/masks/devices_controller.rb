@@ -3,8 +3,6 @@
 module Masks
   # @visibility private
   class DevicesController < ApplicationController
-    require_mask type: :session, only: :update
-
     def update
       device =
         masked_session.config.find_device(masked_session, key: params[:key])

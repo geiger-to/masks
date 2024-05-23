@@ -15,6 +15,7 @@ require "device_detector"
 require "active_model"
 require "chronic_duration"
 require "openid_connect"
+require 'active_record/session_store'
 
 # Top-level module for masks.
 #
@@ -25,6 +26,18 @@ module Masks
   ANON = :anon
 
   class << self
+    def seed!
+      begin
+        tenant = default_tenant
+      rescue Error::TenantNotFound
+        tenant = nil
+      end
+
+      return unless !tenant&.seeded? && configuration.data[:seeds]
+
+      require config_path.join(configuration.data[:seeds]).to_s
+    end
+
     # Returns an access instance based on the type & session passed.
     #
     # @param [Symbol|String] name
@@ -55,6 +68,75 @@ module Masks
       session
     end
 
+    def default_tenant
+      @default_tenant ||= tenant(configuration.data.dig(:tenant))
+    end
+
+    # Returns a masked session based on the params and data passed.
+    #
+    # This method is useful for creating masks directly, outside of a
+    # specific context like a web request.
+    #
+    # @param key [String]
+    # @return [Masks::Profile] profile
+    def tenant(key)
+      if key.is_a?(Masks::Tenant)
+        return key
+      end
+
+      @tenants ||= {}
+
+      if @tenants[key]
+        @tenants[key].reload
+      else
+        @tenants[key] = Masks::Tenant.find_by(key:)
+      end
+
+      raise Error::TenantNotFound unless @tenants[key]
+
+      @tenants[key]
+    end
+
+    # Returns a masked session based on the params and data passed.
+    #
+    # This method is useful for creating masks directly, outside of a
+    # specific context like a web request.
+    #
+    # @param key [String]
+    # @return [Masks::Profile] profile
+    def profile(key)
+      if key.is_a?(Masks::Profile)
+        return key
+      end
+
+      @profiles ||= {}
+
+      if @profiles[key]
+        @profiles[key].reload
+      else
+        @profiles[key] = Masks::Profile.find_by(key:)
+      end
+
+      raise Error::ProfileNotFound unless @profiles[key]
+
+      @profiles[key]
+    end
+
+    # Returns a masked session based on the parameters passed.
+    #
+    # @param [ActionDispatch::Request] request
+    # @return [Masks::Sessions::Request] session
+    def session(name, *args, **opts)
+      profile = profile(name)
+      session = case args[0]
+      when Rack::Request
+        Masks::Sessions::Request.new(*(args[1..]), profile:, request: args[0], **opts)
+      end
+
+      session&.mask!
+      session
+    end
+
     # Returns a masked session based on the params and data passed.
     #
     # This method is useful for creating masks directly, outside of a
@@ -64,7 +146,13 @@ module Masks
     # @param data [Hash]
     # @yield [Masks::Sessions::Inline]
     # @return [Masks::Sessions::Inline] session
-    def mask(name, params: {}, **data)
+    def mask_for(param)
+      case param
+      when Rack::Request
+
+      end
+
+
       model = configuration.model(:inline)
       session = model.new(name:, config: configuration, params:, data:)
       session.mask!

@@ -1,0 +1,81 @@
+  <div class="flex flex-col gap-2">
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">logo</span>
+        <input name="settings[logo]" type="text" value="<%= @profile.setting('logo') %>" placeholder="enter a url to an image..." class="w-full" />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">shown on all pages and emails</span>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">theme</span>
+        <input name="settings[theme]" type="text" value="<%= @profile.setting('theme') %>" placeholder="..." autocomplete="off" />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">
+          any of the <a class="underline" href="https://daisyui.com/docs/themes/">daisyUI themes</a> are accepted
+        </span>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">background</span>
+        <input name="settings[background]" type="text" value="<%= @profile.setting('background') %>" placeholder="enter a valid background-image property..." class="w-full" />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">any value that can be passed to the css <span class="font-mono">background-image:</span> property is accepted</span>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">favicon</span>
+        <input name="settings[favicon]" type="text" value="<%= @profile.setting('favicon') %>" placeholder="..." />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">shown in the browser's title bar</span>
+      </div>
+    </div>
+
+    <h3 class="font-bold text-sm my-2 flex items-center gap-3">
+      <%= lucide_icon('moon', size: 16) %>
+      <span>
+        dark mode
+      </span>
+    </h3>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">theme</span>
+        <input name="settings[dark_mode.theme]" type="text" value="<%= @profile.setting('dark_mode', 'theme') %>" placeholder="..." autocomplete="off"  />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">leave blank to disable dark mode</span>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">logo</span>
+        <input name="settings[dark_mode.logo]" type="text" value="<%= @profile.setting('dark_mode', 'logo') %>" placeholder="..." autocomplete="off"  />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">if blank the default logo will be used</span>
+      </div>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">background</span>
+        <input name="settings[dark_mode.background]" type="text" value="<%= @profile.setting('dark_mode', 'background') %>" placeholder="enter a valid background-image property..." class="w-full" />
+      </label>
+      <div class="label">
+        <span class="label-text-alt opacity-75">the default background will be used unless overridden</span>
+      </div>
+    </div>
+  </div>

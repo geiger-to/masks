@@ -17,6 +17,10 @@ namespace :masks do
     Rails.application.eager_load!
   end
 
+  task seed: [:boot, 'db:migrate'] do |_task, args|
+    Masks.seed!
+  end
+
   task :signup, %i[nickname password] => :boot do |_task, args|
     access = cli_access("actor.signup", args:)
     signup = access.signup(**args) if access

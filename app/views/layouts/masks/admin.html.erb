@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html class="h-full bg-base-200" data-theme="luxury">
+  <head>
+    <title><%= t(".meta.title") %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "masks/application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "masks/application", "data-turbo-track": "reload", defer: true %>
+  </head>
+  <body class="h-full">
+    <% if !local_assigns[:anon] %>
+      <div class="drawer lg:drawer-open">
+        <input id="masks-drawer" type="checkbox" class="drawer-toggle" autocomplete="off" />
+
+        <div class="drawer-content flex flex-col">
+          <div class="w-full navbar bg-base-100 lg:hidden">
+            <div class="flex-none lg:hidden">
+              <label for="masks-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
+                <%= lucide_icon('menu') %>
+              </label>
+            </div>
+            <div class="flex-1 font-bold lg:hidden">
+              <a class="btn btn-ghost text-lg" href="<%= admin_path %>"><%= admin_client.profile.name %></a>
+            </div>
+            <div class="flex-none hidden lg:block">
+            </div>
+          </div>
+
+          <div class="w-full p-6 max-w-screen-lg mx-auto">
+            <%= yield %>
+          </div>
+        </div>
+
+        <div class="drawer-side z-50">
+          <label for="masks-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <div class="p-4 w-[220px] min-h-full bg-base-100 flex flex-col gap-2">
+              <div class="flex items-center gap-2 pl-2">
+                <a class="btn btn-ghost text-lg font-bold" href="<%= admin_path %>">
+                  <%= admin_client.profile.name %>
+                </a>
+              </div>
+
+              <ul class="menu flex-grow">
+                <li>
+                  <a class="<%= section == 'actors' ? 'active' : '' %>" href="<%= admin_actors_path %>">
+                    <%= lucide_icon('user', size: 16) %>
+                    Actors
+                  </a>
+                </li>
+                <li>
+                  <a class="<%= section == 'devices' ? 'active' : '' %>" href="<%= admin_devices_path %>">
+                    <%= lucide_icon('monitor-smartphone', size: 16) %>
+                    Devices
+                  </a>
+                </li>
+                <li>
+                  <a class="<%= section == 'tokens' ? 'active' : '' %>" href="<%= admin_tokens_path %>">
+                    <%= lucide_icon('key-square', size: 16) %>
+                    Tokens
+                  </a>
+                </li>
+                <li>
+                  <a class="<%= section == 'clients' ? 'active' : '' %>" href="<%= admin_clients_path %>">
+                    <%= lucide_icon('handshake', size: 16) %>
+                    Clients
+                  </a>
+                </li>
+                <li>
+                  <a class="<%= section == 'profiles' ? 'active' : '' %>" href="<%= admin_profiles_path %>">
+                    <%= lucide_icon('scan-text', size: 16) %>
+                    Profiles
+                  </a>
+                </li>
+              </ul>
+
+              <div class="flex pl-2 pr-4 items-center">
+                <a href="<%= admin_actor_path(current_actor) %>" class="btn btn-ghost btn-xs">
+                  <%= current_actor.identifier.value %>
+                </a>
+                <a href="<%= session_path(prompt: 'select_account') %>" class="link-hover text-xs opacity-75 text-right flex-grow" data-turbo="false">
+                  switch
+                </a>
+              </div>
+            </div>
+        </div>
+      </div>
+    <% else %>
+      <div class="h-screen flex flex-col px-2">
+        <div class="m-auto w-full max-w-[450px]">
+          <div class="w-full p-6 bg-base-100 shadow-2xl z-10 rounded-xl">
+            <div class="flex items-center gap-2 -mx-2">
+              <a class="btn btn-ghost text-lg font-bold" href="<%= admin_path %>">
+                <%= (client || tenant).name %>
+              </a>
+            </div>
+
+            <%= yield %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+
+<div class="alert bg-base-100 mb-4 mt-0 flex items-center rounded-xl">
+  <div class="text-left">
+    <div class="text-xs">
+      clients
+    </div>
+    <a class="underline" href="<%= admin_client_path(@clients.first) %>"><%= @clients.first.name %></a>
+    <% if @clients.count == 2 %>
+      and <a class="underline" href="<%= admin_client_path(@clients.second) %>"><%= @clients.second.name %></a>
+    <% elsif @clients.count > 2 %>
+      <a class="underline" href="<%= admin_clients_path(q: @profile.key) %>"><%= @clients.count - 1 %> others</a>
+    <% end %>
+  </div>
+</div>
+

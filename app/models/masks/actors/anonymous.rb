@@ -6,8 +6,6 @@ module Masks
     #
     # @see Masks::Actor
     class Anonymous < ApplicationModel
-      include Masks::Actor
-
       attribute :session
 
       # Generates and returns random nickname for the actor.

@@ -1,0 +1,19 @@
+<%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
+  <input type="hidden" name="nonce" value="<%= login.nonce %>" />
+
+  <%= render('masks/input/openid',
+    icon: 'external-link',
+    heading: login.identifier.value,
+    subheading: openid.client ? t('.access_client', client: openid.client.name) : t('.access'),
+    client: openid.client,
+    tenant:,
+  ) %>
+
+  <div class="flex mt-6">
+    <div class="flex-grow">
+      <a href="<%= session_path(prompt: "select_account", nonce: login.nonce) %>" class="btn btn-outline btn-error"><%= t('.cancel') %></a>
+    </div>
+
+    <input type="submit" name="approve" class="btn btn-accent" value="<%= t('.submit')%>" />
+  </div>
+<% end %>

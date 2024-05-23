@@ -1,0 +1,109 @@
+  <div class="form-control mb-2">
+    <label class="flex items-center gap-4 input input-bordered">
+      <span class="label-text-alt opacity-75">url</span>
+      <input name="settings[url]" type="text" value="<%= setting('url') %>" class="w-full" />
+    </label>
+  </div>
+
+    <div class="bg-base-100 px-4 py-2 rounded-lg flex md:flex-row flex-col md:items-start md:gap-8">
+      <div data-controller="reveal">
+        <label class="label cursor-pointer gap-2 flex items-center">
+          <span class="text-sm font-bold flex-grow">
+            login
+          </span>
+          <input name="settings[logins.enabled]" type="hidden" value="" />
+          <input name="settings[logins.enabled]"
+            type="checkbox"
+            class="toggle toggle-success toggle-xs"
+            <%= @profile.setting('logins', 'enabled') ? 'checked' : '' %>
+            autocomplete="off"
+            data-action="reveal#toggle" />
+          <span data-reveal-target="item" class="label-text opacity-75 font-normal <%= @profile.enabled?(:logins) ? "hidden" : "" %>">
+            disabled
+          </span>
+          <span data-reveal-target="item" class="text-success label-text opacity-75 font-normal <%= @profile.enabled?(:logins) ? "" : "hidden" %>">
+            enabled
+          </span>
+        </label>
+      </div>
+
+      <div data-controller="reveal">
+        <label class="label cursor-pointer gap-2 flex items-center">
+          <span class="text-sm font-bold flex-grow">
+            signup
+          </span>
+          <input name="settings[signups.enabled]" type="hidden" value="" />
+          <input name="settings[signups.enabled]"
+            type="checkbox"
+            class="toggle toggle-success toggle-xs"
+            <%= @profile.setting('signups', 'enabled') ? 'checked' : '' %>
+            autocomplete="off"
+            data-action="reveal#toggle" />
+          <span data-reveal-target="item" class="label-text opacity-75 font-normal <%= @profile.enabled?(:signups) ? "hidden" : "" %>">
+            disabled
+          </span>
+          <span data-reveal-target="item" class="text-success label-text opacity-75 font-normal <%= @profile.enabled?(:signups) ? "" : "hidden" %>">
+            enabled
+          </span>
+        </label>
+      </div>
+    </div>
+
+  <div class="text-sm mt-4 mb-2 ml-2 font-bold">identifiers</div>
+
+  <div class="">
+    <% @profile.tenant.identifiers.each do |key, id|  %>
+      <div class="bg-base-100 px-4 py-1 rounded-lg flex-grow md:flex mb-2 h-full w-full" data-controller="reveal">
+          <label class="label cursor-pointer gap-2 flex items-center">
+            <span class="-ml-1 text-xs opacity-75 flex-grow min-w-[60px]">
+              <%= key %>
+            </span>
+            <input name="settings[<%= key %>.enabled]" type="hidden" value="" />
+            <input name="settings[<%= key %>.enabled]"
+              type="checkbox"
+              class="toggle toggle-success toggle-xs mt-0.5"
+              <%= @profile.enabled?(key) ? 'checked' : '' %>
+              autocomplete="off"
+              data-action="reveal#toggle" />
+            <span data-reveal-target="item" class="label-text opacity-75 font-normal <%= @profile.enabled?(key) ? "hidden" : "" %>">
+              disabled
+            </span>
+            <span data-reveal-target="item" class="text-success label-text opacity-75 font-normal <%= @profile.enabled?(key) ? "" : "hidden" %>">
+              accepted
+            </span>
+          </label>
+          <div data-reveal-target="item" class="md:flex items-center gap-4 <%= @profile.enabled?(key) ? "" : "hidden" %>">
+            <label class="label cursor-pointer gap-2 flex items-center md:ml-4 md:mb-0 mb-2">
+              <input name="settings[<%= key %>.signups]" type="hidden" value="" />
+              <input name="settings[<%= key %>.signups]" type="checkbox" class="checkbox checkbox-xs" <%= @profile.setting(key, "signups") ? 'checked' : '' %> autocomplete="off" />
+              <span class="text-xs opacity-75">
+                required at signup
+              </span>
+              <div class='flex-grow'></div>
+            </label>
+
+            <% if key == 'nickname' %>
+              <div class="form-control flex flex-row items-center gap-2">
+                <p class="text-xs opacity-75 mr-1">
+                  length
+                </p>
+                <label class="label cursor-pointer gap-2 input input-sm input-bordered w-full max-w-[100px]">
+                  <span class="label-text-alt whitespace-nowrap opacity-75">min</span>
+                  <input name="settings[nickname.minimum]" type="text" class="w-full"  value="<%= @profile.setting("nickname", "minimum") %>" autocomplete="off" />
+                </label>
+                <label class="label cursor-pointer gap-2 input input-sm input-bordered w-full max-w-[100px]">
+                  <span class="label-text-alt whitespace-nowrap opacity-75">max</span>
+                  <input name="settings[nickname.maximum]" type="text" class="w-full"  value="<%= @profile.setting("nickname", "maximum") %>" autocomplete="off" />
+                </label>
+              </div>
+              <div class="form-control">
+                <label class="label cursor-pointer gap-4 w-full px-0 flex items-center max-w-[150px]">
+                  <span class="text-xs whitespace-nowrap opacity-75">prefix</span>
+                  <input name="settings[nickname.prefix]" type="text" class=" input input-sm input-bordered w-full"  value="<%= @profile.setting("nickname", "prefix") %>" autocomplete="off" />
+                </label>
+              </div>
+            <% end %>
+          </div>
+      </div>
+    <% end %>
+  </div>

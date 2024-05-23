@@ -1,0 +1,35 @@
+<%= form_with url: admin_profiles_path(tab: 'general'), method: :patch do |f| %>
+  <%= render 'header', section: 'general' %>
+
+  <div class="flex flex-col gap-2">
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">name</span>
+        <input name="name" type="text" value="<%= @profile.name %>" class="w-full" />
+      </label>
+    </div>
+
+    <div class="form-control">
+      <label class="flex items-center gap-4 input input-bordered">
+        <span class="text-sm">url</span>
+        <input name="name" type="text" value="<%= @settings['url'] %>" class="w-full" />
+      </label>
+    </div>
+
+    <div role="tablist" class="tabs tabs-bordered w-full [&>.tab-content]:grow">
+      <input type="radio" name="tabs" role="tab" class="tab" aria-label="general" />
+      <div role="tabpanel" class="tab-content">
+        <%= render('masks/admin/profiles/general') %>
+      </div>
+      <input type="radio" name="tabs" role="tab" class="tab" aria-label="theme" />
+      <div role="tabpanel" class="tab-content p-10">
+        <%= render('masks/admin/profiles/theme') %>
+      </div>
+      <input type="radio" name="tabs" role="tab" class="tab" aria-label="actors" checked />
+      <div role="tabpanel" class="tab-content p-10">
+        <%= render('masks/admin/profiles/theme') %>
+      </div>
+    </div>
+
+  </div>
+<% end%>

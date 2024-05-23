@@ -1,0 +1,42 @@
+<div class="mb-4 flex items-center gap-2">
+  <div>
+    <%= lucide_icon('scan-text', class: 'w-5 h-5') %>
+  </div>
+
+  <h1 class="font-bold flex-grow">
+    profiles
+  </h1>
+
+  <button class="btn btn-sm btn-ghost btn-primary" disabled>
+    <span class="">
+      <%= lucide_icon('plus-square', class: 'w-5 h-5') %>
+    </span>
+
+    new
+  </button>
+</div>
+
+<% if @profiles.any? %>
+  <div class="overflow-x-auto">
+    <% @profiles.each do |profile| %>
+      <a href="<%= admin_profile_path(profile, tab: 'general') %>" class="bg-base-100 px-4 py-2 rounded-lg flex items-center gap-2">
+
+        <span class="flex flex-col md:flex-row md:items-center md:gap-4 flex-grow mb-1 md:mb-0">
+          <span class="font-bold truncate text-neutral-content"><%= profile.name %></span>
+          <span class="font-mono text-xs truncate"><%= profile.key %></span>
+        </span>
+
+        <span class="text-right text-xs pr-2">
+          <%= time_ago_in_words(profile.created_at) %> old
+        </span>
+      </a>
+    <% end %>
+  </div>
+  <% else %>
+    <tr>
+      <td colspan="2" class="text-center text-sm">
+          nothing found...
+      </td>
+    </tr>
+  </div>
+<% end %>
