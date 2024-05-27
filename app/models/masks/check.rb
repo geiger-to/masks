@@ -35,9 +35,12 @@ module Masks
     #
     # @return [Hash]
     def attempts
-      attempted.deep_merge(@attempts || {}).deep_stringify_keys.map do |id, opts|
-        [id, opts] unless expired?(opts)
-      end.compact.to_h
+      attempted
+        .deep_merge(@attempts || {})
+        .deep_stringify_keys
+        .map { |id, opts| [id, opts] unless expired?(opts) }
+        .compact
+        .to_h
     end
 
     # Whether or not the check is optional.
@@ -58,9 +61,7 @@ module Masks
       return true if optional? && !failed?
       return false if attempts.keys.empty?
 
-      attempts.all? do |id, _opts|
-        attempt_approved?(id)
-      end
+      attempts.all? { |id, _opts| attempt_approved?(id) }
     end
 
     # Returns true if a specific attempt was approved.
@@ -99,10 +100,7 @@ module Masks
     def approve!(id, **opts)
       self.approved = true
 
-      merge_attempt(
-        id,
-        opts.merge(approved_at: Time.current.iso8601)
-      )
+      merge_attempt(id, opts.merge(approved_at: Time.current.iso8601))
     end
 
     # Denies an attempt.
@@ -174,9 +172,7 @@ module Masks
     def failed?
       return false if attempts.keys.empty?
 
-      attempts.any? do |id, _opts|
-        !attempt_approved?(id)
-      end
+      attempts.any? { |id, _opts| !attempt_approved?(id) }
     end
 
     def merge_attempt(id, data)

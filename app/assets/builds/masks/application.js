@@ -8909,11 +8909,17 @@
     toggle(e) {
       if (e.target.checked) {
         api.set("default_theme", "dark", { sameSite: "strict" });
-        document.documentElement.setAttribute("data-theme", e.target.dataset.dark);
+        document.documentElement.setAttribute(
+          "data-theme",
+          e.target.dataset.dark
+        );
         document.documentElement.classList.add("dark");
       } else {
         api.set("default_theme", "light", { sameSite: "strict" });
-        document.documentElement.setAttribute("data-theme", e.target.dataset.light);
+        document.documentElement.setAttribute(
+          "data-theme",
+          e.target.dataset.light
+        );
         document.documentElement.classList.remove("dark");
       }
     }
@@ -8937,12 +8943,22 @@
     }
   };
 
+  // app/assets/javascripts/controllers/bulk_controller.js
+  var bulk_controller_default = class extends Controller {
+    static get targets() {
+      return ["table"];
+    }
+    connect() {
+    }
+  };
+
   // app/assets/javascripts/controllers/index.js
   application.register("session", session_controller_default);
   application.register("recover", recover_controller_default);
   application.register("recover-password", recover_password_controller_default);
   application.register("keys", keys_controller_default);
   application.register("table", table_controller_default);
+  application.register("bulk", bulk_controller_default);
   application.register("password-visibility", PasswordVisibility);
   application.register("reveal", Reveal);
   application.register("dialog", Dialog);

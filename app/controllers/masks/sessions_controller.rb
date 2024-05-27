@@ -3,7 +3,7 @@
 module Masks
   # @visibility private
   class SessionsController < ApplicationController
-    helper_method :profile, :client, :openid, :login
+    helper_method :login, :openid
 
     delegate :client, :openid, to: :login
     delegate :profile, to: :client, allow_nil: true
@@ -14,9 +14,11 @@ module Masks
       render :error, status: e.status
     end
 
+    before_action :validate_device
+
     before_action do
       nonce.value = params[:nonce] if params[:nonce]
-      nonce.clear_hint if params[:prompt] == 'select_account'
+      nonce.clear_hint if params[:prompt] == "select_account"
       nonce.hint = params[:login_hint] if params[:login_hint]
       nonce.redirect_uri = params[:redirect_uri] if params[:redirect_uri]
       nonce.openid_qs = request.query_string if openid_request?
@@ -38,9 +40,15 @@ module Masks
 
         login.actor = tenant.actors.build(signup: true)
         login.actor.identifiers << login.identifier
-        login.actor.identifiers << nickname_id if nickname_id && nickname_id.key != login.identifier.key
-        login.actor.identifiers << email_id if email_id && email_id.key != login.identifier.key
-        login.actor.identifiers << phone_id if phone_id && phone_id.key != login.identifier.key
+        if nickname_id && nickname_id.key != login.identifier.key
+          login.actor.identifiers << nickname_id
+        end
+        if email_id && email_id.key != login.identifier.key
+          login.actor.identifiers << email_id
+        end
+        if phone_id && phone_id.key != login.identifier.key
+          login.actor.identifiers << phone_id
+        end
         login.actor.password = login.password = params[:password]
         login.actor.save
       else
@@ -53,6 +61,10 @@ module Masks
     end
 
     private
+
+    def validate_device
+      render :device unless device.known? && device.record.save
+    end
 
     def openid_request?
       params[:client_id] && params[:response_type] && params[:redirect_uri]
@@ -75,7 +87,8 @@ module Masks
     end
 
     def consented?
-      client.auto_consent? || (request.post? && params[:approve]) || login.already_complete?
+      client.auto_consent? || (request.post? && params[:approve]) ||
+        login.already_complete?
     end
 
     def approved?
@@ -104,6 +117,20 @@ module Masks
       profile.identifier(key: :phone, value: params[:phone])
     end
 
+    def login
+      @login ||=
+        Masks::Requests::Login.new(tenant:, request:, nonce:, actors:, device:)
+    end
+
+    def nonce
+      @nonce ||= Masks::Sessions::Nonce.new(request:, tenant:)
+    end
+
+    def actors
+      @actors ||=
+        Masks::Sessions::Actors.new(request:, tenant:, hint: nonce.hint)
+    end
+
     # def signup
     #   # if password_param
     #   #   masks_session.verify!(actor, actor.valid_password?(password_param)) if actor
@@ -127,8 +154,6 @@ module Masks
     #   #   return
     #   # end
 
-
-
     #   # if identifier_param
     #   #   masks_session.login_hint = identified? ? identifier_param : nil
     #   #   masks_session.verify!(actor, :identifier, identifier_param) if identified?
@@ -147,7 +172,6 @@ module Masks
     # def destroy
     # end
 
-    private
 
     # def mask_params
     #   if request.post?
@@ -232,7 +256,6 @@ module Masks
     # def password_required?
     #   !masks_session.checked?(actor, :password)
     # end
-
 
     # def valid_password?
 

@@ -23,7 +23,7 @@ class CreateActors < ActiveRecord::Migration[7.1]
 
       t.string :key
       t.string :name
-      t.text   :settings
+      t.text :settings
 
       t.datetime :defaulted_at
       t.timestamps
@@ -74,9 +74,8 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.datetime :verified_at
       t.timestamps
 
-      t.index [:tenant_id, :value], unique: true
+      t.index %i[tenant_id value], unique: true
     end
-
 
     create_table :masks_scopes do |t|
       t.references :tenant

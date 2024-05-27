@@ -8,9 +8,9 @@ module Masks
     include Masks::TestHelper
 
     setup do
-      add_setting('signups.enabled', true)
-      add_setting('nickname.signups', true)
-      add_setting('email.signups', false)
+      add_setting("signups.enabled", true)
+      add_setting("nickname.signups", true)
+      add_setting("email.signups", false)
     end
 
     test "POST /session requires an identifier" do
@@ -25,7 +25,7 @@ module Masks
       assert_equal 0, Masks::Rails::Actor.count
       assert_match(/nickname is too short/, response.body)
 
-      signup_as nickname: "test", password: '', status: 200
+      signup_as nickname: "test", password: "", status: 200
 
       assert_equal 0, Masks::Rails::Actor.count
       refute_match(/nickname is too short/, response.body)
@@ -55,7 +55,7 @@ module Masks
     test "POST /session requires a nickname + password by default" do
       refute_logged_in
 
-      signup_as nickname: 'admin'
+      signup_as nickname: "admin"
 
       assert_equal 1, Masks::Rails::Actor.count
       assert_logged_in

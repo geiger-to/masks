@@ -45,58 +45,65 @@ module Masks
       end
 
       def authorize
-        app = Rack::OAuth2::Server::Authorize.new do |req, res|
-          req.bad_request!(:client_id, "not found") unless client && client.key == req.client_id
+        app =
+          Rack::OAuth2::Server::Authorize.new do |req, res|
+            unless client && client.key == req.client_id
+              req.bad_request!(:client_id, "not found")
+            end
 
-          unless req.redirect_uri
-            req.invalid_request!('"redirect_uri" missing')
-          end
+            unless req.redirect_uri
+              req.invalid_request!('"redirect_uri" missing')
+            end
 
-          unless client.redirect_uris.any?
-            client.redirect_uris = [req.redirect_uri.to_s]
-            client.valid? || req.invalid_request!('"redirect_uri" invalid')
-          end
+            unless client.redirect_uris.any?
+              client.redirect_uris = [req.redirect_uri.to_s]
+              client.valid? || req.invalid_request!('"redirect_uri" invalid')
+            end
 
-          redirect_uris = client.redirect_uris.map do |uri|
-            if uri.end_with?('*') && req.redirect_uri.to_s.start_with?(uri.slice(0..-2))
-              req.redirect_uri.to_s
+            redirect_uris =
+              client.redirect_uris.map do |uri|
+                if uri.end_with?("*") &&
+                     req.redirect_uri.to_s.start_with?(uri.slice(0..-2))
+                  req.redirect_uri.to_s
+                else
+                  uri
+                end
+              end
+
+            res.redirect_uri = req.verify_redirect_uri!(redirect_uris)
+
+            self.scopes = req.scope & client.scopes
+
+            if actor && (scopes - actor.scopes).any?
+              req.bad_request! "invalid_scopes",
+                               "request scopes are unavailable"
+            end
+
+            if res.protocol_params_location == :fragment && req.nonce.blank?
+              req.invalid_request! "nonce required"
+            end
+
+            if client.response_types.include?(
+                 Array(req.response_type).collect(&:to_s).join(" ")
+               )
+              if denied
+                req.access_denied!
+              elsif actor && approved
+                client.save if client.redirect_uris_changed?
+
+                approved! req, res
+              end
             else
-              uri
+              req.unsupported_response_type!
             end
           end
 
-          res.redirect_uri = req.verify_redirect_uri!(redirect_uris)
+        status, headers, =
+          app.call(query ? env.merge("QUERY_STRING" => query) : env)
 
-          self.scopes = req.scope & client.scopes
+        return unless status > 300 && status < 399 && headers["location"]
 
-          if actor && (scopes - actor.scopes).any?
-            req.bad_request! "invalid_scopes", "request scopes are unavailable"
-          end
-
-          if res.protocol_params_location == :fragment && req.nonce.blank?
-            req.invalid_request! "nonce required"
-          end
-
-          if client.response_types.include?(
-               Array(req.response_type).collect(&:to_s).join(" ")
-             )
-            if denied
-              req.access_denied!
-            elsif actor && approved
-              client.save if client.redirect_uris_changed?
-
-              approved! req, res
-            end
-          else
-            req.unsupported_response_type!
-          end
-        end
-
-        status, headers, body = app.call(query ? env.merge("QUERY_STRING" => query) : env)
-
-        return unless status > 300 && status < 399 && headers['location']
-
-        headers['location']
+        headers["location"]
       end
 
       def approved!(req, res)
@@ -138,12 +145,13 @@ module Masks
               nonce: req.nonce
             )
 
-          self.jwt ||= res.id_token =
-            id_token.to_jwt(
-              code: (res.respond_to?(:code) ? res.code : nil),
-              access_token:
-                (res.respond_to?(:access_token) ? res.access_token : nil)
-            )
+          self.jwt ||=
+            res.id_token =
+              id_token.to_jwt(
+                code: (res.respond_to?(:code) ? res.code : nil),
+                access_token:
+                  (res.respond_to?(:access_token) ? res.access_token : nil)
+              )
         end
 
         res.approve!

@@ -17,7 +17,7 @@ module Masks
         render json:
                  OpenIDConnect::Discovery::Provider::Config::Response.new(
                    issuer: client.issuer,
-                   authorization_endpoint: openid_authorization_url,
+                   authorization_endpoint: session_url,
                    token_endpoint: openid_token_url,
                    userinfo_endpoint: openid_userinfo_url,
                    jwks_uri: openid_jwks_url,
@@ -36,19 +36,18 @@ module Masks
                      client_secret_basic
                      client_secret_post
                    ],
-                   claims_supported: %w[sub iss name email address phone_number]
+                   claims_supported: %w[sub iss email phone_number]
                  )
       end
 
       private
 
       def find_client
-        head :not_found unless client
+        render_not_found if !client || client.internal?
       end
 
       def client
-        @client ||=
-          Masks.configuration.model(:openid_client).find_by(key: params[:id])
+        @client ||= tenant.clients.find_by(key: params[:id])
       end
     end
   end

@@ -29,7 +29,7 @@ Gem::Specification.new do |spec|
       ]
     end
 
-  spec.add_dependency 'activerecord-session_store', '~> 2'
+  spec.add_dependency "activerecord-session_store", "~> 2"
   spec.add_dependency "alba"
   spec.add_dependency "bcrypt", "~> 3.1"
   spec.add_dependency "chronic_duration", "~> 0.10"

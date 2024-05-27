@@ -17,7 +17,7 @@ namespace :masks do
     Rails.application.eager_load!
   end
 
-  task seed: [:boot, 'db:migrate'] do |_task, args|
+  task seed: [:boot, "db:migrate"] do |_task, _args|
     Masks.seed!
   end
 

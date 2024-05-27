@@ -78,7 +78,7 @@ module Masks
     end
 
     def checked?(key)
-      return unless actor && !actor.new_record?
+      return false unless actor && !actor.new_record?
 
       current_data[actor.uuid] ||= {}
       current_data[actor.uuid][key]

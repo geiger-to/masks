@@ -6,51 +6,45 @@ Masks::Engine.routes.draw do
   # signup/login
   get "session", to: "sessions#new", as: :session
   post "session", to: "sessions#create"
-  post "signup", to: "sessions#signup"
   # post "two-factor", to: "sessions#"
   # post "recovery", to: "sessions#recovery"
   # post ""
-  delete "session", to: "sessions#destroy"
-
+  #
   # recovery
-  get "recovery", to: "recoveries#new", as: :recovery
-  post "recovery", to: "recoveries#create"
+  # get "recovery", to: "recoveries#new", as: :recovery
+  # post "recovery", to: "recoveries#create"
 
   # manage account details, password, etc
   # namespace :my do
-    # get "/me", to: "actors#current", as: :current
-    # get "password", to: "passwords#edit", as: :password
-    # post "password", to: "passwords#update"
-    # post "device/:key", to: "devices#update", as: :device
+  # get "/me", to: "actors#current", as: :current
+  # get "password", to: "passwords#edit", as: :password
+  # post "password", to: "passwords#update"
+  # post "device/:key", to: "devices#update", as: :device
 
-    # manage 2nd factor options
-    # get "one-time-codes", to: "one_time_code#new", as: :one_time_code
-    # post "one-time-codes", to: "one_time_code#create"
-    # delete "one-time-codes", to: "one_time_code#destroy"
-    # get "backup-codes", to: "backup_codes#new", as: :backup_codes
-    # post "backup-codes", to: "backup_codes#create"
+  # manage 2nd factor options
+  # get "one-time-codes", to: "one_time_code#new", as: :one_time_code
+  # post "one-time-codes", to: "one_time_code#create"
+  # delete "one-time-codes", to: "one_time_code#destroy"
+  # get "backup-codes", to: "backup_codes#new", as: :backup_codes
+  # post "backup-codes", to: "backup_codes#create"
   # end
 
   # OAuth/OpenID support
-  # get "client/:id/.well-known/openid-configuration",
-  #     to: "openid/discoveries#new",
-  #     as: :openid_discovery
-  # get "client/:id/jwks.json", to: "openid/discoveries#jwks", as: :openid_jwks
-  # get "client/:id",
-  #     to:
-  #       redirect { |params, _|
-  #         "client/#{params[:id]}/.well-known/openid-configuration"
-  #       },
-  #     as: :openid_issuer
-  # get "authorize", to: "openid/authorizations#new", as: :openid_authorization
-  # post "authorize", to: "openid/authorizations#create"
-  # post "token",
-  #      to: proc { |env| Masks::OpenID::TokenRequest.new.call(env) },
-  #      as: :openid_token
-  # match "userinfo",
-  #       to: "openid/userinfo#show",
-  #       via: %i[get post],
-  #       as: :openid_userinfo
+  get "client/:id/.well-known/openid-configuration",
+      to: "openid/discoveries#new",
+      as: :openid_discovery
+  get "client/:id/jwks.json", to: "openid/discoveries#jwks", as: :openid_jwks
+  get "client/:id",
+      to:
+        redirect { |params, _|
+          "client/#{params[:id]}/.well-known/openid-configuration"
+        },
+      as: :openid_issuer
+  post "token", to: "openid/tokens#create", as: :openid_token
+  match "userinfo",
+        to: "openid/userinfo#show",
+        via: %i[get post],
+        as: :openid_userinfo
 
   # managers-only section
   namespace :admin do
@@ -70,12 +64,18 @@ Masks::Engine.routes.draw do
 
     # manage actors
     get "actors", to: "actors#index", as: :actors
-    get "actors/:actor", to: "actors#show", as: :actor, constraints: { actor: /.*/ }
+    get "actors/:actor",
+        to: "actors#show",
+        as: :actor,
+        constraints: {
+          actor: /.*/
+        }
     post "actors", to: "actors#create"
     patch "actors/:actor", to: "actors#update", constraints: { actor: /.*/ }
 
     # manage devices
     get "devices", to: "devices#index", as: :devices
+    delete "devices", to: "devices#destroy"
     get "device/:id", to: "devices#show", as: :device
     patch "device/:id", to: "devices#update"
 

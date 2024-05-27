@@ -18,34 +18,34 @@
 @tailwind utilities;
 
 .rainbow {
-  background-color: #FF0000;
+  background-color: #ff0000;
   animation: bgColor 5s infinite linear;
 }
 
 @keyframes bgColor {
   12.5% {
-    background-color: #FF0000;
+    background-color: #ff0000;
   }
   25% {
-    background-color: #FFA500;
+    background-color: #ffa500;
   }
   37.5% {
-    background-color: #FFFF00;
+    background-color: #ffff00;
   }
   50% {
-    background-color: #7FFF00;
+    background-color: #7fff00;
   }
   62.5% {
-    background-color: #00FFFF;
+    background-color: #00ffff;
   }
   75% {
-    background-color: #0000FF;
+    background-color: #0000ff;
   }
   87.5% {
-    background-color: #9932CC;
+    background-color: #9932cc;
   }
   100% {
-    background-color: #FF1493;
+    background-color: #ff1493;
   }
 }
 
@@ -66,5 +66,19 @@
 }
 
 .background {
-  background-image: linear-gradient(to right bottom, #00cdb7, #00c6d2, #00bcea, #00b0fb, #009fff, #2e8eef, #407dde, #4c6ccc, #365ca5, #294b7f, #233a5a, #1f2937);
+  background-image: linear-gradient(
+    to right bottom,
+    #00cdb7,
+    #00c6d2,
+    #00bcea,
+    #00b0fb,
+    #009fff,
+    #2e8eef,
+    #407dde,
+    #4c6ccc,
+    #365ca5,
+    #294b7f,
+    #233a5a,
+    #1f2937
+  );
 }

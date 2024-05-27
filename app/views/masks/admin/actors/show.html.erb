@@ -57,10 +57,6 @@
   </div>
 <% end %>
 
-<% if !@actor.last_login_at %>
-  <%= render('masks/admin/alert/note', class: 'mb-4', icon: 'log-in', note: "#{@actor.identifier.value} has never logged in...") %>
-<% end %>
-
 <div class="bg-base-100 flex flex-col gap-4 p-4 rounded-xl mb-4">
   <div class="flex items-center gap-4" data-controller="dialog" data-action="click->dialog#backdropClose">
     <%= lucide_icon('unlock', class: 'w-4 h-4') %>
@@ -126,7 +122,9 @@
 
 </div>
 
-<% if @actor.last_login_at %>
+<% if !@actor.last_login_at %>
+  <%= render('masks/admin/alert/note', class: 'mb-4', icon: 'log-in', note: "#{@actor.identifier.value} has never logged in...") %>
+<% else %>
 <div data-controller="reveal" class="mb-4">
   <div class="flex flex-col gap-2 p-4 bg-base-100 rounded-xl">
     <% if @clients.any? %>

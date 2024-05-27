@@ -14,17 +14,13 @@
         <input id="masks-drawer" type="checkbox" class="drawer-toggle" autocomplete="off" />
 
         <div class="drawer-content flex flex-col">
-          <div class="w-full navbar bg-base-100 lg:hidden">
+          <div class="w-full bg-base-100 lg:hidden flex items-center py-2 px-6">
             <div class="flex-none lg:hidden">
-              <label for="masks-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost">
-                <%= lucide_icon('menu') %>
+              <label for="masks-drawer" aria-label="open sidebar" class="btn btn-square btn-ghost btn-sm flex items-center">
+                <%= lucide_icon('menu', size: 28) %>
               </label>
             </div>
-            <div class="flex-1 font-bold lg:hidden">
-              <a class="btn btn-ghost text-lg" href="<%= admin_path %>"><%= admin_client.profile.name %></a>
-            </div>
-            <div class="flex-none hidden lg:block">
-            </div>
+            <a class="flex-grow text-lg btn btn-sm btn-ghost mb-0.5" href="<%= admin_path %>"><%= admin_client.profile.name %></a>
           </div>
 
           <div class="w-full p-6 max-w-screen-lg mx-auto">
@@ -34,7 +30,7 @@
 
         <div class="drawer-side z-50">
           <label for="masks-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-            <div class="p-4 w-[220px] min-h-full bg-base-100 flex flex-col gap-2">
+            <div class="p-4 w-[220px] min-h-full bg-base-100 flex flex-col">
               <div class="flex items-center gap-2 pl-2">
                 <a class="btn btn-ghost text-lg font-bold" href="<%= admin_path %>">
                   <%= admin_client.profile.name %>
@@ -49,6 +45,12 @@
                   </a>
                 </li>
                 <li>
+                  <a class="<%= section == 'clients' ? 'active' : '' %>" href="<%= admin_clients_path %>">
+                    <%= lucide_icon('handshake', size: 16) %>
+                    Clients
+                  </a>
+                </li>
+                <li>
                   <a class="<%= section == 'devices' ? 'active' : '' %>" href="<%= admin_devices_path %>">
                     <%= lucide_icon('monitor-smartphone', size: 16) %>
                     Devices
@@ -58,12 +60,6 @@
                   <a class="<%= section == 'tokens' ? 'active' : '' %>" href="<%= admin_tokens_path %>">
                     <%= lucide_icon('key-square', size: 16) %>
                     Tokens
-                  </a>
-                </li>
-                <li>
-                  <a class="<%= section == 'clients' ? 'active' : '' %>" href="<%= admin_clients_path %>">
-                    <%= lucide_icon('handshake', size: 16) %>
-                    Clients
                   </a>
                 </li>
                 <li>

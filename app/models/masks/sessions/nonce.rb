@@ -33,9 +33,10 @@ module Masks
       end
 
       def openid_params
-        @openid_params ||= if openid_qs
-          Rack::Utils.parse_query(openid_qs).with_indifferent_access
-        end
+        @openid_params ||=
+          if openid_qs
+            Rack::Utils.parse_query(openid_qs).with_indifferent_access
+          end
       end
 
       def openid_qs=(value)

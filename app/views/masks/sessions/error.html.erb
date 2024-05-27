@@ -1,9 +1,17 @@
-<div class="flex flex-col gap-4">
-  <div class="text-error text-4xl font-bold mt-4">
-    <%= t(".error.#{@error.class.name.underscore}") %>
-  </div>
+<% if client %>
+  <%= render('masks/input/openid',
+    icon: 'octagon-x',
+    icon_class: 'text-error',
+    heading: t(".error.#{@error.class.name.parameterize.underscore}"),
+    client: client,
+    tenant:,
+  ) %>
+<% end %>
 
-  <h1 class="text-xl mb-4">
-    <%= @error %>
-  </h1>
+<div class="flex flex-col gap-4">
+  <div class="flex items-center gap-8 alert">
+    <p>
+    <%= t(".desc.#{@error.class.name.parameterize.underscore}", client: client.name) %>
+    </p>
+  </div>
 </div>

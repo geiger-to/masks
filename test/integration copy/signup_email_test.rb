@@ -8,9 +8,9 @@ module Masks
     include Masks::TestHelper
 
     setup do
-      add_setting('signups.enabled', true)
-      add_setting('nickname.signups', false)
-      add_setting('email.signups', true)
+      add_setting("signups.enabled", true)
+      add_setting("nickname.signups", false)
+      add_setting("email.signups", true)
     end
 
     test "POST /session requires a valid email" do
@@ -22,7 +22,7 @@ module Masks
     end
 
     test "POST /session requires email length <= 256" do
-      signup_as email: "#{'a' * 256}@example.com" , status: 200
+      signup_as email: "#{"a" * 256}@example.com", status: 200
 
       assert_equal 0, Masks::Rails::Actor.count
       assert_match(/email address is too long/, response.body)
@@ -31,7 +31,7 @@ module Masks
     test "POST /session requires an + password by default" do
       refute_logged_in
 
-      signup_as email: 'admin@example.com'
+      signup_as email: "admin@example.com"
 
       assert_equal 1, Masks::Rails::Actor.count
       assert_logged_in

@@ -84,11 +84,7 @@ module Masks
       reset!
     end
 
-    delegate :optional?,
-             :passed?,
-             :invalidated?,
-             to: :check,
-             allow_nil: true
+    delegate :optional?, :passed?, :invalidated?, to: :check, allow_nil: true
 
     def slug
       self.class.name.split("::").join("_").underscore.to_sym

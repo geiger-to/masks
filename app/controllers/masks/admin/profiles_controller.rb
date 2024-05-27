@@ -55,7 +55,7 @@ module Masks
         @profile.settings = @profile.settings.deep_merge(param_settings)
 
         if @profile.save
-          flash[:info] = 'settings updated'
+          flash[:info] = "settings updated"
         else
           flash[:error] = @profile.errors.full_messages.first
         end
@@ -64,28 +64,36 @@ module Masks
       end
 
       def param_settings
-        @param_settings ||= begin
-          hash = {}
-          names = params[:settings].keys & Masks::Profile::SETTINGS
+        @param_settings ||=
+          begin
+            hash = {}
+            names = params[:settings].keys & Masks::Profile::SETTINGS
 
-          params[:settings].each do |name, value|
-            next unless names.include?(name)
-            value = name.end_with?('.enabled') || name.end_with?('.signups') ? value.present? : value.presence
-            keys = name.split('.')
-            next if value == @profile.setting(*keys)
+            params[:settings].each do |name, value|
+              next unless names.include?(name)
+              value =
+                (
+                  if name.end_with?(".enabled") || name.end_with?(".signups")
+                    value.present?
+                  else
+                    value.presence
+                  end
+                )
+              keys = name.split(".")
+              next if value == @profile.setting(*keys)
 
-            last_key = keys.pop
-            current = hash
-            keys.each do |k|
-              current[k] ||= {}
-              current = current[k]
+              last_key = keys.pop
+              current = hash
+              keys.each do |k|
+                current[k] ||= {}
+                current = current[k]
+              end
+
+              current[last_key] = value
             end
 
-            current[last_key] = value
+            hash
           end
-
-          hash
-        end
       end
     end
   end

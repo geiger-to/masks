@@ -30,8 +30,7 @@ module Masks
 
       new_device do
         login_as "admin" do
-          device2 =
-            find_actor("@admin").devices.first
+          device2 = find_actor("@admin").devices.first
 
           assert_equal device1, device2
           assert_logged_in

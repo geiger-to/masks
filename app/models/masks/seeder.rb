@@ -1,9 +1,8 @@
+# frozen_string_literal: true
 module Masks
   class Seeder
     def self.run(&)
-      ActiveRecord::Base.transaction do
-        new.instance_exec(&)
-      end
+      ActiveRecord::Base.transaction { new.instance_exec(&) }
     end
 
     def seed_tenant(key)
@@ -40,9 +39,7 @@ module Masks
 
       actor.identifiers << id
 
-      if block_given?
-        yield actor
-      end
+      yield actor if block_given?
 
       puts "saving actor \"#{identifier}\"..."
 
@@ -56,9 +53,7 @@ module Masks
 
       return client unless client.new_record?
 
-      if block_given?
-        yield client
-      end
+      yield client if block_given?
 
       puts "saving openid client \"#{key}\"..."
 

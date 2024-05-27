@@ -1,4 +1,4 @@
-<div class="mb-4 flex items-center gap-2">
+<div class="mb-5 flex items-center gap-2">
   <%= lucide_icon('monitor-smartphone', class: 'w-5 h-5') %>
 
   <h1 class="font-bold">
@@ -16,54 +16,54 @@
   <% end %>
 </div>
 
+<div class="my-4">
+  <%= render 'masks/admin/alert/info' %>
+</div>
+
 <div class="overflow-x-auto -mx-6 md:mx-0">
   <table class="table bg-base-100 rounded-none md:rounded-lg md:table-sm table-xs [&_td]:py-3 [&_td]:px-4 [&_thead_td]:py-2">
     <thead>
       <tr>
         <th>device</th>
-        <th>ip address</th>
-        <th class="text-right">actor</th>
+        <th class="text-center">tokens</th>
+        <th class="text-right">created</th>
       </tr>
     </thead>
     <% if @devices.any? %>
       <% @devices.each do |device| %>
         <tr>
           <td>
-            <a href="<%= admin_device_path(device) %>" class="flex items-center gap-4">
-              <%= lucide_icon(device_icon(device), size: 16) %>
-              <span class="flex flex-col gap-1">
-                <span class="truncate">
-                  <%= device.name %> on <%= device.os_name %>
-                </span>
+            <div class="flex items-center gap-4 md:max-w-full max-w-[150px]">
+            <a href="<%= admin_device_path(device) %>" class="label flex items-center gap-2 py-0 cursor-pointer link-hover truncate">
+              <span class="truncate">
+                <%= device.name %> on <%= device.os_name %>
               </span>
-            </a>
-          </td>
-          <td>
-            <span class="flex flex-col gap-1">
-              <span class="truncate text-xs font-mono">
+              <%= lucide_icon(device_icon(device), size: 16) %>
+              <span class="truncate text-xs font-mono opacity-75">
                 <%= device.ip_address %>
               </span>
-            </span>
+            </label>
+            </div>
+          </td>
+          <td class="text-center text-xs">
+            <% if (tokens = device.access_tokens.valid).none? %>
+              <span class="opacity-50">none</span>
+            <% elsif tokens.any? %>
+              <a href="<%= admin_tokens_path(q: tokens.first.token.slice(0, 6)) %>">
+                <%= tokens.count %>
+              </a>
+            <% end %>
           </td>
           <td class="text-right text-xs">
-            <% if (actors = device.actors.distinct).none? %>
-              -
-            <% elsif actors.any? %>
-              <a href="<%= admin_actor_path(actors.first) %>">
-                <%= actors.first.identifier.value %>
-              </a>
-              <% if actors.length > 1%>
-                <span class="text-xs opacity-75">
-                  +<%= actors.length - 1 %>
-                </span>
-              <% end %>
-            <% end %>
+            <div class="truncate">
+              <%= time_ago_in_words(device.created_at) %> ago
+            </div>
           </td>
         </tr>
       <% end %>
     <% else %>
       <tr>
-        <td colspan="2" class="text-sm text-center">
+        <td colspan="3" class="text-sm text-center">
           nothing found...
         </td>
       </tr>

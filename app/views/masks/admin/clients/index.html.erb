@@ -2,9 +2,19 @@
   <div class="mb-4 flex items-center gap-2">
     <%= lucide_icon('handshake', class: 'w-5 h-5') %>
 
-    <h1 class="font-bold flex-grow">
+    <h1 class="font-bold">
       clients
     </h1>
+
+    <%= form_with url: admin_clients_path, method: :get, class: 'flex-grow ml-2 flex gap-2 items-center' do |f| %>
+      <label class="input input-sm flex items-center gap-2 flex-grow">
+        <input type="text" name="q" class="w-full flex-grow" placeholder="search by identifier or device..." value="<%= params[:q] %>" />
+
+        <button type="submit" class="btn btn-ghost btn-xs -mr-2" value="search">
+          <%= lucide_icon('search', size: 16) %>
+        </button>
+      </label>
+    <% end %>
 
     <button class="btn btn-sm btn-ghost btn-primary" data-action="dialog#open">
       <span class="">
@@ -54,12 +64,7 @@
   <% end %>
 
   <% if flash[:destroyed] %>
-    <div role="alert" class="alert alert-error mb-4 mt-0 flex items-center">
-      <%= lucide_icon('trash-2') %>
-      <div>
-        <h3 class="font-bold">"<%= flash[:destroyed] %>" deleted...</h3>
-      </div>
-    </div>
+    <%= render('masks/admin/alert/error', class: 'mb-4', icon: 'trash-2', error: "\"#{flash[:destroyed]}\" deleted...") %>
   <% end %>
 
   <div class="overflow-x-auto -mx-6 md:mx-0">

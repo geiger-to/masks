@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Masks
   module Requests
     class Signup < ApplicationModel
@@ -17,11 +18,12 @@ module Masks
       attr_writer :actor
 
       def actor
-        @actor ||= if request.session[actor_key]
-          tenant.actors.find_by(uuid: request.session[actor_key])
-        elsif hint
-          profile.find_actor(identifier: hint)
-        end
+        @actor ||=
+          if request.session[actor_key]
+            tenant.actors.find_by(uuid: request.session[actor_key])
+          elsif hint
+            profile.find_actor(identifier: hint)
+          end
       end
 
       def actor_session
