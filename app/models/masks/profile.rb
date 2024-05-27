@@ -28,14 +28,12 @@ module Masks
       password.enabled
       password.minimum
       password.maximum
-    ]
+    ].freeze
 
-    belongs_to :tenant, class_name: 'Masks::Tenant'
-    has_many :clients, class_name: 'Masks::Client'
+    belongs_to :tenant, class_name: "Masks::Tenant"
+    has_many :clients, class_name: "Masks::Client"
 
-    validates :key,
-              presence: true,
-              uniqueness: true
+    validates :key, presence: true, uniqueness: true
 
     validates :identifiers, presence: true
 
@@ -49,34 +47,37 @@ module Masks
       super || setting(:name)
     end
 
+    def url
+      setting(:url)
+    end
+
     delegate :find_actor, to: :tenant
 
     def identifiers_key
-      if identifiers.keys.any?
-        identifiers.keys.sort.join('_')
-      else
-        'none'
-      end
+      identifiers.keys.any? ? identifiers.keys.sort.join("_") : "none"
     end
 
     def identifiers
-      tenant.identifiers.map do |key, cls|
-        if enabled?(key)
-          [key, cls]
-        end
-      end.compact.to_h.with_indifferent_access
+      tenant
+        .identifiers
+        .map { |key, cls| [key, cls] if enabled?(key) }
+        .compact
+        .to_h
+        .with_indifferent_access
     end
 
     def signup_identifiers
-      identifiers.map do |key, value|
-        [key, value] if setting(key, :signups)
-      end.compact.to_h
+      identifiers
+        .map { |key, value| [key, value] if setting(key, :signups) }
+        .compact
+        .to_h
     end
 
     def optional_identifiers
-      identifiers.map do |key, value|
-        [key, value] unless setting(key, :signups)
-      end.compact.to_h
+      identifiers
+        .map { |key, value| [key, value] unless setting(key, :signups) }
+        .compact
+        .to_h
     end
 
     def identifier(value:, key: nil)
@@ -109,7 +110,9 @@ module Masks
     end
 
     def merged_settings
-      tenant.settings.deep_stringify_keys.deep_merge(settings.deep_stringify_keys)
+      tenant.settings.deep_stringify_keys.deep_merge(
+        settings.deep_stringify_keys
+      )
     end
   end
 end

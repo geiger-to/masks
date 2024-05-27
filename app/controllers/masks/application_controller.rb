@@ -11,14 +11,8 @@ module Masks
 
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
-    helper_method :tenant, :setting, :masked
+    helper_method :tenant, :client, :profile, :setting
     helper_method :dark_mode?, :dark_mode_allowed?, :theme
-    helper_method :profile, :client, :login, :openid
-
-    delegate :client, :openid, to: :login
-    delegate :profile, to: :client, allow_nil: true
-
-    before_action :validate_device
 
     private
 
@@ -26,24 +20,16 @@ module Masks
       @device ||= Masks::Sessions::Device.new(request:, tenant:)
     end
 
-    def login
-      @login ||= Masks::Requests::Login.new(tenant:, request:, nonce:, actors:, device:)
+    def client
+      nil
     end
 
-    def nonce
-      @nonce ||= Masks::Sessions::Nonce.new(request:, tenant:)
-    end
-
-    def actors
-      @actors ||= Masks::Sessions::Actors.new(request:, tenant:, hint: nonce.hint)
+    def profile
+      nil
     end
 
     def setting(*args)
       profile&.setting(*args) || tenant&.setting(*args)
-    end
-
-    def current_actor
-      login.actor
     end
 
     def theme
@@ -55,11 +41,11 @@ module Masks
     end
 
     def dark_mode?
-      dark_mode_allowed? ? cookies[:default_theme] == 'dark' : false
+      dark_mode_allowed? ? cookies[:default_theme] == "dark" : false
     end
 
     def tenant_key
-      "masks:#{tenant.key || 'unknown'}"
+      "masks:#{tenant.key || "unknown"}"
     end
 
     def tenant_id
@@ -74,12 +60,8 @@ module Masks
       request.format.symbol == :json
     end
 
-    def validate_device
-      render 'masks/device' unless device.known? && device.record.save
-    end
-
     def render_not_found
-      render 'masks/404', layout: 'masks/application', status: :not_found
+      render "masks/404", layout: "masks/application", status: :not_found
     end
   end
 end

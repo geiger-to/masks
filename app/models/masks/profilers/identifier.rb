@@ -13,10 +13,13 @@ module Masks
       private
 
       def identifier
-        @identifier ||= if param
-          match = profile.identifier(value: param)
-          match ? Masks::Identifier.find_by(value: match.value, type: match.type) : nil
-        end
+        @identifier ||=
+          if param
+            match = profile.identifier(value: param)
+            if match
+              Masks::Identifier.find_by(value: match.value, type: match.type)
+            end
+          end
       end
     end
   end

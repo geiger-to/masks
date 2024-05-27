@@ -10,8 +10,6 @@ module Masks
 
       def lookup
         nil unless request.writable? && session_params[:identifier]
-
-
       end
 
       def lookup
@@ -31,10 +29,17 @@ module Masks
       end
 
       def identifier
-        @identifier ||= if identifier_param
-          match = profile.identifier(key: nil, value: session_params[:identifier])
-          match ? config.model(:identifier).find_by(value: match.value, type: match.type) : nil
-        end
+        @identifier ||=
+          if identifier_param
+            match =
+              profile.identifier(key: nil, value: session_params[:identifier])
+            if match
+              config.model(:identifier).find_by(
+                value: match.value,
+                type: match.type
+              )
+            end
+          end
       end
     end
   end

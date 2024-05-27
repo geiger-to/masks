@@ -9,6 +9,7 @@ module Masks
       before_action only: %i[show update] do
         @device = tenant.devices.find(params[:id])
         @actors = @device.actors.distinct
+        @clients = @device.clients.distinct
       end
 
       rescue_from Pagy::OverflowError do
@@ -43,11 +44,18 @@ module Masks
         redirect_back fallback_location: admin_devices_path
       end
 
-      def logout
-        device = Masks::Device.find(params[:id])
-        device.reset_version!
+      def destroy
+        devices = tenant.devices.where(id: params[:ids].slice(0, 500))
+        count = devices.count
+        devices.destroy_all if count.positive?
 
-        redirect_back fallback_location: admin_devices_path
+        if count == 1
+          flash[:info] = "device deleted"
+        elsif count > 1
+          flash[:info] = "devices deleted"
+        end
+
+        redirect_to admin_devices_path
       end
 
       private

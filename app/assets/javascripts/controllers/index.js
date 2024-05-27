@@ -9,12 +9,14 @@ import RecoverPasswordController from "./recover_password_controller";
 import KeysController from "./keys_controller";
 import ThemeController from "./theme_controller";
 import TableController from "./table_controller";
+import BulkController from "./bulk_controller";
 
 application.register("session", SessionController);
 application.register("recover", RecoverController);
 application.register("recover-password", RecoverPasswordController);
 application.register("keys", KeysController);
 application.register("table", TableController);
+application.register("bulk", BulkController);
 application.register("password-visibility", PasswordVisibilityController);
 application.register("reveal", RevealController);
 application.register("dialog", DialogController);

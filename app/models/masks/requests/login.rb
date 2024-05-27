@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 module Masks
   module Requests
     class Login < ApplicationModel
@@ -15,21 +16,28 @@ module Masks
       validates :valid_identifiers?, presence: true
       validates :valid_password?, presence: true
       validates :valid_scopes?, presence: true
-      validates :password, length: {
-        minimum: -> (login) { login.profile.setting(:password, :minimum).to_i },
-        maximum: -> (login) { login.profile.setting(:password, :maximum).to_i }
-      }, if: :password
+      validates :password,
+                length: {
+                  minimum: ->(login) do
+                    login.profile.setting(:password, :minimum).to_i
+                  end,
+                  maximum: ->(login) do
+                    login.profile.setting(:password, :maximum).to_i
+                  end
+                },
+                if: :password
 
       delegate :hint, to: :nonce
 
       def client
-        @client ||= if request.params[:client_id]
-          tenant.clients.find_by(key: request.params[:client_id])
-        elsif nonce.openid_qs
-          tenant.clients.find_by(key: nonce.openid_params[:client_id])
-        else
-          tenant.client
-        end
+        @client ||=
+          if request.params[:client_id]
+            tenant.clients.find_by(key: request.params[:client_id])
+          elsif nonce.openid_qs
+            tenant.clients.find_by(key: nonce.openid_params[:client_id])
+          else
+            tenant.client
+          end
       end
 
       def profile
@@ -108,19 +116,27 @@ module Masks
       end
 
       def complete!(approved: false, denied: false)
-        uri = if already_complete?
-          checked_value(:redirect_uri, actor:)
-        elsif client.internal?
-          if client.valid_redirect_uri?(nonce.redirect_uri)
-            nonce.redirect_uri
-          else
-            client.redirect_uris.first
-          end
-        elsif approved || denied
-          approved ? openid.approve! : openid.deny!
+        uri =
+          if already_complete?
+            checked_value(:redirect_uri, actor:)
+          elsif client.internal?
+            actor.access_tokens.create!(
+              tenant:,
+              client:,
+              device: device.record,
+              scopes: client.scopes
+            )
 
-          openid.redirect_uri
-        end
+            if client.valid_redirect_uri?(nonce.redirect_uri)
+              nonce.redirect_uri
+            else
+              client.redirect_uris.first
+            end
+          elsif approved || denied
+            approved ? openid.approve! : openid.deny!
+
+            openid.redirect_uri
+          end
 
         actor.touch(:last_login_at) if actor && valid?
         checked(:redirect_uri, uri, actor:)
@@ -128,17 +144,31 @@ module Masks
 
       def already_complete?
         checked?(:redirect_uri, actor:) &&
-          (!nonce.redirect_uri || nonce.redirect_uri == checked_value(:redirect_uri, actor:))
+          (
+            !nonce.redirect_uri ||
+              nonce.redirect_uri == checked_value(:redirect_uri, actor:)
+          )
       end
 
       def redirect_uri
-        checked?(:redirect_uri, actor:) ? checked_value(:redirect_uri, actor:) : nonce.redirect_uri
+        if checked?(:redirect_uri, actor:)
+          checked_value(:redirect_uri, actor:)
+        else
+          nonce.redirect_uri
+        end
       end
 
       def openid
-        @openid ||= Masks::Requests::OpenID.new(
-          tenant:, profile:, client:, actor:, request:, device:, query: nonce.openid_qs
-        )
+        @openid ||=
+          Masks::Requests::OpenID.new(
+            tenant:,
+            profile:,
+            client:,
+            actor:,
+            request:,
+            device:,
+            query: nonce.openid_qs
+          )
       rescue Rack::OAuth2::Server::Authorize::BadRequest
         nil
       end
@@ -146,9 +176,7 @@ module Masks
       attr_writer :actor
 
       def actor
-        @actor ||= if hint
-          profile.find_actor(identifier: hint)
-        end
+        @actor ||= (profile.find_actor(identifier: hint) if hint)
       end
 
       delegate :checked, :checked?, :checked_value, :last_actor, to: :actors

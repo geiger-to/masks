@@ -22,7 +22,7 @@ class SupportOpenID < ActiveRecord::Migration[7.1]
 
       t.timestamps
 
-      t.index [:tenant_id, :key], unique: true
+      t.index %i[tenant_id key], unique: true
     end
 
     create_table :masks_authorizations do |t|

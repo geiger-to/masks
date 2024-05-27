@@ -73,7 +73,7 @@ module Masks
             }
 
         admin = find_actor("@admin")
-        admin.update_attribute(:uuid, '12345')
+        admin.update_attribute(:uuid, "12345")
         token =
           Masks::Rails::OpenID::AccessToken.find_by!(
             actor: admin,
@@ -86,7 +86,7 @@ module Masks
         assert_equal(
           {
             "sub" =>
-            "76cf21e9f269ef4910f14170bc88efb5233770c983ded132a38fc2f86e76958e"
+              "76cf21e9f269ef4910f14170bc88efb5233770c983ded132a38fc2f86e76958e"
           },
           response.parsed_body
         )
@@ -111,7 +111,7 @@ module Masks
             }
 
         admin = find_actor("@admin")
-        admin.update_attribute(:uuid, '12345')
+        admin.update_attribute(:uuid, "12345")
         token =
           Masks::Rails::OpenID::AccessToken.find_by!(
             actor: admin,
@@ -124,7 +124,7 @@ module Masks
         assert_equal(
           {
             "sub" =>
-            "a3b3bc413ae15241f764fb6bb073a7af22b8aebdfff323aca13bd889d4dc6ce3"
+              "a3b3bc413ae15241f764fb6bb073a7af22b8aebdfff323aca13bd889d4dc6ce3"
           },
           response.parsed_body
         )

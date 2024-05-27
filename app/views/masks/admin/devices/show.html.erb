@@ -16,54 +16,58 @@
   </div>
 </div>
 
-<div class="mb-6 p-4 py-2 rounded-xl bg-base-100">
-  <div class="flex gap-2 flex-col">
-    <div class="flex-grow truncate">
-      <span class="opacity-75 text-xs">
+<%= render 'masks/admin/alert/info', class: 'mb-2', info: 'nobody is associated with this device...' if @clients&.empty? && @actors&.empty? %>
+
+<div class="mb-2 p-4 py-3 rounded-lg bg-base-100">
+  <div class="flex flex-col gap-2 text-sm">
+    <div class="flex items-center gap-2 flex-grow">
+      <span class="opacity-75 text-xs truncate min-w-[70px]">
         user agent
       </span>
 
-      <span class="font-mono text-sm pl-1"><%= @device.user_agent %></span>
+      <span class="font-mono text-sm truncate"><%= @device.user_agent %></span>
     </div>
 
-    <div class="flex-grow truncate">
-      <span class="opacity-75 text-xs">
+    <div class="flex items-center gap-2 flex-grow">
+      <span class="opacity-75 text-xs truncate min-w-[70px]">
         ip address
       </span>
 
-      <span class="font-mono text-sm pl-1"><%= @device.ip_address %></span>
+      <span class="font-mono text-sm truncate"><%= @device.ip_address %></span>
     </div>
 
-    <div class="truncate mb-1 text-sm">
-      <span class="opacity-75 text-xs">
+    <div class="flex items-center gap-2 flex-grow">
+      <span class="opacity-75 text-xs truncate min-w-[70px]">
         registered
        </span>
 
-      <span class="pl-1">
+      <span class="truncate">
         <%= time_ago_in_words(@device.created_at) %> ago
       </span>
     </div>
   </div>
 </div>
 
-<% if @actors.any? %>
-  <div class="text-xs flex items-center gap-2 mb-3 ml-2">
-    <div>
-      <%= lucide_icon('users-round', size: 16) %>
+<div class="flex items-center gap-2 text-center md:text-base text-xs">
+  <a class="hover:bg-base-300 focus:bg-base-300 flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_actors_path(q: "device:#{@device.key}") %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('user-round', size: 15) %>
+      <p class="text-2xl"><%= @device.actors.count %></p>
     </div>
-    <div>
-      actors
+    actors
+  </a>
+  <a class="hover:bg-base-300 focus:bg-base-300  flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_clients_path(q: "device:#{@device.key}") %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('handshake', size: 15) %>
+      <p class="text-2xl"><%= @device.clients.count %></p>
     </div>
-  </div>
-
-  <% @actors.each do |actor| %>
-    <div class="bg-base-100 shadow p-2 px-4 rounded-xl mb-2" data-controller="reveal">
-      <div class=" flex items-center gap-4">
-        <a href="<%= admin_actor_path(actor) %>" class="hover:underline focus:underline font-bold">
-          <%= actor.identifier.value %>
-        </a>
-      </div>
+    clients
+  </a>
+  <a class="hover:bg-base-300 focus:bg-base-300  flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_tokens_path(q: "device:#{@device.key}") %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('key-square', size: 15) %>
+      <p class="text-2xl"><%= @device.access_tokens.valid.count %></p>
     </div>
-  <% end %>
-
-<% end %>
+    tokens
+  </a>
+</div>

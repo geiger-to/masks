@@ -7,14 +7,14 @@ module Masks
       checks :actor
 
       def lookup
-        return if actor || !config.setting('signups.enabled')
+        return if actor || !config.setting("signups.enabled")
 
-        access = session.access('actor.signup')
+        access = session.access("actor.signup")
         access.signup(**session_params.slice(:nickname, :email, :phone))
       end
 
       def maskup
-        return unless config.setting('signups.enabled')
+        return unless config.setting("signups.enabled")
 
         approve! if actor&.valid? && actor&.signup
       end

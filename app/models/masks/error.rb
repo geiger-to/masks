@@ -7,13 +7,13 @@ module Masks
     end
 
     class TenantNotFound < Base
-      def initialize(name = '')
+      def initialize(name = "")
         super("tenant \"#{name}\" not found")
       end
     end
 
     class ProfileNotFound < Base
-      def initialize(name = '')
+      def initialize(name = "")
         super("profile \"#{name}\" not found")
       end
     end

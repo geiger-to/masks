@@ -8,20 +8,13 @@ module Masks
 
       class << self
         def section(section, subsection = nil)
-          before_action do
-            @section = [section, subsection].compact.join('-')
-          end
+          before_action { @section = [section, subsection].compact.join("-") }
         end
       end
 
       helper_method :current_actor, :section, :admin_client
       before_action :require_admin_client
       before_action :redirect_to_login, unless: :logged_in?
-
-      before_action do
-        device.actor = current_actor
-        device.client = admin_client
-      end
 
       attr_accessor :section
 
@@ -56,24 +49,24 @@ module Masks
       end
 
       def access_token
-        @access_token ||= begin
-          access_token = authorization&.access_token
+        @access_token ||=
+          begin
+            access_token = authorization&.access_token
 
-          if access_token
-            session[token_key] = access_token.token
-            session[code_key] = nil
-          elsif session[token_key]
-            access_token = tenant.access_tokens.valid.find_by(token: session[token_key])
+            if access_token
+              session[token_key] = access_token.token
+              session[code_key] = nil
+            elsif session[token_key]
+              access_token =
+                tenant.access_tokens.valid.find_by(token: session[token_key])
+            end
+
+            access_token
           end
-
-          access_token
-        end
       end
 
       def authorization
-        if params[:code]
-          session[code_key] = params[:code]
-        end
+        session[code_key] = params[:code] if params[:code]
 
         return unless (code = session[code_key])
 
@@ -84,21 +77,25 @@ module Masks
         current_actor.present?
       end
 
+      def render_not_found
+        render "masks/admin/404", layout: "masks/admin", locals: { anon: true }
+      end
+
       def redirect_to_login
         if params[:error]
-          return render 'masks/admin/error', locals: { anon: true }
+          return render "masks/admin/error", locals: { anon: true }
         end
 
         if session[token_key]
-          return render 'masks/admin/expired', locals: { anon: true }
+          return render "masks/admin/expired", locals: { anon: true }
         end
 
         redirect_to session_path(
-          client_id: admin_client.key,
-          response_type: 'code',
-          redirect_uri: admin_url,
-          scope: 'openid masks:manage'
-        )
+                      client_id: admin_client.key,
+                      response_type: "code",
+                      redirect_uri: admin_url,
+                      scope: "openid masks:manage"
+                    )
       end
     end
   end

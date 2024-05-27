@@ -110,10 +110,7 @@ module Masks
            }
 
       token =
-        Masks::OpenID::AccessToken.find_by!(
-          actor: admin,
-          openid_client: client
-        )
+        Masks::OpenID::AccessToken.find_by!(actor: admin, openid_client: client)
 
       assert_equal 200, status
       assert_equal token.token, response.parsed_body["access_token"]

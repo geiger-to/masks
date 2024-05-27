@@ -4,9 +4,9 @@ module Masks
   class Identifier < ApplicationRecord
     self.table_name = "masks_identifiers"
 
-    belongs_to :tenant, class_name: 'Masks::Tenant'
-    belongs_to :profile, class_name: 'Masks::Profile', optional: true
-    belongs_to :actor, class_name: 'Masks::Actor'
+    belongs_to :tenant, class_name: "Masks::Tenant"
+    belongs_to :profile, class_name: "Masks::Profile", optional: true
+    belongs_to :actor, class_name: "Masks::Actor"
 
     validates :value, presence: true, uniqueness: true
     validates :type, presence: true
@@ -18,7 +18,7 @@ module Masks
     end
 
     def key
-      super || self.class.name.split('::').last.underscore.to_sym
+      super || self.class.name.split("::").last.underscore.to_sym
     end
 
     def verified?
@@ -26,7 +26,11 @@ module Masks
     end
 
     def setting(*args, **opts)
-      profile ? profile.setting(key, *args, **opts) : tenant.setting(key, *args, **opts)
+      if profile
+        profile.setting(key, *args, **opts)
+      else
+        tenant.setting(key, *args, **opts)
+      end
     end
   end
 end

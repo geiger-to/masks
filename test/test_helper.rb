@@ -55,8 +55,11 @@ module Masks
 
     def assert_actor(nickname: nil)
       assert Masks::Rails::Actor.includes(:identifiers).find_by(
-        identifiers: { value: nickname, type: Masks::Rails::Identifiers::Nickname.to_s }
-      )
+               identifiers: {
+                 value: nickname,
+                 type: Masks::Rails::Identifiers::Nickname.to_s
+               }
+             )
     end
 
     def new_device(&)
@@ -108,7 +111,11 @@ module Masks
     end
 
     def find_actor(identifier)
-      Masks::Rails::Actor.includes(:identifiers).find_by!(identifiers: { value: identifier })
+      Masks::Rails::Actor.includes(:identifiers).find_by!(
+        identifiers: {
+          value: identifier
+        }
+      )
     end
 
     def add_email(
@@ -192,7 +199,7 @@ module Masks
       get "/private"
 
       assert_equal 302, status
-      assert_includes headers['Location'], '/session'
+      assert_includes headers["Location"], "/session"
     end
 
     def assert_logged_in

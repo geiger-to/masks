@@ -35,7 +35,12 @@ module Masks
           .mask
           .actor_scope
           .includes(:identifiers)
-          .find_by(identifiers: { value: identifier.value, type: identifier.type })
+          .find_by(
+            identifiers: {
+              value: identifier.value,
+              type: identifier.type
+            }
+          )
       end
     end
   end

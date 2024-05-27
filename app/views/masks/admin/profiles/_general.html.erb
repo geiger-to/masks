@@ -8,7 +8,7 @@
     <div class="bg-base-100 px-4 py-2 rounded-lg flex md:flex-row flex-col md:items-start md:gap-8">
       <div data-controller="reveal">
         <label class="label cursor-pointer gap-2 flex items-center">
-          <span class="text-sm font-bold flex-grow">
+          <span class="text-sm font-bold flex-grow mr-2">
             login
           </span>
           <input name="settings[logins.enabled]" type="hidden" value="" />
@@ -29,7 +29,7 @@
 
       <div data-controller="reveal">
         <label class="label cursor-pointer gap-2 flex items-center">
-          <span class="text-sm font-bold flex-grow">
+          <span class="text-sm font-bold flex-grow mr-2">
             signup
           </span>
           <input name="settings[signups.enabled]" type="hidden" value="" />
@@ -49,14 +49,12 @@
       </div>
     </div>
 
-  <div class="text-sm mt-4 mb-2 ml-2 font-bold">identifiers</div>
-
-  <div class="">
+  <div class="mt-2">
     <% @profile.tenant.identifiers.each do |key, id|  %>
       <div class="bg-base-100 px-4 py-1 rounded-lg flex-grow md:flex mb-2 h-full w-full" data-controller="reveal">
           <label class="label cursor-pointer gap-2 flex items-center">
-            <span class="-ml-1 text-xs opacity-75 flex-grow min-w-[60px]">
-              <%= key %>
+            <span class="text-sm font-bold flex-grow min-w-[60px]">
+              <%= key.pluralize %>
             </span>
             <input name="settings[<%= key %>.enabled]" type="hidden" value="" />
             <input name="settings[<%= key %>.enabled]"
@@ -69,7 +67,7 @@
               disabled
             </span>
             <span data-reveal-target="item" class="text-success label-text opacity-75 font-normal <%= @profile.enabled?(key) ? "" : "hidden" %>">
-              accepted
+              enabled
             </span>
           </label>
           <div data-reveal-target="item" class="md:flex items-center gap-4 <%= @profile.enabled?(key) ? "" : "hidden" %>">

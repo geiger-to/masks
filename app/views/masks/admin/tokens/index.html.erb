@@ -19,12 +19,17 @@
 <% if @access_tokens.any? %>
   <%= form_with(url: admin_tokens_path(q: params[:q]), method: :patch) do |f| %>
     <% if @access_tokens.any? %>
-      <div class="flex text-sm mb-3 gap-4 items-baseline">
+      <div class="flex text-sm mb-3 gap-4 items-baseline bg-base-300 px-4 py-2 rounded-lg">
         <p class="flex-grow">
           <%= @access_tokens.count %> found
         </p>
-        <button class="btn btn-xs btn-error btn-outline" type="submit">
-          expire checked
+
+        <p class="text-xs opacity-50">
+          0 selected
+        </p>
+
+        <button class="btn btn-xs btn-error" type="submit" disabled>
+          revoke
         </button>
       </div>
     <% end %>
@@ -36,13 +41,10 @@
           <td>
             token
           </td>
-          <td>
-            actor
+          <td class="text-left">
+            owner
           </td>
-          <td>
-            client
-          </td>
-          <td>
+          <td class="text-right">
             expires
           </td>
         </tr>
@@ -51,35 +53,40 @@
       <% @access_tokens.each do |access_token| %>
         <tr>
           <td>
-            <label class="font-mono cursor-pointer flex-grow  md:max-w-full max-w-[85px] flex items-center gap-2">
-              <input type="checkbox" name="expire_access_tokens" class="checkbox checkbox-xs" value="<%= access_token.id %>" autocomplete="off">
-              <p class="truncate">
-                <%= access_token.hidden_token %>
-              </p>
-            </label>
+            <div class="flex flex-col md:flex-row gap-2">
+              <label class="font-mono cursor-pointer max-w-[90px] md:max-w-[175px] flex items-center gap-2">
+                <input type="checkbox" name="expire_access_tokens" class="checkbox checkbox-xs" value="<%= access_token.id %>" autocomplete="off">
+                <p class="truncate">
+                  <%= access_token.hidden_token %>
+                </p>
+              </label>
+            </div>
           </td>
-          <td>
-            <div class="truncate flex items-center gap-2">
-              <a href="<%= admin_tokens_path(q: access_token.actor) %>" class="underline decoration-dotted">
-                <%= access_token.actor.identifier.value %>
+          <td class="">
+            <div class="flex gap-1 text-left items-center">
+              <a href="<%= admin_tokens_path(q: "device:#{access_token.device.key}") %>" class=" mr-1 opacity-75">
+                <%= lucide_icon(device_icon(access_token.device), class: 'w-4 h-4') %>
               </a>
 
-              <span class="opacity-75">on</span>
+              <% if access_token.actor %>
+                <a href="<%= admin_tokens_path(q: "actor:#{access_token.actor.to_param}") %>" class="underline decoration-dotted">
+                  <%= access_token.actor&.identifier&.value %>
+                </a>
 
-              <a href="<%= admin_tokens_path(q: access_token.device.key) %>" class="underline decoration-dotted">
-                <%= lucide_icon(device_icon(access_token.device), size: 16) %>
-              </a>
+                on
+
+                <a href="<%= admin_tokens_path(q: "client:#{access_token.client.to_param}") %>" class="underline decoration-dotted">
+                  <%= access_token.client.key %>
+                </a>
+              <% else %>
+                <a href="<%= admin_tokens_path(q: "client:#{access_token.client.to_param}") %>" class="underline decoration-dotted">
+                  <%= access_token.client.key %>
+                </a>
+              <% end %>
             </div>
           </td>
           <td>
-            <div class="truncate">
-              <a href="<%= admin_tokens_path(q: access_token.client) %>" class="underline decoration-dotted truncate">
-                <%= access_token.client.key %>
-              </a>
-            </div>
-          </td>
-          <td>
-              <div class="whitespace-nowrap">
+              <div class="whitespace-nowrap text-right text-xs">
                 <% if access_token.expires_at > Time.current %>
                   in <%= time_ago_in_words(access_token.expires_at) %>
                 <% else %>

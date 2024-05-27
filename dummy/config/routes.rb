@@ -1,5 +1,3 @@
 # frozen_string_literal: true
 
-Rails.application.routes.draw do
-  mount Masks::Engine => "/"
-end
+Rails.application.routes.draw { mount Masks::Engine => "/" }

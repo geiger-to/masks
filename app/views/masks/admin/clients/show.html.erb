@@ -13,13 +13,13 @@
     <input type="submit" name="submit" value="save" class="btn btn-sm btn-success" />
   </div>
 
-  <div class="my-2">
+  <div class="my-4">
     <%= render('masks/admin/alert/info') %>
     <%= render('masks/admin/alert/errors', heading: 'unable to save client') %>
   </div>
 
-  <div class="form-control w-full mb-2">
-    <label class="input input-bordered flex items-center gap-4 mb-2 text-sm">
+  <div class="form-control w-full mb-2 flex flex-col md:flex-row md:items-center gap-2 [&>*]:flex-grow">
+    <label class="input input-bordered flex items-center gap-4 text-sm">
       <div class="text-xs opacity-75">
         key
       </div>
@@ -58,10 +58,10 @@
       <div class="text-xs opacity-75">
         type
       </div>
-      <div role="tablist" class="tabs tabs-boxed bg-base-100 [&>div]:py-2 [&>div]:px-2 [&>input]:!rounded-lg text-xs">
-        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="internal" aria-label="internal" <%= @client.client_type == 'internal' ? 'checked' : '' %>/>
-        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="confidential" aria-label="confidential" <%= @client.client_type == 'confidential' ? 'checked' : '' %>/>
-        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="public" aria-label="public" <%= @client.client_type == 'public' ? 'checked' : '' %>/>
+      <div role="tablist" class="tabs tabs-boxed bg-base-100 [&>input:checked]:bg-base-300 [&>input:checked]:!text-neutral-content [&>input]:!rounded-lg text-xs">
+        <input autocomplete="off" type="radio" name="client_type" role="tab" class="tab" value="internal" aria-label="internal" <%= @client.client_type == 'internal' ? 'checked' : '' %>/>
+        <input autocomplete="off" type="radio" name="client_type" role="tab" class="tab" value="confidential" aria-label="confidential" <%= @client.client_type == 'confidential' ? 'checked' : '' %>/>
+        <input autocomplete="off" type="radio" name="client_type" role="tab" class="tab" value="public" aria-label="public" <%= @client.client_type == 'public' ? 'checked' : '' %>/>
       </div>
     </div>
   </div>
@@ -168,8 +168,10 @@
     </table>
   </div>
 
+<div class="divider"></div>
+
 <%= form_with url: admin_client_path(@client), method: :delete  do |form| %>
-  <div class="border border-error bg-base-300 flex gap-2 p-4 rounded-xl mb-4 items-center">
+  <div class="border border-error bg-base-100 flex gap-2 p-4 rounded-xl mb-4 items-center">
     <p class="text-error">
       <%= lucide_icon('trash-2') %>
     </p>

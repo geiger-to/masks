@@ -10,7 +10,7 @@ module Masks
   # @see Masks::Check Masks::Check
   # @see Masks::Credentials Masks::Credentials
   class Rule < ApplicationRecord
-    self.table_name = 'masks_rules'
+    self.table_name = "masks_rules"
 
     serialize :checks, coder: JSON
     serialize :credentials, coder: JSON
@@ -23,7 +23,7 @@ module Masks
 
     validates :name, presence: true, uniqueness: true
 
-    belongs_to :profile, class_name: 'Masks::Profile'
+    belongs_to :profile, class_name: "Masks::Profile"
 
     # Returns the class name expected for any actor attached to this session.
     #

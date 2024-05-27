@@ -48,9 +48,10 @@ module Masks
     end
 
     def actor
-      @actor ||= if current_data[:actor_id]
-        Masks::Actor.find_by(uuid: current_data[:actor_id])
-      end
+      @actor ||=
+        if current_data[:actor_id]
+          Masks::Actor.find_by(uuid: current_data[:actor_id])
+        end
     end
 
     def add_alt(id)
@@ -62,9 +63,11 @@ module Masks
     end
 
     def alt_actors
-      @alt_actors ||= current_data.fetch(:alts, []).map do |uuid|
-        Masks::Actor.find_by(uuid:)
-      end.compact
+      @alt_actors ||=
+        current_data
+          .fetch(:alts, [])
+          .map { |uuid| Masks::Actor.find_by(uuid:) }
+          .compact
     end
 
     def checked(key, approved)
@@ -75,7 +78,7 @@ module Masks
     end
 
     def checked?(key)
-      return unless actor && !actor.new_record?
+      return false unless actor && !actor.new_record?
 
       current_data[actor.uuid] ||= {}
       current_data[actor.uuid][key]

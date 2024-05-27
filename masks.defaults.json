@@ -16,7 +16,7 @@
       "authorization_code",
       "implicit",
       "refresh_token"
-     ]
+    ]
   },
   "dark_mode": {
     "enabled": true,
@@ -35,17 +35,17 @@
   },
   "nickname": {
     "prefix": "@",
-    "enabled": true,
-    "signups": true,
+    "enabled": false,
+    "signups": false,
     "minimum": "4",
     "maximum": "16"
   },
   "email": {
     "enabled": true,
-    "signups": false
+    "signups": true
   },
   "phone": {
-    "enabled": true,
+    "enabled": false,
     "signups": false
   }
 }

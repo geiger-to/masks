@@ -12,9 +12,8 @@ module Masks
 
       def signup(**opts)
         actor = session.mask.actor_scope.new(session:, signup: true)
-        actor.identifiers = opts.map do |key, value|
-          config.identifier(key:, value:)
-        end.compact
+        actor.identifiers =
+          opts.map { |key, value| config.identifier(key:, value:) }.compact
 
         actor.password = opts[:password]
         actor.save if actor.valid?

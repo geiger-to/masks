@@ -25,56 +25,63 @@ module Masks
       end
 
       def checked(key, value, actor: last_actor)
-        actor_data(actor)["#{key}"] = if value
-          {
-            value:,
-            time: Time.current.iso8601
-          }.stringify_keys
+        actor_data(actor)[key.to_s] = if value
+          { value:, time: Time.current.iso8601 }.stringify_keys
         end
       end
 
       def checked?(key, actor: last_actor)
-        actor_data(actor).dig(key.to_s, "time").present? && actor_data(actor).dig(key.to_s, "value").present?
+        actor_data(actor).dig(key.to_s, "time").present? &&
+          actor_data(actor).dig(key.to_s, "value").present?
       end
 
       def all
-        @all ||= if data.keys.any?
-          uuids = []
+        @all ||=
+          if data.keys.any?
+            uuids = []
 
-          data.each_value do |data|
-            uuid = data.dig('actor', 'value')
-            uuids << uuid if uuid
+            data.each_value do |data|
+              uuid = data.dig("actor", "value")
+              uuids << uuid if uuid
+            end
+
+            tenant
+              .actors
+              .includes(:identifiers)
+              .where(uuid: uuids.uniq.compact)
+              .to_a
+              .map do |actor|
+                actor.last_login_at =
+                  logged_in_at(actor) || checked_time("actor", actor:)
+                actor
+              end
+              .sort_by(&:last_login_at)
           end
-
-          tenant.actors.includes(:identifiers).where(uuid: uuids.uniq.compact).to_a.map do |actor|
-            actor.last_login_at = logged_in_at(actor) || checked_time('actor', actor:)
-            actor
-          end.sort_by(&:last_login_at)
-        end
       end
 
       def last_actor
-        @last_actor ||= if data.keys.any?
-          actor = nil
-          time = nil
+        @last_actor ||=
+          if data.keys.any?
+            actor = nil
+            time = nil
 
-          all.each do |alt|
-            actor ||= alt
-            time ||= logged_in_at(alt)
-            alt_time = logged_in_at(alt)
+            all.each do |alt|
+              actor ||= alt
+              time ||= logged_in_at(alt)
+              alt_time = logged_in_at(alt)
 
-            if alt_time && time && alt_time > time
-              actor = alt
-              time = alt_time
+              if alt_time && time && alt_time > time
+                actor = alt
+                time = alt_time
+              end
             end
-          end
 
-          actor
-        end
+            actor
+          end
       end
 
       def logged_in_at(actor)
-        checked_time('redirect_uri', actor:)
+        checked_time("redirect_uri", actor:)
       end
 
       def data

@@ -1,8 +1,8 @@
 <% if flash[:info] || local_assigns[:info] %>
-  <div role="alert" class="bg-blue-950 border-blue-500 rounded-lg text-blue-200 alert alert-info flex items-center <%= local_assigns[:class] %>">
-    <%= lucide_icon('info') %>
+  <div role="alert" class="text-left bg-blue-950 border-blue-500 rounded-lg text-blue-200 alert alert-info flex items-center text-sm md:text-lg <%= local_assigns[:class] %>">
+    <%= lucide_icon('info', class: 'w-4 h-4') %>
     <div>
-      <h3 class="font-bold"><%= local_assigns[:info] || flash[:error] %></h3>
+      <h3><%= local_assigns[:info] || flash[:info] %></h3>
     </div>
   </div>
 <% end %>

@@ -2,9 +2,20 @@
   <div class="mb-4 flex items-center gap-2">
     <%= lucide_icon('user', class: 'w-5 h-5') %>
 
-    <h1 class="font-bold flex-grow">
+    <h1 class="font-bold">
       actors
     </h1>
+
+    <%= form_with url: admin_actors_path, method: :get, class: 'flex-grow ml-2 flex gap-2 items-center' do |f| %>
+      <label class="input input-sm flex items-center gap-2 flex-grow">
+        <input type="text" name="q" class="w-full flex-grow" placeholder="search by identifier or device..." value="<%= params[:q] %>" />
+
+        <button type="submit" class="btn btn-ghost btn-xs -mr-2" value="search">
+          <%= lucide_icon('search', size: 16) %>
+        </button>
+      </label>
+    <% end %>
+
     <button class="btn btn-sm btn-ghost btn-primary" data-action="dialog#open">
       <span class="">
         <%= lucide_icon('plus-square', class: 'w-5 h-5') %>

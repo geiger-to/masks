@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -10,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_05_16_004559) do
+ActiveRecord::Schema[7.1].define(version: 20_240_516_004_559) do
   create_table "masks_access_tokens", force: :cascade do |t|
     t.string "token"
     t.string "refresh_token"
@@ -181,7 +182,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_05_16_004559) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_scopes_on_actor_id"
-    t.index ["tenant_id", "name", "actor_id"], name: "index_masks_scopes_on_tenant_id_and_name_and_actor_id", unique: true
+    t.index ["tenant_id", "name", "actor_id"], name: "index_masks_scopes_on_tenant_id_and_name_and_actor_id", 
+unique: true
     t.index ["tenant_id"], name: "index_masks_scopes_on_tenant_id"
   end
 

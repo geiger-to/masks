@@ -1,8 +1,9 @@
+# frozen_string_literal: true
 class Settings < ActiveRecord::Migration[7.1]
   def change
     create_table :masks_settings do |t|
       t.string :name
-      t.text   :value
+      t.text :value
 
       t.timestamps
 

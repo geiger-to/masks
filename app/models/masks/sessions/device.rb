@@ -13,12 +13,13 @@ module Masks
       end
 
       def record
-        @record ||= begin
-          device = tenant.devices.find_or_initialize_by(key: device_id)
-          device.user_agent = request.user_agent if device.new_record?
-          device.ip_address = request.remote_ip if device.new_record?
-          device
-        end
+        @record ||=
+          begin
+            device = tenant.devices.find_or_initialize_by(key: device_id)
+            device.user_agent = request.user_agent if device.new_record?
+            device.ip_address = request.remote_ip if device.new_record?
+            device
+          end
       end
 
       delegate :known?, :name, :device_type, :device_name, :os_name, to: :record

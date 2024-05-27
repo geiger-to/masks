@@ -6,11 +6,12 @@ module Masks
 
     attribute :session
 
-    belongs_to :tenant, class_name: 'Masks::Tenant'
+    belongs_to :tenant, class_name: "Masks::Tenant"
 
-    has_many :interactions, class_name: 'Masks::Interaction'
-    has_many :access_tokens, class_name: 'Masks::AccessToken'
-    has_many :actors, through: :access_tokens, class_name: 'Masks::Actor'
+    has_many :interactions, class_name: "Masks::Interaction"
+    has_many :access_tokens, class_name: "Masks::AccessToken"
+    has_many :clients, through: :access_tokens, class_name: "Masks::Client"
+    has_many :actors, through: :access_tokens, class_name: "Masks::Actor"
 
     validates :key, presence: true, uniqueness: { scope: :tenant_id }
     validates :known?, :user_agent, presence: true
@@ -20,13 +21,14 @@ module Masks
 
     def expire!(actor: nil, all: false)
       actor = actor ? actors.find_by(uuid: actor) : nil
-      tokens = if actor
-        tenant.access_tokens.where(device: self, actor:)
-      elsif all
-        tenant.access_tokens.where(device: self)
-      else
-        []
-      end
+      tokens =
+        if actor
+          tenant.access_tokens.where(device: self, actor:)
+        elsif all
+          tenant.access_tokens.where(device: self)
+        else
+          []
+        end
 
       return unless tokens.any?
 

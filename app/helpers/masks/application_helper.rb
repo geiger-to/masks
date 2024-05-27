@@ -11,7 +11,7 @@ module Masks
     end
 
     def device_desc(device)
-      "#{device.name} on #{device.os_name}"
+      "#{device.name}#{device.os_name ? " on #{device.os_name}" : ""}"
     end
 
     def device_icon(device)
@@ -33,7 +33,7 @@ module Masks
       when "smart speaker", "wearable", "peripheral"
         "bluetooth"
       else
-        "question-circle"
+        "server"
       end
     end
 
