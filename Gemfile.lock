@@ -307,7 +307,7 @@ GEM
       tzinfo
       validate_url
       webfinger (~> 2.0)
-    pagy (8.2.2)
+    pagy (9.0.9)
     parallel (1.24.0)
     parser (3.3.0.5)
       ast (~> 2.4.1)
