@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/geiger-to/masks/compare/masks/v0.4.0...masks/v0.5.0) (2024-09-22)
+
+
+### Features
+
+* build a deployable docker image ([1bf9e93](https://github.com/geiger-to/masks/commit/1bf9e93f9b9e546cab7157d8f4fa4c861d95c20b))
+* search and logout devices from management section ([daef750](https://github.com/geiger-to/masks/commit/daef750bf5c0f1ba17173a8acf334e4e777b636b))
+
 ## [0.4.0](https://github.com/geiger-to/masks/compare/masks/v0.3.2...masks/v0.4.0) (2024-04-11)
 
 
