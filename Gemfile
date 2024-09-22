@@ -21,7 +21,7 @@ gem "lucide-rails", "~> 0.4"
 gem "guard", "~> 2.18"
 gem "guard-shell", "~> 0.7.2"
 
-group :docs do
+group :development do
   gem "jekyll", "~> 4.3"
   gem "yard", "~> 0.9.36"
 end
@@ -45,7 +45,6 @@ gem "wdm", "~> 0.1.1", platforms: %i[mingw x64_mingw mswin]
 # Lock `http_parser.rb` gem to `v0.6.x` on JRuby builds since newer versions of the gem
 # do not have a Java counterpart.
 gem "http_parser.rb", "~> 0.6.0", platforms: [:jruby]
-
 gem "prettier_print", "~> 1.2"
 gem "syntax_tree", "~> 6.2"
 gem "syntax_tree-haml", "~> 4.0"

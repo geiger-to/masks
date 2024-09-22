@@ -1,9 +1,0 @@
-#!/usr/bin/env bash
-
-set -xe
-
-bundle install
-npm install
-
-JEKYLL_ENV=production bundle exec jekyll build
-bundle exec yard -o _site/api

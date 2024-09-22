@@ -123,12 +123,10 @@ module Masks
         raise Error::InvalidConfiguration, path_or_config
       end
 
-      result = yield
+      yield
     ensure
       @config = previous_config
       @config_path = previous_path
-
-      result
     end
 
     # @visibility private
