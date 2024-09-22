@@ -19,7 +19,7 @@
     "tailwindcss": "^3.4.1"
   },
   "scripts": {
-    "fmt": "bin/lint --fix",
+    "format": "bin/lint --fix",
     "lint": "bin/lint",
     "test": "bin/rails test",
     "fmt:prettier": "prettier --write .",
