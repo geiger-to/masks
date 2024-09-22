@@ -19,7 +19,7 @@
     "tailwindcss": "^3.4.1"
   },
   "scripts": {
-    "fmt": "bin/lint --fix",
+    "format": "bin/lint --fix",
     "lint": "bin/lint",
     "test": "bin/rails test",
     "fmt:prettier": "prettier --write .",
@@ -27,8 +27,8 @@
     "lint:prettier": "prettier --check .",
     "lint:rubocop": "bundle exec rubocop",
     "dev": "foreman start -f Procfile.dev",
-    "site": "bundle exec jekyll serve",
-    "docs": "yard server --reload -o _site/api",
+    "site": "bin/jekyll serve",
+    "docs": "bin/yard server --reload -o _site/api",
     "rails": "bin/rails s -p 3000",
     "build:docs": "yard -o _site/api",
     "build": "esbuild app/assets/javascripts/*.* --bundle --sourcemap --outdir=app/assets/builds/masks",

@@ -137,7 +137,7 @@ module Masks
       if self.actor && actor != self.actor
         errors.add(:base, :multiple_actors)
       else
-        super(actor)
+        super
       end
     end
 

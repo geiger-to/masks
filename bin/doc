@@ -5,5 +5,6 @@ set -xe
 bundle install
 npm install
 
-JEKYLL_ENV=production bundle exec jekyll build
-bundle exec yard -o _site/api
+JEKYLL_ENV=production bin/jekyll build
+
+bin/yard -o _site/api

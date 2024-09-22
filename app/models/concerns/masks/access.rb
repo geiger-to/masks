@@ -88,7 +88,7 @@ module Masks
 
         raise Masks::Error::Unauthorized unless session.passed?
 
-        instance = super(*args, **opts)
+        instance = super
         instance.session = session
         instance
       end
