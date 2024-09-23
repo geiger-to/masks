@@ -5,7 +5,7 @@ module Masks
     class Key < ApplicationRecord
       include Masks::Scoped
 
-      self.table_name = "keys"
+      self.table_name = "actor_keys"
 
       class << self
         def sha(secret)

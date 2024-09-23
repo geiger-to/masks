@@ -20,9 +20,3 @@ cadence, depending on the lifetimes set in [masks configuration](configuration.h
 Deletes actors that have not logged in after a period of time.
 
 [API docs](/api/Masks/ExpireActorsJob)
-
-### `ExpireRecoveriesJob`
-
-Deletes stale nickname and password recovery requests.
-
-[API docs](/api/Masks/ExpireRecoveriesJob)

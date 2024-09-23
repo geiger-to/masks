@@ -36,32 +36,12 @@ module Masks
       configuration.access(name).fetch(:cls).build(session)
     end
 
-    # Returns the value for a setting.
+    # Returns whether or not a field is accepted.
     #
-    # Setting values are stored in the database, but fallback to what is found in Masks.configuration.data.
-    #
-    # @param [Symbol|String] name
-    # @return [String|Number|Array|Hash|nil]
-    def setting(name)
-      settings[name]
-    end
-
-    # Returns a hash of settings.
-    #
-    # @return [Hash]
-    def settings
-      ::Rails.cache.fetch('masks.settings', expires_in: 1.minute)  do
-        cls = model(:setting)
-        all = cls.all.map do |record|
-          [record.name, record.value]
-        end.to_h
-
-        map = cls::NAMES.map do |name|
-          [name, all.fetch(name, Masks.configuration.data.dig(*name.to_s.split('.').map(&:to_sym)))]
-        end
-
-        map.to_h.with_indifferent_access
-      end
+    # @param [String] name
+    # @return [Bool]
+    def accepted?(name)
+      Masks.setting("#{name}.allowed") && Masks.setting("#{name}.required")
     end
 
     # Returns a masked session based on the request passed.
@@ -105,7 +85,7 @@ module Masks
       @configuration ||= Masks::Configuration.new(data: config.dup)
     end
 
-    delegate :model, to: :configuration
+    delegate :model, :accepted?, :setting, :settings, to: :configuration
 
     # @visibility private
     def event(name, **opts, &block)

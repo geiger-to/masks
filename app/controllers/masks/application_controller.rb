@@ -14,6 +14,8 @@ module Masks
 
     helper_method :masks_settings, :dark_mode?, :dark_mode_allowed?, :theme
 
+    rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+
     private
 
     def theme
@@ -48,10 +50,6 @@ module Masks
       flash[:errors] = ["enter a valid password"]
 
       redirect_to redirect
-    end
-
-    def masks_settings
-      Masks.settings
     end
   end
 end

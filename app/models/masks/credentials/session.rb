@@ -14,7 +14,7 @@ module Masks
 
         actor_ids = session.data[:actors]&.keys || []
         actor_id = session.data[:actor]
-        actors = (actor_ids.any? ? config.find_actors(session, actor_ids) : [])
+        actors = (actor_ids.any? ? find_actors(actor_ids) : [])
 
         # only lookup and return the current actor if
         # it's not provided via a param (e.g. someone
@@ -61,6 +61,12 @@ module Masks
         session.data[:actor] = nil
         session.data[:actors] ||= {}
         session.data[:actors].delete(actor_id)
+      end
+
+      private
+
+      def find_actors(ids)
+        session.mask.actor_scope.where(uuid: ids).to_a
       end
     end
   end

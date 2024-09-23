@@ -15,8 +15,7 @@ module Masks
   # - +cleanup+ - deletes any recorded data for the credential
   #
   # Sessions expect credentials to use checks to record their results, so there
-  # are helper methods to approve, deny, or skip associated checks—+approve!+,
-  # +deny!+, and +skip!+ respectively.
+  # are helper methods to approve or deny associated checks.
   #
   # @see Masks::Check Masks::Check
   # @see Masks::Credentials Masks::Credentials
@@ -87,13 +86,12 @@ module Masks
 
     delegate :optional?,
              :passed?,
-             :skipped?,
              :invalidated?,
              to: :check,
              allow_nil: true
 
     def slug
-      self.class.name.split("::").join("_").underscore
+      self.class.name.split("::").join("_").underscore.to_sym
     end
 
     def name
@@ -122,10 +120,6 @@ module Masks
       check&.deny!(slug, **opts)
     end
 
-    def skip!(**opts)
-      check&.skip!(slug, **opts)
-    end
-
     def fail!(**opts)
       deny!(**opts)
 
@@ -134,39 +128,6 @@ module Masks
 
     def reset!
       check&.clear!(slug)
-    end
-
-    def nickname_config
-      session.config.dat.nickname
-    end
-
-    def nickname_format
-      return unless nickname_config.format
-
-      Regexp.new(nickname_config.format)
-    end
-
-    def prefix_nickname(value, default: nil)
-      prefix = nickname_config&.prefix
-
-      return default unless value.present?
-
-      prefixed = value
-      prefixed = "#{prefix}#{value}" if prefix && !value.start_with?(prefix)
-
-      return default if nickname_format && !nickname_format.match?(prefixed)
-
-      prefixed
-    end
-
-    def validates_length(key, opts)
-      return unless opts
-
-      if opts[:min] && send(key).length < opts[:min]
-        errors.add(key, :too_short, count: opts[:min])
-      elsif opts[:max] && send(key).length > opts[:max]
-        errors.add(key, :too_long, count: opts[:max])
-      end
     end
   end
 end

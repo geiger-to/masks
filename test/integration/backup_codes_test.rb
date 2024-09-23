@@ -12,10 +12,10 @@ module Masks
     include Masks::TestHelper
 
     test "enabling one-time codes creates backup codes" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.factor2?
         assert actor.should_save_backup_codes?
         refute actor.saved_backup_codes?
@@ -24,13 +24,13 @@ module Masks
     end
 
     test "POST enables backup codes with the enable param" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
         save_backup_codes
 
         assert_equal 302, status
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.factor2?
         refute actor.should_save_backup_codes?
         assert actor.saved_backup_codes?
@@ -39,23 +39,23 @@ module Masks
     end
 
     test "POST with the enable param requires a password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
         save_backup_codes password: "invalid"
 
         assert_equal 302, status
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.should_save_backup_codes?
         refute actor.saved_backup_codes?
       end
     end
 
     test "POST with the reset param resets the codes before enabling" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         codes = actor.backup_codes
 
         assert_equal 12, codes.keys.length
@@ -72,10 +72,10 @@ module Masks
     end
 
     test "POST with the reset param resets the codes after enabling" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
 
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+        actor = find_actor("@admin")
         codes = actor.backup_codes
 
         save_backup_codes
@@ -95,7 +95,7 @@ module Masks
     end
 
     test "POST /session accepts a backup code after saving" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
         save_backup_codes
       end
@@ -104,7 +104,7 @@ module Masks
         refute_logged_in
       end
 
-      actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+      actor = find_actor("@admin")
       code = actor.backup_codes.keys.first
 
       login_as "admin", backup_code: code do
@@ -115,7 +115,7 @@ module Masks
     end
 
     test "POST /session does not require re-entering a username/password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         add_one_time_code
         save_backup_codes
       end
@@ -123,7 +123,7 @@ module Masks
       login_as "admin" do
         refute_logged_in
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         code = actor.backup_codes.keys.first
 
         post "/session", params: { session: { backup_code: code } }

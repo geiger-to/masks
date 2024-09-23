@@ -25,10 +25,6 @@ module Masks
       has_many :saved_roles,
                class_name: Masks.configuration.models[:role],
                autosave: true
-      has_many :recoveries,
-               class_name: Masks.configuration.models[:recovery],
-               autosave: true
-      has_many :emails, class_name: Masks.configuration.models[:email]
       has_many :devices,
                class_name: Masks.configuration.models[:device],
                autosave: true
@@ -69,7 +65,19 @@ module Masks
       serialize :backup_codes, coder: JSON
 
       def to_param
-        uuid
+        public_id.value
+      end
+
+      def accepted_ids
+        identifiers.where(type: Masks.configuration.identifiers.values.map(&:to_s))
+      end
+
+      def public_id
+        accepted_ids.first
+      end
+
+      def verified_ids
+        identifiers.where('verified_at')
       end
 
       def identifier
@@ -77,7 +85,7 @@ module Masks
       end
 
       def nickname
-        identifiers.where(type: Masks.configuration.model(:nickname_id).to_s).first
+        identifiers.where(type: Masks.configuration.model(:nickname_id).to_s).first&.value
       end
 
       def phone_number
@@ -88,21 +96,13 @@ module Masks
         identifiers.where(type: Masks.configuration.model(:email_id).to_s).first
       end
 
-      def primary_email
-        emails.where(verified: true).first
-      end
-
-      def email_addresses
-        emails.pluck(:email)
-      end
-
       def factor2?
-        phone_number || totp_secret
+        false
       end
 
       def remove_factor2!
         self.added_totp_secret_at = nil
-        saved_backup_codes_at
+        self.saved_backup_codes_at = nil
         self.totp_secret = nil
         self.backup_codes = nil
         save!
@@ -212,9 +212,9 @@ module Masks
       end
 
       def validates_signup
-        return unless signup && Masks.setting('signups.disabled')
-          errors.add(:signup, :disabled)
+        return unless signup && Masks.setting('signups.enabled')
 
+        errors.add(:signup, :disabled)
       end
 
       def reset_version

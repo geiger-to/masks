@@ -10,10 +10,10 @@ module Masks
     include Masks::TestHelper
 
     test "POST requires a confirmation password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         change_password(old: "invalid", new: "password2")
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         refute actor.changed_password_at
       end
 
@@ -29,10 +29,10 @@ module Masks
     end
 
     test "POST requires a valid password" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         change_password(new: "hi")
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         refute actor.changed_password_at
       end
 
@@ -48,10 +48,10 @@ module Masks
     end
 
     test "POST changes the actor's password given valid params" do
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         change_password
 
-        actor = Masks::Rails::Actor.find_by!(nickname: "admin")
+        actor = find_actor("@admin")
         assert actor.changed_password_at
       end
 

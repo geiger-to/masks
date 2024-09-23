@@ -3,6 +3,12 @@
 module Masks
   # @visibility private
   class SessionsController < ApplicationController
+    before_action :set_identifiers
+
+    helper_method :password_required?, :factor2_required?, :signup?
+
+    layout 'masks/session'
+
     def new
       respond_to do |format|
         format.json { render json: resource_cls.new(masked_session) }
@@ -18,17 +24,21 @@ module Masks
       respond_to do |format|
         format.json { render json: resource_cls.new(masked_session) }
         format.html do
-          path =
+          redirect =
             (
               if masked_session.passed?
                 session.delete(:return_to) || masked_session.mask.pass ||
                   Masks.configuration.site_links[:after_login]
               else
-                masked_session.mask.fail ||
-                  Masks.configuration.site_links[:login]
+                masked_session.mask.fail
               end
             )
-          redirect_to path
+
+          if redirect
+            redirect_to redirect
+          else
+            render 'new'
+          end
         end
       end
     end
@@ -46,8 +56,31 @@ module Masks
 
     private
 
+    def password_required?
+      @session.checks[:password] && !@session.checks[:password].passed?
+    end
+
+    def factor2_required?
+      checks = @session.checks
+
+      return false unless checks
+
+      checks[:factor2] && !checks[:factor2]&.passed? &&
+        checks[:actor]&.passed? && checks[:password]&.passed?
+    end
+
+    def signup?
+      masks_settings['signups.enabled'] && @actor&.signup
+    end
+
+    def set_identifiers
+      @identifier = masks_config.identifiers.keys.map do |field|
+        masks_config.identifier?(field) ? field : nil
+      end.compact.sort.join('_')
+    end
+
     def resource_cls
-      Masks.configuration.model(:session_json)
+      masks_config.model(:session_json)
     end
   end
 end

@@ -1,5 +1,5 @@
-<div data-controller="session">
-  <%= form_with url: session_path, method: :post do |form| %>
+<div>
+  <%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
     <div role="alert" class="alert mb-4 text-left" data-session-target="flash">
       <% if flash[:errors]&.any? && !factor2_required? %>
         <div class="flex items-center gap-4">
@@ -11,79 +11,31 @@
           <%= lucide_icon("check", class: "stroke-success") %>
           <span><%= t(".logged_in") %></span>
         </div>
-      <% else %>
-        <div data-flash="enter-factor2" class="hidden flex items-center gap-4">
-          <%= lucide_icon("key-square", class: "stroke-warning") %>
-          <span><%= t(".enter_factor2") %></span>
+      <% elsif signup? %>
+        <div class="flex items-center gap-4">
+          <%= lucide_icon("user-plus", class: "stroke-success") %>
+          <span><%= t(".signup") %></span>
         </div>
-        <div data-flash="enter-credentials" class="flex items-center gap-4">
-          <%= lucide_icon("shield-alert", class: "stroke-warning") %>
-          <span><%= t(".enter_credentials") %></span>
-        </div>
-        <div data-flash="enter-password" class="hidden flex items-center gap-4">
+      <% elsif params.dig(:session, :identifier) && password_required? %>
+        <div data-flash="enter-password" class="flex items-center gap-4">
           <%= lucide_icon("shield-ellipsis", class: "stroke-warning") %>
           <span><%= t(".enter_password") %></span>
         </div>
-        <div data-flash="continue" class="hidden flex items-center gap-4">
-          <%= lucide_icon("shield-question", class: "stroke-accent") %>
-          <span><%= t(".continue") %></span>
+      <% elsif masks_settings['signups.enabled'] %>
+        <div data-flash="enter-credentials" class="flex items-center gap-4">
+          <%= lucide_icon("shield-alert", class: "stroke-warning") %>
+          <span><%= t(".login_or_signup") %></span>
+        </div>
+      <% else %>
+        <div data-flash="enter-credentials" class="flex items-center gap-4">
+          <%= lucide_icon("shield-alert", class: "stroke-warning") %>
+          <span><%= t(".enter_credentials") %></span>
         </div>
       <% end %>
     </div>
 
     <% if factor2_required? %>
-      <div class="w-full">
-        <div role="tablist" class="tabs tabs-bordered mb-4">
-          <% if @actor.totp_secret %>
-            <input
-              checked
-              name="factor2"
-              type="radio"
-              role="tab"
-              class="tab whitespace-nowrap"
-              aria-label="<%= t('.tab.one_time_code') %>">
-            <div role="tabpanel" class="tab-content p-4 bg-base-100 rounded-b">
-              <p class="flex items-center gap-4 text-sm mb-4">
-                <%= lucide_icon("qr-code") %>
-                <%= t(".one_time_code") %>
-              </p>
-              <label class="form-control w-full">
-                <input
-                  type="text"
-                  data-action="session#updateCode"
-                  data-session-target="oneTimeCode"
-                  placeholder="<%= t('.placeholder.one_time_code') %>"
-                  name="session[one_time_code]"
-                  class="input input-bordered w-full">
-              </label>
-            </div>
-          <% end %>
-
-          <% if @actor.saved_backup_codes? %>
-            <input
-              type="radio"
-              name="factor2"
-              role="tab"
-              class="tab whitespace-nowrap"
-              aria-label="<%= t('.tab.backup_code') %>">
-            <div role="tabpanel" class="tab-content p-4 bg-base-100 rounded-b">
-              <p class="flex items-center gap-4 text-sm mb-4">
-                <%= lucide_icon("rotate-cw") %>
-                <%= t(".backup_code") %>
-              </p>
-              <label class="form-control w-full">
-                <input
-                  type="text"
-                  data-action="session#updateCode"
-                  data-session-target="backupCode"
-                  placeholder="<%= t('.placeholder.backup_code') %>"
-                  name="session[backup_code]"
-                  class="input input-bordered w-full">
-              </label>
-            </div>
-          <% end %>
-        </div>
-      </div>
+      <%= render('factor2') %>
     <% elsif !logged_in? %>
       <div class="flex flex-col gap-2">
         <label class="form-control w-full">
@@ -91,11 +43,12 @@
             type="text"
             data-action="session#updateNickname"
             data-session-target="nickname"
-            placeholder="<%= t('.placeholder.nickname') %>"
-            name="session[nickname]"
+            placeholder="<%= t(".placeholder.#{@identifier}") %>"
+            name="session[identifier]"
             class="input input-bordered w-full">
         </label>
-        <label class="form-control input input-bordered w-full flex flex-row items-center gap-2" data-controller="password-visibility">
+
+        <label class="form-control input input-bordered w-full flex flex-row items-center gap-2 mb-2" data-controller="password-visibility">
           <input
             type="password"
             data-action="session#updatePassword"
@@ -111,30 +64,16 @@
             <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
           </button>
         </label>
-        <% if @config.site_links[:recover] %>
-          <div class="label">
-            <span class="label-text-alt opacity-60 hover:opacity-100"><a
-                class="hover:underline"
-                href="<%= @config.site_links[:recover] %>"><%= t(".recover_credentials") %></a></span>
+        <div class="flex items-start gap-4 ">
+          <div class="flex-grow">
+            <%= form.submit t(".submit"),
+                        class: "btn btn-active",
+                        data: {
+                          session_target: "submit",
+                        } %>
           </div>
-        <% end %>
+        </div>
       </div>
-    <% end %>
-
-    <% unless logged_in? %>
-    <div class="flex items-center gap-4">
-      <%= form.submit t(".submit"),
-                  class: "btn btn-active",
-                  data: {
-                    session_target: "submit",
-                  } %>
-      <div class="form-control" data-session-target="remember">
-        <label class="label cursor-pointer">
-          <input type="checkbox" name="session[remember_me]" class="toggle toggle-sm">
-          <span class="label-text pl-2"><%= t(".remember_me") %></span>
-        </label>
-      </div>
-    </div>
     <% end %>
   <% end %>
 

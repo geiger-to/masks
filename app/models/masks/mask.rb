@@ -175,8 +175,7 @@ module Masks
     def matches_session?(session)
       actor = session.actor
 
-      return false unless actor
-      return true if actor.anonymous? && allow_anonymous?
+      return true if (!actor || actor.anonymous?) && allow_anonymous?
 
       case self.actor
       when String

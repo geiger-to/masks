@@ -8675,6 +8675,7 @@
 
   // app/assets/javascripts/controllers/session_controller.js
   var session_controller_default = class extends Controller {
+    static values = { signup: Boolean };
     static get targets() {
       return [
         "nickname",
@@ -8682,7 +8683,6 @@
         "backupCode",
         "password",
         "submit",
-        "remember",
         "flash"
       ];
     }
@@ -8718,20 +8718,13 @@
       let flash;
       if (this.session.nickname && this.session.password) {
         this.submitTarget.disabled = false;
-        this.rememberTarget.classList.remove("hidden");
         flash = "continue";
       } else if (this.session.factor2) {
         const disabled = (this.session.code?.length || 0) < 6;
         this.submitTarget.disabled = disabled;
-        if (disabled) {
-          this.rememberTarget.classList.add("hidden");
-        } else {
-          this.rememberTarget.classList.remove("hidden");
-        }
         flash = "enter-factor2";
       } else {
-        this.submitTarget.disabled = true;
-        this.rememberTarget.classList.add("hidden");
+        this.submitTarget.disabled = !this.session.nickname;
         if (this.session.nickname) {
           flash = "enter-password";
         } else {
@@ -8783,29 +8776,6 @@
     }
     syncState() {
       this.submitTarget.disabled = !this.password?.length;
-    }
-  };
-
-  // app/assets/javascripts/controllers/emails_controller.js
-  var emails_controller_default = class extends Controller {
-    static get targets() {
-      return ["email", "password", "submit"];
-    }
-    connect() {
-      this.email = this.emailTarget.value;
-      this.pass = this.passwordTarget.value;
-      this.syncState();
-    }
-    updateEmail(e) {
-      this.email = e.target.value;
-      this.syncState();
-    }
-    updatePassword(e) {
-      this.pass = e.target.value;
-      this.syncState();
-    }
-    syncState() {
-      this.submitTarget.disabled = !this.email?.includes("@") || !this.pass;
     }
   };
 
@@ -8969,7 +8939,6 @@
   application.register("session", session_controller_default);
   application.register("recover", recover_controller_default);
   application.register("recover-password", recover_password_controller_default);
-  application.register("emails", emails_controller_default);
   application.register("keys", keys_controller_default);
   application.register("table", table_controller_default);
   application.register("password-visibility", PasswordVisibility);

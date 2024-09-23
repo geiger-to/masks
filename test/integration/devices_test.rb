@@ -13,8 +13,8 @@ module Masks
       device1 = nil
       device2 = nil
 
-      signup_as "admin" do
-        device1 = Masks::Rails::Actor.find_by!(nickname: "admin").devices.first
+      signup_as nickname: "admin" do
+        device1 = find_actor("@admin").devices.first
 
         assert device1
         assert_logged_in
@@ -23,13 +23,7 @@ module Masks
 
         refute_logged_in
 
-        post "/session",
-             params: {
-               session: {
-                 nickname: "admin",
-                 password: "password"
-               }
-             }
+        login_as "admin"
 
         assert_logged_in
       end
@@ -37,7 +31,7 @@ module Masks
       new_device do
         login_as "admin" do
           device2 =
-            Masks::Rails::Actor.find_by!(nickname: "admin").devices.first
+            find_actor("@admin").devices.first
 
           assert_equal device1, device2
           assert_logged_in

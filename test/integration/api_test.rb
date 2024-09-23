@@ -8,8 +8,8 @@ module Masks
     include Masks::TestHelper
 
     test "GET session.json is accessible by a key" do
-      signup_as "admin" do
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      signup_as nickname: "admin" do
+        actor = find_actor("@admin")
 
         post "/keys",
              params: {
@@ -36,8 +36,8 @@ module Masks
     end
 
     test "GET me.json is accessible by a key" do
-      signup_as "admin" do
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      signup_as nickname: "admin" do
+        actor = find_actor("@admin")
 
         post "/keys",
              params: {
@@ -64,8 +64,8 @@ module Masks
     end
 
     test "keys can be granted a subset of their actor's scopes" do
-      signup_as "admin" do
-        actor = Masks::Rails::Actor.find_by(nickname: "admin")
+      signup_as nickname: "admin" do
+        actor = find_actor("@admin")
         actor.assign_scopes!("foo", "bar", "baz")
 
         post "/keys",

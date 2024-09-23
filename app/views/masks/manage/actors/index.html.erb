@@ -41,9 +41,9 @@
 
       <%= form_with url: manage_actors_path, method: :post do |form| %>
         <label class="form-control input input-bordered flex flex-row gap-4 items-center flex-grow mb-2">
-          nickname
+          identifier
 
-          <input placeholder="enter a name for the client..." type="text" name="nickname" class="grow">
+          <input placeholder="enter an identifier for the actor (nickname, email, etc)..." type="text" name="nickname" class="grow">
         </label>
 
         <label class="form-control input input-bordered w-full flex flex-row items-center gap-4 mb-4" data-controller="password-visibility">
@@ -83,7 +83,7 @@
         <% @actors.each do |actor| %>
           <tr data-action="click->table#click" data-controller="table" class="cursor-pointer">
             <td>
-              <a data-table-target="url" href="<%= manage_actor_path(actor) %>" class="font-bold"><%= actor.nickname %></a>
+              <a data-table-target="url" href="<%= manage_actor_path(actor.identifier.value) %>" class="font-bold"><%= actor.identifier.value %></a>
             </td>
             <td class="text-xs whitespace-nowrap text-right">
               <% if actor.last_login_at %>

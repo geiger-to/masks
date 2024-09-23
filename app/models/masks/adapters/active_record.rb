@@ -37,44 +37,8 @@ module Masks
         record
       end
 
-      def find_actor(session, identifier:, **opts)
-        session
-          .mask
-          .actor_scope
-          .includes(:identifiers)
-          .find_by(identifiers: { value: identifier.value, type: identifier.type })
-      end
-
-      def find_actors(session, ids)
-        session.mask.actor_scope.where(uuid: ids).to_a
-      end
-
-      def build_actor(session, nickname: nil, email: nil, phone: nil, **opts)
-        record = session.mask.actor_scope.new(session:)
-        record.identifiers << nickname if nickname
-        record.identifiers << email if email
-        record.identifiers << phone if phone
-        record
-      end
-
       def expire_actors
         @config.model(:actor).expired.destroy_all
-      end
-
-      def expire_recoveries
-        @config.model(:recovery).expired.destroy_all
-      end
-
-      def find_recovery(_session, **opts)
-        if opts[:token]
-          @config.model(:recovery).recent.find_by(token: opts[:token])
-        elsif opts[:id]
-          @config.model(:recovery).recent.find_by(id: opts[:id])
-        end
-      end
-
-      def build_recovery(session, **opts)
-        @config.model(:recovery).new(configuration: @config, session:, **opts)
       end
     end
   end

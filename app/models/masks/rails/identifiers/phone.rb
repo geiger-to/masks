@@ -6,7 +6,7 @@ module Masks
       class Phone < Base
         class << self
           def match(value:)
-            return unless PhoneLib.valid?(value)
+            return unless Phonelib.possible?(value)
 
             new(value:, type: self)
           end

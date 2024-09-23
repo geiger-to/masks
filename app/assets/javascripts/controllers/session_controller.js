@@ -1,6 +1,8 @@
 import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
+  static values = { signup: Boolean }
+
   static get targets() {
     return [
       "nickname",
@@ -8,7 +10,6 @@ export default class extends Controller {
       "backupCode",
       "password",
       "submit",
-      "remember",
       "flash",
     ];
   }
@@ -56,23 +57,15 @@ export default class extends Controller {
 
     if (this.session.nickname && this.session.password) {
       this.submitTarget.disabled = false;
-      this.rememberTarget.classList.remove("hidden");
 
       flash = "continue";
     } else if (this.session.factor2) {
       const disabled = (this.session.code?.length || 0) < 6;
       this.submitTarget.disabled = disabled;
 
-      if (disabled) {
-        this.rememberTarget.classList.add("hidden");
-      } else {
-        this.rememberTarget.classList.remove("hidden");
-      }
-
       flash = "enter-factor2";
     } else {
-      this.submitTarget.disabled = true;
-      this.rememberTarget.classList.add("hidden");
+      this.submitTarget.disabled = !this.session.nickname;
 
       if (this.session.nickname) {
         flash = "enter-password";

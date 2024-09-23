@@ -110,5 +110,20 @@ module Masks
         masked_session.passed?
       end
     end
+
+    # Returns the current masks config for the request.
+    #
+    # @return [Masks::Configuration]
+    # @visibility public
+    def masks_config
+      @masks_config ||= masked_session&.config || Mask.configuration
+    end
+
+    # A hash of Masks runtime settings data.
+    #
+    # @return [Hash]
+    def masks_settings
+      masks_config.settings
+    end
   end
 end

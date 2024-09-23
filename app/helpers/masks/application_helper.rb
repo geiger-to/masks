@@ -36,14 +36,5 @@ module Masks
     def logged_in?
       @session&.passed? && @session&.actor && !@session.actor.anonymous?
     end
-
-    def factor2_required?
-      checks = @session.checks_for(:session)
-
-      return false unless checks
-
-      checks[:factor2] && !checks[:factor2]&.passed? &&
-        checks[:actor]&.passed? && checks[:password]&.passed?
-    end
   end
 end

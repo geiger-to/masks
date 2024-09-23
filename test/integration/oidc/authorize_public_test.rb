@@ -21,11 +21,11 @@ module Masks
       assert_equal 302, status
       assert_includes headers["Location"], "/session"
 
-      signup_as "admin"
+      signup_as nickname: "admin"
 
       follow_redirect!
 
-      admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+      admin = find_actor("@admin")
 
       assert_token(client, admin)
     end
@@ -33,7 +33,7 @@ module Masks
     test "GET authorize?response_type=token redirects to the RP if already authenticated" do
       client = add_client(client_type: "public")
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "token",
@@ -42,7 +42,7 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
 
         assert_token(client, admin)
       end
@@ -51,7 +51,7 @@ module Masks
     test "GET authorize?response_type=id_token redirects to the RP if already authenticated" do
       client = add_client(client_type: "public")
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "id_token",
@@ -60,7 +60,7 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
 
         assert_id_token(client, admin)
       end
@@ -69,7 +69,7 @@ module Masks
     test "GET authorize?response_type=token+id_token redirects to the RP if already authenticated" do
       client = add_client(client_type: "public")
 
-      signup_as "admin" do
+      signup_as nickname: "admin" do
         get "/authorize",
             params: {
               response_type: "token id_token",
@@ -78,7 +78,7 @@ module Masks
               nonce: "12345"
             }
 
-        admin = Masks::Rails::Actor.find_by!(nickname: "admin")
+        admin = find_actor("@admin")
 
         token = assert_token(client, admin)
         assert_id_token(client, admin, access_token: token.to_bearer_token)

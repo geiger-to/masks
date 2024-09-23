@@ -29,7 +29,7 @@ module Masks
             prefix = Masks.setting('nickname.prefix')
 
             if prefix
-              /^[#{prefix}]([\w\-]+)$/
+              /^[#{prefix}]([a-z])([\w\-]+)$/
             else
               /^[a-z][\w\-]+[a-z0-9]$/
             end
