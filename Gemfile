@@ -29,7 +29,7 @@ end
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
   gem "jekyll-postcss"
-  gem "jekyll-toc", "~> 0.18.0"
+  gem "jekyll-toc", "~> 0.19.0"
 end
 
 # Windows and JRuby does not include zoneinfo files, so bundle the tzinfo-data gem
