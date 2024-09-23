@@ -28,43 +28,30 @@ module Masks
     end
 
     def call(env)
-      request = ActionDispatch::Request.new(env)
-      session = Masks.request(request)
+      # request = Masks::Request.new(ActionDispatch::Request.new(env))
 
-      ::Rails.logger.info(
-        [
-          "Mask #{session.passed? ? "allowed" : "blocked"}",
-          "by type=#{session.mask.type}",
-          session.mask.name ? "name=#{session.mask.name}" : ""
-        ].join(" ")
-      )
+      # mask = Masks.mask(request)
 
-      env[SESSION_KEY] = session
-      app = @app
-      app = (session.passed? ? app : error_app(session, app))
+      # if mask
 
-      app.call(env)
-    end
+      # end
+      # masked = Masks::Mask.match(request)
 
-    private
+      # session = Masks.request(request)
 
-    def error_app(session, app)
-      value = session.mask.fail
-      case value
-      when false
-        app
-      when /.+\#.+/
-        controller, action = value.split("#")
-        controller.constantize.action(action)
-      when %r{/.*}, %r{https?://.+}
-        Masks::ErrorController.action(:redirect)
-      when /\d+/
-        Masks::ErrorController.action("render_#{value}")
-      when /\w+/
-        Masks::ErrorController.action(value)
-      else
-        Masks::ErrorController.action(:render_unauthorized)
-      end
+      # ::Rails.logger.info(
+      #   [
+      #     "Mask #{session.passed? ? "allowed" : "blocked"}",
+      #     "by type=#{session.mask.type}",
+      #     session.mask.name ? "name=#{session.mask.name}" : ""
+      #   ].join(" ")
+      # )
+
+      # env[SESSION_KEY] = session
+      # app = @app
+      # app = (session.passed? ? app : error_app(session, app))
+
+      @app.call(env)
     end
   end
 end

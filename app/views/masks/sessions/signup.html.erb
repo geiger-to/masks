@@ -1,0 +1,60 @@
+<%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
+  <%= render('masks/input/openid',
+    icon: 'user-round-plus',
+    heading: t('.signup'),
+    client: openid.client,
+    tenant:,
+  ) %>
+
+  <label class="form-control w-full mb-3">
+    <div class="flex items-center gap-3">
+      <div class="text-lg font-bold truncate">
+        <%= login.identifier.value %>
+      </div>
+      <a href="<%= session_path(nonce: login.nonce, prompt: 'select_account') %>" class="font-normal text-xs underline">
+        <%= t(".start_over") %>
+      </a>
+
+      <input
+        type="hidden"
+        name="login_hint"
+        class="input input-bordered w-full"
+        value="<%= login.identifier.value %>"
+      >
+    </div>
+  </label>
+
+  <div class="flex flex-col gap-2">
+    <% profile.signup_identifiers.each do |key, id| %>
+      <% if login.identifier.key != key %>
+        <label class="form-control w-full mb-2">
+          <input
+            type="text"
+            placeholder="<%= t(".required.#{key}") %>"
+            name="<%= key %>"
+            value="<%= login.identifier&.key == key ? login.hint : params[key] %>"
+            class="input input-bordered w-full">
+        </label>
+      <% end %>
+    <% end %>
+
+    <% profile.optional_identifiers.each do |key, id| %>
+      <% if login.identifier&.key != key && params[key] %>
+        <label class="form-control w-full">
+          <input
+            type="text"
+            placeholder="<%= t(".optional.#{key}") %>"
+            name="<%= key %>"
+            value="<%= login.identifier&.key == key ? login.hint : params[key] %>"
+            class="input input-bordered w-full">
+        </label>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if profile.enabled?(:password) %>
+    <%= render('masks/input/password', error: login.password_error, value: login.password, submit: t('.signup'), placeholder: t('.password')) do |assigns| %>
+      <%= form.submit assigns[:submit], name: 'signup', class: "btn btn-accent" %>
+    <% end %>
+  <% end%>
+<% end %>

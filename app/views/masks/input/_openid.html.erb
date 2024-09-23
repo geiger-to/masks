@@ -1,0 +1,77 @@
+<div data-controller="reveal" class="dark:border-neutral bg-base-100 pt-4 px-6 -mx-6 mb-2 <%= local_assigns[:class] %>">
+  <div class="flex items-center gap-5">
+    <div class="flex-grow">
+      <h1 class="text-2xl md:text-3xl font-bold dark:text-white text-black">
+        <%= local_assigns[:heading] %>
+      </h1>
+
+      <h2 class="text-xl">
+        <% if local_assigns[:subheading] %>
+          <%= local_assigns[:subheading] %>
+        <% elsif local_assigns[:client] %>
+          <%= t('.access_client', client: local_assigns[:client].name) %>
+        <% elsif local_assigns[:tenant] %>
+          <%= t('.access_tenant', tenant: local_assigns[:tenant].name) %>
+        <% else %>
+          <%= t('.access') %>
+        <% end %>
+      </h2>
+    </div>
+    <div class="avatar">
+      <div class="p-2 <%= local_assigns[:icon_class] %> rounded-lg">
+        <%= lucide_icon(local_assigns[:icon], size: 30) %>
+      </div>
+    </div>
+  </div>
+
+  <% if local_assigns[:actor] && (local_assigns[:scopes] - local_assigns[:actor].scopes).any? %>
+    <div class="alert mt-4 mb-0">
+      <div class="text-error">
+        <%= lucide_icon('x') %>
+      </div>
+
+      <div>
+        <%= t('.scopes_invalid') %>
+      </div>
+    </div>
+  <% end %>
+
+    <% if local_assigns[:scopes]&.any? %>
+      <div class="divider text-xs mb-2">
+        <a href="#" class="hover:underline focus:underline" data-action="reveal#toggle:prevent">show details</a>
+      </div>
+    <% else %>
+      <div class="divider mb-0"></div>
+    <% end%>
+
+  <% if local_assigns[:scopes]&.any? %>
+    <div data-reveal-target="item" class="hidden">
+      <div class="flex items-center gap-5">
+        <div class="flex-grow">
+          <table class="table table-auto w-full text-xs">
+            <thead>
+              <tr>
+                <th class="px-0"><%= t('.scope_name') %></th>
+                <th class="px-0 text-right"><%= t('.scope_desc') %></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% local_assigns[:scopes].each do |scope| %>
+                <tr>
+                  <td class="px-0 font-bold <%= !local_assigns[:actor] || local_assigns[:actor].scope?(scope) ? '' : 'text-error' %>">
+                    <%= scope %>
+                  </td>
+                  <td class="text-right px-0">
+                    <%= t(".scope.#{scope}") %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="divider text-xs my-2"></div>
+    </div>
+  <% end %>
+</div>

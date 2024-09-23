@@ -8910,9 +8910,11 @@
       if (e.target.checked) {
         api.set("default_theme", "dark", { sameSite: "strict" });
         document.documentElement.setAttribute("data-theme", e.target.dataset.dark);
+        document.documentElement.classList.add("dark");
       } else {
         api.set("default_theme", "light", { sameSite: "strict" });
         document.documentElement.setAttribute("data-theme", e.target.dataset.light);
+        document.documentElement.classList.remove("dark");
       }
     }
     // toggleSettings(e) {

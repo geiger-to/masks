@@ -1,0 +1,57 @@
+<%= render 'masks/admin/breadcrumbs', heading: 'all profiles', back: admin_profiles_path do %>
+  <span class="italic truncate">
+    updated <%= time_ago_in_words(@profile.updated_at) %> ago
+  </span>
+<% end %>
+
+<%= form_with(url: admin_profile_path(@profile, tab: params[:tab]), method: :patch) do |f| %>
+  <div class="mb-3 flex items-center gap-0">
+    <div>
+      <%= lucide_icon('scan-face', class: 'w-5 h-5') %>
+    </div>
+
+    <div class="flex-grow">
+      <input name="settings[name]" value="<%= @profile.name %>" class="input input-sm input-ghost text-base font-bold text-neutral-content w-full">
+    </div>
+
+    <input type="submit" class="btn btn-xs btn-success" value="save" />
+  </div>
+
+  <div class="bg-base-100 rounded-t-lg w-full px-4 py-2 flex items-center gap-2">
+    <span class="font-mono text-xs truncate flex-grow"><%= @profile.key %></span>
+    <div class="whitspace-nowrap text-xs flex items-end gap-1">
+      <div>
+        <%= lucide_icon('handshake', size: 15) %>
+      </div>
+      <a class="underline" href="<%= admin_client_path(@clients.first) %>"><%= @clients.first.name.truncate(12) %></a>
+      <% if @clients.count == 2 %>
+        and <a class="underline" href="<%= admin_client_path(@clients.second) %>"><%= @clients.second.name.truncate(12) %></a>
+      <% elsif @clients.count > 2 %>
+        <a class="underline" href="<%= admin_clients_path(q: @profile.key) %>"><%= @clients.count - 1 %> others</a>
+      <% end %>
+    </div>
+  </div>
+
+  <ul class="menu menu-xs menu-horizontal bg-base-300 rounded-b-lg w-full">
+    <li>
+      <a href="<%= admin_profile_path(@profile, tab: "general") %>" class="flex items-center gap-4 <%= params[:tab] == 'general' ? 'active' : '' %>">
+        general
+      </a>
+    </li>
+    <li>
+      <a href="<%= admin_profile_path(@profile, tab: "theme") %>" class="flex items-center gap-4 <%= params[:tab] == 'theme' ? 'active' : '' %>">
+        theme
+      </a>
+    </li>
+  </ul>
+
+  <div class="my-4">
+    <%= render('masks/admin/alert/info') %>
+    <%= render('masks/admin/alert/error') %>
+  </div>
+
+  <div class="">
+    <%= render("masks/admin/profiles/#{params[:tab]}") %>
+  </div>
+
+<% end %>

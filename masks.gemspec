@@ -29,6 +29,7 @@ Gem::Specification.new do |spec|
       ]
     end
 
+  spec.add_dependency 'activerecord-session_store', '~> 2'
   spec.add_dependency "alba"
   spec.add_dependency "bcrypt", "~> 3.1"
   spec.add_dependency "chronic_duration", "~> 0.10"
@@ -48,6 +49,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "sprockets-rails"
   spec.add_dependency "sqlite3", "~> 1.7"
   spec.add_dependency "stimulus-rails", "~> 1.3"
+  spec.add_dependency "token_phrase", "~> 1"
   spec.add_dependency "turbo-rails", ">= 1.5", "< 3.0"
   spec.add_dependency "validates_host", "~> 1.3"
   spec.add_dependency "valid_email", "~> 0.2"

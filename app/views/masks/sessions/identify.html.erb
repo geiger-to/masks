@@ -1,0 +1,94 @@
+<%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
+  <input type="hidden" name="nonce" value="<%= login.nonce %>" />
+
+  <%= render('masks/input/openid',
+    color: 'warning',
+    icon: 'lock-keyhole',
+    heading: t(login.signups_allowed? ? '.login_or_signup' : '.login'),
+    client: openid.client,
+    scopes: login.scopes,
+    tenant:,
+  ) %>
+
+  <% if login.actors.any? %>
+    <div class="mt-4">
+      <% login.actors.all.each_with_index do |alt, i| %>
+        <div class="mb-3 group flex items-center gap-0.5 w-full">
+          <a href="<%= session_path(nonce: login.nonce, login_hint: alt.identifier.value) %>"
+            class="<%= alt == login.last_actor ? "btn-active" : "" %> flex items-center gap-4 px-3 btn focus:btn-accent hover:btn-accent text-left flex-grow peer"
+          >
+            <div class="flex flex-col flex-grow">
+              <span class="text-lg font-bold flex-grow">
+                <%= alt.identifier.value %>
+              </span>
+            </div>
+
+            <%= lucide_icon('chevrons-right') %>
+          </a>
+        </div>
+      <% end %>
+
+      <div class="divider text-xs opacity-75">use a different account</div>
+
+      <div class="flex items-center gap-4">
+        <input
+          class="input input-bordered w-full <%= login.hint&.present? ? 'input-error' : '' %>"
+          placeholder="<%= t(".label.#{profile.identifiers_key}") %>"
+          type="text"
+          name="login_hint"
+          value="<%= login.hint %>">
+
+        <button type="submit" class="btn hover:btn-accent focus:btn-accent">
+          <%= lucide_icon('user-round-plus') %>
+        </button>
+      </div>
+    </div>
+  <% else%>
+    <div class="flex flex-col <%= !login.hint.present? && login.actors.any? ? 'hidden' : '' %>" data-reveal-target="item">
+      <label class="form-control w-full">
+        <div class="label">
+          <span class="label-text-alt font-bold">
+            <%= t(".label.#{profile.identifiers_key}") %>
+          </span>
+        </div>
+          <div class="flex items-end gap-2">
+            <div class="flex items-center gap-2 input input-bordered w-full <%= login.hint&.present? ? 'input-error' : '' %>">
+              <%= lucide_icon('user-round-search') %>
+              <input
+                autofocus
+                type="text"
+                name="login_hint"
+                value="<%= login.hint %>"
+                class="w-full">
+            </div>
+
+            <%= form.submit t(".submit"), class: "btn btn-active btn-accent" %>
+          </div>
+        </label>
+
+      <label class="hidden form-control input input-bordered w-full flex flex-row items-center gap-2" data-controller="password-visibility">
+        <input
+          type="password"
+          spellcheck="false"
+          placeholder="<%= t('.password') %>"
+          name="password"
+          data-password-visibility-target="input"
+          class="flex-grow">
+
+        <button data-action="password-visibility#toggle" type="button" class="btn btn-sm btn-ghost -mr-2">
+          <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+          <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+        </button>
+      </label>
+
+      <% if login.hint&.present? %>
+        <div class="label pb-0">
+          <span class="label-text-alt text-error flex items-center gap-2">
+            <%= lucide_icon('x', size: 14) %>
+            <%= t('.invalid') %>
+          </span>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

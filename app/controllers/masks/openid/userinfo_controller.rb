@@ -22,7 +22,7 @@ module Masks
         @access_token ||= masked_session.extra(:access_token)
       end
 
-      delegate :openid_client, to: :access_token
+      delegate :client, to: :access_token
     end
   end
 end

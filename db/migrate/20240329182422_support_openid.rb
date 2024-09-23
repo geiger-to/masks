@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 class SupportOpenID < ActiveRecord::Migration[7.1]
   def change
-    create_table :openid_clients do |t|
+    create_table :masks_clients do |t|
       t.string :name
       t.string :key
       t.string :secret
@@ -12,37 +12,45 @@ class SupportOpenID < ActiveRecord::Migration[7.1]
       t.string :subject_type
       t.string :sector_identifier
       t.string :code_expires_in
-      t.string :token_expires_in
+      t.string :id_token_expires_in
+      t.string :access_token_expires_in
       t.string :refresh_expires_in
       t.text :rsa_private_key
 
+      t.references :tenant
+      t.references :profile
+
       t.timestamps
 
-      t.index :key, unique: true
+      t.index [:tenant_id, :key], unique: true
     end
 
-    create_table :openid_authorizations do |t|
+    create_table :masks_authorizations do |t|
       t.string :code
       t.string :nonce
       t.string :redirect_uri
       t.text :scopes
 
       t.references :actor
-      t.references :openid_client
+      t.references :device
+      t.references :client
+      t.references :tenant
       t.datetime :expires_at
       t.timestamps
 
       t.index :code, unique: true
     end
 
-    create_table :openid_access_tokens do |t|
+    create_table :masks_access_tokens do |t|
       t.string :token
       t.string :refresh_token
       t.string :refreshed_token
       t.text :scopes
 
       t.references :actor, null: true
-      t.references :openid_client
+      t.references :device, null: true
+      t.references :client
+      t.references :tenant
       t.datetime :expires_at
       t.datetime :revoked_at
       t.timestamps
@@ -52,13 +60,18 @@ class SupportOpenID < ActiveRecord::Migration[7.1]
       t.index :refreshed_token, unique: true
     end
 
-    create_table :openid_id_tokens do |t|
+    create_table :masks_id_tokens do |t|
       t.string :nonce
-      t.datetime :expires_at
 
       t.references :actor
-      t.references :openid_client
+      t.references :device
+      t.references :client
+      t.references :tenant
+
+      t.datetime :expires_at
       t.timestamps
+
+      t.index :nonce, unique: true
     end
   end
 end

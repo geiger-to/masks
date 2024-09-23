@@ -1,0 +1,234 @@
+<%= render 'masks/admin/breadcrumbs', heading: 'all actors', back: admin_actors_path do %>
+  <span class="italic truncate">
+    updated <%= time_ago_in_words(@actor.updated_at) %> ago
+  </span>
+<% end %>
+
+<%= render('masks/admin/alert/info', class: 'mb-4') %>
+<%= render('masks/admin/alert/error', class: 'mb-4') %>
+
+<% if @identifiers.any? %>
+  <div class="mb-4">
+    <div class="overflow-x-auto max-h-96">
+      <table class="table table-pin-rows bg-base-300 rounded-lg">
+        <tbody>
+          <% @identifiers.each do |identifier| %>
+            <tr>
+              <td class="md:text-lg text-base font-mono text-neutral-content"><%= identifier.value %></td>
+              <td class="font-mono w-full italic text-sm"><span class="hidden md:block"><%= identifier.key%></span></td>
+              <td class="flex items-center gap-2">
+                <div class="hidden text-success whitespace-nowrap md:inline text-sm flex-grow text-right <%= !identifier.verified? ? 'opacity-50' : '' %>">
+                  <%= identifier.verified? ? "verified #{time_ago_in_words(identifier.verified_at)} ago" : 'unverified' %>
+                </div>
+                <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+                  <input type="hidden" name="<%= identifier.verified? ? 'un' : '' %>verify_identifier" value="<%= identifier.value %>">
+
+                  <button type="submit" class="btn <%= identifier.verified? ? "" : "btn-outline" %> btn-success btn-xs">
+                    <%= lucide_icon(identifier.verified? ? 'user-round-minus' : 'user-round-check', class: 'w-4 h-4') %>
+                  </button>
+                <% end %>
+                <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+                  <input type="hidden" name="remove_identifier" value="<%= identifier.value %>">
+
+                  <button type="submit" class="btn btn-outline btn-xs btn-error" <%= @identifier_count == 1 ? "disabled" : "" %>>
+                    <%= lucide_icon('trash-2', class: 'w-4 h-4') %>
+                  </button>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+
+            <tr>
+              <td colspan="3">
+                <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+                  <div class="flex items-center gap-4">
+                    <%= lucide_icon('user-plus', class: 'text-base-300-content') %>
+                    <div class="flex-grow">
+                      <input type="text" name="add_identifier" class="w-full input input-sm" placeholder="add an identifier...">
+                    </div>
+                    <input type="submit" class="btn btn-sm" value="add">
+                  </div>
+                <% end %>
+              </td>
+            </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>
+
+<% if !@actor.last_login_at %>
+  <%= render('masks/admin/alert/note', class: 'mb-4', icon: 'log-in', note: "#{@actor.identifier.value} has never logged in...") %>
+<% end %>
+
+<div class="bg-base-100 flex flex-col gap-4 p-4 rounded-xl mb-4">
+  <div class="flex items-center gap-4" data-controller="dialog" data-action="click->dialog#backdropClose">
+    <%= lucide_icon('unlock', class: 'w-4 h-4') %>
+      <div class="text-sm flex-grow">
+    <% if @actor.changed_password_at %>
+        <b class="text-neutral-content">password</b> changed <%= time_ago_in_words(@actor.changed_password_at) %> ago
+    <% else %>
+        <b class="text-neutral-content">password</b> never changed
+    <% end %>
+      </div>
+
+    <button data-action="dialog#open" type="button" class="btn hover:btn-error btn-xs">
+      change
+    </button>
+
+    <dialog class="modal" data-dialog-target="dialog">
+      <div class="modal-box">
+        <form method="dialog">
+          <button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"><%= lucide_icon('x') %></button>
+        </form>
+
+        <h3 class="mb-4 font-bold flex items-center gap-2">
+          <%= lucide_icon('lock-keyhole', size: 16) %>
+          change password
+        </h3>
+
+        <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+          <label class="form-control input input-bordered w-full flex flex-row items-center gap-2 mb-4" data-controller="password-visibility">
+            <input
+              type="password"
+              data-password-visibility-target="input"
+              spellcheck="false"
+              placeholder="enter a new password..."
+              name="change_password"
+              class="flex-grow">
+
+            <button data-action="password-visibility#toggle" type="button" class="btn btn-sm btn-ghost -mr-2">
+              <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+              <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+            </button>
+          </label>
+
+          <div class="modal-actions">
+            <input type="submit" class="btn btn-sm btn-success" value="change">
+          </div>
+        <% end %>
+      </div>
+    </dialog>
+  </div>
+
+  <div class="flex items-center gap-4">
+    <%= lucide_icon('key-square', class: 'w-4 h-4') %>
+    <div class="text-sm flex-grow">
+      <b class="text-neutral-content">secondary</b> credentials <span class="italic <%= @actor.factor2? ? 'text-success' : "text-error" %>"><%= @actor.factor2? ? 'enabled' : 'disabled' %></span>
+
+    </div>
+    <% if @actor.factor2? %>
+      <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+        <input type="submit" class="btn hover:btn-error btn-xs" name="remove_factor2" value="remove">
+      <% end %>
+    <% end %>
+  </div>
+
+</div>
+
+<% if @actor.last_login_at %>
+<div data-controller="reveal" class="mb-4">
+  <div class="flex flex-col gap-2 p-4 bg-base-100 rounded-xl">
+    <% if @clients.any? %>
+      <div class="overflow-x-auto max-h-96 flex flex-col gap-3">
+        <% @clients.each do |client| %>
+          <div class="flex items-center gap-4">
+            <div class="flex-grow flex flex-col md:flex-row md:items-center md:gap-4">
+              <a href="<%= admin_client_path(client) %>" class="max-w-[222px] flex gap-2 items-center">
+                <span class="truncate text-sm font-bold text-neutral-content">
+                  <%= client.name %>
+                </span>
+              </a>
+              <div class="text-xs">
+                <% if (last_accessed_at = @client_access[client.key]) %>
+                  accessed <%= time_ago_in_words(last_accessed_at) %> ago
+                <% else %>
+                  <span class="opacity-75">inactive</span>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="flex-grow"></div>
+
+            <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+              <input type="hidden" name="expire_client" value="<%= client.key %>">
+
+              <button type="submit" class="btn btn-outline btn-xs">
+                revoke
+              </button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+      <div class="divider my-0 mb-0 text-xs opacity-75"></div>
+    <% end %>
+
+    <% if @devices.any? %>
+      <div class="overflow-x-auto max-h-96 flex flex-col gap-3">
+        <% @devices.each do |device| %>
+          <div class="flex items-center gap-4">
+            <%= lucide_icon(device_icon(device), size: 16) %>
+
+            <div class="flex-grow flex flex-col md:flex-row md:gap-4 md:items-center">
+              <a href="<%= admin_device_path(device) %>" class="max-w-[222px] md:max-w-full flex gap-2 items-center">
+                <span class="truncate text-sm font-bold text-neutral-content">
+                  <%= device_desc(device) %>
+                </span>
+              </a>
+              <div class="text-xs">
+                <% if (last_accessed_at = @device_access[device.key]) %>
+                  logged in <%= time_ago_in_words(last_accessed_at) %> ago
+                <% else %>
+                  <span class="opacity-75">inactive</span>
+                <% end %>
+              </div>
+            </div>
+
+            <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+              <input type="hidden" name="expire_device" value="<%= device.key %>">
+
+              <button type="submit" class="btn btn-outline btn-xs">
+                logout
+              </button>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+<% end %>
+
+<div class="overflow-x-auto max-h-96 mb-4">
+  <table class="table table-pin-rows bg-base-100 rounded-xl">
+    <tbody>
+        <tr>
+          <td colspan="2">
+              <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+            <div class="flex items-center gap-2">
+                <span class="text-xs opacity-75">scopes</span>
+                <div class="flex-grow">
+                  <input type="text" name="add_scope" class="w-full input input-sm" placeholder="add a scope...">
+                </div>
+                <input type="submit" class="btn btn-sm" value="add">
+            </div>
+               <% end %>
+          </td>
+        </tr>
+      <% @actor.scopes.each do |scope| %>
+        <tr>
+          <td class="font-mono w-full"><%= scope %></td>
+          <td class="">
+            <%= form_with url: admin_actor_path(@actor), method: :patch do |form| %>
+              <input type="hidden" name="remove_scope" value="<%= scope %>">
+
+              <button type="submit" class="btn btn-ghost btn-error hover:btn-outline btn-xs">
+                <%= lucide_icon('x', class: 'w-4 h-4') %>
+              </button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

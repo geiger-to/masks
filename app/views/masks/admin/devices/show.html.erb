@@ -1,0 +1,69 @@
+<%= render 'masks/admin/breadcrumbs', heading: 'all devices', back: admin_devices_path do %>
+  <span class="italic truncate">
+    updated <%= time_ago_in_words(@device.updated_at) %> ago
+  </span>
+<% end %>
+
+<div class="mb-4 flex items-center gap-4">
+  <%= lucide_icon(device_icon(@device), class: 'w-5 h-5') %>
+
+  <div>
+    <h1 class="font-bold text-neutral-content">
+      <%= device_desc(@device) %>
+    </h1>
+
+    <p class="font-mono text-xs">#<%= @device.key %></p>
+  </div>
+</div>
+
+<div class="mb-6 p-4 py-2 rounded-xl bg-base-100">
+  <div class="flex gap-2 flex-col">
+    <div class="flex-grow truncate">
+      <span class="opacity-75 text-xs">
+        user agent
+      </span>
+
+      <span class="font-mono text-sm pl-1"><%= @device.user_agent %></span>
+    </div>
+
+    <div class="flex-grow truncate">
+      <span class="opacity-75 text-xs">
+        ip address
+      </span>
+
+      <span class="font-mono text-sm pl-1"><%= @device.ip_address %></span>
+    </div>
+
+    <div class="truncate mb-1 text-sm">
+      <span class="opacity-75 text-xs">
+        registered
+       </span>
+
+      <span class="pl-1">
+        <%= time_ago_in_words(@device.created_at) %> ago
+      </span>
+    </div>
+  </div>
+</div>
+
+<% if @actors.any? %>
+  <div class="text-xs flex items-center gap-2 mb-3 ml-2">
+    <div>
+      <%= lucide_icon('users-round', size: 16) %>
+    </div>
+    <div>
+      actors
+    </div>
+  </div>
+
+  <% @actors.each do |actor| %>
+    <div class="bg-base-100 shadow p-2 px-4 rounded-xl mb-2" data-controller="reveal">
+      <div class=" flex items-center gap-4">
+        <a href="<%= admin_actor_path(actor) %>" class="hover:underline focus:underline font-bold">
+          <%= actor.identifier.value %>
+        </a>
+      </div>
+    </div>
+  <% end %>
+
+<% end %>

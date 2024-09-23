@@ -3,9 +3,6 @@
 module Masks
   # @visibility private
   class PasswordsController < ApplicationController
-    require_mask type: :session, only: :edit
-    require_access "actor.password", only: :update
-
     before_action only: %i[update] do
       require_sudo(password_path)
     end

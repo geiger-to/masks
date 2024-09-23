@@ -1,0 +1,183 @@
+<%= render 'masks/admin/breadcrumbs', heading: 'all clients', back: admin_clients_path do %>
+  <span class="italic truncate">
+    updated <%= time_ago_in_words(@client.updated_at) %> ago
+  </span>
+<% end %>
+
+<%= form_with url: admin_client_path(@client), method: :patch, data: { turbo: false } do |form| %>
+  <div class="flex items-center gap-2 w-full">
+    <div class="w-full flex-grow">
+      <input name="name" type="text" class="w-full input input-sm text-lg input-ghost font-bold" value="<%= @client.name %>">
+    </div>
+
+    <input type="submit" name="submit" value="save" class="btn btn-sm btn-success" />
+  </div>
+
+  <div class="my-2">
+    <%= render('masks/admin/alert/info') %>
+    <%= render('masks/admin/alert/errors', heading: 'unable to save client') %>
+  </div>
+
+  <div class="form-control w-full mb-2">
+    <label class="input input-bordered flex items-center gap-4 mb-2 text-sm">
+      <div class="text-xs opacity-75">
+        key
+      </div>
+      <input name="key" class="text-base" type="text" class="grow" value="<%= @client.key %>" disabled>
+    </label>
+
+    <label class="input input-bordered flex items-center gap-4 text-sm" data-controller="password-visibility">
+      <div class="text-xs opacity-75">
+        secret
+      </div>
+
+      <div class="flex-grow w-full">
+        <input name="secret" class="text-base w-full" type="password" value="<%= @client.secret %>" data-password-visibility-target="input" spellcheck="false">
+      </div>
+
+      <button data-action="password-visibility#toggle" type="button">
+        <span data-password-visibility-target="icon"><%= lucide_icon('eye') %></span>
+        <span data-password-visibility-target="icon" class="hidden"><%= lucide_icon('eye-off') %></span>
+      </button>
+    </label>
+  </div>
+
+  <div class="flex items-center gap-2 bg-base-100 rounded-lg pl-4 mb-2">
+    <div class="text-xs opacity-75">
+      profile
+    </div>
+    <select class="select select-ghost flex-grow" name="profile">
+      <%= all_profiles.each do |profile| %>
+        <option value="<%=profile.key %>" <%= @client.profile == profile ? 'selected' : '' %>><%= profile.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="flex flex-col md:flex-row md:items-center gap-2 mb-2">
+    <div class="flex items-center gap-2 bg-base-100 rounded-lg pl-4 pr-1 py-1 flex-grow">
+      <div class="text-xs opacity-75">
+        type
+      </div>
+      <div role="tablist" class="tabs tabs-boxed bg-base-100 [&>div]:py-2 [&>div]:px-2 [&>input]:!rounded-lg text-xs">
+        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="internal" aria-label="internal" <%= @client.client_type == 'internal' ? 'checked' : '' %>/>
+        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="confidential" aria-label="confidential" <%= @client.client_type == 'confidential' ? 'checked' : '' %>/>
+        <input autocomplete="off" type="radio" name="my_tabs_1" role="tab" class="tab" value="public" aria-label="public" <%= @client.client_type == 'public' ? 'checked' : '' %>/>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-base-100 flex flex-col gap-2 py-1 px-4 rounded-xl mb-2" data-controller="reveal">
+    <div class="form-control pl-2 mt-4">
+      <label class="flex items-center gap-4">
+        <input name="consent" type="checkbox" class="toggle toggle-sm" <%= @client.consent ? 'checked' : '' %>>
+
+        <span class="label-text-alt">require consent when accessing this client</span>
+      </label>
+    </div>
+
+    <button class="opacity-75 divider text-xs my-2 mt-1 flex items-center" data-action="reveal#toggle:prevent">
+      <div>
+        advanced
+      </div>
+      <div class="-ml-2">
+        <%= lucide_icon('chevron-down', size: 16) %>
+      </div>
+    </button>
+
+    <div class="hidden -mt-4" data-reveal-target="item">
+      <label class="form-control mb-2">
+        <div class="label">
+          <span class="label-text-alt">redirect uri(s)</span>
+        </div>
+
+        <textarea name="redirect_uris" class="textarea textarea-bordered h-24" placeholder="separate by a newline..."><%= @client.redirect_uris&.join("\n") %></textarea>
+      </label>
+
+      <div class="form-control w-full mb-2">
+        <div class="label">
+          <span class="label-text-alt">subject type</span>
+        </div>
+
+        <select name="subject_type" class="select select-bordered">
+          <option value="uuid" <%= @client.subject_type == 'uuid' ? 'selected' : '' %>>uuid</option>
+          <option value="email" <%= @client.subject_type == 'email' ? 'selected' : '' %>>email</option>
+          <option value="nickname" <%= @client.subject_type == 'nickname' ? 'selected' : '' %>>nickname</option>
+          <option value="pairwise" <%= @client.subject_type == 'pairwise' ? 'selected' : '' %>>anonymized</option>
+        </select>
+      </div>
+      <div class="form-control w-full mb-2">
+        <div class="label">
+          <span class="label-text-alt">lifetimes</span>
+        </div>
+
+        <div class="md:flex items-center gap-2">
+          <label class="input input-bordered flex items-center gap-4 mb-2 text-sm min-w-[100px]">
+            <span class="text-xs whitespace-nowrap">auth codes</span>
+            <input name="code_expires_in" type="text" class="" value="<%= @client.code_expires_in %>">
+          </label>
+
+          <label class="input input-bordered flex items-center gap-4 text-sm mb-2 min-w-[100px]">
+            <span class="text-xs whitespace-nowrap">access tokens</span>
+            <input name="access_token_expires_in" type="text" class="grow" value="<%= @client.access_token_expires_in %>">
+          </label>
+
+          <label class="input input-bordered flex items-center gap-4 text-sm mb-2 min-w-[100px]">
+            <span class="text-xs whitespace-nowrap">id tokens</span>
+            <input name="id_token_expires_in" type="text" class="grow" value="<%= @client.id_token_expires_in %>">
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+<% end %>
+
+
+  <div class="overflow-x-auto max-h-96 rounded-xl mb-4 bg-base-100">
+    <table class="table table-pin-row">
+        <tr>
+          <td colspan="2">
+            <%= form_with url: admin_client_path(@client), method: :patch do |form| %>
+              <div class="flex items-center gap-2">
+                <div class="opacity-75 text-xs">
+                  scopes
+                </div>
+
+                <div class="flex-grow ">
+                  <input type="text" name="add_scope" class="input input-sm w-full" placeholder="add a scope...">
+                </div>
+
+                <input type="submit" class="btn btn-sm" value="add">
+              </div>
+            <% end %>
+          </td>
+        </tr>
+      <% @client.scopes.each do |scope| %>
+        <tr>
+          <td class="font-mono w-full"><%= scope %></td>
+          <td class="">
+            <%= form_with url: admin_client_path(@client), method: :patch do |form| %>
+              <input type="hidden" name="remove_scope" value="<%= scope %>">
+
+              <button type="submit" class="btn btn-ghost btn-error hover:btn-outline btn-xs" <%= scope == 'openid' ? 'disabled' : '' %>>
+                <%= lucide_icon('x', class: 'w-4 h-4') %>
+              </button>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </table>
+  </div>
+
+<%= form_with url: admin_client_path(@client), method: :delete  do |form| %>
+  <div class="border border-error bg-base-300 flex gap-2 p-4 rounded-xl mb-4 items-center">
+    <p class="text-error">
+      <%= lucide_icon('trash-2') %>
+    </p>
+
+    <p class="flex-grow text-error">
+      <span class="font-bold">permanently</span> delete this client...
+    </p>
+
+    <input type="submit" class="btn btn-sm btn-error" value="delete">
+  </div>
+<% end %>

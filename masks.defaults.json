@@ -1,35 +1,51 @@
 {
   "name": "masks",
-  "logo": null,
-  "favicon": null,
+  "url": "http://localhost:3000",
+  "seeds": "seeds/default.rb",
+  "tenant": "default",
+  "client": "login",
+  "admin": "admin",
   "theme": "light",
   "background": "linear-gradient(to right bottom, #00cdb7, #00c6d2, #00bcea, #00b0fb, #009fff, #2e8eef, #407dde, #4c6ccc, #365ca5, #294b7f, #233a5a, #1f2937)",
+  "openid": {
+    "scopes": ["openid", "profile", "email", "address", "phone"],
+    "subject_types": ["nickname", "pairwise"],
+    "response_types": ["code", "token", "id_token"],
+    "grant_types": [
+      "client_credentials",
+      "authorization_code",
+      "implicit",
+      "refresh_token"
+     ]
+  },
   "dark_mode": {
-    "theme": "dark",
-    "background": null,
-    "logo": null
+    "enabled": true,
+    "theme": "dark"
+  },
+  "logins": {
+    "enabled": true
   },
   "signups": {
-    "disabled": true
+    "enabled": true
   },
   "password": {
+    "enabled": true,
     "minimum": "8",
     "maximum": "64"
   },
   "nickname": {
     "prefix": "@",
-    "allowed": true,
+    "enabled": true,
     "signups": true,
     "minimum": "4",
     "maximum": "16"
   },
   "email": {
-    "allowed": true,
-    "signups": false,
-    "domains": []
+    "enabled": true,
+    "signups": false
   },
   "phone": {
-    "allowed": true,
+    "enabled": true,
     "signups": false
   }
 }

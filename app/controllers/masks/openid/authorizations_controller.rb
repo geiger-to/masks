@@ -2,6 +2,8 @@
 module Masks
   module OpenID
     class AuthorizationsController < ApplicationController
+      before_action :require_openid
+
       rescue_from Rack::OAuth2::Server::Authorize::BadRequest do |e|
         @error = e
 
@@ -18,9 +20,17 @@ module Masks
 
       private
 
+      def require_openid
+        render_not_found unless masks_tenant.openid?
+      end
+
+      def authorization
+        @authorization ||= Masks::Requests::AuthorizationRequest.new(request)
+      end
+
       def authorize(**opts)
         # TODO: support incoming id_token request object + max_age parameter
-        @authorization = Authorization.perform(request.env, **opts)
+        @authorization = AuthorizationRequest.perform(request.env, **opts)
 
         _status, header, = @authorization.response
 

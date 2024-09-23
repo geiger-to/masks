@@ -3,8 +3,6 @@
 module Masks
   # @visibility private
   class OneTimeCodeController < ApplicationController
-    require_mask type: :session, only: :new
-
     before_action only: %i[create destroy] do
       require_sudo(one_time_code_path)
     end

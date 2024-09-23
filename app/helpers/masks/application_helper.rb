@@ -10,6 +10,10 @@ module Masks
       raw qrcode.as_svg(**opts)
     end
 
+    def device_desc(device)
+      "#{device.name} on #{device.os_name}"
+    end
+
     def device_icon(device)
       case device.device_type
       when "desktop"

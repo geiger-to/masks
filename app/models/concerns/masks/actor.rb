@@ -4,7 +4,7 @@ module Masks
   # An interface that all masked actors should adhere to.
   #
   # @see Masks::Scoped Masks::Scoped
-  # @see Masks::Rails::Actor Masks::Rails::Actor
+  # @see Masks::Actor Masks::Actor
   # @see Actors::Anonymous
   # @see Actors::System
   module Actor

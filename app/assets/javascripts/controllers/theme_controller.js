@@ -22,9 +22,11 @@ export default class extends Controller {
     if (e.target.checked) {
       Cookie.set('default_theme', 'dark', { sameSite: 'strict' })
       document.documentElement.setAttribute("data-theme", e.target.dataset.dark);
+      document.documentElement.classList.add('dark')
     } else {
       Cookie.set('default_theme', 'light', { sameSite: 'strict' })
       document.documentElement.setAttribute("data-theme", e.target.dataset.light);
+      document.documentElement.classList.remove('dark')
     }
   }
 

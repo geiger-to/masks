@@ -1,0 +1,76 @@
+<div class="mb-4 flex items-center gap-2">
+  <%= lucide_icon('monitor-smartphone', class: 'w-5 h-5') %>
+
+  <h1 class="font-bold">
+    devices
+  </h1>
+
+  <%= form_with url: admin_devices_path, method: :get, class: 'flex-grow ml-2 flex gap-2 items-center' do |f| %>
+    <label class="input input-sm flex items-center gap-2 flex-grow">
+      <input type="text" name="q" class="w-full flex-grow" placeholder="search by actor or ip address..." value="<%= params[:q] %>" />
+
+      <button type="submit" class="btn btn-ghost btn-xs -mr-2" value="search">
+        <%= lucide_icon('search', size: 16) %>
+      </button>
+    </label>
+  <% end %>
+</div>
+
+<div class="overflow-x-auto -mx-6 md:mx-0">
+  <table class="table bg-base-100 rounded-none md:rounded-lg md:table-sm table-xs [&_td]:py-3 [&_td]:px-4 [&_thead_td]:py-2">
+    <thead>
+      <tr>
+        <th>device</th>
+        <th>ip address</th>
+        <th class="text-right">actor</th>
+      </tr>
+    </thead>
+    <% if @devices.any? %>
+      <% @devices.each do |device| %>
+        <tr>
+          <td>
+            <a href="<%= admin_device_path(device) %>" class="flex items-center gap-4">
+              <%= lucide_icon(device_icon(device), size: 16) %>
+              <span class="flex flex-col gap-1">
+                <span class="truncate">
+                  <%= device.name %> on <%= device.os_name %>
+                </span>
+              </span>
+            </a>
+          </td>
+          <td>
+            <span class="flex flex-col gap-1">
+              <span class="truncate text-xs font-mono">
+                <%= device.ip_address %>
+              </span>
+            </span>
+          </td>
+          <td class="text-right text-xs">
+            <% if (actors = device.actors.distinct).none? %>
+              -
+            <% elsif actors.any? %>
+              <a href="<%= admin_actor_path(actors.first) %>">
+                <%= actors.first.identifier.value %>
+              </a>
+              <% if actors.length > 1%>
+                <span class="text-xs opacity-75">
+                  +<%= actors.length - 1 %>
+                </span>
+              <% end %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    <% else %>
+      <tr>
+        <td colspan="2" class="text-sm text-center">
+          nothing found...
+        </td>
+      </tr>
+    <% end %>
+  </table>
+</div>
+
+<% if @pagy.pages > 1 %>
+  <%== pagy_nav(@pagy) %>
+<% end %>

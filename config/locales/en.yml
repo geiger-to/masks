@@ -42,13 +42,19 @@ en:
       application:
         meta:
           title: masks
-      manage:
+      admin:
         meta:
           title: masks
   masks:
     application:
       header:
         logged_in: welcome
+    admin:
+      error:
+        openid:
+          access_denied: login failed
+        openid_desc:
+          access_denied: the previous request for access was denied.
     actor_mailer:
       recover_credentials:
         recover: reset password
@@ -149,7 +155,7 @@ en:
           <li>to recover your nickname or password
         privacy: your emails will never be shared.
         manage: to manage it and others...
-        manage_expired: to try again...
+        admin_expired: to try again...
         added: manage it in
         emails: view your emails
       new:
@@ -239,6 +245,20 @@ en:
         submitted:
           heading: check your notifications...
           description: if you have an account with us you'll receive an email or message on your phone with instructions on how to recover your account.
+    input:
+      password:
+        password: password...
+      openid:
+        access: to access your account
+        access_client: to %{client}
+        access_tenant: to %{tenant}
+        scopes_invalid: you do not have some of scopes required
+        scopes: requested access
+        scope_name: scope
+        scope_desc: description
+        scope:
+          openid: your account identifier
+          masks:manage: masks admin access
     signups:
       new:
         submit: sign up
@@ -265,7 +285,74 @@ en:
           phone: phone number...
           password: password...
     sessions:
+      denied:
+        login_or_signup_desc: login and signup are unavailable right now. try again later...
+        login_desc: logins are unavailable right now. try again later...
+        login_or_signup: unable to login & signup...
+        login: unable to login...
+        submit: go back
+      identify:
+        label:
+          nickname: nickname
+          email_nickname: nickname or email
+          nickname_phone: nickname or phone
+          email_phone: email or phone
+          email_nickname_phone: nickname, email, or phone
+          email: email
+          phone: phone
+        login_or_signup: login or signup...
+        login: login...
+        access: to access %{client}
+        password: password...
+        submit: continue
+        invalid: enter a valid nickname, email, or phone number
+      login:
+        label:
+          nickname: nickname
+          email: email
+          phone: phone
+        password: enter your password...
+        password_placeholder: password...
+        password_invalid: invalid password
+        scope: scopes required
+        submit: verify
+        start_over: not you?
+        select_account: select a different account...
+      continue:
+        start_over: switch accounts
+        welcome: welcome!
+        go_home: continue to %{profile}...
+        submit: continue
+        last_login: last login %{time} ago
+        never_logged_in: never logged in
+        authorize: welcome!
+        authorize: welcome!
+        access_client: continue to %{client}?
+        access: continue to your account?
+        cancel: cancel
+      signup:
+        required:
+          nickname: enter a nickname...
+          email: enter an email address...
+          phone: enter your phone number...
+        optional:
+          nickname: enter a nickname (optional)...
+          email: enter an email address (optional)...
+          phone: enter your phone number (optional)...
+        start_over: change
+        password: enter a password...
+        signup: sign up
+        submit: continue
       new:
+        login_hint:
+          nickname: nickname...
+          email_nickname: nickname or email address...
+          nickname_phone: nickname or phone number...
+          email_phone: email address or phone number...
+          email_nickname_phone: nickname, email address, or phone number...
+          email: email address...
+          phone: phone number...
+
         submit: log in
         remember_me: remember me
         start_over:

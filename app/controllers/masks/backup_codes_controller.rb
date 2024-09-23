@@ -3,7 +3,6 @@
 module Masks
   # @visibility private
   class BackupCodesController < ApplicationController
-    require_mask type: :session, only: :new
     before_action only: %i[create] do
       require_sudo(backup_codes_path)
     end

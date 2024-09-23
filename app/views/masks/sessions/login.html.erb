@@ -1,0 +1,65 @@
+<%= form_with url: session_path, method: :post, data: { turbo: false } do |form| %>
+  <input type="hidden" name="nonce" value="<%= login.nonce %>" />
+
+  <%= render('masks/input/openid',
+    icon: !login.valid_password? ? 'key-round' : 'alert-triangle',
+    heading: !login.valid_password? ? t('.password') : t('.scope'),
+    tenant: tenant,
+    client: openid.client,
+    scopes: login.scopes,
+    actor: login.valid_password? ? login.actor : nil
+  ) %>
+
+  <% if !login.valid_password? %>
+    <div class="mt-4">
+      <label class="form-control w-full mb-2">
+        <div class="flex items-baseline gap-2">
+          <div class="text-lg font-bold">
+            <%= login.identifier&.value %>
+          </div>
+          <a href="<%= session_path(prompt: 'select_account', nonce: login.nonce) %>" class="font-normal text-xs opacity-75 hover:underline">
+            <%= t('.start_over') %>
+          </a>
+
+          <input
+            type="hidden"
+            name="login_hint"
+            class="input input-bordered"
+            value="<%= login.identifier&.value %>"
+          >
+        </div>
+      </label>
+
+      <% if profile.enabled?(:password) %>
+        <%= render('masks/input/password',
+          submit: t('.submit'),
+          placeholder: t('.password_placeholder'),
+          value: login.password,
+          error: login.password&.present? ? t('.password_invalid') : nil
+        ) do |assigns| %>
+          <%= form.submit assigns[:submit], class: "btn btn-accent" %>
+        <% end %>
+      <% end%>
+    </div>
+  <% else %>
+    <div class="mt-4">
+      <label class="form-control w-full mb-2">
+        <div class="flex items-center gap-4">
+          <div class="flex-grow">
+            <div class="text-lg font-bold flex-grow">
+              <%= login.identifier&.value %>
+            </div>
+
+            <span class="text-sm">
+              <%= t('.select_account') %>
+            </span>
+          </div>
+          <a href="<%= session_path(prompt: 'select_account', nonce: login.nonce) %>" class="btn btn-accent">
+            <%= lucide_icon('user-round-plus', size: 18) %>
+            select
+          </a>
+        </div>
+      </label>
+    </div>
+  <% end %>
+<% end %>

@@ -1,0 +1,10 @@
+<% if flash[:note] || local_assigns[:note] %>
+  <div role="alert" class="alert bg-indigo-950 border-indigo-500 text-indigo-200 rounded-lg flex items-center <%= local_assigns[:class] %>">
+    <span class="opacity-75">
+      <%= lucide_icon(local_assigns[:icon] || 'notepad-text') %>
+    </span>
+    <div class="text-sm">
+      <h3><%= local_assigns[:note] || flash[:note] %></h3>
+    </div>
+  </div>
+<% end %>

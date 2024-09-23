@@ -3,53 +3,83 @@
 module Masks
   # @visibility private
   class ApplicationController < ActionController::Base
-    include Masks::Controller
     include Pagy::Backend
 
-    before_action :assign_session
+    skip_before_action :verify_authenticity_token, if: :json_request?
 
-    skip_before_action :verify_authenticity_token #, if: :json_request?
-
-    # protect_from_forgery with: :exception
-
-    helper_method :masks_settings, :dark_mode?, :dark_mode_allowed?, :theme
+    protect_from_forgery with: :exception
 
     rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
 
+    helper_method :tenant, :setting, :masked
+    helper_method :dark_mode?, :dark_mode_allowed?, :theme
+    helper_method :profile, :client, :login, :openid
+
+    delegate :client, :openid, to: :login
+    delegate :profile, to: :client, allow_nil: true
+
+    before_action :validate_device
+
     private
 
+    def device
+      @device ||= Masks::Sessions::Device.new(request:, tenant:)
+    end
+
+    def login
+      @login ||= Masks::Requests::Login.new(tenant:, request:, nonce:, actors:, device:)
+    end
+
+    def nonce
+      @nonce ||= Masks::Sessions::Nonce.new(request:, tenant:)
+    end
+
+    def actors
+      @actors ||= Masks::Sessions::Actors.new(request:, tenant:, hint: nonce.hint)
+    end
+
+    def setting(*args)
+      profile&.setting(*args) || tenant&.setting(*args)
+    end
+
+    def current_actor
+      login.actor
+    end
+
     def theme
-      dark_mode? ? masks_settings['dark_mode.theme'] : masks_settings['theme']
+      dark_mode? ? setting(:dark_mode, :theme) : setting(:theme)
     end
 
     def dark_mode_allowed?
-      masks_settings['dark_mode.theme']&.present?
+      setting(:dark_mode, :enabled)
     end
 
     def dark_mode?
       dark_mode_allowed? ? cookies[:default_theme] == 'dark' : false
     end
 
+    def tenant_key
+      "masks:#{tenant.key || 'unknown'}"
+    end
+
+    def tenant_id
+      @tenant_id ||= params[:tenant_id] || Masks.configuration.data[:tenant]
+    end
+
+    def tenant
+      @tenant ||= Masks::Tenant.find_by!(key: tenant_id)
+    end
+
     def json_request?
       request.format.symbol == :json
     end
 
-    def assign_session
-      @session = masked_session
-      @config = @session.config
-      @actor = @session.actor
+    def validate_device
+      render 'masks/device' unless device.known? && device.record.save
     end
 
     def render_not_found
-      render 'masks/404', status: :not_found
-    end
-
-    def require_sudo(redirect)
-      return if current_mask.type == "sudo" && passed?
-
-      flash[:errors] = ["enter a valid password"]
-
-      redirect_to redirect
+      render 'masks/404', layout: 'masks/application', status: :not_found
     end
   end
 end

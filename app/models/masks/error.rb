@@ -6,6 +6,18 @@ module Masks
     class Base < RuntimeError
     end
 
+    class TenantNotFound < Base
+      def initialize(name = '')
+        super("tenant \"#{name}\" not found")
+      end
+    end
+
+    class ProfileNotFound < Base
+      def initialize(name = '')
+        super("profile \"#{name}\" not found")
+      end
+    end
+
     # Thrown when a session is required but not provided
     class InvalidSession < Base
       def initialize

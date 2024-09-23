@@ -1,0 +1,33 @@
+<div class="flex items-center gap-4 text-center md:text-base text-xs [&_a]:shadow">
+  <a class="hover:bg-base-300 focus:bg-base-300 flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_actors_path %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('user-round', size: 15) %>
+      <p class="text-2xl"><%= @actors %></p>
+    </div>
+
+    actors
+  </a>
+  <a class="hover:bg-base-300 focus:bg-base-300  flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_clients_path %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('handshake', size: 15) %>
+      <p class="text-2xl"><%= @clients %></p>
+    </div>
+    clients
+  </a>
+  <a class="hover:bg-base-300 focus:bg-base-300  flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_devices_path %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('monitor-smartphone', size: 15) %>
+      <p class="text-2xl"><%= @devices %></p>
+    </div>
+    devices
+  </a>
+  <a class="hover:bg-base-300 focus:bg-base-300  flex flex-col items-center bg-base-100 rounded-lg flex-grow py-3 md:py-6" href="<%= admin_tokens_path %>">
+    <div class="flex items-center gap-2">
+      <%= lucide_icon('key-square', size: 15) %>
+      <p class="text-2xl"><%= @tokens %></p>
+    </div>
+    tokens
+  </a>
+</div>
+
+

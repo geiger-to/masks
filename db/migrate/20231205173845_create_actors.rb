@@ -2,7 +2,51 @@
 
 class CreateActors < ActiveRecord::Migration[7.1]
   def change
-    create_table :actors do |t|
+    create_table :masks_tenants do |t|
+      t.string :key
+      t.string :name
+      t.string :version
+      t.text :settings
+
+      t.references :client, null: true
+      t.references :admin, null: true
+
+      t.datetime :seeded_at
+      t.datetime :enabled_at
+      t.timestamps
+
+      t.index %i[key], unique: true
+    end
+
+    create_table :masks_profiles do |t|
+      t.references :tenant
+
+      t.string :key
+      t.string :name
+      t.text   :settings
+
+      t.datetime :defaulted_at
+      t.timestamps
+
+      t.index %i[key], unique: true
+    end
+
+    create_table :masks_devices do |t|
+      t.references :tenant
+      t.string :key
+      t.string :user_agent
+      t.string :ip_address
+      t.string :fingerprint
+      t.string :version
+
+      t.timestamps
+
+      t.index %i[tenant_id key], unique: true
+    end
+
+    create_table :masks_actors do |t|
+      t.references :tenant
+
       t.string :uuid
       t.string :type
       t.string :version
@@ -19,7 +63,10 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.datetime :notified_inactive_at
     end
 
-    create_table :actor_identifiers do |t|
+    create_table :masks_identifiers do |t|
+      t.references :tenant
+      t.references :profile
+
       t.string :value
       t.string :type
       t.references :actor
@@ -27,51 +74,16 @@ class CreateActors < ActiveRecord::Migration[7.1]
       t.datetime :verified_at
       t.timestamps
 
-      t.index :value, unique: true
+      t.index [:tenant_id, :value], unique: true
     end
 
-    create_table :actor_keys do |t|
-      t.string :name
-      t.string :sha
-      t.text :scopes
 
+    create_table :masks_scopes do |t|
+      t.references :tenant
       t.references :actor
-      t.timestamps
-      t.datetime :accessed_at
-
-      t.index %i[sha], unique: true
-    end
-
-    create_table :scopes do |t|
       t.string :name
-      t.references :actor, polymorphic: true
-      t.index %i[name actor_id], unique: true
+      t.index %i[tenant_id name actor_id], unique: true
       t.timestamps
-    end
-
-    create_table :roles do |t|
-      t.string :type
-      t.references :actor, polymorphic: true
-      t.references :record, polymorphic: true
-      t.timestamps
-    end
-
-    add_index :roles,
-              %i[type actor_id actor_type record_id record_type],
-              unique: true
-
-    create_table :devices do |t|
-      t.string :key
-      t.string :user_agent
-      t.string :ip_address
-      t.string :fingerprint
-      t.string :version
-
-      t.references :actor
-      t.datetime :accessed_at
-      t.timestamps
-
-      t.index %i[key actor_id], unique: true
     end
   end
 end

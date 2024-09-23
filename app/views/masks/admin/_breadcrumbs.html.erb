@@ -1,0 +1,13 @@
+<div class="flex items-center gap-2 text-xs mb-4 opacity-75">
+  <a href="<%= local_assigns[:back] %>" class="flex items-center gap-1 flex-grow">
+    <%= lucide_icon(local_assigns[:icon] || 'chevron-left', size: 16) %>
+    <span>
+      <%= local_assigns[:heading] %>
+    </span>
+  </a>
+
+  <span class="italic truncate">
+    <%= yield %>
+  </span>
+</div>
+
