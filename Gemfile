@@ -56,7 +56,7 @@ gem "rubocop", "~> 1.63"
 
 gem "bundler-audit", "~> 0.9.1"
 
-gem "erb_lint", "~> 0.5.0"
+gem "erb_lint", "~> 0.6.0"
 
 gem "dockerfile-rails", ">= 1.6", group: :development
 
