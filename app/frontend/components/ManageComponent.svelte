@@ -1,1 +1,3 @@
-Hello world!
+<script>
+  import "../entrypoints/manage.css"
+</script>

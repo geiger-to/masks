@@ -1,2 +1,6 @@
 <%= content_tag :div, "", id: "manage" %>
 <%= vite_typescript_tag 'manage' %>
+
+<% content_for :styles do %>
+  <%= vite_stylesheet_tag 'manage.css' %>
+<% end %>
