@@ -1,0 +1,2 @@
+namespace :masks do
+end

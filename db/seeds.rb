@@ -1,9 +1,23 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+def log(str)
+  puts "masks: #{str}"
+end
+
+Masks.install! do |installation|
+  log "installing '#{installation.name}'..."
+
+  if ENV["SEED_ADMIN"]
+    admin = Masks::Actor.new(nickname: "admin")
+    admin.password = SecureRandom.uuid
+
+    if admin.save
+      log "creating 'admin' because 'SEED_ADMIN' is truthy..."
+      log "admin password is '#{admin.password}'"
+    end
+  end
+end
+
+def time_ago(time)
+  ApplicationController.helpers.time_ago_in_words(time)
+end
+
+log "seeded #{time_ago(Masks::Installation.first.created_at)} ago..."
