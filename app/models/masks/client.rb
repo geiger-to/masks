@@ -4,7 +4,13 @@ module Masks
   class Client < ApplicationRecord
     include Masks::Scoped
 
+    MANAGE_KEY = 'manage'
+    DEFAULT_KEY = 'default'
+
     self.table_name = "masks_clients"
+
+    scope :default, -> { find_by(key: DEFAULT_KEY) }
+    scope :manage, -> { find_by(key: MANAGE_KEY) }
 
     validates :name, presence: true
 
@@ -16,20 +22,14 @@ module Masks
     serialize :response_types, coder: JSON
     serialize :grant_types, coder: JSON
 
-    validates :key, :secret, :scopes, presence: true
+    validates :key, :secret, :redirect_uris, presence: true
     validates :key, uniqueness: true
     validates :client_type,
               inclusion: {
                 in: %w[internal public confidential],
               },
               presence: true
-    validates :subject_type,
-              inclusion: {
-                in: ->(record) do
-                  record.setting(:openid, :subject_types) || []
-                end,
-              },
-              presence: true
+    validates :subject_type, inclusion: { in: :subject_types }, presence: true
     validate :validate_expiries
 
     has_many :access_tokens,
@@ -39,6 +39,10 @@ module Masks
              class_name: "Masks::Authorization",
              inverse_of: :client
     has_many :devices, class_name: "Masks::Device", through: :access_tokens
+
+    def to_gqlid
+      "client:#{key}"
+    end
 
     def setting(*args)
       nil
@@ -52,6 +56,10 @@ module Masks
       client_type == "internal"
     end
 
+    def default_redirect_uri
+      redirect_uris.first
+    end
+
     def valid_redirect_uri?(uri)
       return false unless uri&.present?
 
@@ -63,6 +71,10 @@ module Masks
       else
         redirect_uris.include?(uri)
       end
+    end
+
+    def subject_types
+      pairwise_subject? ? ["pairwise"] : ["public"]
     end
 
     def response_types
@@ -104,12 +116,8 @@ module Masks
 
     def subject(actor)
       case subject_type
-      when "uuid"
-        actor.uuid
-      when "nickname"
-        actor.nickname
-      when "email"
-        actor.email
+      when "public"
+        actor.key
       else
         Digest::SHA256.hexdigest(
           [
@@ -165,7 +173,7 @@ module Masks
     def generate_credentials
       self.secret ||= SecureRandom.uuid
       self.client_type ||= "confidential"
-      self.subject_type ||= "nickname"
+      self.subject_type ||= "public"
       self.scopes ||= setting(:openid, :scopes) || []
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
       self.sector_identifier ||=

@@ -1,5 +1,5 @@
 export default {
-  content: ["./app/**/*.{svelte,js,css}"],
+  content: ["./app/**/*.{svelte,js,css,html.erb}"],
   theme: {
     extend: {},
   },

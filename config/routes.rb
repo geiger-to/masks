@@ -9,8 +9,9 @@ Rails.application.routes.draw do
   # Manage accounts, sessions, and more...
   get "/manage", to: "manage#index"
 
-  # Manage accounts, sessions, and more...
-  get "/session", to: "session#index"
+  # Authorize (including using the OIDC spec)
+  get "/authorize/:client_id", to: "authorize#new", as: :authorize
+  get "/authorize", to: "authorize#new", as: :oidc
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.

@@ -2,6 +2,8 @@
 
 module Masks
   class Scope < ApplicationRecord
+    MANAGE = 'masks:manage'
+
     self.table_name = "masks_scopes"
 
     validates :name, presence: true, uniqueness: { scope: %i[actor_id] }

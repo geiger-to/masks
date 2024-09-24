@@ -2,6 +2,8 @@
 
 module Types
   class QueryType < Types::BaseObject
+    include GraphQL::Types::Relay::HasNodeField
+
     field :node,
           Types::NodeType,
           null: true,

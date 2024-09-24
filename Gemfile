@@ -61,3 +61,20 @@ gem "prettier_print", "~> 1.2"
 gem "syntax_tree", "~> 6.2"
 gem "syntax_tree-haml", "~> 4.0"
 gem "syntax_tree-rbs", "~> 1.0"
+
+gem "chronic_duration", "~> 0.10.6"
+
+gem "activerecord-session_store", "~> 2.1"
+
+gem "device_detector", "~> 1.1"
+
+gem "validates_host", "~> 1.3"
+
+gem "valid_email", "~> 0.2.1"
+
+gem "rotp", "~> 6.3"
+gem "openid_connect", "~> 2.3"
+
+gem "rqrcode", "~> 2.2"
+
+gem "byebug", "~> 11.1"

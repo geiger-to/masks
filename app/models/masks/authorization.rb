@@ -30,6 +30,7 @@ module Masks
 
     def generate_access_token!
       return if expires_at > Time.current
+
       actor.access_tokens.create!(device:, client:, scopes:)
     end
 

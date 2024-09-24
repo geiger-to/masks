@@ -1,5 +1,14 @@
 class Init < ActiveRecord::Migration[7.2]
   def change
+    create_table :masks_sessions do |t|
+      t.string :session_id, null: false
+      t.text :data
+      t.timestamps
+    end
+
+    add_index :masks_sessions, :session_id, unique: true
+    add_index :masks_sessions, :updated_at
+
     create_table :masks_installation do |t|
       t.text :settings
       t.timestamps
@@ -25,6 +34,18 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[key], unique: true
     end
 
+    create_table :masks_events do |t|
+      t.string :key
+      t.string :session_id
+      t.text :data
+
+      t.references :actor
+      t.references :device
+      t.references :client
+
+      t.timestamps
+    end
+
     create_table :masks_scopes do |t|
       t.references :actor
       t.string :name
@@ -36,7 +57,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :key
       t.string :user_agent
       t.string :ip_address
-      t.string :fingerprint
       t.string :version
 
       t.timestamps
@@ -52,6 +72,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :redirect_uris
       t.text :scopes
       t.boolean :consent
+      t.boolean :signups
       t.string :subject_type
       t.string :sector_identifier
       t.string :code_expires_in
