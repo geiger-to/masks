@@ -22,6 +22,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :totp_secret
       t.string :version
       t.text :backup_codes
+      t.text :scopes
 
       t.timestamps
       t.datetime :last_login_at
@@ -46,13 +47,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    create_table :masks_scopes do |t|
-      t.references :actor
-      t.string :name
-      t.index %i[actor_id name], unique: true
-      t.timestamps
-    end
-
     create_table :masks_devices do |t|
       t.string :key
       t.string :user_agent
@@ -72,9 +66,9 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :redirect_uris
       t.text :scopes
       t.boolean :consent
-      t.boolean :signups
       t.string :subject_type
       t.string :sector_identifier
+      t.string :session_expires_in
       t.string :code_expires_in
       t.string :id_token_expires_in
       t.string :access_token_expires_in

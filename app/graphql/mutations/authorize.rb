@@ -15,24 +15,25 @@ module Mutations
     def resolve(**args)
       history = context[:history]
       client = context.schema.object_from_id(args[:client_id], context)
-      actor = if args[:nickname]
-                Masks::Actor.find_by(nickname: args[:nickname])
-              elsif history.actor
-                history.actor
-              end
+      actor =
+        if args[:nickname]
+          Masks::Actor.find_by(nickname: args[:nickname])
+        elsif history.actor
+          history.actor
+        end
 
       if actor
         if args[:password]
           if actor.authenticate(args[:password])
             history.authenticate(client:, actor:)
           else
-            history.denied('invalid credentials', client:, actor:)
+            history.denied("invalid credentials", client:, actor:)
           end
         else
           history.identify(client:, actor:)
         end
       elsif args[:nickname] && args[:password]
-        history.denied('invalid credentials')
+        history.denied("invalid credentials")
       end
 
       {

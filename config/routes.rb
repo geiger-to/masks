@@ -13,6 +13,12 @@ Rails.application.routes.draw do
   get "/authorize/:client_id", to: "authorize#new", as: :authorize
   get "/authorize", to: "authorize#new", as: :oidc
 
+  # OAuth/OpenID support
+  get "/.well-known/:client/openid-configuration",
+      to: "oidc/discoveries#new",
+      as: :oidc_discovery
+  get "/jwks/:client", to: "oidc/discoveries#jwks", as: :oidc_jwks
+
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", :as => :rails_health_check

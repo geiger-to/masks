@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="<%= content_for(:theme) || 'dark' %>" class="h-full">
+<html data-theme="<%= @theme || content_for(:theme) || 'dark' %>" class="h-full">
   <head>
     <title><%= content_for(:title) || "Masks" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">

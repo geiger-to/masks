@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-class GraphqlController < ApplicationController
-  # If accessing from outside this domain, nullify the session
-  # This allows for outside API access while preventing CSRF attacks,
-  # but you'll have to authenticate your user separately
-  # protect_from_forgery with: :null_session
-
+class GraphqlController < AuthorizedController
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
@@ -13,6 +8,7 @@ class GraphqlController < ApplicationController
     context = {
       # Query context goes here, for example:
       history: history,
+      actor: logged_in? ? actor : nil,
     }
     result =
       MasksSchema.execute(
@@ -28,6 +24,10 @@ class GraphqlController < ApplicationController
   end
 
   private
+
+  def client
+    @client ||= Masks::Client.manage
+  end
 
   # Handle variables in form data, JSON body, or a blank value
   def prepare_variables(variables_param)

@@ -2,12 +2,12 @@
   export let code;
 
   let codes = {
-    404: '404 not found'
-  }
+    404: "404 not found",
+  };
 
   let desc = {
-    404: 'the requested page does not exist...'
-  }
+    404: "the requested page does not exist...",
+  };
 </script>
 
 <div class="flex h-full w-full align-items-center items-center">

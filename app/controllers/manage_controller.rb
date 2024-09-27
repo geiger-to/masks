@@ -1,5 +1,12 @@
-class ManageController < ApplicationController
+class ManageController < AuthorizedController
   before_action :redirect_to_login, unless: :logged_in?
+
+  def index
+    @theme = "luxury"
+    @props = { section: "Manage", nickname: actor.nickname }
+
+    render "app"
+  end
 
   private
 
@@ -12,6 +19,6 @@ class ManageController < ApplicationController
   end
 
   def logged_in?
-    super && actor.scopes.include?(Masks::Scope::MANAGE)
+    super && actor.scopes.include?(Masks::Scoped::MANAGE)
   end
 end

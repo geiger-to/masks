@@ -2,11 +2,8 @@
 
 module Masks
   class Actor < ApplicationRecord
-    include Scoped
-
     self.table_name = "masks_actors"
 
-    has_many :saved_scopes, class_name: "Masks::Scope", autosave: true
     has_many :authorizations, class_name: "Masks::Authorization", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
@@ -16,7 +13,7 @@ module Masks
              through: :access_tokens,
              autosave: true
 
-    has_secure_password
+    has_secure_password validations: false
 
     attribute :signup
     attribute :session
@@ -25,6 +22,12 @@ module Masks
     after_initialize :generate_key, unless: :key
     before_validation :reset_version, unless: :version
 
+    validates :nickname,
+              uniqueness: true,
+              format: {
+                with: /\A[a-z][a-z0-9\-]+\z/,
+              }
+    validates :password, length: { minimum: 8, maximum: 128 }, if: :password
     validates :totp_secret, presence: true, if: :totp_code
     validates :version, presence: true
     validate :validates_totp, if: :totp_code
@@ -32,6 +35,13 @@ module Masks
     before_save :regenerate_backup_codes
 
     serialize :backup_codes, coder: JSON
+    serialize :scopes, coder: JSON
+
+    include Scoped
+
+    def masks_manager?
+      scopes.include?(Masks::Scoped::MANAGE)
+    end
 
     def version_digest
       return if new_record? || !valid?
@@ -81,22 +91,6 @@ module Masks
 
     def random_totp_secret
       @random_totp_secret ||= ROTP::Base32.random
-    end
-
-    def assign_scopes(*list)
-      list.map { |scope| saved_scopes.find_or_initialize_by(name: scope) }
-    end
-
-    def assign_scopes!(*list)
-      list.map { |scope| saved_scopes.find_or_create_by(name: scope) }
-    end
-
-    def remove_scopes!(*list)
-      saved_scopes.where(name: list).destroy_all
-    end
-
-    def scopes
-      @scopes ||= saved_scopes.order(created_at: :desc).pluck(:name)
     end
 
     def should_save_backup_codes?

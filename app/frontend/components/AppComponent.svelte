@@ -1,24 +1,31 @@
 <script>
-  import { Client, setContextClient, cacheExchange, fetchExchange } from '@urql/svelte';
+  import {
+    Client,
+    setContextClient,
+    cacheExchange,
+    fetchExchange,
+  } from "@urql/svelte";
   import ErrorSection from "./ErrorSection.svelte";
   import AuthorizeSection from "./AuthorizeSection.svelte";
+  import ManageSection from "./ManageSection.svelte";
 
-  let csrf = document.querySelector('meta[name="csrf-token"]').content
+  let csrf = document.querySelector('meta[name="csrf-token"]').content;
   let sections = {
-    'Error': ErrorSection,
-    'Authorize': AuthorizeSection
-  }
+    Error: ErrorSection,
+    Authorize: AuthorizeSection,
+    Manage: ManageSection,
+  };
 
   export let section;
 
   const client = new Client({
-    url: '/graphql',
+    url: "/graphql",
     exchanges: [cacheExchange, fetchExchange],
     fetchOptions: () => {
       return {
-        headers: { 'X-CSRF-Token': csrf }
-      }
-    }
+        headers: { "X-CSRF-Token": csrf },
+      };
+    },
   });
 
   setContextClient(client);

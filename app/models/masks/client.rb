@@ -4,10 +4,12 @@ module Masks
   class Client < ApplicationRecord
     include Masks::Scoped
 
-    MANAGE_KEY = 'manage'
-    DEFAULT_KEY = 'default'
+    MANAGE_KEY = "manage"
+    DEFAULT_KEY = "default"
 
     self.table_name = "masks_clients"
+
+    has_secure_token :secret
 
     scope :default, -> { find_by(key: DEFAULT_KEY) }
     scope :manage, -> { find_by(key: MANAGE_KEY) }
@@ -19,10 +21,8 @@ module Masks
 
     serialize :scopes, coder: JSON
     serialize :redirect_uris, coder: JSON
-    serialize :response_types, coder: JSON
-    serialize :grant_types, coder: JSON
 
-    validates :key, :secret, :redirect_uris, presence: true
+    validates :key, :secret, presence: true
     validates :key, uniqueness: true
     validates :client_type,
               inclusion: {
@@ -58,6 +58,10 @@ module Masks
 
     def default_redirect_uri
       redirect_uris.first
+    end
+
+    def redirect_uris
+      super || []
     end
 
     def valid_redirect_uri?(uri)
@@ -171,8 +175,7 @@ module Masks
     private
 
     def generate_credentials
-      self.secret ||= SecureRandom.uuid
-      self.client_type ||= "confidential"
+      self.client_type ||= "internal"
       self.subject_type ||= "public"
       self.scopes ||= setting(:openid, :scopes) || []
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem

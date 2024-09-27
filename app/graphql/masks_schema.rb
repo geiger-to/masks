@@ -46,10 +46,10 @@ class MasksSchema < GraphQL::Schema
 
   # Given a string UUID, find the object
   def self.object_from_id(global_id, query_ctx)
-    type, id = global_id.split(':')
+    type, id = global_id.split(":")
 
     case type
-    when 'client'
+    when "client"
       Masks::Client.find_by(key: id)
     end
   end

@@ -1,6 +1,6 @@
 module Masks
   class Event < ApplicationRecord
-    self.table_name = 'masks_events'
+    self.table_name = "masks_events"
 
     validates :key, :session_id, presence: true
 

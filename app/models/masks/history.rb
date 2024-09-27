@@ -20,7 +20,7 @@ module Masks
       if session[:actor_id] != actor.key
         session[:actor_id] = actor.key
 
-        log_event('actor.identified', actor:, **args)
+        log_event("actor.identified", actor:, **args)
       end
     end
 
@@ -28,7 +28,7 @@ module Masks
       if actor == self.actor
         actor_session[:password_entered_at] = Time.now.utc.iso8601
 
-        log_event('actor.authenticated', actor:, **args)
+        log_event("actor.authenticated", actor:, **args)
 
         actor.touch(:last_login_at)
       end
@@ -58,9 +58,8 @@ module Masks
     end
 
     def actor
-      @actor ||= if session[:actor_id]
-        Masks::Actor.find_by(key: session[:actor_id])
-      end
+      @actor ||=
+        (Masks::Actor.find_by(key: session[:actor_id]) if session[:actor_id])
     end
 
     def events
@@ -80,7 +79,13 @@ module Masks
     end
 
     def log_event(name, **args)
-      Masks::Event.create!(key: 'actor.identified', session_id:, device:, actor:, **args)
+      Masks::Event.create!(
+        key: "actor.identified",
+        session_id:,
+        device:,
+        actor:,
+        **args,
+      )
     end
   end
 end
