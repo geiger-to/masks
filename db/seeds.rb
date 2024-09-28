@@ -29,7 +29,7 @@ Masks.install! do |installation|
       client_type: "internal",
       key: Masks::Client::MANAGE_KEY,
       name: "manage masks",
-      scopes: Masks::Scoped::MANAGE,
+      scopes: [Masks::Scoped::MANAGE],
       redirect_uris: [ENV["MASKS_URL"] + "/manage"],
       consent: false,
     )

@@ -78,14 +78,8 @@ module Masks
       false
     end
 
-    def log_event(name, **args)
-      Masks::Event.create!(
-        key: "actor.identified",
-        session_id:,
-        device:,
-        actor:,
-        **args,
-      )
+    def log_event(key, **args)
+      Masks::Event.create!(key:, session_id:, device:, actor:, **args)
     end
   end
 end

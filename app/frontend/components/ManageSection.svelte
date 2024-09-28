@@ -1,6 +1,7 @@
 <script>
   import AddClientComponent from "./AddClientComponent.svelte";
   import AddActorComponent from "./AddActorComponent.svelte";
+  import EventCard from "./EventCard.svelte";
   import ClientCard from "./ClientCard.svelte";
   import ActorCard from "./ActorCard.svelte";
   import Identicon from "./Identicon.svelte";
@@ -43,6 +44,31 @@
             consent
             createdAt
             updatedAt
+          }
+          events {
+            name
+            clientId
+            actorId
+            sessionId
+            createdAt
+            device {
+              id
+              name
+              deviceType
+              deviceName
+              osName
+              userAgent
+              ipAddress
+            }
+          }
+          devices {
+            id
+            name
+            deviceType
+            deviceName
+            osName
+            userAgent
+            ipAddress
           }
         }
       }
@@ -179,15 +205,20 @@
         </div>
       {:else if $query?.data?.search?.actors?.length}
         {#each $query.data.search.actors as actor}
-          <ActorCard {actor} editing={$query.data.search.actors.length == 1} />
+          <ActorCard {actor} />
         {/each}
       {:else if $query?.data?.search?.clients?.length}
         {#each $query.data.search.clients as client}
-          <ClientCard
-            {client}
-            editing={$query.data.search.clients.length == 1}
-          />
+          <ClientCard {client} />
         {/each}
+      {/if}
+
+      {#if $query?.data?.search?.events}
+        <div class="">
+          {#each $query?.data?.search?.events as event}
+            <EventCard {search} {event} />
+          {/each}
+        </div>
       {/if}
     {/if}
   </div>

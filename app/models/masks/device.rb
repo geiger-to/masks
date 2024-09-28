@@ -4,10 +4,11 @@ module Masks
   class Device < ApplicationRecord
     self.table_name = "masks_devices"
 
+    has_many :events, class_name: "Masks::Event"
     has_many :access_tokens, class_name: "Masks::AccessToken"
     has_many :authorizations, class_name: "Masks::Authorization"
-    has_many :clients, through: :access_tokens, class_name: "Masks::Client"
-    has_many :actors, through: :access_tokens, class_name: "Masks::Actor"
+    has_many :clients, through: :events, class_name: "Masks::Client"
+    has_many :actors, through: :events, class_name: "Masks::Actor"
 
     validates :key, presence: true, uniqueness: true
     validates :known?, :user_agent, presence: true
