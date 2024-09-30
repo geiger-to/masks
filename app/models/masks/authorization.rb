@@ -2,9 +2,11 @@
 
 module Masks
   class Authorization < ApplicationRecord
+    include Scoped
+
     self.table_name = "masks_authorizations"
 
-    scope :valid, -> { where("expires_at >= ?", Time.now.utc) }
+    scope :active, -> { where("expires_at >= ?", Time.now.utc) }
 
     belongs_to :client, class_name: "Masks::Client"
     belongs_to :device, class_name: "Masks::Device"

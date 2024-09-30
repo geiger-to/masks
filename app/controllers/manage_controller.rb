@@ -1,5 +1,7 @@
 class ManageController < AuthorizedController
-  before_action :redirect_to_login, unless: :logged_in?
+  delegate :actor, to: :authorization, allow_nil: true
+
+  authorized { actor && authorization&.scopes&.include?(Masks::Scoped::MANAGE) }
 
   def index
     @theme = "luxury"
@@ -10,15 +12,7 @@ class ManageController < AuthorizedController
 
   private
 
-  def redirect_to_login
-    redirect_to authorize_path(client_id: client.key, redirect_uri: request.url)
-  end
-
   def client
     @client ||= Masks::Client.manage
-  end
-
-  def logged_in?
-    super && actor.scopes.include?(Masks::Scoped::MANAGE)
   end
 end

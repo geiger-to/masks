@@ -39,10 +39,6 @@ module Masks
 
     include Scoped
 
-    def masks_manager?
-      scopes.include?(Masks::Scoped::MANAGE)
-    end
-
     def version_digest
       return if new_record? || !valid?
 

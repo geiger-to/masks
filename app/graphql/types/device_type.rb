@@ -5,7 +5,6 @@ module Types
     implements GraphQL::Types::Relay::Node
 
     field :id, ID
-    field :session_id, String
     field :name, String
     field :device_type, String
     field :device_name, String
@@ -14,7 +13,7 @@ module Types
     field :user_agent, String
 
     def id
-      object.key
+      object.session_id
     end
   end
 end

@@ -10,19 +10,13 @@ module Masks
     has_many :clients, through: :events, class_name: "Masks::Client"
     has_many :actors, through: :events, class_name: "Masks::Actor"
 
-    validates :key, presence: true, uniqueness: true
+    validates :session_id, presence: true, uniqueness: true
     validates :known?, :user_agent, presence: true
     validates :ip_address, ip: true
-
-    after_initialize :generate_key
 
     delegate :name, :device_type, :device_name, :os_name, :known?, to: :detected
 
     private
-
-    def generate_key
-      self.key ||= SecureRandom.uuid
-    end
 
     def detected
       @detected ||= DeviceDetector.new(user_agent) if user_agent

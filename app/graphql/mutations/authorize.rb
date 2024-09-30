@@ -5,45 +5,39 @@ module Mutations
     input_object_class Types::AuthorizeInputType
 
     field :actor, Types::ActorType, null: true
-    field :client, Types::ClientType, null: false
+    field :client, Types::ClientType, null: true
     field :nickname, String, null: true
-    field :authenticated, Boolean, null: false
-    field :authorized, Boolean, null: false
+    field :authenticated, Boolean, null: true
+    field :authorized, Boolean, null: true
     field :redirect_uri, String, null: true
-    field :error, String, null: true
+    field :error_message, String, null: true
+    field :error_code, String, null: true
 
     def resolve(**args)
       history = context[:history]
-      client = context.schema.object_from_id(args[:client_id], context)
-      actor =
-        if args[:nickname]
-          Masks::Actor.find_by(nickname: args[:nickname])
-        elsif history.actor
-          history.actor
-        end
-
-      if actor
-        if args[:password]
-          if actor.authenticate(args[:password])
-            history.authenticate(client:, actor:)
-          else
-            history.denied("invalid credentials", client:, actor:)
-          end
-        else
-          history.identify(client:, actor:)
-        end
-      elsif args[:nickname] && args[:password]
-        history.denied("invalid credentials")
-      end
+      history.actor = Masks::Actor.find_by(nickname: args[:nickname]) if args[
+        :nickname
+      ]
+      history.resume!(args[:id])
+      history.authenticate!(args[:password]) if args[:password]
+      history.authorize!(**args.slice(:approve, :deny))
 
       {
-        client: client,
-        actor: actor,
-        error: history.error,
-        nickname: args[:nickname] || history.nickname,
+        client: history.client,
+        actor: history.actor,
+        error_code: history.error ? "invalid_credentials" : nil,
+        error_message: history.error,
+        nickname: history.nickname,
         authenticated: history.authenticated?,
-        authorized: history.authorized?(client),
-        redirect_uri: history.authorized?(client) ? args[:redirect_uri] : nil,
+        authorized: history.authorized?,
+        redirect_uri: history.redirect_uri,
+      }
+    rescue Rack::OAuth2::Server::Authorize::BadRequest => e
+      {
+        client: history.client,
+        error_code: e.error,
+        error_message: e.message,
+        redirect_uri: e.redirect_uri,
       }
     end
   end

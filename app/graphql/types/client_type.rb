@@ -13,8 +13,8 @@ module Types
     field :scopes, [String]
     field :consent, Boolean
     field :subject_type, String
-    field :created_at, GraphQL::Types::ISO8601Date, null: false
-    field :updated_at, GraphQL::Types::ISO8601Date, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
     field :code_expires_in, String
     field :id_token_expires_in, String
     field :access_token_expires_in, String

@@ -49,7 +49,6 @@
             name
             clientId
             actorId
-            sessionId
             createdAt
             device {
               id

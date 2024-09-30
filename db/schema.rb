@@ -237,18 +237,19 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
   end
 
   create_table "masks_devices", force: :cascade do |t|
-    t.string "key"
+    t.string "session_id", null: false
     t.string "user_agent"
     t.string "ip_address"
     t.string "version"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["key"], name: "index_masks_devices_on_key", unique: true
+    t.index ["session_id"],
+            name: "index_masks_devices_on_session_id",
+            unique: true
   end
 
   create_table "masks_events", force: :cascade do |t|
     t.string "key"
-    t.string "session_id"
     t.text "data"
     t.bigint "actor_id"
     t.bigint "device_id"

@@ -5,8 +5,7 @@
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import Time from "svelte-time";
 
-  export let clientId;
-  export let redirectUri;
+  export let authId;
 
   let client = getContextClient();
   let mutation;
@@ -17,7 +16,8 @@
       query: gql`
         mutation ($input: AuthorizeInput!) {
           authorize(input: $input) {
-            error
+            errorMessage
+            errorCode
             nickname
             authenticated
             authorized
@@ -34,7 +34,7 @@
           }
         }
       `,
-      variables: { input: { clientId, redirectUri, nickname, password } },
+      variables: { input: { id: authId, nickname, password } },
     });
   };
 
@@ -58,7 +58,7 @@
   const updateAuth = (result) => {
     loading = result.fetching;
 
-    if (result.fetching || result.error) {
+    if (result.fetching) {
       return;
     }
 
@@ -70,149 +70,182 @@
         window.location.replace(auth.redirectUri);
       }, 100);
     }
+
+    console.log(auth);
   };
 
   authorize({});
 
+  const ERROR_CODES = {
+    invalid_request: "invalid request",
+  };
+
+  const ERROR_MESSAGES = {
+    invalid_request: (auth) => `cannot login to`,
+  };
+
   $: updateAuth($mutation);
 </script>
 
-<form
-  action="#"
-  on:submit={continueAuth({ nickname, password })}
-  class="flex h-full w-full align-items-center items-center"
->
-  <div class="bold bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
-    {#if loading}
-      <div class="text-center w-full py-20 opacity-50">
-        <div class="loading loading-spinner loading-lg"></div>
-      </div>
-    {:else}
+{#if auth?.errorCode}
+  <div class="flex h-full w-full align-items-center items-center">
+    <div class="bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
       <div class="flex flex-col mb-5">
-        <h1>
-          access {auth?.authorized ? "granted" : "required"}
+        <h1 class="text-error">
+          {ERROR_CODES[auth.errorCode]}
         </h1>
 
         <h2 class="text-black dark:text-white text-2xl">
-          {auth?.authorized ? "returning" : "login"} to
+          {ERROR_MESSAGES[auth.errorCode](auth)}
           <i>{auth?.client?.name}</i>
         </h2>
       </div>
 
-      {#if auth?.authorized}
-        <div
-          class="flex items-center gap-2.5 mb-5 bg-white dark:bg-black
-          p-2.5 rounded-lg shadow
-          shadow"
-        >
-          <div class="avatar">
-            <div class="w-12 rounded-full dark:bg-bg-white">
-              <Identicon nickname={auth.nickname} />
-            </div>
-          </div>
-
-          <div>
-            <div class="text-xl">
-              {auth.nickname}
-            </div>
-
-            {#if auth?.actor}
-              <div class="text-xs">
-                created
-
-                <span class="italic">
-                  <Time timestamp={auth.actor.createdAt} />
-                </span>
-              </div>
-            {/if}
-          </div>
-        </div>
-
-        <div class="flex items-center gap-4 mx-auto text-center">
-          <span class="loading loading-dots loading-sm"></span>
-          <a href={redirectUri} class="underline">{redirectUri}</a>
+      <button class="btn btn-error"> go back </button>
+    </div>
+  </div>
+{:else}
+  <form
+    action="#"
+    on:submit={continueAuth({ nickname, password })}
+    class="flex h-full w-full align-items-center items-center"
+  >
+    <div class="bold bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
+      {#if loading}
+        <div class="text-center w-full py-20 opacity-50">
+          <div class="loading loading-spinner loading-lg"></div>
         </div>
       {:else}
-        <div class="mb-5">
-          {#if auth?.nickname}
-            <div
-              class="flex items-center gap-2.5 mb-2.5 bg-white dark:bg-black
-              p-2.5 rounded-lg shadow
-              shadow"
-            >
-              <div class="avatar">
-                <div class="w-12 rounded-full dark:bg-bg-white">
-                  <Identicon nickname={auth.nickname} />
-                </div>
-              </div>
+        <div class="flex flex-col mb-5">
+          <h1>
+            access {auth?.authorized ? "granted" : "required"}
+          </h1>
 
-              <div>
-                <div class="text-xl">
-                  {auth.nickname}
-                </div>
-
-                {#if auth?.actor}
-                  <div class="text-xs">
-                    last login
-
-                    <span class="italic">
-                      {#if auth.actor.lastLoginAt}
-                        <Time timestamp={auth.actor.lastLoginAt} />
-                      {:else}
-                        never
-                      {/if}
-                    </span>
-                  </div>
-                {/if}
-              </div>
-            </div>
-          {:else if !auth?.nickname}
-            <input
-              autofocus
-              class="w-full input input-lg"
-              placeholder="enter your nickname..."
-              type="text"
-              bind:value={nickname}
-            />
-          {/if}
-
-          {#if auth?.nickname}
-            <input
-              autofocus
-              class="w-full input input-lg"
-              placeholder="enter your password..."
-              type="password"
-              bind:value={password}
-            />
-          {/if}
+          <h2 class="text-black dark:text-white text-2xl">
+            {auth?.authorized ? "returning" : "login"} to
+            <i>{auth?.client?.name}</i>
+          </h2>
         </div>
 
-        <div class="flex items-center gap-5">
-          <input type="submit" class="btn btn-primary" value="continue" />
-
-          {#if auth?.error}
-            <div class="text-xs text-error flex items-center gap-2">
-              <AlertTriangle size="15" />
-
-              <div>
-                {auth.error}...
+        {#if auth?.authorized}
+          <div
+            class="flex items-center gap-2.5 mb-5 bg-white dark:bg-black
+            p-2.5 rounded-lg shadow
+            shadow"
+          >
+            <div class="avatar">
+              <div class="w-12 rounded-full dark:bg-bg-white">
+                <Identicon nickname={auth.nickname} />
               </div>
             </div>
-          {:else}
-            <span class="text-xs">
-              to
 
-              {#if !auth?.nickname}
-                enter your password...
-              {:else}
-                <a href={redirectUri} class="text-xs underline" target="_blank">
-                  {redirectUri}</a
-                >...
+            <div>
+              <div class="text-xl">
+                {auth.nickname}
+              </div>
+
+              {#if auth?.actor}
+                <div class="text-xs">
+                  created
+
+                  <span class="italic">
+                    <Time timestamp={auth.actor.createdAt} />
+                  </span>
+                </div>
               {/if}
-            </span>
-          {/if}
-        </div>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-4 mx-auto text-center">
+            <span class="loading loading-dots loading-sm"></span>
+            <a href={auth.redirectUri} class="underline">{auth.redirectUri}</a>
+          </div>
+        {:else}
+          <div class="mb-5">
+            {#if auth?.nickname}
+              <div
+                class="flex items-center gap-2.5 mb-2.5 bg-white dark:bg-black
+                p-2.5 rounded-lg shadow
+                shadow"
+              >
+                <div class="avatar">
+                  <div class="w-12 rounded-full dark:bg-bg-white">
+                    <Identicon nickname={auth.nickname} />
+                  </div>
+                </div>
+
+                <div>
+                  <div class="text-xl">
+                    {auth.nickname}
+                  </div>
+
+                  {#if auth?.actor}
+                    <div class="text-xs">
+                      last login
+
+                      <span class="italic">
+                        {#if auth.actor.lastLoginAt}
+                          <Time timestamp={auth.actor.lastLoginAt} />
+                        {:else}
+                          never
+                        {/if}
+                      </span>
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {:else if !auth?.nickname}
+              <input
+                autofocus
+                class="w-full input input-lg"
+                placeholder="enter your nickname..."
+                type="text"
+                bind:value={nickname}
+              />
+            {/if}
+
+            {#if auth?.nickname}
+              <input
+                autofocus
+                class="w-full input input-lg"
+                placeholder="enter your password..."
+                type="password"
+                bind:value={password}
+              />
+            {/if}
+          </div>
+
+          <div class="flex items-center gap-5">
+            <input type="submit" class="btn btn-primary" value="continue" />
+
+            {#if auth?.error}
+              <div class="text-xs text-error flex items-center gap-2">
+                <AlertTriangle size="15" />
+
+                <div>
+                  {auth.error}...
+                </div>
+              </div>
+            {:else}
+              <span class="text-xs">
+                to
+
+                {#if !auth?.nickname}
+                  enter your password...
+                {:else}
+                  <a
+                    href={auth.redirectUri}
+                    class="text-xs underline"
+                    target="_blank"
+                  >
+                    {auth.redirectUri}</a
+                  >...
+                {/if}
+              </span>
+            {/if}
+          </div>
+        {/if}
       {/if}
-    {/if}
-  </div>
-</form>
+    </div>
+  </form>
+{/if}

@@ -8,7 +8,7 @@ module Mutations
     field :errors, [String], null: true
 
     def visible?(context)
-      context[:actor]&.manager?
+      context[:authorization]&.masks_manager?
     end
 
     def resolve(**args)

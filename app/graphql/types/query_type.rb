@@ -4,7 +4,7 @@ module Types
   class QueryType < Types::BaseObject
     include GraphQL::Types::Relay::HasNodeField
 
-    PREFIXES = %w[d device devices e event events]
+    PREFIXES = %w[e event events]
 
     field :node,
           Types::NodeType,
@@ -32,7 +32,7 @@ module Types
       prefix, query = parse_query(query)
       events = %w[e event events].include?(prefix)
 
-      return unless context[:actor]&.masks_manager?
+      return unless context[:authorization]&.masks_manager?
       return unless query.length > 0
 
       actors = find_actors(query)

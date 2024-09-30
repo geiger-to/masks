@@ -83,7 +83,7 @@ module Masks
 
     def response_types
       {
-        "internal" => [],
+        "internal" => ["code"],
         "confidential" => ["code"],
         "public" => ["token", "id_token", "id_token token"],
       }.fetch(client_type, [])
@@ -172,6 +172,17 @@ module Masks
       Time.now + ChronicDuration.parse(refresh_expires_in)
     end
 
+    def oidc_params(params)
+      case client_type
+      when "internal"
+        { redirect_uri: default_redirect_uri }.merge(
+          **params.merge({ response_type: "code", scope: scopes.join(" ") }),
+        )
+      else
+        params
+      end
+    end
+
     private
 
     def generate_credentials
@@ -181,11 +192,11 @@ module Masks
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
       self.sector_identifier ||=
         begin
-          URI.parse("TODO").host
+          URI.parse(ENV["MASKS_URL"]).host
         rescue StandardError
           "masks"
         end
-      self.code_expires_in ||= "5 minutes"
+      self.code_expires_in ||= "12 hours"
       self.access_token_expires_in ||= "1 day"
       self.id_token_expires_in ||= "1 hour"
       self.refresh_expires_in ||= "1 week"

@@ -1,27 +1,18 @@
 # frozen_string_literal: true
 
 module Masks
-  # A smaller interface that all scoped actors should adhere to.
-  #
-  # @see Masks::Actor Masks::Actor
   module Scoped
     MANAGE = "masks:manage"
     PASSWORD = "masks:password"
 
-    # Returns a list of scopes granted to the actor.
-    #
-    # @return [Array<String>] An array of scopes (as strings)
+    def masks_manager?
+      scopes.include?(MANAGE)
+    end
+
     def scopes
       super || []
     end
 
-    # Returns whether or not a scope is available.
-    #
-    # In practice this is similar to calling +scopes.include?(scope)+,
-    # but implementations may provide faster implementations.
-    #
-    # @param [String] scope
-    # @return [Boolean]
     def scope?(scope)
       scopes.include?(scope.to_s)
     end

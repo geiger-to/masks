@@ -3,6 +3,8 @@
   "type": "module",
   "scripts": {
     "format": "prettier --write .",
+    "rails": "PORT=1111 bin/rails s",
+    "jobs": "...",
     "dev": "overmind start -f Procfile.dev"
   },
   "devDependencies": {

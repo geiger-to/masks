@@ -6,13 +6,13 @@ module Types
 
     field :nickname, String
     field :scopes, String
-    field :created_at, GraphQL::Types::ISO8601Date, null: false
-    field :updated_at, GraphQL::Types::ISO8601Date, null: false
-    field :last_login_at, GraphQL::Types::ISO8601Date, null: true
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true
     field :password, Boolean
-    field :changed_password_at, GraphQL::Types::ISO8601Date, null: true
-    field :added_totp_secret_at, GraphQL::Types::ISO8601Date, null: true
-    field :saved_backup_codes_at, GraphQL::Types::ISO8601Date, null: true
+    field :changed_password_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
 
     def scopes
       object.scopes.join("\n")

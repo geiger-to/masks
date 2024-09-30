@@ -2,23 +2,23 @@ def log(str)
   puts "masks: #{str}"
 end
 
-ENV["MASKS_URL"] ||= "http://localhost:#{ENV.fetch("PORT", 5100)}"
+ENV["MASKS_URL"] ||= "http://localhost:#{ENV.fetch("PORT", 1111)}"
 
 Masks.install! do |installation|
   log "installing '#{installation.name}'..."
 
-  if ENV["SEED_ADMIN"] || ENV["ADMIN_PASSWORD"]
-    admin = Masks::Actor.new(nickname: "admin")
-    admin.password = ENV["ADMIN_PASSWORD"] || SecureRandom.uuid
-    admin.assign_scopes(Masks::Scoped::PASSWORD, Masks::Scoped::MANAGE)
+  if ENV["SEED_MANAGER"] || ENV["MANAGER_PASSWORD"]
+    manager = Masks::Actor.new(nickname: "manager")
+    manager.password = ENV["MANAGER_PASSWORD"] || SecureRandom.uuid
+    manager.assign_scopes(Masks::Scoped::PASSWORD, Masks::Scoped::MANAGE)
 
-    if admin.save
-      log "creating 'admin' actor..."
+    if manager.save
+      log "creating 'manager' actor..."
       log(
-        if ENV["ADMIN_PASSWORD"]
-          "admin password set from ADMIN_PASSWORD env var"
+        if ENV["MANAGER_PASSWORD"]
+          "manager password set from MANAGER_PASSWORD env var"
         else
-          "admin password is '#{admin.password}'"
+          "manager password is '#{manager.password}'"
         end,
       )
     end
@@ -38,21 +38,6 @@ Masks.install! do |installation|
     log "created management client named '#{manage.name}'."
   else
     log manage.errors.full_messages.join("\n")
-  end
-
-  default =
-    Masks::Client.new(
-      client_type: "internal",
-      name: Masks::Client::DEFAULT_KEY,
-      scopes: [],
-      redirect_uris: [ENV["MASKS_URL"] + "/"],
-      consent: false,
-    )
-
-  if default.save
-    log "created default client named '#{default.name}'."
-  else
-    log default.errors.full_messages.join("\n")
   end
 end
 

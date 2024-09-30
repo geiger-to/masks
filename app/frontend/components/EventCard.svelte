@@ -20,15 +20,6 @@
       >{event.device.name} on {event.device.osName}</span
     >
     <span class="text-sm font-mono">{event.device.ipAddress}</span>
-    <span class="text-sm grow">#{event.sessionId}</span>
     <span class="italic"><Time relative timestamp={event.createdAt} /></span>
-    <div>
-      by
-      <a
-        href="#"
-        on:click|preventDefault|stopPropagation={search(`@${event.actorId}`)}
-        class="underline">{event.actorId}</a
-      >
-    </div>
   </div>
 </div>

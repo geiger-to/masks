@@ -5,10 +5,9 @@ module Types
     implements GraphQL::Types::Relay::Node
 
     field :name, String
-    field :session_id, String
     field :client_id, String
     field :actor_id, String
-    field :created_at, GraphQL::Types::ISO8601Date, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :device, Types::DeviceType
 
     def name

@@ -37,7 +37,6 @@ class Init < ActiveRecord::Migration[7.2]
 
     create_table :masks_events do |t|
       t.string :key
-      t.string :session_id
       t.text :data
 
       t.references :actor
@@ -48,14 +47,14 @@ class Init < ActiveRecord::Migration[7.2]
     end
 
     create_table :masks_devices do |t|
-      t.string :key
+      t.string :session_id, null: false
       t.string :user_agent
       t.string :ip_address
       t.string :version
 
       t.timestamps
 
-      t.index %i[key], unique: true
+      t.index %i[session_id], unique: true
     end
 
     create_table :masks_clients do |t|
