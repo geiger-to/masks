@@ -81,7 +81,6 @@
         class="join-item btn btn-secondary"
         disabled={!input.nickname}><Save size="15" /> save</button
       >
-      <button class="join-item btn" on:click={cancel}><X /></button>
     </div>
   </div>
 

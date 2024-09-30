@@ -6,25 +6,28 @@ module Masks
 
     self.table_name = "masks_access_tokens"
 
+    has_secure_token :token
+
     scope :valid,
           -> { where("revoked_at IS NULL AND expires_at >= ?", Time.now.utc) }
 
     belongs_to :client, class_name: "Masks::Client"
+    belongs_to :authorization_code,
+               class_name: "Masks::AuthorizationCode",
+               optional: true
     belongs_to :device, class_name: "Masks::Device", optional: true
     belongs_to :actor, class_name: "Masks::Actor", optional: true
 
     serialize :scopes, coder: JSON
 
-    before_validation :generate_token
+    before_validation :generate_defaults
 
     validates :client, presence: true
     validates :token, presence: true, uniqueness: true
     validates :expires_at, presence: true
 
-    def hidden_token
-      return "*" * token.length if token.length <= 8
-
-      "#{token[0, 5]}#{"*" * (token.length - 5)}"
+    def obfuscated_token
+      obfuscate(:token)
     end
 
     def scopes
@@ -44,8 +47,7 @@ module Masks
 
     private
 
-    def generate_token
-      self.token ||= SecureRandom.uuid
+    def generate_defaults
       self.expires_at ||= client.access_token_expires_at
       self.scopes ||= []
     end

@@ -5,7 +5,8 @@
     "format": "prettier --write .",
     "rails": "PORT=1111 bin/rails s",
     "jobs": "...",
-    "dev": "overmind start -f Procfile.dev"
+    "dev": "overmind start -f Procfile.dev",
+    "dev:reset": "MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset"
   },
   "devDependencies": {
     "@prettier/plugin-ruby": "^4.0.4",

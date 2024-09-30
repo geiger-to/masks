@@ -9,6 +9,9 @@ module Masks
     belongs_to :actor, class_name: "Masks::Actor"
 
     validates :nonce, presence: true
+    validates :expires_at, presence: true
+
+    after_initialize :generate_expires_at
 
     def to_response_object(with = {})
       subject =
@@ -33,6 +36,12 @@ module Masks
       to_response_object(with).to_jwt(client.private_key) do |jwt|
         jwt.kid = client.kid
       end
+    end
+
+    private
+
+    def generate_expires_at
+      self.expires_at ||= client.id_token_expires_at
     end
   end
 end

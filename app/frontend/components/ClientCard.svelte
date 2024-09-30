@@ -1,5 +1,6 @@
 <script>
   import { Save, ChevronDown, X } from "lucide-svelte";
+  import PasswordInput from "./PasswordInput.svelte";
 
   export let client;
   export let editing = false;
@@ -19,7 +20,9 @@
   };
 </script>
 
-<div class="my-3 bg-base-300 rounded-lg p-3 px-3">
+<div
+  class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3 text-base-content"
+>
   <div
     class="flex items-center pl-1.5 cursor-pointer gap-3"
     on:click|preventDefault={() => (editing = !editing)}
@@ -44,7 +47,7 @@
         <button disabled class="btn join-item btn-sm btn-secondary"
           ><Save size="15" /> save</button
         >
-        <button class="btn join-item btn-sm"><X size="20" /></button>
+        <button class="btn join-item btn-sm btn-error"><X size="20" /></button>
       {:else}
         <button class="btn btn-sm btn-ghost"><ChevronDown /></button>
       {/if}
@@ -75,18 +78,10 @@
         />
       </label>
 
-      <label class="input input-bordered flex items-center gap-3">
-        <span class="label-text opacity-70 w-[60px]">secret</span>
-        <input
-          type="password"
-          class="grow ml-3"
-          placeholder="enter a new secret..."
-          bind:value={form.secret}
-        />
-      </label>
+      <PasswordInput label="secret" bind:value={form.secret} />
 
       <div
-        class="dark:bg-black bg-white rounded-md pl-4 pr-1.5 py-1.5 flex items-center gap-3"
+        class="input input-bordered rounded-md pl-4 pr-1.5 py-1.5 flex items-center gap-3"
       >
         <span class="label-text opacity-70 w-[60px]">type</span>
         <select class="select select-sm w-full ml-1.5" bind:value={form.type}>
@@ -97,7 +92,7 @@
       </div>
 
       <div
-        class="dark:bg-black bg-white rounded-md pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
+        class="input input-bordered rounded-md h-auto pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
       >
         <span class="label-text opacity-70 w-[60px]">redirect uris</span>
         <textarea class="w-full textarea"
@@ -106,7 +101,7 @@
       </div>
 
       <div
-        class="dark:bg-black bg-white rounded-md pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
+        class="input input-bordered h-auto rounded-md pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
       >
         <span class="label-text opacity-70 w-[60px]">scopes</span>
         <textarea class="w-full textarea">{client.scopes.join(" ")}</textarea>

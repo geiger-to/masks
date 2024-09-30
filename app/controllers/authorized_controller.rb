@@ -5,8 +5,6 @@ class AuthorizedController < ApplicationController
   before_action :render_404, unless: :client
   before_action :verify_device, unless: :verified_device?
 
-  delegate :authorization, to: :history
-
   class << self
     def authorized(&block)
       before_action do |controller|
@@ -23,6 +21,11 @@ class AuthorizedController < ApplicationController
     raise NotImplementedError
   end
 
+  def authorization
+    @authorization ||=
+      Masks::AuthorizationCode.where(client: client, device: device).last
+  end
+
   def redirect_to_login
     redirect_to authorize_path(client_id: client.key, redirect_uri: request.url)
   end
@@ -30,8 +33,6 @@ class AuthorizedController < ApplicationController
   def history
     @history ||= Masks::History.new(request:, device:, client:)
   end
-
-  delegate :actor, to: :history
 
   def render_404
     @props = { section: "Error", code: 404 }
@@ -48,10 +49,13 @@ class AuthorizedController < ApplicationController
   end
 
   def device
+    # writing data to the session will ensure an ID is present
+    session[:written] = true unless session.id
+
     @device ||=
       Masks::Device.create_with(
         user_agent: request.user_agent,
         ip_address: request.remote_ip,
-      ).find_or_create_by(session_id: session.id.to_s)
+      ).find_or_create_by!(session_id: session.id.to_s)
   end
 end

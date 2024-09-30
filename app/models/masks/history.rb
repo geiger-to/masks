@@ -1,4 +1,24 @@
 module Masks
+  # Keeps track of historical auth attempts.
+  #
+  # Data is stored in the session and a few other data models.
+  # Top-level session keys include:
+  #
+  #  - session[:auth] - a hash of auth attempts, keyed by id
+  #  - session[:actors] - a list of all identified actors
+  #  - session[:actor_id] - the last identified actor
+  #
+  # Various bang-methods can be used to track key events as
+  # the agent moves through authentication. As they are called
+  # various artificats are left in the session and database
+  # to record state.
+  #
+  #  - start!        - creates a new auth request
+  #  - resume!       - continues an auth request (e.g. from another place)
+  #  - authenticate! - authenticates the current actor given a password
+  #  - authorize!    - approve/deny the actor + client + scope combination
+  #
+  # Additional methods are available to interrogate state.
   class History < ApplicationModel
     attribute :request
     attribute :device
@@ -45,29 +65,10 @@ module Masks
 
       if session[:actor_id] != actor.key
         session[:actor_id] = actor.key
-        session[:actor_ids] ||= []
-        session[:actor_ids] << actor.key
-        session[:actor_ids].uniq!
+
+        actor_session[:identified_at] = Time.now.utc.iso8601
 
         log_event("identified")
-      end
-    end
-
-    def error
-      session.delete(:error)
-    end
-
-    def nickname
-      actor&.nickname
-    end
-
-    def redirect_uri
-      return @redirect_uri if @redirect_uri
-
-      if authorized?
-        return auth_session[:redirect_uri]
-      else
-        return oidc_params[:redirect_uri]
       end
     end
 
@@ -80,7 +81,7 @@ module Masks
         return deny! "invalid credentials"
       end
 
-      actor_session[:password_entered_at] = Time.now.utc.iso8601
+      actor_session[:password_expires_at] = client.password_expires_at
       actor.touch(:last_login_at)
 
       log_event("authenticated")
@@ -95,7 +96,6 @@ module Masks
           auth_session[:redirect_uri] = oidc.redirect_uri
 
           if client.internal?
-            client_session[:code] = oidc.authorization.code
             auth_session[:redirect_uri] = oidc_params[:redirect_uri]
           end
 
@@ -113,23 +113,34 @@ module Masks
       session[:error] = msg
     end
 
-    def authorization
-      @authorization ||=
-        Masks::Authorization.active.find_by(
-          code: client_session[:code],
-        ) if client_session&.fetch(:code, nil)
+    def error
+      @error ||= session.delete(:error)
+    end
+
+    def nickname
+      actor&.nickname
+    end
+
+    def redirect_uri
+      return @redirect_uri if @redirect_uri
+
+      if authorized?
+        return auth_session[:redirect_uri]
+      else
+        return oidc_params[:redirect_uri]
+      end
     end
 
     def authorized?
       return false unless authenticated? && auth_session
 
-      !client.consent || valid_time?(auth_session[:authorized_at])
+      !client.consent || auth_session[:authorized_at]
     end
 
     def authenticated?
       return false unless actor
 
-      valid_time?(actor_session[:password_entered_at])
+      !expired_time?(actor_session[:password_expires_at])
     end
 
     attr_writer :actor
@@ -145,8 +156,10 @@ module Masks
     end
 
     def client
-      if id = auth_session&.dig(:params, :client_id)
-        @client ||= Masks::Client.find_by(key: id)
+      key = session.dig(:auth, auth_id, :params, :client_id) if auth_id
+
+      if key
+        @client ||= Masks::Client.find_by(key:)
       else
         super
       end
@@ -159,14 +172,31 @@ module Masks
 
     def auth_session
       session[:auth] ||= {}
-      session[:auth][auth_id] ||= {} if auth_id
+
+      @auth_session ||=
+        if auth_id
+          time = session.dig(:auth, auth_id, :expires_at)
+
+          if !time || expired_time?(time)
+            session[:auth][auth_id] = { expires_at: client.history_expires_at }
+          end
+
+          session[:auth][auth_id]
+        end
     end
 
-    def valid_time?(value)
-      time = Time.parse(value)
+    def expired_time?(value)
+      time =
+        case value
+        when String
+          Time.parse(value)
+        else
+          value
+        end
+
       time < Time.now.utc
-    rescue TypeError
-      false
+    rescue TypeError, NoMethodError
+      true
     end
 
     def log_event(key, **args)

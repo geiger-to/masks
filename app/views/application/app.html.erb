@@ -1,5 +1,8 @@
 <%= content_tag :div, "", id: "app", class: 'h-full', data: @props %>
-<%= vite_javascript_tag 'app' %>
+
+<% content_for :head do %>
+  <%= vite_javascript_tag 'app' %>
+<% end %>
 
 <% content_for :styles do %>
   <%= vite_stylesheet_tag 'app.css' %>

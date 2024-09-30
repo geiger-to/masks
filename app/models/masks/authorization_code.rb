@@ -1,10 +1,12 @@
 # frozen_string_literal: true
 
 module Masks
-  class Authorization < ApplicationRecord
+  class AuthorizationCode < ApplicationRecord
     include Scoped
 
-    self.table_name = "masks_authorizations"
+    self.table_name = "masks_authorization_codes"
+
+    has_secure_token :code
 
     scope :active, -> { where("expires_at >= ?", Time.now.utc) }
 
@@ -12,14 +14,20 @@ module Masks
     belongs_to :device, class_name: "Masks::Device"
     belongs_to :actor, class_name: "Masks::Actor"
 
+    has_many :access_tokens
+
     serialize :scopes, coder: JSON
 
-    before_validation :generate_code
+    before_validation :generate_expiry
 
     validates :actor, presence: true
     validates :client, presence: true
     validates :code, presence: true, uniqueness: true
     validates :expires_at, presence: true
+
+    def obfuscated_code
+      obfuscate(:code)
+    end
 
     def valid_redirect_uri?(uri)
       uri == redirect_uri
@@ -38,8 +46,7 @@ module Masks
 
     private
 
-    def generate_code
-      self.code ||= SecureRandom.uuid
+    def generate_expiry
       self.expires_at ||= client.code_expires_at
     end
   end

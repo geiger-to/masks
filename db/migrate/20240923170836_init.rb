@@ -79,7 +79,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[key], unique: true
     end
 
-    create_table :masks_authorizations do |t|
+    create_table :masks_authorization_codes do |t|
       t.string :code
       t.string :nonce
       t.string :redirect_uri
@@ -101,11 +101,13 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :scopes
       t.text :data
 
+      t.references :client
       t.references :actor, null: true
       t.references :device, null: true
-      t.references :client
+      t.references :authorization_code, null: true
       t.datetime :expires_at
       t.datetime :revoked_at
+      t.datetime :refreshed_at
       t.timestamps
 
       t.index :token, unique: true
@@ -116,9 +118,10 @@ class Init < ActiveRecord::Migration[7.2]
     create_table :masks_id_tokens do |t|
       t.string :nonce
 
+      t.references :client
       t.references :actor
       t.references :device
-      t.references :client
+      t.references :authorization_code, null: true
 
       t.datetime :expires_at
       t.timestamps

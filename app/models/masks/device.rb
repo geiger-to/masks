@@ -6,7 +6,7 @@ module Masks
 
     has_many :events, class_name: "Masks::Event"
     has_many :access_tokens, class_name: "Masks::AccessToken"
-    has_many :authorizations, class_name: "Masks::Authorization"
+    has_many :authorization_codes, class_name: "Masks::AuthorizationCode"
     has_many :clients, through: :events, class_name: "Masks::Client"
     has_many :actors, through: :events, class_name: "Masks::Actor"
 

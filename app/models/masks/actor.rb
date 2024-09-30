@@ -4,13 +4,16 @@ module Masks
   class Actor < ApplicationRecord
     self.table_name = "masks_actors"
 
-    has_many :authorizations, class_name: "Masks::Authorization", autosave: true
+    has_many :authorization_codes,
+             class_name: "Masks::AuthorizationCode",
+             autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
-    has_many :clients, class_name: "Masks::Client", through: :access_tokens
+    has_many :events, class_name: "Masks::Event"
+    has_many :clients, class_name: "Masks::Client", through: :events
     has_many :devices,
              class_name: "Masks::Device",
-             through: :access_tokens,
+             through: :events,
              autosave: true
 
     has_secure_password validations: false

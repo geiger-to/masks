@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html data-theme="<%= @theme || content_for(:theme) || 'dark' %>" class="h-full">
+<html class="h-full">
   <head>
     <title><%= content_for(:title) || "Masks" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -14,9 +14,7 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= stylesheet_link_tag "application" %>
     <%= vite_client_tag %>
-    <%= vite_javascript_tag 'application' %>
 
     <%= yield :styles %>
   </head>

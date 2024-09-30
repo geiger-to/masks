@@ -11,6 +11,7 @@ module Types
     field :os_name, String
     field :ip_address, String
     field :user_agent, String
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def id
       object.session_id

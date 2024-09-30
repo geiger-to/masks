@@ -8,7 +8,7 @@ module Masks
                   :scopes,
                   :response,
                   :response_type,
-                  :authorization,
+                  :authorization_code,
                   :access_token,
                   :id_token
 
@@ -93,8 +93,8 @@ module Masks
       response_types = Array(req.response_type)
 
       if response_types.include? :code
-        @authorization =
-          actor.authorizations.create!(
+        @authorization_code =
+          actor.authorization_codes.create!(
             client:,
             device:,
             actor:,
@@ -103,12 +103,18 @@ module Masks
             scopes:,
           )
 
-        res.code = authorization.code
+        res.code = authorization_code.code
       end
 
       if response_types.include? :token
         @access_token =
-          actor.access_tokens.create!(client:, device:, actor:, scopes:)
+          actor.access_tokens.create!(
+            client:,
+            device:,
+            actor:,
+            scopes:,
+            authorization_code: @authorization_code,
+          )
 
         res.access_token = access_token.to_bearer_token
       end

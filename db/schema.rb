@@ -160,14 +160,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
     t.string "refreshed_token"
     t.text "scopes"
     t.text "data"
+    t.bigint "client_id"
     t.bigint "actor_id"
     t.bigint "device_id"
-    t.bigint "client_id"
+    t.bigint "authorization_code_id"
     t.datetime "expires_at"
     t.datetime "revoked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_access_tokens_on_actor_id"
+    t.index ["authorization_code_id"],
+            name: "index_masks_access_tokens_on_authorization_code_id"
     t.index ["client_id"], name: "index_masks_access_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_access_tokens_on_device_id"
     t.index ["refresh_token"],
@@ -198,7 +201,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
     t.index ["nickname"], name: "index_masks_actors_on_nickname", unique: true
   end
 
-  create_table "masks_authorizations", force: :cascade do |t|
+  create_table "masks_authorization_codes", force: :cascade do |t|
     t.string "code"
     t.string "nonce"
     t.string "redirect_uri"
@@ -209,10 +212,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
     t.datetime "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_authorizations_on_actor_id"
-    t.index ["client_id"], name: "index_masks_authorizations_on_client_id"
-    t.index ["code"], name: "index_masks_authorizations_on_code", unique: true
-    t.index ["device_id"], name: "index_masks_authorizations_on_device_id"
+    t.index ["actor_id"], name: "index_masks_authorization_codes_on_actor_id"
+    t.index ["client_id"], name: "index_masks_authorization_codes_on_client_id"
+    t.index ["code"],
+            name: "index_masks_authorization_codes_on_code",
+            unique: true
+    t.index ["device_id"], name: "index_masks_authorization_codes_on_device_id"
   end
 
   create_table "masks_clients", force: :cascade do |t|
@@ -263,13 +268,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
 
   create_table "masks_id_tokens", force: :cascade do |t|
     t.string "nonce"
+    t.bigint "client_id"
     t.bigint "actor_id"
     t.bigint "device_id"
-    t.bigint "client_id"
+    t.bigint "authorization_code_id"
     t.datetime "expires_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_id_tokens_on_actor_id"
+    t.index ["authorization_code_id"],
+            name: "index_masks_id_tokens_on_authorization_code_id"
     t.index ["client_id"], name: "index_masks_id_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_id_tokens_on_device_id"
     t.index ["nonce"], name: "index_masks_id_tokens_on_nonce", unique: true

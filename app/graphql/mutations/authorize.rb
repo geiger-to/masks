@@ -4,7 +4,6 @@ module Mutations
   class Authorize < BaseMutation
     input_object_class Types::AuthorizeInputType
 
-    field :actor, Types::ActorType, null: true
     field :client, Types::ClientType, null: true
     field :nickname, String, null: true
     field :authenticated, Boolean, null: true
@@ -24,10 +23,9 @@ module Mutations
 
       {
         client: history.client,
-        actor: history.actor,
         error_code: history.error ? "invalid_credentials" : nil,
         error_message: history.error,
-        nickname: history.nickname,
+        nickname: history.nickname || args[:nickname],
         authenticated: history.authenticated?,
         authorized: history.authorized?,
         redirect_uri: history.redirect_uri,

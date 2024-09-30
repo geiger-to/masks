@@ -35,8 +35,8 @@ module Masks
     has_many :access_tokens,
              class_name: "Masks::AccessToken",
              inverse_of: :client
-    has_many :authorizations,
-             class_name: "Masks::Authorization",
+    has_many :authorization_codes,
+             class_name: "Masks::AuthorizationCode",
              inverse_of: :client
     has_many :devices, class_name: "Masks::Device", through: :access_tokens
 
@@ -154,6 +154,14 @@ module Masks
       scopes.each { |scope| self.scopes.delete(scope) }
 
       save!
+    end
+
+    def history_expires_at
+      Time.now + ChronicDuration.parse("1 hour")
+    end
+
+    def password_expires_at
+      Time.now + ChronicDuration.parse("1 day")
     end
 
     def code_expires_at

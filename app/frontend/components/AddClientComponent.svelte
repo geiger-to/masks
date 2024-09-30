@@ -81,6 +81,5 @@
       class="join-item btn btn-secondary"
       disabled={!input.name}><Save size="15" /> save</button
     >
-    <button class="join-item btn" on:click={cancel}><X /></button>
   </div>
 </form>
