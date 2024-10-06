@@ -17,11 +17,13 @@
       query: gql`
         mutation ($input: AuthorizeInput!) {
           authorize(input: $input) {
+            requiredScopes
             errorMessage
             errorCode
             nickname
             authenticated
             authorized
+            successful
             redirectUri
             client {
               id
@@ -40,11 +42,10 @@
   let auth;
 
   const startOver = () => {
-    auth.nickname = null;
+    auth.nickname = nickname = null;
+    auth.password = password = null;
     auth.errorCode = null;
     auth.errorMessage = null;
-    nickname = null;
-    password = null;
   };
 
   const continueAuth = (args) => {
@@ -69,7 +70,7 @@
     auth = result.data.authorize;
     nickname = auth?.nickname;
 
-    if (auth?.authorized && auth.redirectUri) {
+    if (auth?.successful) {
       setTimeout(() => {
         window.location.replace(auth.redirectUri);
       }, 100);
@@ -96,6 +97,34 @@
       <button class="btn btn-error"> go back </button>
     </div>
   </div>
+{:else if auth?.errorCode == "scopes_required"}
+  <div class="flex h-full w-full align-items-center items-center">
+    <div class="bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
+      <div class="flex flex-col mb-5">
+        <h1 class="text-error">access denied</h1>
+
+        <h2 class="text-black dark:text-white text-2xl mb-3">
+          unable to
+          <i>{auth?.client?.name}</i>
+        </h2>
+
+        <p>to continue you must have the following permissions:</p>
+
+        <ul class="my-3 list list-disc mx-6">
+          {#each auth.requiredScopes || [] as scope}
+            <li><span class="font-mono text-sm">{scope}</span></li>
+          {/each}
+        </ul>
+      </div>
+
+      <button
+        class="btn btn-error"
+        on:click|stopPropagation|preventDefault={startOver}
+      >
+        start over
+      </button>
+    </div>
+  </div>
 {:else if !auth}
   <div class="flex h-full w-full align-items-center items-center">
     <div class="bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
@@ -113,16 +142,16 @@
     <div class="bold bg-base-300 rounded-xl md:min-w-[500px] mx-auto p-10">
       <div class="flex flex-col mb-5">
         <h1>
-          access {auth?.authorized ? "granted" : "required"}
+          access {auth?.successful ? "granted" : "required"}
         </h1>
 
         <h2 class="text-black dark:text-white text-2xl">
-          {auth?.authorized ? "returning" : "login"} to
+          {auth?.successful ? "returning" : "login"} to
           <i>{auth?.client?.name || "..."}</i>
         </h2>
       </div>
 
-      {#if auth?.authorized}
+      {#if auth?.succesful}
         <div
           class="flex items-center gap-2.5 mb-5 bg-white dark:bg-black
           p-2.5 rounded-lg shadow
@@ -174,7 +203,6 @@
             </div>
           {:else if !auth?.nickname}
             <input
-              autofocus
               class="w-full input input-lg"
               placeholder="enter your nickname..."
               type="text"

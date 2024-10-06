@@ -14,10 +14,9 @@
     <h2 class="font-bold font-mono">{event.name}</h2>
     <span class="opacity-70">via</span>
     <div class="grow">
-      <a
-        href="#"
+      <button
         on:click|preventDefault|stopPropagation={search(event.clientId)}
-        class="underline">{event.clientId}</a
+        class="btn btn-link underline">{event.clientId}</button
       >
     </div>
 

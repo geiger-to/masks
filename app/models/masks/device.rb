@@ -14,7 +14,13 @@ module Masks
     validates :known?, :user_agent, presence: true
     validates :ip_address, ip: true
 
-    delegate :name, :device_type, :device_name, :os_name, :known?, to: :detected
+    delegate :name,
+             :device_type,
+             :device_name,
+             :os_name,
+             :known?,
+             to: :detected,
+             allow_nil: true
 
     private
 

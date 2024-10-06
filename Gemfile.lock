@@ -110,6 +110,12 @@ GEM
     concurrent-ruby (1.3.4)
     connection_pool (2.4.1)
     crass (1.0.6)
+    database_cleaner (2.0.2)
+      database_cleaner-active_record (>= 2, < 3)
+    database_cleaner-active_record (2.2.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     date (3.3.4)
     debug (1.9.2)
       irb (~> 1.10)
@@ -145,7 +151,7 @@ GEM
       thor (>= 1.0.0)
     graphiql-rails (1.10.1)
       railties
-    graphql (2.3.16)
+    graphql (2.3.18)
       base64
       fiber-storage
     haml (6.3.0)
@@ -180,7 +186,7 @@ GEM
     matrix (0.4.2)
     mini_mime (1.1.5)
     minitest (5.25.1)
-    msgpack (1.7.2)
+    msgpack (1.7.3)
     multi_json (1.15.0)
     net-http (0.4.1)
       uri
@@ -281,7 +287,7 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.2.1)
-    rbs (3.6.0)
+    rbs (3.6.1)
       logger
     rdoc (6.7.0)
       psych (>= 4.0.0)
@@ -390,6 +396,9 @@ GEM
     websocket-extensions (0.1.5)
     xpath (3.2.0)
       nokogiri (~> 1.8)
+    yaml_db (0.7.0)
+      rails (>= 3.0)
+      rake (>= 0.8.7)
     zeitwerk (2.6.18)
 
 PLATFORMS
@@ -408,6 +417,8 @@ DEPENDENCIES
   byebug (~> 11.1)
   capybara
   chronic_duration (~> 0.10.6)
+  database_cleaner (~> 2.0)
+  database_cleaner-active_record (~> 2.2)
   debug
   device_detector (~> 1.1)
   good_job (~> 4.3)
@@ -431,6 +442,7 @@ DEPENDENCIES
   validates_host (~> 1.3)
   vite_rails (~> 3.0)
   web-console
+  yaml_db (~> 0.7.0)
 
 BUNDLED WITH
    2.5.18

@@ -24,6 +24,7 @@ module Masks
     attribute :device
     attribute :client
     attribute :auth_id
+    attribute :required_scopes
 
     delegate :session, to: :request
     delegate :nickname, to: :actor, allow_nil: true
@@ -78,7 +79,7 @@ module Masks
       unless actor&.authenticate(password)
         log_event("invalid_password") if actor
 
-        return deny! "invalid credentials"
+        return deny! "invalid_credentials"
       end
 
       actor_session[:password_expires_at] = client.password_expires_at
@@ -88,33 +89,35 @@ module Masks
     end
 
     def authorize!(**opts)
-      return unless oidc_params && authenticated? && !redirect_uri
+      return unless oidc_params && authenticated? && !authorized?
 
-      Masks::OIDCRequest.perform(self, **opts) do |oidc|
-        if oidc.approved?
-          auth_session[:authorized_at] = Time.now.utc.iso8601
-          auth_session[:redirect_uri] = oidc.redirect_uri
+      @oidc =
+        Masks::OIDCRequest.perform(self, **opts) do |oidc|
+          if oidc.approved?
+            auth_session[:authorized_at] = Time.now.utc.iso8601
+            auth_session[:redirect_uri] = oidc.redirect_uri
 
-          if client.internal?
-            auth_session[:redirect_uri] = oidc_params[:redirect_uri]
+            if client.internal?
+              auth_session[:redirect_uri] = oidc_params[:redirect_uri]
+            end
+
+            log_event("authorized")
           end
 
-          log_event("authorized")
+          if oidc.denied?
+            auth_session[:authorized_at] = nil
+            @redirect_uri = oidc.redirect_uri
+            deny!(oidc.error) if oidc.error
+          end
         end
-
-        if oidc.denied?
-          auth_session[:authorized_at] = nil
-          @redirect_uri = oidc.redirect_uri
-        end
-      end
     end
 
     def deny!(msg)
-      session[:error] = msg
+      @error = msg
     end
 
     def error
-      @error ||= session.delete(:error)
+      @error ||= @oidc&.error
     end
 
     def nickname
@@ -126,15 +129,25 @@ module Masks
 
       if authorized?
         return auth_session[:redirect_uri]
-      else
+      elsif oidc_params
         return oidc_params[:redirect_uri]
       end
+    end
+
+    def required_scopes
+      return unless @oidc
+
+      @oidc.scopes - actor.scopes
+    end
+
+    def successful?
+      authorized? && authenticated? && redirect_uri && !error
     end
 
     def authorized?
       return false unless authenticated? && auth_session
 
-      !client.consent || auth_session[:authorized_at]
+      auth_session[:authorized_at]
     end
 
     def authenticated?

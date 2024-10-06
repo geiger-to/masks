@@ -10,7 +10,8 @@ module Masks
                   :response_type,
                   :authorization_code,
                   :access_token,
-                  :id_token
+                  :id_token,
+                  :error
 
     class << self
       def perform(history, **opts, &block)
@@ -34,22 +35,24 @@ module Masks
 
           unless client.redirect_uris.any?
             client.redirect_uris = [req.redirect_uri.to_s]
-            client.valid? || req.invalid_request!('"redirect_uri" invalid')
+            client.valid? || invalid_redirect_uri!(req)
           end
 
           res.redirect_uri = req.verify_redirect_uri!(client.redirect_uris)
 
           @scopes = req.scope & client.scopes
 
+          scopes_required!(req) unless actor&.scopes?(*@scopes)
+
           if res.protocol_params_location == :fragment && req.nonce.blank?
-            req.invalid_request! "nonce required"
+            nonce_required!(req)
           end
 
           if client.response_types.include?(
                Array(req.response_type).collect(&:to_s).join(" "),
              )
             if actor
-              if opts[:approve] || history.authorized?
+              if opts[:approve] || history.authorized? || client.auto_consent?
                 client.save if client.redirect_uris_changed?
 
                 approved! req, res
@@ -57,7 +60,7 @@ module Masks
 
                 history.instance_exec(self, &block)
               elsif opts[:deny]
-                req.access_denied!
+                access_denied!(req)
                 @denied = true
 
                 history.instance_exec(self, &block)
@@ -74,7 +77,32 @@ module Masks
     end
 
     def denied?
-      @denied
+      @denied || @error
+    end
+
+    def access_denied!(req)
+      @error = "access_denied"
+      req.access_denied!
+    end
+
+    def nonce_required!(req)
+      @error = "nonce_required"
+      req.invalid_request! "nonce required"
+    end
+
+    def scopes_required!(req)
+      @error = "scopes_required"
+      req.invalid_request! "scopes required"
+    end
+
+    def invalid_redirect_uri!(req)
+      @error = "invalid_redirect_uri"
+      req.invalid_request!("invalid redirect_uri")
+    end
+
+    def unsupported_response_type!(req)
+      @error = "unsupported_response_type"
+      req.unsupported_response_type!
     end
 
     def redirect_uri

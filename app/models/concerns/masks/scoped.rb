@@ -17,6 +17,10 @@ module Masks
       scopes.include?(scope.to_s)
     end
 
+    def scopes?(*scopes)
+      scopes.all? { |scope| scope?(scope) }
+    end
+
     def scopes_text=(text)
       self.scopes = text.split("\n").map { |line| line.split(" ") }.flatten
 

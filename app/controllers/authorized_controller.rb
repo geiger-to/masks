@@ -23,7 +23,7 @@ class AuthorizedController < ApplicationController
 
   def authorization
     @authorization ||=
-      Masks::AuthorizationCode.where(client: client, device: device).last
+      Masks::AuthorizationCode.active.where(client: client, device: device).last
   end
 
   def redirect_to_login
@@ -37,7 +37,7 @@ class AuthorizedController < ApplicationController
   def render_404
     @props = { section: "Error", code: 404 }
 
-    render "app"
+    render "app", status: 404
   end
 
   def verify_device

@@ -64,19 +64,6 @@ module Masks
       super || []
     end
 
-    def valid_redirect_uri?(uri)
-      return false unless uri&.present?
-
-      if internal?
-        uri.start_with?("/") ||
-          redirect_uris.any? do |redirect_uri|
-            uri.start_with?(redirect_uri) || uri == redirect_uri
-          end
-      else
-        redirect_uris.include?(uri)
-      end
-    end
-
     def subject_types
       pairwise_subject? ? ["pairwise"] : ["public"]
     end
@@ -138,7 +125,7 @@ module Masks
     end
 
     def auto_consent?
-      !consent
+      internal? || !consent
     end
 
     def pairwise_subject?

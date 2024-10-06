@@ -1,6 +1,6 @@
 module Masks
   class Installation < ApplicationRecord
-    self.table_name = "masks_installation"
+    self.table_name = "masks_installations"
 
     serialize :settings, coder: JSON
 

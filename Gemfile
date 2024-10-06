@@ -44,6 +44,7 @@ group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "capybara"
   gem "selenium-webdriver"
+  gem "database_cleaner", "~> 2.0"
 end
 
 gem "vite_rails", "~> 3.0"
@@ -78,3 +79,7 @@ gem "openid_connect", "~> 2.3"
 gem "rqrcode", "~> 2.2"
 
 gem "byebug", "~> 11.1"
+
+gem "database_cleaner-active_record", "~> 2.2"
+
+gem "yaml_db", "~> 0.7.0"

@@ -23,7 +23,7 @@
 <div
   class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3 text-base-content"
 >
-  <div
+  <button
     class="flex items-center pl-1.5 cursor-pointer gap-3"
     on:click|preventDefault={() => (editing = !editing)}
   >
@@ -52,7 +52,7 @@
         <button class="btn btn-sm btn-ghost"><ChevronDown /></button>
       {/if}
     </div>
-  </div>
+  </button>
 
   {#if editing}
     <div class="divider my-1.5" />

@@ -166,6 +166,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
     t.bigint "authorization_code_id"
     t.datetime "expires_at"
     t.datetime "revoked_at"
+    t.datetime "refreshed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_access_tokens_on_actor_id"
@@ -283,11 +284,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_23_234426) do
     t.index ["nonce"], name: "index_masks_id_tokens_on_nonce", unique: true
   end
 
-  create_table "masks_installation", force: :cascade do |t|
+  create_table "masks_installations", force: :cascade do |t|
     t.text "settings"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.datetime "expired_at"
   end
 
   create_table "masks_sessions", force: :cascade do |t|

@@ -9,10 +9,9 @@ class Init < ActiveRecord::Migration[7.2]
     add_index :masks_sessions, :session_id, unique: true
     add_index :masks_sessions, :updated_at
 
-    create_table :masks_installation do |t|
+    create_table :masks_installations do |t|
       t.text :settings
       t.timestamps
-      t.datetime :expired_at
     end
 
     create_table :masks_actors do |t|

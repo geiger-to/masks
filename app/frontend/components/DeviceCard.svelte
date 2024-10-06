@@ -17,7 +17,6 @@
   import Time from "svelte-time";
 
   export let device;
-  export let search;
   export let inline;
 
   let form = { ...device };

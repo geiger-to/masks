@@ -3,7 +3,6 @@
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
 
   export let search = () => {};
-  export let cancel = () => {};
 
   let result;
   let input = {};

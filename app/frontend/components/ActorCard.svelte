@@ -16,7 +16,8 @@
 </script>
 
 <div class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3">
-  <div
+  <button
+    tabindex="0"
     class="flex items-center cursor-pointer"
     on:click|preventDefault={() => (editing = !editing)}
   >
@@ -56,7 +57,7 @@
         <button class="btn btn-sm btn-ghost"><ChevronDown /></button>
       {/if}
     </div>
-  </div>
+  </button>
 
   {#if editing}
     <div class="divider my-1.5" />

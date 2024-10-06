@@ -1,0 +1,17 @@
+// vite.config.js
+import { defineConfig } from "file:///Users/geiger/Projects/masks/node_modules/vite/dist/node/index.js";
+import RubyPlugin from "file:///Users/geiger/Projects/masks/node_modules/vite-plugin-ruby/dist/index.js";
+import FullReload from "file:///Users/geiger/Projects/masks/node_modules/vite-plugin-full-reload/dist/index.js";
+import { svelte } from "file:///Users/geiger/Projects/masks/node_modules/@sveltejs/vite-plugin-svelte/src/index.js";
+import tailwindcss from "file:///Users/geiger/Projects/masks/node_modules/tailwindcss/lib/index.js";
+var vite_config_default = defineConfig({
+  mode: "development",
+  plugins: [
+    RubyPlugin(),
+    FullReload(["config/routes.rb", "app/views/**/*"]),
+    svelte(),
+    tailwindcss(),
+  ],
+});
+export { vite_config_default as default };
+//# sourceMappingURL=data:application/json;base64,ewogICJ2ZXJzaW9uIjogMywKICAic291cmNlcyI6IFsidml0ZS5jb25maWcuanMiXSwKICAic291cmNlc0NvbnRlbnQiOiBbImNvbnN0IF9fdml0ZV9pbmplY3RlZF9vcmlnaW5hbF9kaXJuYW1lID0gXCIvVXNlcnMvZ2VpZ2VyL1Byb2plY3RzL21hc2tzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ZpbGVuYW1lID0gXCIvVXNlcnMvZ2VpZ2VyL1Byb2plY3RzL21hc2tzL3ZpdGUuY29uZmlnLmpzXCI7Y29uc3QgX192aXRlX2luamVjdGVkX29yaWdpbmFsX2ltcG9ydF9tZXRhX3VybCA9IFwiZmlsZTovLy9Vc2Vycy9nZWlnZXIvUHJvamVjdHMvbWFza3Mvdml0ZS5jb25maWcuanNcIjtpbXBvcnQgeyBkZWZpbmVDb25maWcgfSBmcm9tIFwidml0ZVwiO1xuaW1wb3J0IFJ1YnlQbHVnaW4gZnJvbSBcInZpdGUtcGx1Z2luLXJ1YnlcIjtcbmltcG9ydCBGdWxsUmVsb2FkIGZyb20gXCJ2aXRlLXBsdWdpbi1mdWxsLXJlbG9hZFwiO1xuaW1wb3J0IHsgc3ZlbHRlIH0gZnJvbSBcIkBzdmVsdGVqcy92aXRlLXBsdWdpbi1zdmVsdGVcIjtcbmltcG9ydCB0YWlsd2luZGNzcyBmcm9tIFwidGFpbHdpbmRjc3NcIjtcblxuZXhwb3J0IGRlZmF1bHQgZGVmaW5lQ29uZmlnKHtcbiAgbW9kZTogXCJkZXZlbG9wbWVudFwiLFxuICBwbHVnaW5zOiBbXG4gICAgUnVieVBsdWdpbigpLFxuICAgIEZ1bGxSZWxvYWQoW1wiY29uZmlnL3JvdXRlcy5yYlwiLCBcImFwcC92aWV3cy8qKi8qXCJdKSxcbiAgICBzdmVsdGUoKSxcbiAgICB0YWlsd2luZGNzcygpLFxuICBdLFxufSk7XG4iXSwKICAibWFwcGluZ3MiOiAiO0FBQXNRLFNBQVMsb0JBQW9CO0FBQ25TLE9BQU8sZ0JBQWdCO0FBQ3ZCLE9BQU8sZ0JBQWdCO0FBQ3ZCLFNBQVMsY0FBYztBQUN2QixPQUFPLGlCQUFpQjtBQUV4QixJQUFPLHNCQUFRLGFBQWE7QUFBQSxFQUMxQixNQUFNO0FBQUEsRUFDTixTQUFTO0FBQUEsSUFDUCxXQUFXO0FBQUEsSUFDWCxXQUFXLENBQUMsb0JBQW9CLGdCQUFnQixDQUFDO0FBQUEsSUFDakQsT0FBTztBQUFBLElBQ1AsWUFBWTtBQUFBLEVBQ2Q7QUFDRixDQUFDOyIsCiAgIm5hbWVzIjogW10KfQo=

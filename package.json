@@ -2,8 +2,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "bin/vite build",
     "format": "prettier --write .",
+    "lint": "prettier --check .",
     "rails": "PORT=1111 bin/rails s",
+    "test": "bin/rails test",
     "jobs": "...",
     "dev": "overmind start -f Procfile.dev",
     "dev:reset": "MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset"

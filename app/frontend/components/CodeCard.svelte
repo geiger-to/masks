@@ -3,7 +3,6 @@
   import Time from "svelte-time";
 
   export let code;
-  export let search;
 
   let form = { ...code };
 </script>

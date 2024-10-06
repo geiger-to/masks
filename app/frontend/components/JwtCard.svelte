@@ -11,10 +11,9 @@
 <div class="my-1.5 bg-base-200 rounded-lg p-3 px-3">
   <div class="flex items-center pl-1.5 gap-3">
     <h2 class="font-bold font-mono">{event.name}</h2>
-    <a
-      href="#"
+    <button
       on:click|preventDefault|stopPropagation={search(event.clientId)}
-      class="underline">{event.clientId}</a
+      class="btn btn-link underline">{event.clientId}</button
     >
     <span class="text-sm" alt={event.device.userAgent}
       >{event.device.name} on {event.device.osName}</span

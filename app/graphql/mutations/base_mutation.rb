@@ -6,5 +6,11 @@ module Mutations
     field_class Types::BaseField
     input_object_class Types::BaseInputObject
     object_class Types::BaseObject
+
+    def t(key)
+      return unless key
+
+      I18n.t("gql.#{self.class.name.underscore.gsub("/", ".")}.#{key}")
+    end
   end
 end

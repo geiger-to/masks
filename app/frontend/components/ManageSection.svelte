@@ -146,14 +146,14 @@
     isAddOpen = false;
     isAdding = false;
     isIncludeOpen = false;
-    isConfiguring = !isConfiguring
-  }
+    isConfiguring = !isConfiguring;
+  };
 
   const including = () => {
     isIncludeOpen = !isIncludeOpen;
     isAddOpen = false;
     isAdding = false;
-  }
+  };
 
   const adding = (name) => {
     return () => {
@@ -196,7 +196,7 @@
   }, 300);
 
   let isOneOf = (search) => {
-    return search?.actors?.length == 1 || search?.clients?.length == 1
+    return search?.actors?.length == 1 || search?.clients?.length == 1;
   };
 
   let isEmpty = (search) => {
@@ -235,9 +235,8 @@
       </button>
 
       <div class={isAddOpen && !isAdding ? `dropdown dropdown-end` : ""}>
-        <div
+        <button
           tabindex="0"
-          role="button"
           on:click|preventDefault|stopPropagation={toggleMenu}
           class={`btn ${!isAdding && "focus:btn-success hover:btn-success"} btn-sm px-0 w-8 py-0`}
         >
@@ -246,11 +245,10 @@
           {:else}
             <PlusSquare size="20" />
           {/if}
-        </div>
+        </button>
 
         {#if isAddOpen}
           <ul
-            tabindex="0"
             class="dropdown-content menu bg-white dark:bg-black
         rounded-lg z-[1] p-2 py-1.5 shadow-lg [&>li]:my-1"
           >
@@ -336,14 +334,13 @@
               on:click|preventDefault|stopPropagation={including}
             >
               {#if isIncludeOpen}
-              <X />
+                <X />
               {:else}
-              <ListCheck />
+                <ListCheck />
               {/if}
             </button>
 
             <ul
-              tabindex="0"
               class={`dropdown-content rounded-lg menu bg-white dark:bg-base-300 mt-1.5 ${!isIncludeOpen ? "hidden" : ""}  rounded-box z-[1] p-2 shadow-lg [&>li]:my-1.5`}
             >
               <li>

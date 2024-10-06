@@ -28,4 +28,8 @@
 #       enabled: "ON"
 
 en:
-  hello: "Hello world"
+  gql:
+    mutations:
+      authorize:
+        invalid_credentials: "invalid credentials"
+        scopes_required: "unauthorized"

@@ -3,12 +3,18 @@
 # Top-level module for masks.
 module Masks
   class << self
+    def url=(value)
+      @url = value
+    end
+
+    def url
+      @url || ENV["MASKS_URL"]
+    end
+
     def installation
       @installation ||=
-        Masks::Installation
-          .where(expired_at: nil)
-          .order(created_at: :desc)
-          .last || Masks::Installation.new
+        Masks::Installation.order(created_at: :desc).last ||
+          Masks::Installation.new
     end
 
     def install!
@@ -17,6 +23,11 @@ module Masks
       installation.seed!
 
       yield installation if block_given?
+    end
+
+    def reset!
+      @installation&.destroy!
+      @installation = nil
     end
   end
 end
