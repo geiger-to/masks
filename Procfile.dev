@@ -1,2 +1,3 @@
 vite: bin/vite dev
+docs: bin/jekyll serve --watch --livereload
 web: PORT=1111 bin/rails s
