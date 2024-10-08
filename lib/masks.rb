@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative "masks/version"
+
 # Top-level module for masks.
 module Masks
   class << self
