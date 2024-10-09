@@ -155,7 +155,7 @@ GEM
       raabro (~> 1.4)
     globalid (1.2.1)
       activesupport (>= 6.1)
-    good_job (4.3.0)
+    good_job (4.4.0)
       activejob (>= 6.1.0)
       activerecord (>= 6.1.0)
       concurrent-ruby (>= 1.3.1)
@@ -508,7 +508,7 @@ DEPENDENCIES
   database_cleaner-active_record (~> 2.2)
   debug
   device_detector (~> 1.1)
-  good_job (~> 4.3)
+  good_job (~> 4.4)
   graphiql-rails
   graphql (~> 2.3)
   jekyll (~> 4.3)
