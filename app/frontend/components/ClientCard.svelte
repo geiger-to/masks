@@ -1,16 +1,83 @@
 <script>
-  import { Save, ChevronDown, X } from "lucide-svelte";
+  import _ from "lodash-es";
+  import Time from "svelte-time";
+  import { ImageUp, Save, ChevronRight, X } from "lucide-svelte";
   import PasswordInput from "./PasswordInput.svelte";
+  import EditableImage from "./EditableImage.svelte";
+  import { getContext } from "svelte";
+  import { mutationStore, gql, getContextClient } from "@urql/svelte";
+
+  let result;
+  let errors;
+  let page = getContext("page");
+  let loading;
 
   export let client;
   export let editing = false;
+  export let isEditing = () => {};
 
-  let avatarPlaceholder = client?.name
-    ?.split(" ")
-    .map((word) => word[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2);
+  const updateClient = (input) => {
+    result = mutationStore({
+      client: page.graphql,
+      query: gql`
+        mutation ($input: ClientInput!) {
+          client(input: $input) {
+            client {
+              id
+              name
+              type
+              logo
+              secret
+              redirectUris
+              scopes
+              consent
+              createdAt
+              updatedAt
+            }
+
+            errors
+          }
+        }
+      `,
+      variables: { input: { ...input, id: client.id } },
+    });
+  };
+
+  const save = (input) => {
+    return () => {
+      loading = true;
+
+      updateClient(
+        _.pick(input, ["type", "redirectUris", "scopes", "redirectUris"])
+      );
+    };
+  };
+
+  const handleResult = (result) => {
+    if (!result) {
+      return;
+    }
+
+    loading = true;
+    errors = null;
+
+    if (!result?.data?.client) {
+      return;
+    }
+
+    client = result?.data?.client?.client;
+    errors = result?.data?.client?.errors;
+    loading = false;
+  };
+
+  let updateName = _.debounce((value) => {
+    if (value != client.name) {
+      updateClient({ name: value });
+    }
+  }, 500);
+
+  $: handleResult($result);
+  $: updateName(form.name);
 
   let form = { ...client };
   let ICON_TYPES = {
@@ -23,63 +90,50 @@
 <div
   class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3 text-base-content"
 >
-  <button
-    class="flex items-center pl-1.5 cursor-pointer gap-3"
-    on:click|preventDefault={() => (editing = !editing)}
-  >
-    <div class="avatar placeholder">
-      <div class="bg-neutral text-neutral-content w-12 rounded-lg">
-        <span>{avatarPlaceholder}</span>
-      </div>
-    </div>
+  <div class="flex items-center gap-3">
+    <EditableImage
+      disabled={!editing}
+      endpoint="/upload/logo"
+      params={{ client_id: client.id }}
+      src={client?.logo}
+      name={client?.name}
+      class="w-12 h-12"
+    />
 
-    <div class="grow">
-      <h2 class="font-bold">{client.name}</h2>
+    <div class="flex-grow">
+      <input
+        type="text"
+        class="bg-transparent font-bold px-1.5 w-full rounded-sm"
+        placeholder="required"
+        bind:value={form.name}
+        disabled={!editing}
+      />
 
-      <div class="flex items-baseline gap-3">
+      <div class="flex items-baseline gap-3 pl-1.5">
         <span class="text-sm font-mono">{client.id}</span>
-        <span class="text-xs italic">{client.type}</span>
+        <span class="text-xs italic"
+          >last updated <Time relative timestamp={client.updatedAt} /></span
+        >
       </div>
     </div>
 
-    <div class="flex group join">
+    <div class="group join">
       {#if editing}
-        <button disabled class="btn join-item btn-sm btn-secondary"
+        <button class="btn join-item btn-primary" on:click={save(form)}
           ><Save size="15" /> save</button
         >
-        <button class="btn join-item btn-sm btn-error"><X size="20" /></button>
       {:else}
-        <button class="btn btn-sm btn-ghost"><ChevronDown /></button>
+        <button class="btn btn-ghost" on:click={() => isEditing({ client })}
+          ><ChevronRight /></button
+        >
       {/if}
     </div>
-  </button>
+  </div>
 
   {#if editing}
     <div class="divider my-1.5" />
 
     <div class="flex flex-col gap-1.5 mb-3">
-      <label class="input input-bordered flex items-center gap-3">
-        <span class="label-text opacity-70 w-[60px]">name</span>
-        <input
-          type="text"
-          class="grow ml-3"
-          placeholder="required"
-          bind:value={form.name}
-        />
-      </label>
-
-      <label class="input input-bordered flex items-center gap-3">
-        <span class="label-text opacity-70 w-[60px]">identifier</span>
-        <input
-          type="text"
-          class="grow ml-3"
-          placeholder="required"
-          bind:value={form.id}
-        />
-      </label>
-
-      <PasswordInput label="secret" bind:value={form.secret} />
-
       <div
         class="input input-bordered rounded-md pl-4 pr-1.5 py-1.5 flex items-center gap-3"
       >
@@ -91,20 +145,21 @@
         </select>
       </div>
 
+      <PasswordInput label="secret" bind:value={form.secret} />
+
       <div
         class="input input-bordered rounded-md h-auto pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
       >
         <span class="label-text opacity-70 w-[60px]">redirect uris</span>
-        <textarea class="w-full textarea"
-          >{client.redirectUris.join("\n")}</textarea
-        >
+        <textarea class="w-full textarea" bind:value={form.redirectUris}
+        ></textarea>
       </div>
 
       <div
         class="input input-bordered h-auto rounded-md pl-4 pr-1.5 py-1.5 flex items-baseline gap-3"
       >
         <span class="label-text opacity-70 w-[60px]">scopes</span>
-        <textarea class="w-full textarea">{client.scopes.join(" ")}</textarea>
+        <textarea class="w-full textarea" bind:value={form.scopes}></textarea>
       </div>
     </div>
   {/if}

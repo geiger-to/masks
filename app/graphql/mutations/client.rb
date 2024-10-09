@@ -22,12 +22,9 @@ module Mutations
         )
 
       client.name = args[:name] if args[:name]
-      client.type = args[:type] if args[:type]
-      client.redirect_uris = args[:redirect_uris].split("\n") if args[
-        :redirect_uris
-      ]
-      client.scopes_text = args[:scopes] if args[:scopes]
-      client.regenerate_secret if args[:rotate_secret]
+      client.client_type = args[:type] if args[:type]
+      client.redirect_uris = args[:redirect_uris] if args[:redirect_uris]
+      client.scopes = args[:scopes] if args[:scopes]
       client.save
 
       { client:, errors: client.errors.full_messages }

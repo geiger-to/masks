@@ -5,18 +5,23 @@ require_relative "masks/version"
 # Top-level module for masks.
 module Masks
   class << self
-    def url=(value)
-      @url = value
+    def uri
+      URI.parse(url)
     end
 
     def url
-      @url || ENV["MASKS_URL"]
+      env.url
     end
 
     def installation
       @installation ||=
-        Masks::Installation.order(created_at: :desc).last ||
-          Masks::Installation.new
+        Masks::Installation.active.last ||
+          Masks::Installation.new(settings: env)
+    end
+
+    def env
+      @env ||=
+        RecursiveOpenStruct.new(Rails.application.config_for("installation"))
     end
 
     def install!

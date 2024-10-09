@@ -8,4 +8,6 @@
     encodeURIComponent(minidenticon(`@${nickname}`, saturation, lightness));
 </script>
 
-<img src={svgURI} alt={nickname} {...others} />
+{#key nickname}
+  <img src={svgURI} alt={nickname} {...others} />
+{/key}

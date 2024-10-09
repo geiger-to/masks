@@ -8,9 +8,10 @@ module Types
     field :name, String
     field :type, String
     field :secret, String
-    field :redirect_uris, [String]
+    field :logo, String
+    field :redirect_uris, String
     field :response_types, [String]
-    field :scopes, [String]
+    field :scopes, String
     field :consent, Boolean
     field :subject_type, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
@@ -26,6 +27,17 @@ module Types
 
     def type
       object.client_type
+    end
+
+    def logo
+      case object
+      when Hash
+        object.logo
+      when Masks::Client
+        if object.logo.attached?
+          rails_storage_proxy_url(object.logo.variant(:preview))
+        end
+      end
     end
   end
 end

@@ -192,6 +192,9 @@ GEM
     http_parser.rb (0.8.0)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
+    image_processing (1.13.0)
+      mini_magick (>= 4.9.5, < 5)
+      ruby-vips (>= 2.0.17, < 3)
     io-console (0.7.2)
     irb (1.14.1)
       rdoc (>= 4.0.0)
@@ -251,6 +254,7 @@ GEM
     marcel (1.0.4)
     matrix (0.4.2)
     mercenary (0.4.0)
+    mini_magick (4.13.2)
     mini_mime (1.1.5)
     minitest (5.25.1)
     msgpack (1.7.3)
@@ -293,6 +297,7 @@ GEM
       tzinfo
       validate_url
       webfinger (~> 2.0)
+    ostruct (0.6.0)
     parallel (1.26.3)
     parser (3.3.5.0)
       ast (~> 2.4.1)
@@ -363,6 +368,8 @@ GEM
       logger
     rdoc (6.7.0)
       psych (>= 4.0.0)
+    recursive-open-struct (2.0.0)
+      ostruct
     regexp_parser (2.9.2)
     reline (0.5.10)
       io-console (~> 0.5)
@@ -402,6 +409,9 @@ GEM
       rubocop-performance
       rubocop-rails
     ruby-progressbar (1.13.0)
+    ruby-vips (2.2.2)
+      ffi (~> 1.12)
+      logger
     rubyzip (2.3.2)
     safe_yaml (1.0.5)
     sass-embedded (1.79.4-aarch64-linux-gnu)
@@ -511,6 +521,7 @@ DEPENDENCIES
   good_job (~> 4.3)
   graphiql-rails
   graphql (~> 2.3)
+  image_processing (~> 1.13)
   jekyll (~> 4.3)
   jekyll-feed (~> 0.12)
   jekyll-postcss
@@ -520,6 +531,7 @@ DEPENDENCIES
   prettier_print (~> 1.2)
   puma (>= 5.0)
   rails (~> 7.2.1)
+  recursive-open-struct (~> 2.0)
   rotp (~> 6.3)
   rqrcode (~> 2.2)
   rubocop-rails-omakase

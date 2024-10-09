@@ -54,3 +54,7 @@ gem "rotp", "~> 6.3"
 gem "openid_connect", "~> 2.3"
 gem "rqrcode", "~> 2.2"
 gem "csv", "~> 3.3"
+
+gem "recursive-open-struct", "~> 2.0"
+
+gem "image_processing", "~> 1.13"
