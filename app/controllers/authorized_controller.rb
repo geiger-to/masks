@@ -6,19 +6,29 @@ class AuthorizedController < ApplicationController
   before_action :verify_device, unless: :verified_device?
 
   class << self
-    def authorized(&block)
-      before_action do |controller|
+    def managers_only(**opts)
+      prepend_before_action(**opts) { self.client = Masks::Client.manage }
+
+      authorized { authorization&.scopes&.include?(Masks::Scoped::MANAGE) }
+    end
+
+    def authorized(**opts, &block)
+      before_action(**opts) do |controller|
         controller.logged_in = controller.instance_exec(&block)
       end
 
-      before_action :redirect_to_login, unless: :logged_in
+      before_action :redirect_to_login, **opts.merge(unless: :logged_in)
     end
   end
 
   private
 
+  def client=(value)
+    @client = value
+  end
+
   def client
-    raise NotImplementedError
+    @client
   end
 
   def authorization
@@ -27,7 +37,10 @@ class AuthorizedController < ApplicationController
   end
 
   def redirect_to_login
-    redirect_to authorize_path(client_id: client.key, redirect_uri: request.url)
+    redirect_to authorize_path(
+                  client_id: client.key,
+                  redirect_uri: request.path,
+                )
   end
 
   def history

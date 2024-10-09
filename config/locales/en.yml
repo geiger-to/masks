@@ -28,8 +28,7 @@
 #       enabled: "ON"
 
 en:
-  gql:
-    mutations:
-      authorize:
-        invalid_credentials: "invalid credentials"
-        scopes_required: "unauthorized"
+  auth:
+    invalid_credentials: "invalid credentials"
+    invalid_request: the request is malformed
+    scopes_required: "unauthorized"

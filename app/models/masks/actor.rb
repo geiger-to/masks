@@ -4,6 +4,10 @@ module Masks
   class Actor < ApplicationRecord
     self.table_name = "masks_actors"
 
+    has_one_attached :avatar do |attachable|
+      attachable.variant :preview, resize_to_limit: [350, 350]
+    end
+
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
@@ -38,7 +42,6 @@ module Masks
     before_save :regenerate_backup_codes
 
     serialize :backup_codes, coder: JSON
-    serialize :scopes, coder: JSON
 
     include Scoped
 

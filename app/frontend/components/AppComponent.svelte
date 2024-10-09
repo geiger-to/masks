@@ -8,8 +8,21 @@
   import ErrorSection from "./ErrorSection.svelte";
   import AuthorizeSection from "./AuthorizeSection.svelte";
   import ManageSection from "./ManageSection.svelte";
+  import { setContext } from "svelte";
 
   let csrf = document.querySelector('meta[name="csrf-token"]').content;
+
+  function fetchOptions(csrf, options) {
+    const update = { ...options };
+
+    update.headers = {
+      ...update.headers,
+      "X-CSRF-Token": csrf,
+    };
+
+    return update;
+  }
+
   let sections = {
     Error: ErrorSection,
     Authorize: AuthorizeSection,
@@ -18,7 +31,7 @@
 
   export let section;
 
-  const client = new Client({
+  const graphql = new Client({
     url: "/graphql",
     exchanges: [cacheExchange, fetchExchange],
     fetchOptions: () => {
@@ -28,7 +41,16 @@
     },
   });
 
-  setContextClient(client);
+  setContext("page", {
+    csrf,
+    section,
+    graphql,
+    fetch: (url, options) => {
+      return fetch(url, fetchOptions(csrf, options));
+    },
+  });
+
+  setContextClient(graphql);
 </script>
 
 <svelte:component this={sections[section]} {...$$props} />

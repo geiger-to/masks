@@ -78,7 +78,4 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  <<: *default
-  database: masks_production
-  username: masks
-  password: <%= ENV["MASKS_DATABASE_PASSWORD"] %>
+  url: <%= ENV["MASKS_DATABASE_URL"] %>

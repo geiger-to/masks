@@ -4,7 +4,10 @@ Rails.application.routes.draw do
   end
 
   post "/graphql", to: "graphql#execute"
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
+
+  # Image uploads
+  post "/upload/logo", to: "uploads/logo#create"
+  post "/upload/avatar", to: "uploads/avatar#create"
 
   # Manage accounts, sessions, and more...
   get "/manage", to: "manage#index"
@@ -30,3 +33,9 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 end
+
+Rails.application.routes.default_url_options = {
+  protocol: Masks.uri.scheme,
+  host: Masks.uri.hostname,
+  port: Masks.uri.port,
+}.compact

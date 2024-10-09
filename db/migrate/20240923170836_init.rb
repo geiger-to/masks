@@ -11,6 +11,8 @@ class Init < ActiveRecord::Migration[7.2]
 
     create_table :masks_installations do |t|
       t.text :settings
+      t.datetime :expired_at
+
       t.timestamps
     end
 
@@ -32,6 +34,17 @@ class Init < ActiveRecord::Migration[7.2]
 
       t.index %i[nickname], unique: true
       t.index %i[key], unique: true
+    end
+
+    create_table :masks_emails do |t|
+      t.string :email, null: false
+      t.string :totp
+      t.string :group
+      t.timestamps
+
+      t.references :actor
+
+      t.index %i[email group], unique: true
     end
 
     create_table :masks_events do |t|
@@ -79,7 +92,7 @@ class Init < ActiveRecord::Migration[7.2]
     end
 
     create_table :masks_authorization_codes do |t|
-      t.string :code
+      t.string :code, limit: 64
       t.string :nonce
       t.string :redirect_uri
       t.text :scopes
@@ -94,7 +107,7 @@ class Init < ActiveRecord::Migration[7.2]
     end
 
     create_table :masks_access_tokens do |t|
-      t.string :token
+      t.string :token, limit: 64
       t.string :refresh_token
       t.string :refreshed_token
       t.text :scopes
