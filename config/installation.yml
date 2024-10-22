@@ -1,0 +1,44 @@
+default: &default
+  url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
+  name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
+  secret_key: "<%= ENV['MASKS_SECRET_KEY']  %>"
+  encryption_key: "<%= ENV['MASKS_ENCRYPTION_KEY'] %>"
+  deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
+  salt: "<%= ENV['MASKS_SALT'] %>"
+  email:
+    addresses: false
+    password_reset: false
+    magic_links: false
+  sendmail:
+    location: ~
+  smtp:
+    address: <%= ENV['MASKS_SMTP_ADDRESS'] %>
+    port: <%= ENV['MASKS_SMTP_PORT'] %>
+    domain: <%= ENV['MASKS_SMTP_DOMAIN'] %>
+    user_name: <%= ENV['MASKS_SMTP_USER_NAME'] %>
+    password: <%= ENV['MASKS_SMTP_PASSWORD'] %>
+    authentication: <%= ENV['MASKS_SMTP_MODE'] %>
+  storage:
+    dir: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('storage') %>"
+    s3:
+      access_key_id: <%= ENV['MASKS_AWS_KEY_ID'] %>
+      secret_access_key: <%= ENV['MASKS_AWS_SECRET'] %>
+      region: <%= ENV['MASKS_AWS_BUCKET'] || 'us-east-1' %>
+      bucket: <%= ENV['MASKS_AWS_BUCKET'] %>
+    gcs:
+      project: <%= ENV['MASKS_GCS_PROJECT'] %>
+      credentials: <%= ENV['MASKS_GCS_KEYFILE'] %>
+      bucket: <%= ENV['MASKS_GCS_BUCKET'] %>
+    azure:
+      storage_account_name: <%= ENV['MASKS_AZURE_ACCOUNT'] %>
+      storage_access_key: <%= ENV['MASKS_AZURE_KEY'] %>
+      container: <%= ENV['MASKS_AZURE_CONTAINER'] %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

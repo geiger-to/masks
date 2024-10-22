@@ -1,22 +1,34 @@
 class AuthorizeController < AuthorizedController
+  include HistoryHelper
+
   def new
     history.start!
 
-    @props = { section: "Authorize", auth_id: history.auth_id }
+    @props = { section: "Authorize", auth: history_json }
 
-    headers["X-Masks-Auth-Id"] = history.auth_id
+    unless history.error
+      @props[:auth_id] = history.auth_id
 
-    respond_to { |format| format.html { render "app" } }
+      headers["X-Masks-Auth-Id"] = history.auth_id
+    end
+
+    status =
+      case history.error
+      when nil
+        200
+      else
+        400
+      end
+
+    @props = @props.deep_transform_keys { |key| key.to_s.camelize(:lower) }
+
+    respond_to { |format| format.html { render "app", status: } }
   end
 
   private
 
   def client
     @client ||=
-      if params[:client_id]
-        Masks::Client.find_by(key: params[:client_id])
-      else
-        Masks::Client.default
-      end
+      (Masks::Client.find_by(key: params[:client_id]) if params[:client_id])
   end
 end

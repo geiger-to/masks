@@ -14,35 +14,44 @@ module Masks
                   :error
 
     class << self
-      def perform(history, **opts, &block)
-        request = new(history, **opts, &block)
-        request.perform
+      def authorize(history, &block)
+        request = new(history, &block)
+        request.authorize
         request
       end
     end
 
-    delegate :client, :actor, :device, to: :history
+    delegate :client, :device, to: :history
 
     attr_reader :history
 
-    def initialize(history, **opts, &block)
+    def actor
+      history.actor if history.authenticated?
+    end
+
+    def initialize(history, &block)
       @history = history
       @params = history.oidc_params
       @env = make_env(@params)
+      @block = block
       @app =
         Rack::OAuth2::Server::Authorize.new do |req, res|
-          req.invalid_request!('"redirect_uri" missing') unless req.redirect_uri
+          invalid_redirect_uri!(req) unless req.redirect_uri
 
-          unless client.redirect_uris.any?
-            client.redirect_uris = [req.redirect_uri.to_s]
+          unless client.redirect_uris_a.any?
+            client.redirect_uris = req.redirect_uri.to_s
             client.valid? || invalid_redirect_uri!(req)
           end
 
-          res.redirect_uri = req.verify_redirect_uri!(client.redirect_uris)
+          if client.valid_redirect_uri?(req.redirect_uri)
+            res.redirect_uri = req.verified_redirect_uri = req.redirect_uri.to_s
+          else
+            invalid_redirect_uri!(req)
+          end
 
-          @scopes = req.scope & client.scopes
+          @scopes = req.scope & client.scopes_a
 
-          scopes_required!(req) unless actor&.scopes?(*@scopes)
+          scopes_required!(req) if actor && !actor.scopes?(*@scopes)
 
           if res.protocol_params_location == :fragment && req.nonce.blank?
             nonce_required!(req)
@@ -51,23 +60,19 @@ module Masks
           if client.response_types.include?(
                Array(req.response_type).collect(&:to_s).join(" "),
              )
-            if actor
-              if opts[:approve] || history.authorized? || client.auto_consent?
+            if !@validate && actor
+              if @approve || history.authorized? || client.auto_consent?
                 client.save if client.redirect_uris_changed?
 
                 approved! req, res
                 @approved = true
-
-                history.instance_exec(self, &block)
-              elsif opts[:deny]
-                access_denied!(req)
+              elsif @deny
                 @denied = true
-
-                history.instance_exec(self, &block)
+                access_denied!(req)
               end
             end
           else
-            req.unsupported_response_type!
+            unsupported_response_type!
           end
         end
     end
@@ -77,31 +82,31 @@ module Masks
     end
 
     def denied?
-      @denied || @error
+      @denied || error
     end
 
     def access_denied!(req)
-      @error = "access_denied"
+      self.error = "access_denied"
       req.access_denied!
     end
 
     def nonce_required!(req)
-      @error = "nonce_required"
+      self.error = "nonce_required"
       req.invalid_request! "nonce required"
     end
 
     def scopes_required!(req)
-      @error = "scopes_required"
+      self.error = "scopes_required"
       req.invalid_request! "scopes required"
     end
 
     def invalid_redirect_uri!(req)
-      @error = "invalid_redirect_uri"
+      self.error = "invalid_redirect_uri"
       req.invalid_request!("invalid redirect_uri")
     end
 
     def unsupported_response_type!(req)
-      @error = "unsupported_response_type"
+      self.error = "unsupported_response_type"
       req.unsupported_response_type!
     end
 
@@ -113,8 +118,29 @@ module Masks
       header["Location"]
     end
 
+    def validate!
+      @validate = true
+      perform
+    end
+
+    def authorize!(approve: nil, deny: nil)
+      @validate = false
+      @approve = approve
+      @deny = deny
+
+      perform
+    end
+
     def perform
-      @response ||= @app.call(@env)
+      return if error || @response
+
+      begin
+        @response ||= @app.call(@env)
+      rescue Rack::OAuth2::Server::Authorize::BadRequest => e
+        self.error = e.error.to_s if !error
+      end
+
+      history.instance_exec(self, &@block) if @approved || @denied
     end
 
     def approved!(req, res)
@@ -128,7 +154,7 @@ module Masks
             actor:,
             redirect_uri: res.redirect_uri,
             nonce: req.nonce,
-            scopes:,
+            scopes: scopes.join(" "),
           )
 
         res.code = authorization_code.code
@@ -140,7 +166,7 @@ module Masks
             client:,
             device:,
             actor:,
-            scopes:,
+            scopes: scopes.join(" "),
             authorization_code: @authorization_code,
           )
 

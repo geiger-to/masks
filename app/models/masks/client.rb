@@ -9,18 +9,21 @@ module Masks
 
     self.table_name = "masks_clients"
 
-    has_secure_token :secret
+    has_one_attached :logo do |attachable|
+      attachable.variant :preview,
+                         resize_to_limit: [500, 500],
+                         preprocessed: true
+    end
 
     scope :default, -> { find_by(key: DEFAULT_KEY) }
     scope :manage, -> { find_by(key: MANAGE_KEY) }
 
     validates :name, presence: true
 
+    encrypts :secret
+
     after_initialize :generate_credentials
     before_validation :generate_key, unless: :key, on: :create
-
-    serialize :scopes, coder: JSON
-    serialize :redirect_uris, coder: JSON
 
     validates :key, :secret, presence: true
     validates :key, uniqueness: true
@@ -57,11 +60,23 @@ module Masks
     end
 
     def default_redirect_uri
-      redirect_uris.first
+      redirect_uris_a.first
     end
 
     def redirect_uris
-      super || []
+      super || ""
+    end
+
+    def redirect_uris_a
+      redirect_uris.split("\n")
+    end
+
+    def valid_redirect_uri?(uri)
+      uri = uri.to_s
+
+      return true if redirect_uris_a.include?(uri)
+
+      internal? && uri.start_with?("/")
     end
 
     def subject_types
@@ -85,10 +100,6 @@ module Masks
       else
         []
       end
-    end
-
-    def scopes
-      self[:scopes]
     end
 
     def issuer
@@ -171,7 +182,7 @@ module Masks
       case client_type
       when "internal"
         { redirect_uri: default_redirect_uri }.merge(
-          **params.merge({ response_type: "code", scope: scopes.join(" ") }),
+          **params.merge({ response_type: "code", scope: scopes_a.join(" ") }),
         )
       else
         params
@@ -181,6 +192,7 @@ module Masks
     private
 
     def generate_credentials
+      self.secret ||= SecureRandom.base58(64)
       self.client_type ||= "internal"
       self.subject_type ||= "public"
       self.scopes ||= setting(:openid, :scopes) || []

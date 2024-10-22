@@ -13,21 +13,28 @@ module Masks
       key:,
       name:,
       type:,
-      redirect_uris: [],
+      redirect_uris: nil,
       consent: true,
-      scopes: []
+      scopes: nil,
+      logo: nil
     )
-      Masks::Client.create!(
-        key:,
-        name:,
-        scopes:,
-        redirect_uris:,
-        consent:,
-        client_type: type,
-      )
+      client =
+        Masks::Client.create!(
+          key:,
+          name:,
+          scopes:,
+          redirect_uris:,
+          consent:,
+          client_type: type,
+        )
+
+      if logo
+        client.logo.attach(io: File.open(Rails.root.join(logo)), filename: logo)
+      end
+      client
     end
 
-    def seed_actor(nickname: "manager", password: "password", scopes: [])
+    def seed_actor(nickname:, password: "password", scopes: nil)
       actor = Masks::Actor.new(nickname:)
       actor.password = password
       actor.assign_scopes(*scopes)
@@ -36,7 +43,7 @@ module Masks
     end
 
     def seed_manager(**args)
-      manager = seed_actor(**args)
+      manager = seed_actor(**args, nickname: "manager")
       manager.assign_scopes(Masks::Scoped::MANAGE)
       manager.save!
       manager
@@ -51,11 +58,28 @@ module Masks
           seed_client(
             type: "internal",
             key: Masks::Client::MANAGE_KEY,
-            name: "manage masks",
-            scopes: [Masks::Scoped::MANAGE],
-            redirect_uris: [Masks.url + "/manage"],
+            name: "Manage masks",
+            scopes: Masks::Scoped::MANAGE,
+            redirect_uris: "/manage",
+            logo: "app/assets/images/masks.png",
             consent: false,
           )
+        seed_client(
+          type: "confidential",
+          key: "confidential",
+          name: "Confidential",
+          scopes: "",
+          redirect_uris: "http://localhost:1111/test",
+          consent: true,
+        )
+        seed_client(
+          type: "public",
+          key: "public",
+          name: "Public",
+          scopes: "",
+          redirect_uris: "http://localhost:1111/test",
+          consent: true,
+        )
       end
     end
   end

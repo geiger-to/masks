@@ -6,7 +6,7 @@ module Masks
 
     self.table_name = "masks_authorization_codes"
 
-    has_secure_token :code
+    after_initialize :generate_code
 
     scope :active, -> { where("expires_at >= ?", Time.now.utc) }
 
@@ -15,8 +15,6 @@ module Masks
     belongs_to :actor, class_name: "Masks::Actor"
 
     has_many :access_tokens
-
-    serialize :scopes, coder: JSON
 
     before_validation :generate_expiry
 
@@ -45,6 +43,10 @@ module Masks
     end
 
     private
+
+    def generate_code
+      self.code ||= SecureRandom.base58(64)
+    end
 
     def generate_expiry
       self.expires_at ||= client.code_expires_at

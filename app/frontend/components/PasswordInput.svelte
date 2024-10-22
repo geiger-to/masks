@@ -8,6 +8,7 @@
 
   export let value;
   export let label = null;
+  export let disabled;
 </script>
 
 <label class={`input input-bordered flex items-center gap-3 ${$$props.class}`}>
@@ -21,7 +22,12 @@
     <input type="password" {...$$props} class="grow" bind:value />
   {/if}
   <slot name="right" />
-  <button on:click|preventDefault|stopPropagation={toggle} type="button">
+
+  <button
+    on:click|preventDefault|stopPropagation={toggle}
+    type="button"
+    {disabled}
+  >
     <svelte:component this={visible ? EyeOff : Eye} />
   </button>
 </label>

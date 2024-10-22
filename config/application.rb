@@ -39,5 +39,27 @@ module Masks
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
+
+    # Used for file storage—avatars.
+    config.active_storage.service = "masks"
+    config.active_job.queue_adapter = :good_job unless Rails.env.test?
+
+    # Used for signing values, cookies, etc
+    credentials.secret_key_base = Masks.env.secret_key if Masks
+      .env
+      .secret_key
+      &.present?
+
+    def fake_key
+      "masks-#{Rails.env}" unless Rails.env.production?
+    end
+
+    # Used for ActiveRecord models that encrypt and secure data
+    config.active_record.encryption.primary_key =
+      Masks.env.encryption_key&.presence || fake_key
+    config.active_record.encryption.deterministic_key =
+      Masks.env.deterministic_key&.presence || fake_key
+    config.active_record.encryption.key_derivation_salt =
+      Masks.env.salt&.presence || fake_key
   end
 end

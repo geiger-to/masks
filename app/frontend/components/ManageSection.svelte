@@ -3,6 +3,7 @@
   import PasswordInput from "./PasswordInput.svelte";
   import AddClientComponent from "./AddClientComponent.svelte";
   import AddActorComponent from "./AddActorComponent.svelte";
+  import SettingsCard from "./SettingsCard.svelte";
   import EventCard from "./EventCard.svelte";
   import DeviceCard from "./DeviceCard.svelte";
   import TokenCard from "./TokenCard.svelte";
@@ -22,6 +23,7 @@
     X,
     Plus,
     Search,
+    ChevronLeft,
   } from "lucide-svelte";
   import _ from "lodash-es";
 
@@ -30,40 +32,23 @@
   let isConfiguring;
   let isAdding;
   let isAddOpen;
-  let isIncludeOpen;
+  let isEditing;
   let input;
   let query;
   let result;
   let loading;
-  let includeTokens;
-  let includeCodes;
-  let includeJwts;
-  let includeEvents;
-  let includeDevices;
 
   $: query = queryStore({
     client: getContextClient(),
     query: gql`
-      query (
-        $input: String!
-        $jwts: Boolean
-        $codes: Boolean
-        $tokens: Boolean
-        $devices: Boolean
-        $events: Boolean
-      ) {
-        search(
-          query: $input
-          jwts: $jwts
-          codes: $codes
-          tokens: $tokens
-          devices: $devices
-          events: $events
-        ) {
+      query ($input: String!) {
+        search(query: $input) {
           actors {
+            id
             nickname
             password
             scopes
+            avatar
             lastLoginAt
             createdAt
             updatedAt
@@ -75,6 +60,7 @@
             id
             name
             type
+            logo
             secret
             redirectUris
             scopes
@@ -82,54 +68,11 @@
             createdAt
             updatedAt
           }
-          events {
-            name
-            clientId
-            actorId
-            createdAt
-            device {
-              id
-              name
-              deviceType
-              deviceName
-              osName
-              userAgent
-              ipAddress
-              createdAt
-            }
-          }
-          codes {
-            code
-            nonce
-            scopes
-            redirectUri
-            createdAt
-            expiresAt
-          }
-          tokens {
-            createdAt
-            expiresAt
-          }
-          devices {
-            id
-            name
-            deviceType
-            deviceName
-            osName
-            userAgent
-            ipAddress
-            createdAt
-          }
         }
       }
     `,
     variables: {
       input: input || "",
-      tokens: includeTokens,
-      codes: includeCodes,
-      jwts: includeJwts,
-      devices: includeDevices,
-      events: includeEvents,
     },
     requestPolicy: "network-only",
   });
@@ -139,23 +82,25 @@
     isAddOpen = false;
     isAdding = false;
     isConfiguring = false;
-    isIncludeOpen = false;
+    isEditing = false;
   };
 
   const configuring = () => {
     isAddOpen = false;
     isAdding = false;
-    isIncludeOpen = false;
     isConfiguring = !isConfiguring;
   };
 
   const including = () => {
-    isIncludeOpen = !isIncludeOpen;
     isAddOpen = false;
     isAdding = false;
   };
 
-  const adding = (name) => {
+  let editing = (object) => {
+    isEditing = object;
+  };
+
+  let adding = (name) => {
     return () => {
       isAddOpen = false;
       isConfiguring = false;
@@ -164,13 +109,16 @@
   };
 
   let toggleMenu = () => {
-    if (!isAddOpen && !isAdding) {
-      isAddOpen = true;
-      isAdding = null;
-    } else if (isAdding) {
+    console.log("start", isAddOpen, isAdding);
+
+    if (isAddOpen || isAdding) {
       isAddOpen = false;
       isAdding = null;
+    } else {
+      isAddOpen = true;
+      isAdding = null;
     }
+    console.log("end", isAddOpen, isAdding);
   };
 
   let client = getContextClient();
@@ -200,16 +148,7 @@
   };
 
   let isEmpty = (search) => {
-    return (
-      search &&
-      !search.actors?.length &&
-      !search.clients?.length &&
-      !search.tokens?.length &&
-      !search.codes?.length &&
-      !search.jwts?.length &&
-      !search.devices?.length &&
-      !search.events?.length
-    );
+    return search && !search.actors?.length && !search.clients?.length;
   };
 
   $: autocomplete(input, $query);
@@ -234,10 +173,10 @@
         {/if}
       </button>
 
-      <div class={isAddOpen && !isAdding ? `dropdown dropdown-end` : ""}>
+      <div class={`dropdown ${isAddOpen ? "dropdown-open" : ""} dropdown-end`}>
         <button
           tabindex="0"
-          on:click|preventDefault|stopPropagation={toggleMenu}
+          on:click|stopPropagation|preventDefault={toggleMenu}
           class={`btn ${!isAdding && "focus:btn-success hover:btn-success"} btn-sm px-0 w-8 py-0`}
         >
           {#if isAddOpen || isAdding}
@@ -248,23 +187,25 @@
         </button>
 
         {#if isAddOpen}
-          <ul
-            class="dropdown-content menu bg-white dark:bg-black
+          <div
+            class="dropdown-content bg-white dark:bg-black
         rounded-lg z-[1] p-2 py-1.5 shadow-lg [&>li]:my-1"
           >
-            <li>
-              <button
-                on:click={adding("actor")}
-                class="btn text-lg whitespace-nowrap">new actor</button
-              >
-            </li>
-            <li>
-              <button
-                on:click={adding("client")}
-                class="btn text-lg whitespace-nowrap">new client</button
-              >
-            </li>
-          </ul>
+            <ul class="menu gap-3">
+              <li>
+                <button
+                  on:click|stopPropagation|preventDefault={adding("actor")}
+                  class="btn text-lg whitespace-nowrap">new actor</button
+                >
+              </li>
+              <li>
+                <button
+                  on:click|stopPropagation|preventDefault={adding("client")}
+                  class="btn text-lg whitespace-nowrap">new client</button
+                >
+              </li>
+            </ul>
+          </div>
         {/if}
       </div>
 
@@ -280,30 +221,23 @@
     {:else if isAdding == "client"}
       <AddClientComponent cancel={adding(null)} {search} />
     {:else if isConfiguring}
-      <div class="flex flex-col gap-3 mb-3">
-        <h3 class="font-bold">settings</h3>
-        <label class="input input-bordered flex items-center gap-3">
-          <span class="label-text opacity-70 w-[60px]">address</span>
-          <input
-            type="text"
-            class="grow ml-3"
-            placeholder="e.g. smtp.example.com..."
-          />
-        </label>
-        <label class="input input-bordered flex items-center gap-3">
-          <span class="label-text opacity-70 w-[60px]">port</span>
-          <input
-            type="text"
-            class="grow ml-3"
-            placeholder="e.g. 25, 465 or 587..."
-          />
-        </label>
-        <label class="input input-bordered flex items-center gap-3">
-          <span class="label-text opacity-70 w-[60px]">username</span>
-          <input type="text" class="grow ml-3" placeholder="..." />
-        </label>
-        <PasswordInput label="password" placeholder="..." />
-      </div>
+      <SettingsCard />
+    {:else if isEditing}
+      <button on:click={() => editing(false)}>
+        <div class="flex items-center gap-1.5">
+          <ChevronLeft size="18" />
+
+          <p>
+            back to <span class="italic">search</span>
+          </p>
+        </div>
+      </button>
+
+      {#if isEditing?.actor}
+        <ActorCard {...isEditing} editing />
+      {:else if isEditing?.client}
+        <ClientCard {...isEditing} editing />
+      {/if}
     {:else}
       <div class="">
         <div class="flex items-center join">
@@ -324,77 +258,6 @@
               bind:value={input}
             />
           </label>
-
-          <div class={isIncludeOpen ? `dropdown dropdown-end` : "dropdown"}>
-            <button
-              tabindex="0"
-              disabled={!isOneOf(result)}
-              type="button"
-              class={`btn btn-neutral join-item`}
-              on:click|preventDefault|stopPropagation={including}
-            >
-              {#if isIncludeOpen}
-                <X />
-              {:else}
-                <ListCheck />
-              {/if}
-            </button>
-
-            <ul
-              class={`dropdown-content rounded-lg menu bg-white dark:bg-base-300 mt-1.5 ${!isIncludeOpen ? "hidden" : ""}  rounded-box z-[1] p-2 shadow-lg [&>li]:my-1.5`}
-            >
-              <li>
-                <label class="label cursor-pointer">
-                  <input
-                    type="checkbox"
-                    class="toggle"
-                    bind:checked={includeDevices}
-                  />
-                  <span class="ml-1.5 text-lg font-bold">devices</span>
-                </label>
-              </li>
-              <li>
-                <label class="label cursor-pointer">
-                  <input
-                    type="checkbox"
-                    class="toggle"
-                    bind:checked={includeEvents}
-                  />
-                  <span class="text-lg font-bold">events</span>
-                </label>
-              </li>
-              <li>
-                <label class="label cursor-pointer">
-                  <input
-                    type="checkbox"
-                    class="toggle"
-                    bind:checked={includeCodes}
-                  />
-                  <span class="text-lg font-bold">codes</span>
-                </label>
-              </li>
-              <li>
-                <label class="label cursor-pointer">
-                  <input
-                    type="checkbox"
-                    class="toggle"
-                    bind:checked={includeTokens}
-                  />
-                  <span class="text-lg font-bold">tokens</span>
-                </label>
-              </li>
-              <li>
-                <label class="label cursor-pointer">
-                  <input
-                    type="checkbox"
-                    class="toggle"
-                    bind:checked={includeJwts}
-                  />
-                  <span class="text-lg font-bold">jwts</span>
-                </label>
-              </li>
-            </ul>
-          </div>
         </div>
 
         {#if !input}
@@ -424,62 +287,19 @@
           >
             nothing found
           </div>
-        {:else if result?.actors?.length}
-          {#each result.actors as actor}
-            <ActorCard {actor} />
-          {/each}
-        {:else if result?.clients?.length}
-          {#each result.clients as client}
-            <ClientCard {client} />
-          {/each}
+        {:else}
+          {#if result?.actors?.length}
+            {#each result.actors as actor (actor.id)}
+              <ActorCard {actor} isEditing={editing} />
+            {/each}
+          {/if}
+
+          {#if result?.clients?.length}
+            {#each result.clients as client (client.id)}
+              <ClientCard {client} isEditing={editing} />
+            {/each}
+          {/if}
         {/if}
-
-        <div class="flex flex-col gap-3">
-          {#if result?.tokens?.length}
-            <div class="">
-              <h2 class="font-bold">tokens</h2>
-              {#each result?.tokens as token}
-                <TokenCard {search} {token} />
-              {/each}
-            </div>
-          {/if}
-
-          {#if result?.codes?.length}
-            <div class="">
-              <h2 class="font-bold">codes</h2>
-              {#each result?.codes as code}
-                <CodeCard {search} {code} />
-              {/each}
-            </div>
-          {/if}
-
-          {#if result?.jwts?.length}
-            <div class="">
-              <h2 class="font-bold">jwts</h2>
-              {#each result?.jwts as jwt}
-                <JwtCard {search} {jwt} />
-              {/each}
-            </div>
-          {/if}
-
-          {#if result?.devices?.length}
-            <div class="">
-              <h2 class="font-bold">devices</h2>
-              {#each result?.devices as device}
-                <DeviceCard {search} {device} />
-              {/each}
-            </div>
-          {/if}
-
-          {#if result?.events?.length}
-            <div class="">
-              <h2 class="font-bold">events</h2>
-              {#each result?.events as event}
-                <EventCard {search} {event} />
-              {/each}
-            </div>
-          {/if}
-        </div>
       </div>
     {/if}
   </div>
