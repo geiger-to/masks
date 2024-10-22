@@ -1,13 +1,13 @@
-class AuthorizePublicTokenTest < MasksTestCase
+class AuthorizeConfidentialCodeTest < MasksTestCase
   include AuthorizeHelper
 
   def client
     @client ||=
       Masks::Client.create!(
         name: "test",
-        client_type: "public",
+        client_type: "confidential",
         redirect_uris: "http://example.com/test",
-        consent: true,
+        consent: false,
       )
   end
 
@@ -15,7 +15,6 @@ class AuthorizePublicTokenTest < MasksTestCase
     client.key
   end
 
-  test_authorization response_type: "token",
-                     nonce: SecureRandom.uuid,
+  test_authorization response_type: "code",
                      redirect_uri: "http://example.com/test"
 end

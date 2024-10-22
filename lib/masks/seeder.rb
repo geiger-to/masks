@@ -72,6 +72,14 @@ module Masks
           redirect_uris: "http://localhost:1111/test",
           consent: true,
         )
+        seed_client(
+          type: "public",
+          key: "public",
+          name: "Public",
+          scopes: "",
+          redirect_uris: "http://localhost:1111/test",
+          consent: true,
+        )
       end
     end
   end

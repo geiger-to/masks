@@ -16,6 +16,7 @@ module Masks
     belongs_to :device, class_name: "Masks::Device", optional: true
     belongs_to :actor, class_name: "Masks::Actor", optional: true
 
+    after_initialize :generate_token
     before_validation :generate_defaults
 
     validates :client, presence: true

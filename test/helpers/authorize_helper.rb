@@ -105,7 +105,8 @@ module AuthorizeHelper
     opts = (self.class.defaults || {}).merge(opts)
     assert client
 
-    params = opts.slice(:redirect_uri, :scope, :response_type, :client_id)
+    params =
+      opts.slice(:redirect_uri, :scope, :response_type, :client_id, :nonce)
     params[:client_id] = client_id unless params[:path] || params[:client_id]
 
     get "#{opts.fetch(:path, "/authorize")}?#{params.to_query}"

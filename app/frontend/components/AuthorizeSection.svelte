@@ -12,6 +12,7 @@
   import PromptInvalidRequest from "./PromptInvalidRequest.svelte";
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
   import PromptUnsupportedResponseType from "./PromptUnsupportedResponseType.svelte";
+  import PromptNonceRequired from "./PromptNonceRequired.svelte";
   import PromptAuthorize from "./PromptAuthorize.svelte";
   import { onMount } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
@@ -117,6 +118,7 @@
     invalid_redirect_uri: PromptInvalidRedirectUri,
     access_denied: PromptAccessDenied,
     unsupported_response_type: PromptUnsupportedResponseType,
+    nonce_required: PromptNonceRequired,
   };
 
   $: updateAuth($mutation);
