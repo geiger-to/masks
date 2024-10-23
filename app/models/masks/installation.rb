@@ -8,14 +8,20 @@ module Masks
     scope :active, -> { where(expired_at: nil) }
 
     def name
-      settings[:name] || "masks"
+      settings[:name]
     end
 
-    def modify(updates)
-      self.class.new(
-        settings:
-          updates.slice(:url, :name, :email, :smtp, :sendmail, :storage),
-      )
+    def nicknames?
+      settings.dig("nickname", "enabled")
+    end
+
+    def emails?
+      settings.dig("email", "enabled")
+    end
+
+    def modify!(settings)
+      self.settings = self.settings.deep_merge(settings)
+      self.save!
     end
 
     def settings
@@ -24,6 +30,10 @@ module Masks
 
     def seed!
       save!
+    end
+
+    def public_settings
+      ({ name: }).merge(settings.slice(*%w[nickname email url]))
     end
   end
 end

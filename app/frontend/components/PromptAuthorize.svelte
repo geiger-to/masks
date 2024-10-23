@@ -1,12 +1,11 @@
 <script>
   import PromptHeader from "./PromptHeader.svelte";
-  import PromptNickname from "./PromptNickname.svelte";
+  import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
   import PromptBack from "./PromptBack.svelte";
 
   export let auth;
-  export let nickname;
   export let loading;
   export let startOver;
 </script>
@@ -34,13 +33,7 @@
 </div>
 
 <div class="flex gap-3">
-  <PromptNickname
-    avatarOnly
-    {nickname}
-    avatar={auth.avatar}
-    {startOver}
-    class="mb-3"
-  />
+  <PromptIdentifier avatarOnly {identifier} {auth} {startOver} class="mb-3" />
 
   <PromptContinue
     class="btn-success"

@@ -1,13 +1,11 @@
 <script>
   import { X } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
-  import PromptNickname from "./PromptNickname.svelte";
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
   import PromptBack from "./PromptBack.svelte";
 
   export let auth;
-  export let nickname;
   export let password;
   export let startOver;
 </script>

@@ -10,26 +10,28 @@ class AuthorizeManagerTest < MasksTestCase
   test_authorization path: "/authorize/manage", redirect_uri: "/manage"
 
   test "error for actors lacking appropriate scopes" do
-    authorize path: "/authorize/manage"
+    seeder.seed_actor(nickname: "test", password: "password")
+
+    authorize
 
     assert_error_code "scopes_required",
-                      attempt(nickname: "test", password: "password")
+                      attempt(identifier: "test", password: "password")
     assert_artifacts(devices: 1)
   end
 
   test "redirect to /manage on valid login, sans redirect_uri" do
-    authorize path: "/authorize/manage"
+    authorize
 
-    assert_authorized attempt(nickname: "manager", password: "password"),
+    assert_authorized attempt(identifier: "manager", password: "password"),
                       redirect_uri: "/manage"
     assert_artifacts(codes: 1, devices: 1)
   end
 
   test "deny is ignored for internal clients" do
-    authorize path: "/authorize/manage"
+    authorize
 
     assert_authorized attempt(
-                        nickname: "manager",
+                        identifier: "manager",
                         password: "password",
                         deny: true,
                       ),

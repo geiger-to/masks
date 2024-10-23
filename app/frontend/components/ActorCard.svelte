@@ -19,7 +19,7 @@
         endpoint="/upload/avatar"
         params={{ actor_id: actor.id }}
         src={actor?.avatar}
-        name={actor?.nickname}
+        name={actor?.identiconId}
         class="w-12 h-12"
         disabled={!editing}
       />
@@ -28,7 +28,7 @@
         <div class="font-bold text-lg flex items-center gap-1.5">
           <div class="avatar">
             <div class="w-6 rounded-lg dark:bg-black bg-white">
-              <Identicon nickname={actor.nickname} />
+              <Identicon id={actor.identiconId} />
             </div>
           </div>
           <span>

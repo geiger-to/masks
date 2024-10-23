@@ -27,7 +27,6 @@ module Masks
     attribute :required_scopes
 
     delegate :session, to: :request
-    delegate :nickname, to: :actor, allow_nil: true
 
     validates :actor, :client, :session, :device, presence: true
 
@@ -61,10 +60,9 @@ module Masks
       oidc.validate!
     end
 
-    def resume!(id, nickname = nil)
+    def resume!(id, identifier = nil)
       self.auth_id = id
-      self.actor =
-        Masks::Actor.find_or_initialize_by(nickname: nickname) if nickname
+      self.actor = find_actor(identifier)
 
       return unless actor&.persisted?
 
@@ -123,10 +121,6 @@ module Masks
       @error ||= oidc.error
     end
 
-    def nickname
-      actor&.nickname
-    end
-
     def redirect_uri
       return @redirect_uri if @redirect_uri
 
@@ -164,6 +158,22 @@ module Masks
     def actor
       @actor ||=
         (Masks::Actor.find_by(key: session[:actor_id]) if session[:actor_id])
+    end
+
+    def find_actor(identifier)
+      return unless identifier&.present?
+
+      @identifier = identifier
+
+      if identifier.include?("@") && Masks.installation.emails?
+        Masks::Actor.from_login_email(identifier)
+      elsif Masks.installation.nicknames?
+        Masks::Actor.find_or_initialize_by(nickname: identifier)
+      end
+    end
+
+    def identifier
+      @identifier || actor&.identifier
     end
 
     def actor_session

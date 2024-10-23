@@ -5,6 +5,8 @@ class AuthorizedController < ApplicationController
   before_action :render_404, unless: :client
   before_action :verify_device, unless: :verified_device?
 
+  helper_method :props_json
+
   class << self
     def managers_only(**opts)
       prepend_before_action(**opts) { self.client = Masks::Client.manage }
@@ -22,6 +24,10 @@ class AuthorizedController < ApplicationController
   end
 
   private
+
+  def props_json
+    @props.deep_transform_keys { |key| key.to_s.camelize(:lower) }.to_json
+  end
 
   def client=(value)
     @client = value

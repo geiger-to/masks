@@ -6,6 +6,7 @@ module Types
 
     field :id, ID
     field :nickname, String
+    field :identicon_id, String
     field :scopes, String
     field :avatar, String, null: true
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
@@ -21,9 +22,7 @@ module Types
     end
 
     def avatar
-      if object.avatar.attached?
-        rails_storage_proxy_url(object.avatar.variant(:preview))
-      end
+      object.avatar_url
     end
 
     def scopes

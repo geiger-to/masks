@@ -9,7 +9,7 @@
     "test": "bin/rails test",
     "jobs": "...",
     "dev": "overmind start -f Procfile.dev",
-    "dev:reset": "MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset",
+    "dev:reset": "MASKS_MANAGER_EMAIL=masks@example.com MASKS_MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset",
     "postinstall": "cd docs && npm install"
   },
   "devDependencies": {
