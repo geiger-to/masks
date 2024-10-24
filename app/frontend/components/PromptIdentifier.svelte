@@ -2,13 +2,15 @@
   import Identicon from "./Identicon.svelte";
   import { RotateCcw } from "lucide-svelte";
 
-  export let avatar;
-  export let nickname;
+  export let auth;
+  export let identifier;
   export let startOver = null;
   export let avatarOnly;
+
+  let { avatar, identiconId } = auth;
 </script>
 
-{#if nickname}
+{#if identifier}
   <div
     class={[
       "flex items-center gap-3 bg-neutral text-neutral-content shadow font-bold",
@@ -29,7 +31,7 @@
           {#if avatar}
             <img src={avatar} class="object-cover" />
           {:else}
-            <Identicon {nickname} />
+            <Identicon id={identiconId} />
           {/if}
         </div>
 
@@ -43,7 +45,7 @@
 
     {#if !avatarOnly}
       <div class="text-xl grow mr-3">
-        {nickname}
+        {identifier}
       </div>
     {/if}
   </div>

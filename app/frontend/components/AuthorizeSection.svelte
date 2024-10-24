@@ -33,12 +33,14 @@
             errorMessage
             errorCode
             avatar
-            nickname
+            identifier
+            identiconId
             authenticated
             successful
             settled
             redirectUri
             prompt
+            settings
             client {
               id
               name
@@ -52,11 +54,11 @@
   };
 
   let loading = true;
-  let nickname;
+  let identifier;
   let password;
 
   const startOver = () => {
-    auth.nickname = nickname = null;
+    auth.identifier = identifier = null;
     auth.password = password = null;
     auth.errorCode = null;
     auth.errorMessage = null;
@@ -67,7 +69,7 @@
     return (event) => {
       event.preventDefault();
 
-      if (!args.nickname) {
+      if (!args.identifier) {
         return;
       }
 
@@ -94,7 +96,7 @@
     }
 
     auth = result.data.authorize;
-    nickname = auth?.nickname;
+    identifier = auth?.identifier;
 
     if (auth?.settled) {
       setTimeout(() => {
@@ -126,7 +128,7 @@
 
 <form
   action="#"
-  on:submit={continueAuth({ nickname, password })}
+  on:submit={continueAuth({ identifier, password })}
   class="flex h-full w-full align-items-center items-center p-3"
 >
   <div class="bg-base-300 rounded-xl min-w-full md:min-w-[500px] mx-auto p-10">
@@ -135,7 +137,7 @@
       {auth}
       {startOver}
       {loading}
-      bind:nickname
+      bind:identifier
       bind:password
     />
   </div>

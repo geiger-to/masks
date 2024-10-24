@@ -27,7 +27,9 @@
   } from "lucide-svelte";
   import _ from "lodash-es";
 
-  export let nickname;
+  export let actor;
+
+  let { nickname } = actor;
 
   let isConfiguring;
   let isAdding;
@@ -46,6 +48,7 @@
           actors {
             id
             nickname
+            identiconId
             password
             scopes
             avatar
@@ -209,7 +212,7 @@
         {/if}
       </div>
 
-      <Avatar {nickname} onClick={() => search(`@${nickname}`)} />
+      <Avatar {actor} onClick={() => search(`@${nickname}`)} />
     </div>
   </div>
 

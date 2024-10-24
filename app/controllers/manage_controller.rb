@@ -5,7 +5,10 @@ class ManageController < AuthorizedController
 
   def index
     @theme = "luxury"
-    @props = { section: "Manage", nickname: actor.nickname }
+    @props = {
+      section: "Manage",
+      actor: actor.slice(:identicon_id, :nickname, :login_email, :avatar_url),
+    }
 
     render "app"
   end

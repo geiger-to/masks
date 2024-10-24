@@ -72,7 +72,8 @@ module AuthorizeHelper
           authorize(input: $input) {
             errorMessage
             errorCode
-            nickname
+            identifier
+            identiconId
             authenticated
             successful
             settled
@@ -102,7 +103,7 @@ module AuthorizeHelper
   end
 
   def authorize(**opts)
-    opts = (self.class.defaults || {}).merge(opts)
+    opts = (self.class.authorize_options || {}).merge(opts)
     assert client
 
     params =
@@ -139,11 +140,11 @@ module AuthorizeHelper
     assert_equal jwts, Masks::IdToken.count
   end
 
-  included { cattr_accessor :defaults }
+  included { cattr_accessor :authorize_options }
 
   class_methods do
     def test_authorization(**opts)
-      self.defaults = opts
+      self.authorize_options = opts
 
       test "manage client is returned" do
         authorize
@@ -172,7 +173,7 @@ module AuthorizeHelper
         authorize(redirect_uri: first)
         assert_authorized attempt(
                             approve: true,
-                            nickname: "manager",
+                            identifier: "manager",
                             password: "password",
                           )
         assert_equal(first, client.reload.redirect_uris)
@@ -184,7 +185,7 @@ module AuthorizeHelper
         authorize
 
         assert_authorized attempt(
-                            nickname: "manager",
+                            identifier: "manager",
                             password: "password",
                             approve: true,
                           )
@@ -204,7 +205,7 @@ module AuthorizeHelper
         authorize
 
         assert_authorized attempt(
-                            nickname: "manager",
+                            identifier: "manager",
                             password: "password",
                             approve: true,
                           )
@@ -225,7 +226,7 @@ module AuthorizeHelper
 
         assert_equal "invalid_credentials",
                      attempt(
-                       nickname: "manager",
+                       identifier: "manager",
                        password: "invalid",
                        approve: true,
                      ).parsed_body.dig(*PREFIX, :errorCode)
@@ -239,7 +240,7 @@ module AuthorizeHelper
 
         assert_equal "invalid_credentials",
                      attempt(
-                       nickname: "invalid",
+                       identifier: "invalid",
                        password: "invalid",
                        approve: true,
                      ).parsed_body.dig(*PREFIX, :errorCode)

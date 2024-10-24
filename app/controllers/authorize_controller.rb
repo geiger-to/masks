@@ -20,8 +20,6 @@ class AuthorizeController < AuthorizedController
         400
       end
 
-    @props = @props.deep_transform_keys { |key| key.to_s.camelize(:lower) }
-
     respond_to { |format| format.html { render "app", status: } }
   end
 

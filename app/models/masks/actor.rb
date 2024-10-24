@@ -4,6 +4,17 @@ module Masks
   class Actor < ApplicationRecord
     self.table_name = "masks_actors"
 
+    class << self
+      def from_login_email(email)
+        actor =
+          includes(:emails).where(
+            "emails.email" => email,
+            "emails.group" => Masks::Email::LOGIN_GROUP,
+          ).first
+        actor ||= Masks::Actor.new.tap { |a| a.emails.build(email:) }
+      end
+    end
+
     has_one_attached :avatar do |attachable|
       attachable.variant :preview, resize_to_limit: [350, 350]
     end
@@ -11,6 +22,7 @@ module Masks
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
+    has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
     has_many :events, class_name: "Masks::Event"
@@ -44,6 +56,34 @@ module Masks
     serialize :backup_codes, coder: JSON
 
     include Scoped
+
+    def public_id
+      key
+    end
+
+    def identifier
+      if Masks.installation.nicknames? && nickname
+        nickname
+      elsif Masks.installation.emails? && login_email
+        login_email
+      end
+    end
+
+    def avatar_url
+      if avatar&.attached?
+        Rails.application.routes.url_helpers.rails_storage_proxy_url(
+          avatar.variant(:preview),
+        )
+      end
+    end
+
+    def identicon_id
+      @identicon_id ||= Digest::MD5.hexdigest("identicon-#{key}")
+    end
+
+    def login_email
+      emails.where(group: Masks::Email::LOGIN_GROUP).first
+    end
 
     def version_digest
       return if new_record? || !valid?

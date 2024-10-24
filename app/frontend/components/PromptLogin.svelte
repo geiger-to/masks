@@ -4,9 +4,19 @@
   import { User } from "lucide-svelte";
 
   export let auth;
-  export let nickname;
+  export let identifier;
   export let password;
   export let loading;
+
+  let identifiers = [];
+
+  if (auth.settings?.nickname?.enabled) {
+    identifiers.push("nickname");
+  }
+
+  if (auth.settings?.email?.enabled) {
+    identifiers.push("email address");
+  }
 </script>
 
 <PromptHeader
@@ -18,10 +28,10 @@
   <User />
   <input
     class="w-full"
-    placeholder="enter your nickname..."
+    placeholder={`enter your ${identifiers.join(" or ")}...`}
     type="text"
-    bind:value={nickname}
+    bind:value={identifier}
   />
 </label>
 
-<PromptContinue {loading} disabled={!nickname} />
+<PromptContinue {loading} disabled={!identifier} />

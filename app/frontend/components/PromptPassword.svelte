@@ -1,11 +1,11 @@
 <script>
   import PromptHeader from "./PromptHeader.svelte";
-  import PromptNickname from "./PromptNickname.svelte";
+  import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
 
   export let auth;
-  export let nickname;
+  export let identifier;
   export let password;
   export let loading;
   export let startOver;
@@ -16,11 +16,11 @@
   client={auth.client}
   redirectUri={auth.redirectUri}
 />
-<PromptNickname {nickname} avatar={auth.avatar} {startOver} class="mb-3" />
+<PromptIdentifier {identifier} {auth} {startOver} class="mb-3" />
 <PasswordInput
   class="input-lg mb-6"
   placeholder="your password..."
   bind:value={password}
 />
 
-<PromptContinue {loading} disabled={!nickname} />
+<PromptContinue {loading} disabled={!identifier} />

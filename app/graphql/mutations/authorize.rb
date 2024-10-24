@@ -7,6 +7,8 @@ module Mutations
     include HistoryHelper
 
     field :client, Types::ClientType, null: true
+    field :identicon_id, String, null: true
+    field :identifier, String, null: true
     field :nickname, String, null: true
     field :avatar, String, null: true
     field :authenticated, Boolean, null: true
@@ -20,7 +22,7 @@ module Mutations
 
     def resolve(**args)
       history = context[:history]
-      history.resume!(args[:id], args[:nickname])
+      history.resume!(args[:id], args[:identifier])
       history.authenticate!(args[:password])
       history.authorize!(**args.slice(:approve, :deny))
 

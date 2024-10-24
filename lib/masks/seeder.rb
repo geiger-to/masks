@@ -3,7 +3,7 @@
 # Top-level module for masks.
 module Masks
   class Seeder
-    attr_accessor :manage_client, :manager, :tester
+    attr_accessor :manage_client, :manager
 
     def initialize(env: Rails.env)
       @env = env
@@ -34,8 +34,9 @@ module Masks
       client
     end
 
-    def seed_actor(nickname:, password: "password", scopes: nil)
+    def seed_actor(nickname:, password:, scopes: nil, email: nil)
       actor = Masks::Actor.new(nickname:)
+      actor.emails.build(email:, group: Masks::Email::LOGIN_GROUP) if email
       actor.password = password
       actor.assign_scopes(*scopes)
       actor.save!
@@ -43,7 +44,13 @@ module Masks
     end
 
     def seed_manager(**args)
-      manager = seed_actor(**args, nickname: "manager")
+      manager =
+        seed_actor(
+          **args,
+          nickname: Masks.env.manager.nickname,
+          password: Masks.env.manager.password,
+          email: Masks.env.manager.email,
+        )
       manager.assign_scopes(Masks::Scoped::MANAGE)
       manager.save!
       manager
@@ -52,7 +59,6 @@ module Masks
     def seed_env!
       case @env.to_sym
       when :development, :test
-        self.tester = seed_actor(nickname: "test")
         self.manager = seed_manager
         self.manage_client =
           seed_client(

@@ -20,7 +20,7 @@ class AuthorizeConsentRequiredTest < MasksTestCase
 
   test "prompt=authorize when approval is required" do
     authorize
-    attempt nickname: "manager", password: "password"
+    attempt identifier: "manager", password: "password"
 
     assert_equal "authorize", authorize_result["prompt"]
 
@@ -30,14 +30,14 @@ class AuthorizeConsentRequiredTest < MasksTestCase
 
   test "denial redirects back with an error parameter" do
     authorize
-    attempt nickname: "manager", password: "password", deny: true
+    attempt identifier: "manager", password: "password", deny: true
     assert_includes authorize_result["redirectUri"], "http://example.com/test"
     assert_includes authorize_result["redirectUri"], "error=access_denied"
   end
 
   test "approval redirects back with an authorization code" do
     authorize
-    attempt nickname: "manager", password: "password", approve: true
+    attempt identifier: "manager", password: "password", approve: true
     assert_includes authorize_result["redirectUri"], "http://example.com/test"
     assert_includes authorize_result["redirectUri"], "code="
   end
