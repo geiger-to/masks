@@ -26,7 +26,7 @@ end
 group :test do
   gem "capybara"
   gem "selenium-webdriver"
-  gem "database_cleaner", "~> 2.0"
+  gem "database_cleaner", "~> 2.1"
 end
 
 group :development, :doc do
