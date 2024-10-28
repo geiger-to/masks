@@ -13,9 +13,9 @@
     ].join(" ")}
   >
     <span
-      class="text-red-50 bg-red-700 rounded-full flex w-10 h-10 items-center justify-center text-center"
+      class="text-lg text-red-50 bg-red-700 rounded-lg flex w-7 h-7 items-center justify-center text-center"
     >
-      <svelte:component this={icon} size="26" />
+      <svelte:component this={icon} size="20" />
     </span>
 
     <div><slot>{text}</slot></div>

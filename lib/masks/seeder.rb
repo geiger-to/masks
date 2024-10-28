@@ -36,7 +36,9 @@ module Masks
 
     def seed_actor(nickname:, password:, scopes: nil, email: nil)
       actor = Masks::Actor.new(nickname:)
-      actor.emails.build(email:, group: Masks::Email::LOGIN_GROUP) if email
+      if email
+        actor.emails.build(address: email, group: Masks::Email::LOGIN_GROUP)
+      end
       actor.password = password
       actor.assign_scopes(*scopes)
       actor.save!

@@ -8,7 +8,9 @@
   export let name;
   export let params = {};
   export let uploaded = () => {};
-  export let disabled;
+  export let disabled = false;
+
+  let id = crypto.randomUUID();
 
   let page = getContext("page");
 
@@ -52,8 +54,17 @@
     : null;
 </script>
 
-<div class="flex items-center cursor-pointer justify-center relative group">
-  <label for="file" class={["rounded shadow", $$props.class].join(" ")}>
+<label
+  for={id}
+  class="flex items-center cursor-pointer justify-center gap-1 group"
+>
+  <div
+    class={[
+      "rounded shadow relative",
+      disabled ? "" : "cursor-pointer",
+      $$props.class,
+    ].join(" ")}
+  >
     <div
       class={[
         "bg-black text-white z-10 flex items-center justify-center",
@@ -86,7 +97,7 @@
     </div>
 
     <input
-      id="file"
+      {id}
       class="absolute w-full h-full"
       ref="file"
       type="file"
@@ -95,5 +106,7 @@
       on:change={uploadFile}
       {disabled}
     />
-  </label>
-</div>
+  </div>
+
+  <slot />
+</label>

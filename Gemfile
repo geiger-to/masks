@@ -58,3 +58,5 @@ gem "csv", "~> 3.3"
 gem "recursive-open-struct", "~> 2.0"
 
 gem "image_processing", "~> 1.13"
+
+gem "geocoder", "~> 1.8"

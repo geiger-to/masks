@@ -8,7 +8,14 @@ module Masks
     scope :active, -> { where(expired_at: nil) }
 
     def name
-      settings[:name]
+      settings["name"]
+    end
+
+    def passwords
+      {
+        min: settings.dig("password", "min") || 8,
+        max: settings.dig("password", "max") || 100,
+      }
     end
 
     def nicknames?
@@ -33,7 +40,7 @@ module Masks
     end
 
     def public_settings
-      ({ name: }).merge(settings.slice(*%w[nickname email url]))
+      ({ name:, passwords: }).merge(settings.slice(*%w[nickname email url]))
     end
   end
 end

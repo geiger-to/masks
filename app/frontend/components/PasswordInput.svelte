@@ -17,10 +17,11 @@
   {/if}
 
   {#if visible}
-    <input type="text" {...$$props} class="grow" bind:value />
+    <input type="text" {...$$props} class="min-w-0 grow" bind:value />
   {:else}
-    <input type="password" {...$$props} class="grow" bind:value />
+    <input type="password" {...$$props} class="min-w-0 grow" bind:value />
   {/if}
+
   <slot name="right" />
 
   <button

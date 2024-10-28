@@ -217,6 +217,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
 
   create_table "masks_actors", force: :cascade do |t|
     t.string "key"
+    t.string "name"
     t.string "nickname"
     t.string "password_digest"
     t.string "totp_secret"
@@ -230,8 +231,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "added_totp_secret_at"
     t.datetime "saved_backup_codes_at"
     t.datetime "notified_inactive_at"
+    t.datetime "onboarded_at"
     t.index ["key"], name: "index_masks_actors_on_key", unique: true
     t.index ["nickname"], name: "index_masks_actors_on_nickname", unique: true
+  end
+
+  create_table "masks_addresses", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "address", null: false
+    t.string "latitude"
+    t.string "longitude"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "actor_id"
+    t.index ["actor_id"], name: "index_masks_addresses_on_actor_id"
   end
 
   create_table "masks_authorization_codes", force: :cascade do |t|
@@ -287,15 +300,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
   end
 
   create_table "masks_emails", force: :cascade do |t|
-    t.string "email", null: false
+    t.string "address", null: false
     t.string "totp"
     t.string "group"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "actor_id"
     t.index ["actor_id"], name: "index_masks_emails_on_actor_id"
-    t.index %w[email group],
-            name: "index_masks_emails_on_email_and_group",
+    t.index %w[address group],
+            name: "index_masks_emails_on_address_and_group",
             unique: true
   end
 

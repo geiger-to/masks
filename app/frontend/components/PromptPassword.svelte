@@ -1,4 +1,5 @@
 <script>
+  import { Send, Mail } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
@@ -9,6 +10,30 @@
   export let password;
   export let loading;
   export let startOver;
+  export let denied;
+
+  let email = auth?.settings?.email?.enabled;
+  let label;
+  let min;
+  let max;
+  let valid = false;
+  let placeholder = "your password";
+
+  $: if (auth?.errorCode == "invalid_credentials") {
+    label = "try again";
+  } else {
+    label = "continue";
+  }
+
+  $: min = auth?.settings?.passwords?.min;
+  $: max = auth?.settings?.passwords?.max;
+
+  $: if (min && max) {
+    valid = password && password.length >= min && password.length <= max;
+    placeholder = `${min} to ${max} characters...`;
+  } else {
+    valid = true;
+  }
 </script>
 
 <PromptHeader
@@ -16,11 +41,33 @@
   client={auth.client}
   redirectUri={auth.redirectUri}
 />
-<PromptIdentifier {identifier} {auth} {startOver} class="mb-3" />
+<PromptIdentifier bind:identifier {auth} {startOver} class="mb-3" />
+
 <PasswordInput
+  minlength={min}
+  maxlength={max}
   class="input-lg mb-6"
-  placeholder="your password..."
+  {placeholder}
   bind:value={password}
 />
 
-<PromptContinue {loading} disabled={!identifier} />
+<div class="flex flex-col md:flex-row md:items-center md:gap-6">
+  <PromptContinue
+    {label}
+    {loading}
+    {denied}
+    disabled={!valid}
+    class={denied ? "btn-error" : "btn-primary"}
+  />
+
+  {#if email}
+    <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+
+    <PromptContinue
+      class="px-0 w-auto btn-link text-base-content"
+      event="email"
+    >
+      <Mail size="18" class="text-secondary" /> send an email to log in...
+    </PromptContinue>
+  {/if}
+</div>

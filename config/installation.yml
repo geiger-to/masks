@@ -9,13 +9,13 @@ default: &default
   encryption_key: "<%= ENV['MASKS_ENCRYPTION_KEY'] %>"
   deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
   salt: "<%= ENV['MASKS_SALT'] %>"
+  password:
+    min: 8
+    max: 100
   nickname:
     enabled: true
   email:
     enabled: true
-    addresses: false
-    password_reset: false
-    magic_links: false
   sendmail:
     location: ~
   smtp:

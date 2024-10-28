@@ -66,13 +66,8 @@ module Masks
 
       return unless actor&.persisted?
 
-      if session[:actor_id] != actor.key
-        session[:actor_id] = actor.key
-
-        actor_session[:identified_at] = Time.now.utc.iso8601
-
-        log_event("identified")
-      end
+      actor_session[:identified_at] = Time.now.utc.iso8601
+      log_event("identified")
     end
 
     def authenticate!(password)
@@ -88,9 +83,14 @@ module Masks
       actor.touch(:last_login_at)
 
       log_event("authenticated")
+
+      session[:actor_id] = actor.key if session[:actor_id] != actor.key
     end
 
-    delegate :authorize!, to: :oidc
+    def authorize!(event)
+      oidc.authorize!(event)
+      actor.onboarded! if authorized? && event&.include?("onboard")
+    end
 
     def deny!(error)
       @error = error
@@ -133,12 +133,12 @@ module Masks
       @oidc.scopes - actor.scopes_a
     end
 
-    def settled?
-      (redirect_uri && oidc.error) || successful?
+    def oidc_error?
+      oidc.error&.present?
     end
 
     def successful?
-      authorized? && authenticated? && redirect_uri && !error
+      authorized? && redirect_uri && !error
     end
 
     def authorized?
@@ -153,7 +153,7 @@ module Masks
       !expired_time?(actor_session[:password_expires_at])
     end
 
-    attr_writer :actor
+    attr_accessor :actor
 
     def actor
       @actor ||=
@@ -165,11 +165,18 @@ module Masks
 
       @identifier = identifier
 
-      if identifier.include?("@") && Masks.installation.emails?
-        Masks::Actor.from_login_email(identifier)
-      elsif Masks.installation.nicknames?
-        Masks::Actor.find_or_initialize_by(nickname: identifier)
-      end
+      actor =
+        if identifier.include?("@") && Masks.installation.emails?
+          Masks::Actor.from_login_email(identifier)
+        elsif Masks.installation.nicknames?
+          Masks::Actor.find_or_initialize_by(nickname: identifier)
+        else
+          Masks::Actor.new(identifier: identifier)
+        end
+
+      deny!("invalid_identifier") if actor.new_record? && !actor.valid?
+
+      actor
     end
 
     def identifier

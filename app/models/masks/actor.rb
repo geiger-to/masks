@@ -4,14 +4,20 @@ module Masks
   class Actor < ApplicationRecord
     self.table_name = "masks_actors"
 
+    EMAIL_ID = "email"
+    NICKNAME_ID = "nickname"
+
     class << self
       def from_login_email(email)
         actor =
           includes(:emails).where(
-            "emails.email" => email,
+            "emails.address" => email,
             "emails.group" => Masks::Email::LOGIN_GROUP,
           ).first
-        actor ||= Masks::Actor.new.tap { |a| a.emails.build(email:) }
+        actor ||=
+          Masks::Actor
+            .new(identifier: email)
+            .tap { |a| a.emails.build(address: email) }
       end
     end
 
@@ -41,6 +47,7 @@ module Masks
     after_initialize :generate_key, unless: :key
     before_validation :reset_version, unless: :version
 
+    validates :identifier_type, presence: true
     validates :nickname,
               uniqueness: true,
               format: {
@@ -49,6 +56,7 @@ module Masks
     validates :password, length: { minimum: 8, maximum: 128 }, if: :password
     validates :totp_secret, presence: true, if: :totp_code
     validates :version, presence: true
+    validate :validates_password, if: :password
     validate :validates_totp, if: :totp_code
 
     before_save :regenerate_backup_codes
@@ -57,16 +65,42 @@ module Masks
 
     include Scoped
 
+    def onboarded!
+      touch(:onboarded_at)
+    end
+
+    def onboarded?
+      onboarded_at
+    end
+
     def public_id
       key
     end
 
-    def identifier
+    def identifier_type
       if Masks.installation.nicknames? && nickname
-        nickname
-      elsif Masks.installation.emails? && login_email
-        login_email
+        NICKNAME_ID
+      elsif Masks.installation.emails? && login_email&.valid?
+        EMAIL_ID
       end
+    end
+
+    attr_writer :identifier
+
+    def identifier
+      @identifier ||=
+        begin
+          case identifier_type
+          when EMAIL_ID
+            login_email.address
+          when NICKNAME_ID
+            nickname
+          end
+        end
+    end
+
+    def avatar_created_at
+      avatar.created_at if avatar&.attached?
     end
 
     def avatar_url
@@ -78,7 +112,8 @@ module Masks
     end
 
     def identicon_id
-      @identicon_id ||= Digest::MD5.hexdigest("identicon-#{key}")
+      @identicon_id ||=
+        (Digest::MD5.hexdigest("identicon-#{identifier}") if identifier)
     end
 
     def login_email
@@ -155,6 +190,18 @@ module Masks
 
     def reset_version
       self.version = SecureRandom.hex
+    end
+
+    def validates_password
+      opts = Masks.installation.passwords
+
+      return unless password && opts
+
+      if opts[:min] && password.length < opts[:min]
+        errors.add(:password, :too_short, count: opts[:min])
+      elsif opts[:max] && password.length > opts[:max]
+        errors.add(key, :too_long, count: opts[:max])
+      end
     end
 
     def regenerate_backup_codes

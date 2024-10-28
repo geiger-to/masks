@@ -18,6 +18,15 @@ class AuthorizeIdentifiersTest < MasksTestCase
     refute_authorized
   end
 
+  test "login via nickname when nickname.enabled = false" do
+    Masks.installation.modify!(nickname: { enabled: false })
+
+    authorize
+    attempt(identifier: "manager", password: "password")
+
+    refute_authorized
+  end
+
   test "login via email is only allowed for 'login' group" do
     email = "masks@example.com"
     authorize
@@ -27,7 +36,7 @@ class AuthorizeIdentifiersTest < MasksTestCase
     seeder
       .manager
       .emails
-      .find_by!(email:, group: "login")
+      .find_by!(address: email, group: "login")
       .update_attribute("group", "test")
     authorize
     attempt(identifier: email, password: "password")

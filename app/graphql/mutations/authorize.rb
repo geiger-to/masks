@@ -6,7 +6,9 @@ module Mutations
 
     include HistoryHelper
 
+    field :request_id, String, null: true
     field :client, Types::ClientType, null: true
+    field :actor, Types::ActorType, null: true
     field :identicon_id, String, null: true
     field :identifier, String, null: true
     field :nickname, String, null: true
@@ -24,9 +26,12 @@ module Mutations
       history = context[:history]
       history.resume!(args[:id], args[:identifier])
       history.authenticate!(args[:password])
-      history.authorize!(**args.slice(:approve, :deny))
+      history.authorize!(args[:event])
 
-      history_result(history)
+      result = history_result(history)
+      result[:request_id] = SecureRandom.uuid
+      result[:identifier] ||= args[:identifier]
+      result
     end
   end
 end

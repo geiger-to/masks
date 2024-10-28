@@ -29,6 +29,7 @@
 
 en:
   auth:
+    invalid_identifier: "invalid identifier"
     invalid_credentials: "invalid credentials"
     invalid_request: the request is malformed
     scopes_required: "unauthorized"

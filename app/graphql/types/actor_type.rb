@@ -6,19 +6,27 @@ module Types
 
     field :id, ID
     field :nickname, String
+    field :identifier, String, null: true
+    field :identifier_type, String, null: true
+    field :login_email, String, null: true
     field :identicon_id, String
     field :scopes, String
     field :avatar, String, null: true
+    field :avatar_created_at, GraphQL::Types::ISO8601DateTime, null: true
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
     field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true
     field :password, Boolean
-    field :changed_password_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :password_changed_at, GraphQL::Types::ISO8601DateTime, null: true
     field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
 
     def id
       object.key
+    end
+
+    def login_email
+      object.login_email.address
     end
 
     def avatar
@@ -31,6 +39,10 @@ module Types
 
     def password
       object.password_digest.present?
+    end
+
+    def password_changed_at
+      object.changed_password_at
     end
   end
 end

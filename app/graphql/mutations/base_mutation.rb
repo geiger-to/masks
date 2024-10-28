@@ -12,7 +12,7 @@ module Mutations
     def t(key)
       return unless key
 
-      I18n.t("gql.#{self.class.name.underscore.gsub("/", ".")}.#{key}")
+      I18n.t(key)
     end
   end
 end

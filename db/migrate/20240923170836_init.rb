@@ -18,6 +18,7 @@ class Init < ActiveRecord::Migration[7.2]
 
     create_table :masks_actors do |t|
       t.string :key
+      t.string :name, null: true
       t.string :nickname
       t.string :password_digest
       t.string :totp_secret
@@ -31,20 +32,32 @@ class Init < ActiveRecord::Migration[7.2]
       t.datetime :added_totp_secret_at
       t.datetime :saved_backup_codes_at
       t.datetime :notified_inactive_at
+      t.datetime :onboarded_at
 
       t.index %i[nickname], unique: true
       t.index %i[key], unique: true
     end
 
+    create_table :masks_addresses do |t|
+      t.string :name, null: false
+      t.string :address, null: false
+      t.string :latitude, null: true
+      t.string :longitude, null: true
+
+      t.timestamps
+
+      t.references :actor
+    end
+
     create_table :masks_emails do |t|
-      t.string :email, null: false
+      t.string :address, null: false
       t.string :totp
       t.string :group
       t.timestamps
 
       t.references :actor
 
-      t.index %i[email group], unique: true
+      t.index %i[address group], unique: true
     end
 
     create_table :masks_events do |t|
@@ -74,6 +87,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :key
       t.string :secret
       t.string :client_type
+      t.string :public_url, null: true
       t.text :redirect_uris
       t.text :scopes
       t.boolean :consent

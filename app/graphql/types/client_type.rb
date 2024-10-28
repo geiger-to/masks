@@ -9,6 +9,7 @@ module Types
     field :type, String
     field :secret, String
     field :logo, String
+    field :public_url, String, null: true
     field :redirect_uris, String
     field :response_types, [String]
     field :scopes, String

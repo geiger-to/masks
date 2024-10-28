@@ -5,7 +5,7 @@
 
   let svgURI =
     "data:image/svg+xml;utf8," +
-    encodeURIComponent(minidenticon(`@${id}`, saturation, lightness));
+    encodeURIComponent(minidenticon(id, saturation, lightness));
 </script>
 
 {#key id}

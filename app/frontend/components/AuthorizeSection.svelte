@@ -9,11 +9,13 @@
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
   import PromptScopesRequired from "./PromptScopesRequired.svelte";
   import PromptInvalidCredentials from "./PromptInvalidCredentials.svelte";
+  import PromptInvalidIdentifier from "./PromptInvalidIdentifier.svelte";
   import PromptInvalidRequest from "./PromptInvalidRequest.svelte";
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
   import PromptUnsupportedResponseType from "./PromptUnsupportedResponseType.svelte";
   import PromptNonceRequired from "./PromptNonceRequired.svelte";
   import PromptAuthorize from "./PromptAuthorize.svelte";
+  import PromptOnboard from "./PromptOnboard.svelte";
   import { onMount } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import Time from "svelte-time";
@@ -30,6 +32,7 @@
       query: gql`
         mutation ($input: AuthorizeInput!) {
           authorize(input: $input) {
+            requestId
             errorMessage
             errorCode
             avatar
@@ -41,6 +44,17 @@
             redirectUri
             prompt
             settings
+            actor {
+              id
+              nickname
+              identifier
+              identifierType
+              identiconId
+              loginEmail
+              avatar
+              avatarCreatedAt
+              passwordChangedAt
+            }
             client {
               id
               name
@@ -66,22 +80,19 @@
   };
 
   const continueAuth = (args) => {
-    return (event) => {
-      event.preventDefault();
+    return (e) => {
+      e.preventDefault();
+
+      console.log(args);
 
       if (!args.identifier) {
         return;
       }
 
-      let approve = event.submitter.dataset.approve;
-      let deny = event.submitter.dataset.deny;
+      let eventName = e.submitter.dataset.event;
 
-      if (approve) {
-        args.approve = true;
-      }
-
-      if (deny) {
-        args.deny = true;
+      if (eventName) {
+        args.event = eventName;
       }
 
       authorize(args);
@@ -113,9 +124,11 @@
     login: PromptLogin,
     password: PromptPassword,
     authorize: PromptAuthorize,
+    onboard: PromptOnboard,
     success: PromptSuccess,
     scopes_required: PromptScopesRequired,
     invalid_request: PromptInvalidRequest,
+    invalid_identifier: PromptInvalidIdentifier,
     invalid_credentials: PromptInvalidCredentials,
     invalid_redirect_uri: PromptInvalidRedirectUri,
     access_denied: PromptAccessDenied,
@@ -129,9 +142,11 @@
 <form
   action="#"
   on:submit={continueAuth({ identifier, password })}
-  class="flex h-full w-full align-items-center items-center p-3"
+  class="flex h-full w-full align-items-center items-center p-1.5 md:p-3"
 >
-  <div class="bg-base-300 rounded-xl min-w-full md:min-w-[500px] mx-auto p-10">
+  <div
+    class="bg-base-300 rounded-xl min-w-full md:min-w-[500px] mx-auto p-6 pt-6 md:p-10 shadow"
+  >
     <svelte:component
       this={!auth && loading ? PromptLoading : prompts[auth?.prompt]}
       {auth}

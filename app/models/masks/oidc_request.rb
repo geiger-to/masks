@@ -13,14 +13,6 @@ module Masks
                   :id_token,
                   :error
 
-    class << self
-      def authorize(history, &block)
-        request = new(history, &block)
-        request.authorize
-        request
-      end
-    end
-
     delegate :client, :device, to: :history
 
     attr_reader :history
@@ -123,10 +115,10 @@ module Masks
       perform
     end
 
-    def authorize!(approve: nil, deny: nil)
+    def authorize!(event = nil)
       @validate = false
-      @approve = approve
-      @deny = deny
+      @approve = event&.include?("approve")
+      @deny = event&.include?("deny")
 
       perform
     end

@@ -5,7 +5,6 @@
 
   export let auth;
   export let identifier;
-  export let password;
   export let loading;
 
   let identifiers = [];
@@ -24,6 +23,7 @@
   client={auth.client}
   redirectUri={auth.redirectUri}
 />
+
 <label class="input input-lg flex items-center gap-4 w-full mb-6">
   <User />
   <input
@@ -34,4 +34,8 @@
   />
 </label>
 
-<PromptContinue {loading} disabled={!identifier} />
+<div class="flex flex-col md:flex-row md:items-center md:gap-6">
+  <PromptContinue {loading} disabled={!identifier} class="btn-primary" />
+
+  <slot {identifiers} />
+</div>

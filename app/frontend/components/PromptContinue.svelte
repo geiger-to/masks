@@ -1,20 +1,27 @@
 <script>
   import _ from "lodash-es";
 
+  export let event = null;
   export let loading;
   export let disabled;
   export let label = "continue";
   export let approve;
+  export let denied = false;
+  export let auth;
 </script>
 
 <button
-  class={`btn btn-lg btn-primary ${$$props.class} w-[130px] text-center`}
+  type="submit"
+  class={`btn btn-lg min-w-[130px] ${$$props.class} text-center ${denied ? "animate-denied" : ""}`}
   disabled={loading || disabled}
-  {..._.omit($$props, ["disabled", "class"])}
+  data-event={event}
+  {..._.omit($$props, ["disabled", "class", "type"])}
 >
   {#if loading}
     <span class="loading loading-spinner loading-md mx-auto"></span>
   {:else}
-    {label}
+    <slot>
+      {label}
+    </slot>
   {/if}
 </button>

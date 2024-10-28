@@ -33,14 +33,14 @@
 </div>
 
 <div class="flex gap-3">
-  <PromptIdentifier avatarOnly {identifier} {auth} {startOver} class="mb-3" />
+  <PromptIdentifier avatarOnly {auth} {startOver} class="mb-3" />
 
   <PromptContinue
     class="btn-success"
     label="approve"
-    data-approve="true"
+    data-event="approve"
     {loading}
   />
 
-  <PromptContinue class="btn-error" data-deny="true" label="deny" {loading} />
+  <PromptContinue class="btn-error" data-event="deny" label="deny" {loading} />
 </div>

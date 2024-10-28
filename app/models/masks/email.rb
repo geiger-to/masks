@@ -4,8 +4,12 @@ module Masks
 
     self.table_name = "masks_emails"
 
-    validates :email, presence: true, uniqueness: { scope: :group }
-    validates :email, uniqueness: true
+    validates :address,
+              presence: true,
+              uniqueness: {
+                scope: :group,
+              },
+              email: true
 
     belongs_to :actor
   end

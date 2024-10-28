@@ -172,7 +172,7 @@ module AuthorizeHelper
         client.update_attribute(:redirect_uris, nil)
         authorize(redirect_uri: first)
         assert_authorized attempt(
-                            approve: true,
+                            event: "approve+onboard",
                             identifier: "manager",
                             password: "password",
                           )
@@ -187,7 +187,7 @@ module AuthorizeHelper
         assert_authorized attempt(
                             identifier: "manager",
                             password: "password",
-                            approve: true,
+                            event: "approve+onboard",
                           )
 
         travel_to client.history_expires_at do
@@ -207,7 +207,7 @@ module AuthorizeHelper
         assert_authorized attempt(
                             identifier: "manager",
                             password: "password",
-                            approve: true,
+                            event: "approve+onboard",
                           )
 
         travel_to client.password_expires_at do
@@ -228,7 +228,7 @@ module AuthorizeHelper
                      attempt(
                        identifier: "manager",
                        password: "invalid",
-                       approve: true,
+                       event: "approve+onboard",
                      ).parsed_body.dig(*PREFIX, :errorCode)
 
         refute_authorized
@@ -237,15 +237,14 @@ module AuthorizeHelper
 
       test "invalid_credentials for unknown actors" do
         authorize
-
-        assert_equal "invalid_credentials",
-                     attempt(
-                       identifier: "invalid",
-                       password: "invalid",
-                       approve: true,
-                     ).parsed_body.dig(*PREFIX, :errorCode)
+        attempt(
+          identifier: "invalid",
+          password: "invalid",
+          event: "approve+onboard",
+        ).parsed_body.dig(*PREFIX, :errorCode)
 
         refute_authorized
+        assert_error_code "invalid_credentials"
         assert_artifacts(devices: 1)
       end
     end

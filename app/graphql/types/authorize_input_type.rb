@@ -6,7 +6,6 @@ module Types
     argument :scope, [String], required: false
     argument :identifier, String, required: false
     argument :password, String, required: false
-    argument :approve, Boolean, required: false
-    argument :deny, Boolean, required: false
+    argument :event, String, required: false
   end
 end

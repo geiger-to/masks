@@ -33,7 +33,7 @@ class AuthorizeManagerTest < MasksTestCase
     assert_authorized attempt(
                         identifier: "manager",
                         password: "password",
-                        deny: true,
+                        event: "deny",
                       ),
                       redirect_uri: "/manage"
 
