@@ -60,3 +60,7 @@ gem "recursive-open-struct", "~> 2.0"
 gem "image_processing", "~> 1.13"
 
 gem "geocoder", "~> 1.8"
+
+gem "letter_opener", "~> 1.10"
+
+gem "premailer-rails", "~> 1.12"

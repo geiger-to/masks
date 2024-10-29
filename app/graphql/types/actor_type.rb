@@ -26,7 +26,7 @@ module Types
     end
 
     def login_email
-      object.login_email.address
+      object.login_email&.address
     end
 
     def avatar

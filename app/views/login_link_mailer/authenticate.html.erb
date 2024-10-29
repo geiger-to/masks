@@ -1,0 +1,26 @@
+<%= render "email/header", heading: "Your login link..." %>
+
+<div class="alert border-0 flex text-left gap-3 rounded-lg mb-6 text-xl">
+  <span>👋</span>
+  <span>Press the button below to use your one-time login link.</span>
+</div>
+
+<div class="flex items-center gap-3">
+  <a class="btn btn-primary bg-primary btn-lg" href="<%= @link.accept_url %>">
+    log in
+  </a>
+
+  <span class="opacity-75 ml-1.5">
+  or
+  </span>
+
+  <a class="btn btn-link btn-lg text-neutral-content px-0" href="<%= @link.reset_url %>">
+    reset your password...
+  </a>
+</div>
+
+<div class="divider" />
+
+<p>
+  Your link expires in <%= time_ago_in_words(@link.expires_at) %> (<%= @link.expires_at.in_time_zone(@actor.tz).strftime("%b %d at %l:%M%P %Z") %>).
+</p>

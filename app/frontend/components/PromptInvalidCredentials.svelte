@@ -22,11 +22,6 @@
 </script>
 
 {#key requestId}
-  <PromptPassword
-    {auth}
-    {denied}
-    {...$$props}
-    bind:password
-    bind:identifier
+  <PromptPassword {auth} {denied} {...$$props} bind:password bind:identifier
   ></PromptPassword>
 {/key}

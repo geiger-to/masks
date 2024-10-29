@@ -1,13 +1,18 @@
 <script>
   import Identicon from "./Identicon.svelte";
-  import { RotateCcw } from "lucide-svelte";
+  import { ImageOff, RotateCcw } from "lucide-svelte";
 
   export let auth;
   export let startOver = null;
   export let avatarOnly;
   export let identifier;
+  export let loading;
 
   let { avatar, identiconId } = auth;
+
+  $: avatar = auth.avatar;
+  $: identiconId = auth.identiconId;
+  $: console.log(identiconId);
 </script>
 
 {#if identifier || auth?.identifier}
@@ -25,13 +30,19 @@
       on:click|preventDefault|stopPropagation={startOver}
     >
       <div
-        class={`${avatarOnly ? "w-10" : "w-10"} rounded-lg bg-black m-1 group`}
+        class={`${avatarOnly ? "w-10" : "w-10"} rounded bg-black my-1 group`}
       >
         <div class={startOver ? "group-hover:hidden" : ""}>
           {#if avatar}
             <img src={avatar} class="object-cover" />
+          {:else if identiconId}
+            {#key identiconId}
+              <Identicon id={identiconId} />
+            {/key}
           {:else}
-            <Identicon id={identiconId} />
+            <div class="w-full h-10 flex items-center justify-center">
+              <ImageOff size="18" class="opacity-75" />
+            </div>
           {/if}
         </div>
 

@@ -25,16 +25,22 @@ module Masks
     attribute :client
     attribute :auth_id
     attribute :required_scopes
+    attribute :password
+    attribute :event
 
     delegate :session, to: :request
 
     validates :actor, :client, :session, :device, presence: true
 
+    def path
+      auth_session[:path] if auth_session
+    end
+
     def start!
       return unless client
 
       params =
-        client.oidc_params(
+        client.authorize_params(
           request
             .params
             .slice(
@@ -55,14 +61,24 @@ module Masks
 
       self.auth_id = Digest::SHA256.hexdigest(query)
 
+      auth_session[:path] = request.path
       auth_session[:params] = params
-
-      oidc.validate!
+      auth_session[:login_link] = request.params[
+        :login_link
+      ] if request.params.key?(:login_link)
     end
 
-    def resume!(id, identifier = nil)
+    def resume!(id:, identifier: nil, event: nil, password: nil)
+      @identifier = identifier
+
       self.auth_id = id
-      self.actor = find_actor(identifier)
+      self.actor = find_actor
+      self.event = event
+      self.password = password
+
+      oidc.validate!
+
+      auth_session[:identifier] = identifier if identifier
 
       return unless actor&.persisted?
 
@@ -70,7 +86,21 @@ module Masks
       log_event("identified")
     end
 
-    def authenticate!(password)
+    def authenticate!
+      return unless client
+
+      if attempt_login_link? && login_links?
+        login_link =
+          Masks::LoginLink.create(
+            history: self,
+            email: actor&.login_email,
+            client:,
+          )
+        if login_link.valid?
+          LoginLinkMailer.with(login_link:).authenticate.deliver_later
+        end
+      end
+
       return unless client && password&.present?
 
       unless actor&.authenticate(password)
@@ -87,7 +117,7 @@ module Masks
       session[:actor_id] = actor.key if session[:actor_id] != actor.key
     end
 
-    def authorize!(event)
+    def authorize!
       oidc.authorize!(event)
       actor.onboarded! if authorized? && event&.include?("onboard")
     end
@@ -104,7 +134,7 @@ module Masks
             auth_session[:redirect_uri] = oidc.redirect_uri
 
             if client.internal?
-              auth_session[:redirect_uri] = oidc_params[:redirect_uri]
+              auth_session[:redirect_uri] = params[:redirect_uri]
             end
 
             log_event("authorized")
@@ -124,7 +154,7 @@ module Masks
     def redirect_uri
       return @redirect_uri if @redirect_uri
 
-      authorized? ? auth_session[:redirect_uri] : oidc_params[:redirect_uri]
+      authorized? ? auth_session[:redirect_uri] : params[:redirect_uri]
     end
 
     def required_scopes
@@ -160,10 +190,8 @@ module Masks
         (Masks::Actor.find_by(key: session[:actor_id]) if session[:actor_id])
     end
 
-    def find_actor(identifier)
+    def find_actor
       return unless identifier&.present?
-
-      @identifier = identifier
 
       actor =
         if identifier.include?("@") && Masks.installation.emails?
@@ -180,7 +208,7 @@ module Masks
     end
 
     def identifier
-      @identifier || actor&.identifier
+      @identifier || actor&.identifier || auth_session[:identifier]
     end
 
     def actor_session
@@ -236,8 +264,19 @@ module Masks
       Masks::Event.create!(key:, device:, actor:, client:, **args)
     end
 
-    def oidc_params
+    def params
       auth_session&.fetch(:params, nil) || {}
+    end
+
+    def attempt_login_link?
+      event&.include?("login-link")
+    end
+
+    def login_links?
+      return false unless client && actor&.persisted?
+      return false if authenticated?
+
+      client.login_links.active.where(actor: actor).none?
     end
   end
 end

@@ -23,7 +23,7 @@ module Masks
 
     def initialize(history, &block)
       @history = history
-      @params = history.oidc_params
+      @params = history.params
       @env = make_env(@params)
       @block = block
       @app =

@@ -23,6 +23,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :password_digest
       t.string :totp_secret
       t.string :version
+      t.string :tz
       t.text :backup_codes
       t.text :scopes
 
@@ -58,6 +59,21 @@ class Init < ActiveRecord::Migration[7.2]
       t.references :actor
 
       t.index %i[address group], unique: true
+    end
+
+    create_table :masks_login_links do |t|
+      t.string :token
+      t.text :settings
+
+      t.references :client
+      t.references :email
+      t.references :actor
+
+      t.datetime :revoked_at
+      t.datetime :expires_at
+      t.timestamps
+
+      t.index %i[token], unique: true
     end
 
     create_table :masks_events do |t|

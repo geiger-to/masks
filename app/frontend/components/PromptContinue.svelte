@@ -15,7 +15,7 @@
   class={`btn btn-lg min-w-[130px] ${$$props.class} text-center ${denied ? "animate-denied" : ""}`}
   disabled={loading || disabled}
   data-event={event}
-  {..._.omit($$props, ["disabled", "class", "type"])}
+  {..._.omit($$props, ["disabled", "class", "type", "loading"])}
 >
   {#if loading}
     <span class="loading loading-spinner loading-md mx-auto"></span>

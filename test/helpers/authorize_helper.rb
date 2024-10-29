@@ -25,6 +25,10 @@ module AuthorizeHelper
     refute authorize_result(r).dig(:errorCode)
   end
 
+  def assert_actor(id, r = nil)
+    assert_equal id, authorize_result(r).dig(:actor, :identifier)
+  end
+
   def assert_client(r = nil)
     assert_equal client_id, authorize_result(r).dig(:client, :id)
   end
@@ -79,6 +83,9 @@ module AuthorizeHelper
             settled
             redirectUri
             prompt
+            actor {
+              identifier
+            }
             client {
               id
               name

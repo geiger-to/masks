@@ -9,12 +9,8 @@ module Masks
 
     class << self
       def from_login_email(email)
-        actor =
-          includes(:emails).where(
-            "emails.address" => email,
-            "emails.group" => Masks::Email::LOGIN_GROUP,
-          ).first
-        actor ||=
+        email = Masks::Email.for_login.where(address: email).first
+        email&.actor ||
           Masks::Actor
             .new(identifier: email)
             .tap { |a| a.emails.build(address: email) }
@@ -53,7 +49,6 @@ module Masks
               format: {
                 with: /\A[a-z][a-z0-9\-]+\z/,
               }
-    validates :password, length: { minimum: 8, maximum: 128 }, if: :password
     validates :totp_secret, presence: true, if: :totp_code
     validates :version, presence: true
     validate :validates_password, if: :password
@@ -64,6 +59,17 @@ module Masks
     serialize :backup_codes, coder: JSON
 
     include Scoped
+
+    def tz
+      super || Masks.installation.settings["timezone"]
+    end
+
+    def new_login_link!
+      return unless persisted? && login_email
+
+      link = Masks::LoginLink.create!(email: login_email)
+      link
+    end
 
     def onboarded!
       touch(:onboarded_at)
@@ -117,7 +123,7 @@ module Masks
     end
 
     def login_email
-      emails.where(group: Masks::Email::LOGIN_GROUP).first
+      emails.for_login.first
     end
 
     def version_digest

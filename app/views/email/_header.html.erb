@@ -1,0 +1,25 @@
+<div class="-ml-2 mb-2">
+  <div class="navbar gap-2 px-1">
+    <div class="flex-1">
+      <div class="text-xl flex items-center gap-3">
+        <div class="w-16 h-16 overflow-hidden">
+          <img src="<%= @client.logo_url %>">
+        </div>
+
+        <div class="flex flex-col">
+          <span class="text-white text-3xl font-bold"><%= local_assigns[:heading] %></span>
+          <span class="text-2xl">to <%= @client.name %></span>
+        </div>
+      </div>
+    </div>
+
+    <% if @actor %>
+      <span class="whitespace-nowrap text-lg italic">
+        <span class="not-italic pl-1">
+          as
+        </span>
+        <%= @actor.identifier %>
+      </span>
+    <% end %>
+  </div>
+</div>

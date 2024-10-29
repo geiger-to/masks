@@ -2,6 +2,8 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "watch:email": "tailwindcss -i app/frontend/entrypoints/app.css -o public/email.css -w",
+    "build:email": "tailwindcss -i app/frontend/entrypoints/app.css -o public/email.css",
     "build": "bin/vite build",
     "format": "prettier --write .",
     "lint": "prettier --check .",
@@ -10,6 +12,7 @@
     "jobs": "...",
     "dev": "overmind start -f Procfile.dev",
     "dev:reset": "MASKS_MANAGER_EMAIL=masks@example.com MASKS_MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset",
+    "dev:fresh": "npm run dev:reset && npm run dev",
     "postinstall": "cd docs && npm install"
   },
   "devDependencies": {
@@ -23,6 +26,7 @@
     "vite": "^5.4.7"
   },
   "dependencies": {
+    "@rails/actioncable": "^7.2.102",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@tsconfig/svelte": "^5.0.4",
     "@urql/svelte": "^4.2.1",

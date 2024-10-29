@@ -60,7 +60,7 @@ module HistoryHelper
       elsif result[:authenticated] && !history.authorized?
         "authorize"
       elsif result[:identifier]
-        "password"
+        history.attempt_login_link? ? "login-link" : "password"
       else
         "login"
       end

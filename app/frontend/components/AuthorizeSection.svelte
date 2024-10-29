@@ -1,8 +1,10 @@
 <script>
+  import { createConsumer } from "@rails/actioncable";
   import { AlertTriangle, RotateCcw } from "lucide-svelte";
   import Identicon from "./Identicon.svelte";
   import PasswordInput from "./PasswordInput.svelte";
   import PromptPassword from "./PromptPassword.svelte";
+  import PromptLoginLink from "./PromptLoginLink.svelte";
   import PromptLogin from "./PromptLogin.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import PromptSuccess from "./PromptSuccess.svelte";
@@ -23,6 +25,7 @@
   export let authId;
   export let auth;
 
+  let consumer = createConsumer();
   let client = getContextClient();
   let mutation;
 
@@ -120,9 +123,25 @@
     authorize({});
   }
 
+  onMount(() => {
+    if (!authId) {
+      return;
+    }
+
+    return consumer.subscriptions.create(
+      { channel: "AuthorizeChannel", id: authId },
+      {
+        received(data) {
+          console.log(data);
+        },
+      }
+    );
+  });
+
   let prompts = {
     login: PromptLogin,
     password: PromptPassword,
+    "login-link": PromptLoginLink,
     authorize: PromptAuthorize,
     onboard: PromptOnboard,
     success: PromptSuccess,

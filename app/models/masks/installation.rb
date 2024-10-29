@@ -7,6 +7,10 @@ module Masks
 
     scope :active, -> { where(expired_at: nil) }
 
+    def authorize_delay
+      (settings.dig("authorize", "delay")&.to_i || 0)
+    end
+
     def name
       settings["name"]
     end

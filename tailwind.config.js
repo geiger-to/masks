@@ -28,7 +28,10 @@ export default {
         },
       },
       animation: {
-        denied: "denied 2s infinite",
+        spin: "spin 3s linear infinite",
+        "bounce-some": "bounce 1s 5 reverse",
+        "ping-once": "ping 1s",
+        denied: "denied 1s",
       },
     },
     screens: {

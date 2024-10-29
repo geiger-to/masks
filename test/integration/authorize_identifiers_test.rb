@@ -27,7 +27,18 @@ class AuthorizeIdentifiersTest < MasksTestCase
     refute_authorized
   end
 
-  test "login via email is only allowed for 'login' group" do
+  test "login via email prefers LOGIN_VERIFIED_GROUP" do
+    email = "masks@example.com"
+    seeder.manager.emails.for_login.find_by!(address: email).verify!
+    seeder.seed_actor(nickname: "test1", password: "password", email:) # unverified by default
+
+    authorize
+    attempt(identifier: email, password: "password")
+    assert_authorized
+    assert_actor "manager"
+  end
+
+  test "login via email is allowed for LOGIN_UNVERIFIED_GROUP" do
     email = "masks@example.com"
     authorize
     attempt(identifier: email, password: "password")
@@ -36,11 +47,12 @@ class AuthorizeIdentifiersTest < MasksTestCase
     seeder
       .manager
       .emails
-      .find_by!(address: email, group: "login")
+      .find_by!(address: email, group: Masks::Email::LOGIN_UNVERIFIED_GROUP)
       .update_attribute("group", "test")
     authorize
     attempt(identifier: email, password: "password")
 
     refute_authorized
+    assert_actor "manager"
   end
 end

@@ -11,8 +11,8 @@
   export let loading;
   export let startOver;
   export let denied;
+  export let loginLinks = auth?.settings?.email?.enabled;
 
-  let email = auth?.settings?.email?.enabled;
   let label;
   let min;
   let max;
@@ -51,7 +51,7 @@
   bind:value={password}
 />
 
-<div class="flex flex-col md:flex-row md:items-center md:gap-6">
+<div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <PromptContinue
     {label}
     {loading}
@@ -60,14 +60,16 @@
     class={denied ? "btn-error" : "btn-primary"}
   />
 
-  {#if email}
+  {#if loginLinks}
     <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
 
     <PromptContinue
       class="px-0 w-auto btn-link text-base-content"
-      event="email"
+      event="login-link"
     >
-      <Mail size="18" class="text-secondary" /> send an email to log in...
+      send an email to log in...
     </PromptContinue>
   {/if}
+
+  <slot />
 </div>

@@ -42,6 +42,15 @@ module Masks
              class_name: "Masks::AuthorizationCode",
              inverse_of: :client
     has_many :devices, class_name: "Masks::Device", through: :access_tokens
+    has_many :login_links, class_name: "Masks::LoginLink"
+
+    def logo_url
+      if logo&.attached?
+        Rails.application.routes.url_helpers.rails_storage_proxy_url(
+          logo.variant(:preview),
+        )
+      end
+    end
 
     def to_gqlid
       "client:#{key}"
@@ -154,6 +163,10 @@ module Masks
       save!
     end
 
+    def login_link_expires_at
+      Time.now + ChronicDuration.parse("15 minutes")
+    end
+
     def history_expires_at
       Time.now + ChronicDuration.parse("1 hour")
     end
@@ -178,7 +191,7 @@ module Masks
       Time.now + ChronicDuration.parse(refresh_expires_in)
     end
 
-    def oidc_params(params)
+    def authorize_params(params)
       case client_type
       when "internal"
         { redirect_uri: default_redirect_uri }.merge(

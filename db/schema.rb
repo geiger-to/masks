@@ -222,6 +222,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "password_digest"
     t.string "totp_secret"
     t.string "version"
+    t.string "tz"
     t.text "backup_codes"
     t.text "scopes"
     t.datetime "created_at", null: false
@@ -271,6 +272,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "key"
     t.string "secret"
     t.string "client_type"
+    t.string "public_url"
     t.text "redirect_uris"
     t.text "scopes"
     t.boolean "consent"
@@ -347,6 +349,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "expired_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "masks_login_links", force: :cascade do |t|
+    t.string "token"
+    t.text "settings"
+    t.bigint "client_id"
+    t.bigint "email_id"
+    t.bigint "actor_id"
+    t.datetime "revoked_at"
+    t.datetime "expires_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_masks_login_links_on_actor_id"
+    t.index ["client_id"], name: "index_masks_login_links_on_client_id"
+    t.index ["email_id"], name: "index_masks_login_links_on_email_id"
+    t.index ["token"], name: "index_masks_login_links_on_token", unique: true
   end
 
   create_table "masks_sessions", force: :cascade do |t|

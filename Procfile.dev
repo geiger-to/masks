@@ -2,3 +2,4 @@ vite: bin/vite dev
 docs: bin/jekyll serve --watch --livereload
 web: PORT=1111 bin/rails s
 jobs: bin/bundle exec good_job start
+email: npm run watch:email
