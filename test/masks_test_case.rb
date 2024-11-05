@@ -3,8 +3,10 @@ class MasksTestCase < ActionDispatch::IntegrationTest
     @seeder ||= Masks::Seeder.new
   end
 
+  delegate :manager, :tester, to: :seeder
+
   setup do
-    Masks.env.url = "http://example.com"
+    Masks.env.url = "http://www.example.com"
     Masks.reset!
     Masks.install!
     seeder.seed_env!

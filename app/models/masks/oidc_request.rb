@@ -117,8 +117,8 @@ module Masks
 
     def authorize!(event = nil)
       @validate = false
-      @approve = event&.include?("approve")
-      @deny = event&.include?("deny")
+      @approve = history.event?("approve")
+      @deny = history.event?("deny")
 
       perform
     end

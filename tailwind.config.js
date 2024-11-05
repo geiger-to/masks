@@ -3,6 +3,10 @@ export default {
   theme: {
     extend: {
       keyframes: {
+        fadeIn: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 100 },
+        },
         denied: {
           "0%": {
             transform: "translateX(0)",
@@ -28,6 +32,9 @@ export default {
         },
       },
       animation: {
+        "fade-in-fast": "fadeIn 100ms ease-in",
+        "fade-in-slow": "fadeIn 5s linear",
+        "fade-in": "fadeIn 500ms ease-in",
         spin: "spin 3s linear infinite",
         "bounce-some": "bounce 1s 5 reverse",
         "ping-once": "ping 1s",

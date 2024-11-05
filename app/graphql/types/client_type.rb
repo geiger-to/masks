@@ -13,14 +13,15 @@ module Types
     field :redirect_uris, String
     field :response_types, [String]
     field :scopes, String
+    field :require_consent, Boolean
     field :consent, Boolean
     field :subject_type, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :code_expires_in, String
-    field :id_token_expires_in, String
-    field :access_token_expires_in, String
-    field :refresh_expires_in, String
+
+    Masks::Client::LIFETIME_COLUMNS.each { |col| field col, String }
+
+    Masks::Client::BOOLEAN_COLUMNS.each { |col| field col, Boolean }
 
     def id
       object.key

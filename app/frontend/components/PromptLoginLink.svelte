@@ -1,19 +1,106 @@
 <script>
-  import { Send, MailSearch as Mail } from "lucide-svelte";
-  import PromptPassword from "./PromptPassword.svelte";
+  import { Unlink, Link, Send, Mail } from "lucide-svelte";
+  import PromptHeader from "./PromptHeader.svelte";
+  import PromptIdentifier from "./PromptIdentifier.svelte";
+  import PromptContinue from "./PromptContinue.svelte";
+  import { onDestroy } from "svelte";
+
+  export let auth;
+  export let identifier;
+  export let loading;
+  export let startOver;
+  export let denied;
+  export let authorize;
+
+  let seconds = 5;
+  let continuing = false;
+  let cancelled;
+  let button;
+  let done;
+  let invalidCode;
+
+  $: invalidCode = auth?.warnings?.includes("invalid-code");
+
+  let countdown = setInterval(() => {
+    seconds = seconds - 1;
+
+    if (seconds == 0) {
+      continuing = true;
+      clearInterval(countdown);
+    }
+  }, 1000);
+
+  $: if (seconds == 0 && !cancelled && !done && !invalidCode) {
+    setTimeout(() => {
+      authorize({ event: "login-link:verify" });
+
+      done = true;
+    }, 500);
+  }
+
+  let cancel = () => {
+    clearInterval(countdown);
+    seconds = 0;
+    cancelled = true;
+  };
+
+  onDestroy(() => {
+    if (countdown) {
+      clearInterval(countdown);
+    }
+  });
 </script>
 
-<PromptPassword loginLinks={false} {...$$props}>
-  <div class="ml-3 md:mt-0 mt-3">
-    <div class="flex font-bold items-center gap-1.5 text-lg">
-      <div class="rounded p-0.5 relative">
-        <Mail size="15" class="text-info z-20" />
-      </div>
-      <span>Check your email...</span>
-    </div>
+<PromptHeader
+  heading={invalidCode
+    ? "Invalid login link..."
+    : cancelled
+      ? "Press continue to log in..."
+      : "Verifying your login link..."}
+  client={auth.client}
+/>
+<PromptIdentifier
+  identifier={auth?.actor?.loginEmail}
+  alternate={auth?.actor?.nickname}
+  {auth}
+  class="my-6 pr-3"
+>
+  <svelte:component
+    this={invalidCode ? Unlink : Link}
+    class={`mr-1.5 ${invalidCode ? "text-error" : ""} ${!cancelled && !done ? "animate-pulse" : ""}`}
+  />
+</PromptIdentifier>
 
-    <p class="text-xs opacity-75 max-w-[250px]">
-      Follow the login link in your email to log in without your password.
-    </p>
-  </div>
-</PromptPassword>
+<div class="flex flex-col md:flex-row md:items-center md:gap-4">
+  <PromptContinue
+    bind:element={button}
+    {loading}
+    disabled={!cancelled}
+    class={`min-w-[150px] ${invalidCode ? "animate-denied btn-error" : "btn-primary"}`}
+    event="login-link:verify"
+  >
+    {invalidCode ? "failed" : !cancelled ? "verifying" : "verify"}
+
+    {#if seconds > 0}
+      <span class="opacity-75">in {seconds || ""}</span>
+    {/if}
+  </PromptContinue>
+
+  {#if !invalidCode}
+    {#if !cancelled}
+      <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+
+      <button
+        on:click|preventDefault|stopPropagation={cancel}
+        class="px-0 !min-w-0 btn-link text-base-content"
+      >
+        cancel
+      </button>
+    {:else}
+      <span class="opacity-75 max-w-[300px] ml-3 text-sm">
+        Your login link will expire soon. If you don't recognize it, delete the
+        original email and close this window.
+      </span>
+    {/if}
+  {/if}
+</div>

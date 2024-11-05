@@ -9,6 +9,7 @@ module Mutations
     field :request_id, String, null: true
     field :client, Types::ClientType, null: true
     field :actor, Types::ActorType, null: true
+    field :login_link, Types::LoginLinkType, null: true
     field :identicon_id, String, null: true
     field :identifier, String, null: true
     field :nickname, String, null: true
@@ -19,6 +20,7 @@ module Mutations
     field :redirect_uri, String, null: true
     field :error_message, String, null: true
     field :error_code, String, null: true
+    field :warnings, [String], null: false
     field :prompt, String, null: false
     field :settings, GraphQL::Types::JSON, null: true
 
@@ -26,9 +28,7 @@ module Mutations
       delay = Masks.installation.authorize_delay
       starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
       history = context[:history]
-      history.resume!(**args)
-      history.authenticate!
-      history.authorize!
+      history.authenticate!(**args)
 
       result = history_result(history)
       result[:request_id] = SecureRandom.uuid

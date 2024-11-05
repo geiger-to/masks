@@ -6,6 +6,38 @@ module Masks
 
     MANAGE_KEY = "manage"
     DEFAULT_KEY = "default"
+    LIFETIME_COLUMNS = %i[
+      code_expires_in
+      id_token_expires_in
+      access_token_expires_in
+      refresh_expires_in
+      login_link_expires_in
+      auth_attempt_expires_in
+      auth_via_login_link_expires_in
+      auth_via_password_expires_in
+      email_verification_expires_in
+    ]
+
+    BOOLEAN_COLUMNS = %i[
+      require_consent
+      require_onboarded_actor
+      require_verified_email
+      allow_passwords
+      allow_login_links
+    ]
+
+    SETTING_COLUMNS = [
+      *LIFETIME_COLUMNS,
+      *BOOLEAN_COLUMNS,
+      :client_type,
+      :subject_type,
+      :identifier_attempts,
+      :password_attempts,
+      :login_code_attempts,
+      :login_link_attempts,
+      :verify_code_attempts,
+      :verify_email_attempts,
+    ]
 
     self.table_name = "masks_clients"
 
@@ -145,7 +177,7 @@ module Masks
     end
 
     def auto_consent?
-      internal? || !consent
+      internal? || !require_consent
     end
 
     def pairwise_subject?
@@ -163,16 +195,24 @@ module Masks
       save!
     end
 
+    def email_verification_duration
+      ChronicDuration.parse(email_verification_expires_in)
+    end
+
+    def auth_via_login_link_expires_at
+      Time.now + ChronicDuration.parse(auth_via_login_link_expires_in)
+    end
+
+    def auth_via_password_expires_at
+      Time.now + ChronicDuration.parse(auth_via_password_expires_in)
+    end
+
     def login_link_expires_at
-      Time.now + ChronicDuration.parse("15 minutes")
+      Time.now.utc + ChronicDuration.parse(login_link_expires_in)
     end
 
-    def history_expires_at
-      Time.now + ChronicDuration.parse("1 hour")
-    end
-
-    def password_expires_at
-      Time.now + ChronicDuration.parse("1 day")
+    def auth_attempt_expires_at
+      Time.now + ChronicDuration.parse(auth_attempt_expires_in)
     end
 
     def code_expires_at
@@ -206,8 +246,6 @@ module Masks
 
     def generate_credentials
       self.secret ||= SecureRandom.base58(64)
-      self.client_type ||= "internal"
-      self.subject_type ||= "public"
       self.scopes ||= setting(:openid, :scopes) || []
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
       self.sector_identifier ||=
@@ -216,10 +254,8 @@ module Masks
         rescue StandardError
           "masks"
         end
-      self.code_expires_in ||= "12 hours"
-      self.access_token_expires_in ||= "1 day"
-      self.id_token_expires_in ||= "1 hour"
-      self.refresh_expires_in ||= "1 week"
+
+      SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:client, key) }
     end
 
     def generate_key
@@ -237,14 +273,10 @@ module Masks
     end
 
     def validate_expiries
-      %i[
-        code_expires_in
-        id_token_expires_in
-        access_token_expires_in
-        refresh_expires_in
-      ].each do |param|
-        value = send(param)
-        errors.add(param, :invalid) unless value && ChronicDuration.parse(value)
+      LIFETIME_COLUMNS.each do |param|
+        unless self[param] && ChronicDuration.parse(self[param])
+          errors.add(param, :invalid)
+        end
       end
     end
   end

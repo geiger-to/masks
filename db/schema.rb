@@ -228,7 +228,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "last_login_at"
-    t.datetime "changed_password_at"
+    t.datetime "password_changed_at"
     t.datetime "added_totp_secret_at"
     t.datetime "saved_backup_codes_at"
     t.datetime "notified_inactive_at"
@@ -275,14 +275,28 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "public_url"
     t.text "redirect_uris"
     t.text "scopes"
-    t.boolean "consent"
+    t.boolean "require_consent"
+    t.boolean "require_verified_email"
+    t.boolean "require_onboarded_actor"
+    t.boolean "allow_passwords"
+    t.boolean "allow_login_links"
     t.string "subject_type"
     t.string "sector_identifier"
-    t.string "session_expires_in"
     t.string "code_expires_in"
     t.string "id_token_expires_in"
     t.string "access_token_expires_in"
     t.string "refresh_expires_in"
+    t.string "login_link_expires_in"
+    t.string "auth_attempt_expires_in"
+    t.string "auth_via_login_link_expires_in"
+    t.string "auth_via_password_expires_in"
+    t.string "email_verification_expires_in"
+    t.integer "identifier_attempts"
+    t.integer "password_attempts"
+    t.integer "login_code_attempts"
+    t.integer "login_link_attempts"
+    t.integer "verify_code_attempts"
+    t.integer "verify_email_attempts"
     t.text "rsa_private_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -303,8 +317,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
 
   create_table "masks_emails", force: :cascade do |t|
     t.string "address", null: false
-    t.string "totp"
     t.string "group"
+    t.string "otp_secret"
+    t.datetime "last_otp_at"
+    t.datetime "verified_at"
+    t.datetime "verification_sent_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "actor_id"
@@ -353,18 +370,26 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
 
   create_table "masks_login_links", force: :cascade do |t|
     t.string "token"
+    t.string "code"
+    t.boolean "log_in", default: false, null: false
     t.text "settings"
     t.bigint "client_id"
     t.bigint "email_id"
     t.bigint "actor_id"
+    t.bigint "device_id"
     t.datetime "revoked_at"
     t.datetime "expires_at"
+    t.datetime "authenticated_at"
+    t.datetime "reset_password_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_login_links_on_actor_id"
     t.index ["client_id"], name: "index_masks_login_links_on_client_id"
+    t.index %w[code email_id device_id client_id],
+            name: "idx_on_code_email_id_device_id_client_id_2f61fce223",
+            unique: true
+    t.index ["device_id"], name: "index_masks_login_links_on_device_id"
     t.index ["email_id"], name: "index_masks_login_links_on_email_id"
-    t.index ["token"], name: "index_masks_login_links_on_token", unique: true
   end
 
   create_table "masks_sessions", force: :cascade do |t|

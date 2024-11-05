@@ -64,3 +64,5 @@ gem "geocoder", "~> 1.8"
 gem "letter_opener", "~> 1.10"
 
 gem "premailer-rails", "~> 1.12"
+
+gem "apollo_upload_server", "~> 2.1"

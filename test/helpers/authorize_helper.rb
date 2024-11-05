@@ -197,11 +197,11 @@ module AuthorizeHelper
                             event: "approve+onboard",
                           )
 
-        travel_to client.history_expires_at do
+        travel_to client.auth_attempt_expires_at do
           assert_authorized attempt
         end
 
-        travel_to client.history_expires_at + 1.second do
+        travel_to client.auth_attempt_expires_at + 1.second do
           refute_authorized attempt
         end
       end

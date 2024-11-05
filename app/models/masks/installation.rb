@@ -7,6 +7,11 @@ module Masks
 
     scope :active, -> { where(expired_at: nil) }
 
+    def setting(*names, default: nil)
+      setting = settings.dig(*names.map(&:to_s))
+      setting || default
+    end
+
     def authorize_delay
       (settings.dig("authorize", "delay")&.to_i || 0)
     end
@@ -17,17 +22,21 @@ module Masks
 
     def passwords
       {
-        min: settings.dig("password", "min") || 8,
-        max: settings.dig("password", "max") || 100,
+        min: setting("password", "min", default: 8),
+        max: setting("password", "max", default: 100),
       }
     end
 
     def nicknames?
-      settings.dig("nickname", "enabled")
+      setting("nickname", "enabled")
     end
 
     def emails?
-      settings.dig("email", "enabled")
+      setting("email", "enabled")
+    end
+
+    def login_links?
+      emails? && setting(:login_link, :enabled)
     end
 
     def modify!(settings)

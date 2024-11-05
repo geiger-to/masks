@@ -1,26 +1,22 @@
-<%= render "email/header", heading: "Your login link..." %>
+<%= render "email/header", heading: "Your login code..." %>
 
-<div class="alert border-0 flex text-left gap-3 rounded-lg mb-6 text-xl">
+<div class="flex text-left gap-3 my-6 text-xl">
   <span>👋</span>
-  <span>Press the button below to use your one-time login link.</span>
+  <span>Enter the <%= @link.chars %>-character code below to log in without using a password:</span>
 </div>
 
-<div class="flex items-center gap-3">
-  <a class="btn btn-primary bg-primary btn-lg" href="<%= @link.accept_url %>">
-    log in
-  </a>
+<div class="rounded-lg p-12 mb-6 text-5xl bg-base-100 text-white font-mono font-bold shadow tracking-widest">
+  <div class="mx-auto text-center">
+    <%= @link.code %>
+  </div>
+</div>
 
-  <span class="opacity-75 ml-1.5">
-  or
-  </span>
-
-  <a class="btn btn-link btn-lg text-neutral-content px-0" href="<%= @link.reset_url %>">
-    reset your password...
-  </a>
+<div class="text-xl">
+  You can also <a class="underline" href="<%= @link.accept_url %>">click here</a> to log in automatically, provided you're opening this e-mail on the same device you're authorizing.
 </div>
 
 <div class="divider" />
 
 <p>
-  Your link expires in <%= time_ago_in_words(@link.expires_at) %> (<%= @link.expires_at.in_time_zone(@actor.tz).strftime("%b %d at %l:%M%P %Z") %>).
+  Your login code expires in <%= time_ago_in_words(@link.expires_at) %> (<%= @link.expires_at.in_time_zone(@actor.tz).strftime("%b %d at %l:%M%P %Z") %>).
 </p>

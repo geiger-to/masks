@@ -2,7 +2,7 @@ class AuthorizeController < AuthorizedController
   include HistoryHelper
 
   def new
-    history.start!
+    history.authorize!
 
     @props = { section: "Authorize", auth: history_json }
 

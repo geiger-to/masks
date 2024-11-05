@@ -13,6 +13,10 @@ module Masks
       env.url
     end
 
+    def setting(*args, **opts)
+      installation.setting(*args, **opts)
+    end
+
     def installation
       @installation ||=
         Masks::Installation.active.last ||

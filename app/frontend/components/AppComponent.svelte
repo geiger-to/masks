@@ -12,6 +12,8 @@
 
   let csrf = document.querySelector('meta[name="csrf-token"]').content;
 
+  console.log(csrf);
+
   function fetchOptions(csrf, options) {
     const update = { ...options };
 
@@ -32,7 +34,7 @@
   export let section;
 
   const graphql = new Client({
-    url: "/graphql",
+    url: `/graphql${window.location.search}`,
     exchanges: [cacheExchange, fetchExchange],
     fetchOptions: () => {
       return {

@@ -74,8 +74,8 @@
       >
         <div class="text-xs" slot="right">
           <span class="italic">
-            {#if actor.changedPasswordAt}
-              changed <Time timestamp={actor.changedPasswordAt} />
+            {#if actor.passwordChangedAt}
+              changed <Time timestamp={actor.passwordChangedAt} />
             {:else if actor.password}
               never changed
             {:else}

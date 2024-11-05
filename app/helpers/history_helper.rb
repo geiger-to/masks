@@ -17,6 +17,7 @@ module HistoryHelper
       identifier: actor.identifier,
       identifier_type: actor.identifier_type,
       login_email: actor.login_email&.address,
+      login_emails: map_emails(actor.emails.for_login),
       avatar: actor.avatar_url,
       avatar_created_at: actor.avatar_created_at,
     } if actor
@@ -25,6 +26,9 @@ module HistoryHelper
       actor.avatar.variant(:preview),
     ) if actor&.avatar&.attached?
 
+    result[:login_link] = result[:login_link]&.slice(:expires_at) if result[
+      :login_link
+    ]
     result
   end
 
@@ -41,30 +45,34 @@ module HistoryHelper
       authenticated: history.authenticated?,
       successful: history.successful?,
       redirect_uri: history.redirect_uri,
+      warnings: history.warnings,
       error_code: history.error,
       error_message: history.error ? t("auth.#{history.error}") : nil,
       settings: Masks.installation.public_settings,
+      login_link: history.login_link,
     }
 
-    onboarded = actor&.onboarded?
     settled =
-      (history.successful? && onboarded) ||
-        (history.redirect_uri && history.oidc_error?)
+      history.successful? || (history.redirect_uri && history.oidc_error?)
     prompt =
       if result[:error_code]
         result[:error_code]
-      elsif result[:successful] && !actor.onboarded?
-        "onboard"
       elsif result[:successful]
         "success"
       elsif result[:authenticated] && !history.authorized?
         "authorize"
-      elsif result[:identifier]
-        history.attempt_login_link? ? "login-link" : "password"
       else
-        "login"
+        history.authenticator_prompt || "login"
       end
 
-    result.merge(prompt:, settled:, actor: history.authenticated? ? actor : nil)
+    result[:actor] = actor if history.leak_actor?
+
+    result.merge(prompt:, settled:)
+  end
+
+  def map_emails(emails)
+    emails.map do |email|
+      { address: email.address, verified_at: email.verified_at }
+    end
   end
 end

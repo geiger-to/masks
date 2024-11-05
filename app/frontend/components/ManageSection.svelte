@@ -55,7 +55,7 @@
             lastLoginAt
             createdAt
             updatedAt
-            changedPasswordAt
+            passwordChangedAt
             addedTotpSecretAt
             savedBackupCodesAt
           }
@@ -112,8 +112,6 @@
   };
 
   let toggleMenu = () => {
-    console.log("start", isAddOpen, isAdding);
-
     if (isAddOpen || isAdding) {
       isAddOpen = false;
       isAdding = null;
@@ -121,7 +119,6 @@
       isAddOpen = true;
       isAdding = null;
     }
-    console.log("end", isAddOpen, isAdding);
   };
 
   let client = getContextClient();

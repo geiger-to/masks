@@ -10,15 +10,41 @@ default: &default
   encryption_key: "<%= ENV['MASKS_ENCRYPTION_KEY'] %>"
   deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
   salt: "<%= ENV['MASKS_SALT'] %>"
+  client:
+    client_type: internal
+    subject_type: public
+    id_token_expires_in: "1 hour"
+    access_token_expires_in: "1 day"
+    code_expires_in: "12 hours"
+    refresh_expires_in: "1 week"
+    login_link_expires_in: "10 minutes"
+    auth_attempt_expires_in: "2 hours"
+    auth_via_login_link_expires_in: "12 hours"
+    auth_via_password_expires_in: "1 day"
+    email_verification_expires_in: "1 year"
+    verify_email_attempts: 2
+    verify_code_attempts: 5
+    login_link_attempts: 2
+    login_code_attempts: 5
+    password_attempts: 5
+    require_consent: false
+    require_verified_email: false
+    require_onboarded_actor: false
+    allow_passwords: true
+    allow_login_links: true
   authorize:
     delay: 100
   password:
     min: 8
     max: 100
+    change_cooldown: "15 minutes"
   nickname:
     enabled: true
   email:
     enabled: true
+    max_for_login: 5
+    otp_interval: 60
+    otp_drift: 60
   sendmail:
     location: ~
   smtp:

@@ -11,15 +11,21 @@
   export let disabled = false;
 
   let id = crypto.randomUUID();
-
   let page = getContext("page");
+  let uploadedSrc;
 
   let uploadFile = (e) => {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      uploadedSrc = e.target.result;
+    };
+    reader.readAsDataURL(file);
+
     if (!endpoint) {
-      return;
+      return uploaded(file);
     }
 
-    const file = e.target.files[0];
     const formData = new FormData();
 
     Object.entries(params).forEach(([k, v]) => formData.append(k, v));
@@ -32,6 +38,8 @@
         body: formData,
       })
       .then(async (response) => {
+        console.log(response);
+
         if (response.ok) {
           let json = await response.json();
 
@@ -52,6 +60,8 @@
         .toUpperCase()
         .slice(0, 2)
     : null;
+
+  $: console.log(src, uploadedSrc);
 </script>
 
 <label
@@ -77,8 +87,10 @@
 
     <div class="avatar placeholder">
       <div class="bg-neutral text-neutral-content rounded text-center">
-        {#if src}
-          <img {src} class="object-cover" />
+        {#if src || uploadedSrc}
+          {#key src || uploadedSrc}
+            <img src={uploadedSrc || src} class="object-cover" />
+          {/key}
         {:else}
           <span
             class={[

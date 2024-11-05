@@ -1,6 +1,12 @@
 <script>
+  import _ from "lodash-es";
   import {
+    AlertTriangle,
+    Lock,
+    Send,
     User,
+    UserRoundPen,
+    UserRoundCheck,
     UserCheck,
     Mail,
     MessagesSquare,
@@ -11,9 +17,12 @@
     LockKeyhole,
     LockKeyholeOpen,
     Contact,
+    MailPlus,
   } from "lucide-svelte";
 
   import Time from "svelte-time";
+  import Alert from "./Alert.svelte";
+  import OnboardEmail from "./OnboardEmail.svelte";
   import Identicon from "./Identicon.svelte";
   import EditableImage from "./EditableImage.svelte";
   import PromptHeader from "./PromptHeader.svelte";
@@ -25,51 +34,93 @@
   export let auth;
   export let loading;
   export let startOver;
+  export let authorize;
+  export let updates;
 
-  let actor;
-
+  let actor = auth?.actor;
+  let name = actor?.name;
+  let nickname = actor?.nickname;
+  let loginEmail = actor?.loginEmail;
+  let newEmail;
+  let addingEmail;
+  let password;
   let avatarUploaded;
+  let nicknameEnabled;
   let emailEnabled;
-  let emailAdded;
   let installName;
   let secondIdentifierType;
+  let nameUpdated = false;
+  let nameTimeout;
+  let newPassword;
+  let validPassword;
+  let passwordChanged;
+
+  let uploadAvatar = (file) => {
+    authorize({
+      event: "onboard:avatar",
+      upload: file,
+    });
+  };
 
   $: installName = auth?.settings?.name;
   $: actor = auth.actor;
   $: emailEnabled = auth?.settings?.email?.enabled;
-  $: emailAdded = emailEnabled && actor.loginEmail;
+  $: nicknameEnabled = auth?.settings?.nickname?.enabled;
   $: avatarUploaded = actor.avatar;
+
+  let updateName = _.debounce((e) => {
+    authorize({
+      event: "onboard:profile",
+      updates: { name: e.target.value },
+    });
+
+    nameUpdated = true;
+
+    if (nameTimeout) {
+      clearTimeout(nameTimeout);
+    }
+
+    nameTimeout = setTimeout(() => {
+      nameUpdated = false;
+    }, 5000);
+  }, 750);
+
+  let changePassword = () => {
+    authorize({
+      event: "onboard:profile",
+      updates: { password: newPassword },
+    });
+
+    passwordChanged = true;
+  };
 </script>
 
 <PromptHeader
   heading="Before you go..."
   client={auth.client}
   redirectUri={auth.redirectUri}
+  class="mb-6"
 />
 
-<div
-  class="text-xl mb-6 p-6 py-3 rounded-lg flex items-center gap-3 alert text-left bg-base-100"
->
-  <div class="grow">
-    <b
-      >👋 Welcome{#if installName}&nbsp;to <i>{installName}</i>{/if}!</b
-    >
+<Alert type="success" class="mb-3">
+  <b
+    >👋 Welcome{#if installName}&nbsp;to <i>{installName}</i>{/if}!</b
+  >
 
-    Verify your profile before continuing...
-  </div>
-</div>
+  Take a moment to confirm your account details before continuing.
+</Alert>
 
-<div class="flex flex-col gap-1">
-  <div class="p-3 bg-base-200 rounded-lg flex items-center gap-3">
+<div class="flex flex-col gap-3">
+  <div class="p-3 bg-base-100 rounded-lg flex items-center gap-3 mb-3">
     <div
-      class="tooltip tooltip-right md:tooltip-bottom"
+      class="tooltip tooltip-right"
       data-tip={!avatarUploaded
         ? "Upload an avatar..."
         : "Change your avatar..."}
     >
       <EditableImage
-        endpoint="/upload/avatar"
-        params={{ actor_id: actor.id }}
+        uploaded={uploadAvatar}
+        params={{ actor_id: actor?.id }}
         src={actor?.avatar}
         name={actor?.identiconId}
         class="w-12 h-12 rounded-lg"
@@ -77,11 +128,13 @@
     </div>
 
     <div class="grow">
-      <div class="text-xl -mt-1 font-bold">
+      <div class="text-xl -mt-1 font-bold text-black dark:text-white">
         {actor.identifier}
       </div>
       <div class="text-xs flex items-baseline gap-1">
-        <CornerLeftUp size="10" /> Your {actor.identifierType}
+        <CornerLeftUp size="10" />
+        your
+        {actor.identifierType}
       </div>
     </div>
 
@@ -95,48 +148,139 @@
     </div>
   </div>
 
-  <label class="input flex items-center gap-3 mt-1.5">
-    <div class="text-xs mt-[5px]">Your name</div>
+  <div class="uppercase font-bold text-xs">your profile</div>
 
-    <input class="" placeholder="..." />
+  <label class="input input-bordered flex items-center gap-3">
+    <input
+      class="w-full"
+      placeholder="Add your name..."
+      bind:value={name}
+      on:input={updateName}
+    />
+
+    {#if loading}
+      <span class="loading loading-spinner loading-sm"></span>
+    {:else if nameUpdated}
+      <UserRoundCheck class={"text-success"} />
+    {:else}
+      <UserRoundPen />
+    {/if}
   </label>
 
-  <label class="input flex items-center gap-3">
-    <div class="text-xs mt-[5px]">Your email</div>
+  {#if auth?.client?.allowPasswords}
+    <div class="flex items-center gap-1.5 mb-3">
+      {#if actor.passwordChangeable}
+        <PasswordInput
+          disabled={passwordChanged}
+          bind:value={newPassword}
+          bind:valid={validPassword}
+          placeholder="Change your password"
+          class="grow min-w-0"
+          {auth}
+        />
 
-    <input class="" placeholder="..." bind:value={actor.loginEmail} />
-  </label>
+        <button
+          type="button"
+          disabled={!validPassword}
+          class="btn btn-success"
+          on:click|preventDefault|stopPropagation={changePassword}
+        >
+          {#if passwordChanged}
+            <Check />
+          {:else}
+            change
+          {/if}
+        </button>
+      {:else}
+        <div
+          class="bg-base-100 rounded-lg input input-bordered w-full flex items-center gap-3"
+        >
+          <div class="grow">
+            <div class="text-sm truncate">
+              Password <b
+                >changed <Time
+                  relative
+                  timestamp={actor.passwordChangedAt}
+                /></b
+              >
+            </div>
+            <div class="text-xs opacity-75 truncate">
+              Wait a bit to change it...
+            </div>
+          </div>
 
-  <label class="input flex items-center gap-3">
-    <div class="text-xs mt-[5px]">Password</div>
-
-    <Time relative timestamp={actor.setPasswordAt} />
-  </label>
-
-  <div class="p-3 bg-base-100 rounded-lg mb-6">
-    <div class="flex gap-3 items-center">
-      <div class="">
-        <LockKeyholeOpen />
-      </div>
-
-      <div class="grow">
-        <div class="-mt-1">Credentials</div>
-        <div class="text-xs flex items-baseline gap-1">password</div>
-      </div>
-
-      <button class="btn btn-neutral btn-sm"> manage... </button>
+          <Lock />
+        </div>
+      {/if}
     </div>
+  {/if}
+
+  {#if actor.identifierType == "email" && nicknameEnabled}
+    <label class="input input-bordered flex items-center gap-3 mb-3">
+      <div class="text-xs">nickname</div>
+
+      <input
+        class=""
+        placeholder="..."
+        disabled={actor?.nickname}
+        bind:value={nickname}
+      />
+    </label>
+  {/if}
+
+  <div class="flex items-center gap-3">
+    <div class="uppercase font-bold text-xs grow whitespace-nowrap">
+      your email
+    </div>
+
+    {#if auth?.warnings?.includes("login-email-limit")}
+      <div class="text-xs italic truncate text-warning">
+        you cannot add any more emails
+      </div>
+    {:else if actor && !actor?.loginEmails?.length}
+      <div class="text-xs italic truncate">
+        add an email for login and account recovery
+      </div>
+      <AlertTriangle size="16" class="text-warning" />
+    {:else}
+      <div class="text-xs italic truncate">
+        used for login and account recovery
+      </div>
+    {/if}
+  </div>
+
+  <div class="flex flex-col gap-1.5">
+    {#each actor?.loginEmails || [] as email (email.address)}
+      {#key email.address}
+        <OnboardEmail
+          {auth}
+          {authorize}
+          {email}
+          verifyClass="btn-xs -mr-1.5 btn-success btn-outline"
+        />
+      {/key}
+    {/each}
+
+    {#key actor?.loginEmails?.length}
+      <OnboardEmail
+        {auth}
+        {authorize}
+        inputClass="input-sm"
+        btnClass="btn-sm"
+      />
+    {/key}
   </div>
 </div>
 
-<div class="flex gap-6 items-center">
-  <a class="btn btn-lg btn-primary" href="/profile"> save </a>
+<div class="divider my-1.5" />
 
-  <span class="opacity-75 text-lg ml-1.5"> or </span>
-
-  <PromptContinue
-    event="onboard"
-    class="px-0 w-auto !btn-neutral btn-link"
-    label="continue without changes..."
-  />
+<div class="flex flex-col md:flex-row md:items-center md:gap-4">
+  <button
+    type="button"
+    class="btn btn-lg btn-primary"
+    on:click|preventDefault|stopPropagation={() =>
+      authorize({ event: "onboard:confirm" })}
+  >
+    continue
+  </button>
 </div>

@@ -3,7 +3,7 @@
 # Top-level module for masks.
 module Masks
   class Seeder
-    attr_accessor :manage_client, :manager
+    attr_accessor :manage_client, :manager, :tester
 
     def initialize(env: Rails.env)
       @env = env
@@ -14,7 +14,7 @@ module Masks
       name:,
       type:,
       redirect_uris: nil,
-      consent: true,
+      require_consent: true,
       scopes: nil,
       logo: nil
     )
@@ -24,7 +24,7 @@ module Masks
           name:,
           scopes:,
           redirect_uris:,
-          consent:,
+          require_consent:,
           client_type: type,
         )
 
@@ -37,10 +37,7 @@ module Masks
     def seed_actor(nickname:, password:, scopes: nil, email: nil)
       actor = Masks::Actor.new(nickname:)
       if email
-        actor.emails.build(
-          address: email,
-          group: Masks::Email::LOGIN_UNVERIFIED_GROUP,
-        )
+        actor.emails.build(address: email, group: Masks::Email::LOGIN_GROUP)
       end
       actor.password = password
       actor.assign_scopes(*scopes)
@@ -65,6 +62,12 @@ module Masks
       case @env.to_sym
       when :development, :test
         self.manager = seed_manager
+        self.tester =
+          seed_actor(
+            nickname: "tester",
+            password: "password",
+            email: "test@example.com",
+          )
         self.manage_client =
           seed_client(
             type: "internal",
@@ -73,7 +76,7 @@ module Masks
             scopes: Masks::Scoped::MANAGE,
             redirect_uris: "/manage",
             logo: "app/assets/images/masks.png",
-            consent: false,
+            require_consent: false,
           )
         seed_client(
           type: "confidential",
@@ -81,7 +84,7 @@ module Masks
           name: "Confidential",
           scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          consent: true,
+          require_consent: true,
         )
         seed_client(
           type: "public",
@@ -89,7 +92,7 @@ module Masks
           name: "Public",
           scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          consent: true,
+          require_consent: true,
         )
       end
     end

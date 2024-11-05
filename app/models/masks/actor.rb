@@ -8,12 +8,12 @@ module Masks
     NICKNAME_ID = "nickname"
 
     class << self
-      def from_login_email(email)
-        email = Masks::Email.for_login.where(address: email).first
+      def from_login_email(address)
+        email = Masks::Email.for_login.where(address:).first
         email&.actor ||
           Masks::Actor
-            .new(identifier: email)
-            .tap { |a| a.emails.build(address: email) }
+            .new(identifier: address)
+            .tap { |a| a.emails.build(address:).for_login }
       end
     end
 
@@ -34,6 +34,8 @@ module Masks
              through: :events,
              autosave: true
 
+    has_many :login_links, class_name: "Masks::LoginLink", autosave: true
+
     has_secure_password validations: false
 
     attribute :signup
@@ -46,9 +48,11 @@ module Masks
     validates :identifier_type, presence: true
     validates :nickname,
               uniqueness: true,
+              presence: true,
               format: {
                 with: /\A[a-z][a-z0-9\-]+\z/,
-              }
+              },
+              if: :nickname_required?
     validates :totp_secret, presence: true, if: :totp_code
     validates :version, presence: true
     validate :validates_password, if: :password
@@ -64,19 +68,33 @@ module Masks
       super || Masks.installation.settings["timezone"]
     end
 
-    def new_login_link!
-      return unless persisted? && login_email
-
-      link = Masks::LoginLink.create!(email: login_email)
-      link
-    end
-
     def onboarded!
       touch(:onboarded_at)
     end
 
     def onboarded?
       onboarded_at
+    end
+
+    def unverified_email?
+      emails.verified_for_login.none?
+    end
+
+    def change_password(v)
+      return unless password_changeable?
+
+      self.password = v
+      self.password_changed_at = Time.now.utc
+    end
+
+    def password_changeable?
+      cooldown = Masks.setting(:password, :change_cooldown)
+
+      return true unless password_changed_at && cooldown
+
+      password_changed_at + ChronicDuration.parse(cooldown) < Time.now.utc
+    rescue => e
+      true
     end
 
     def public_id
@@ -123,7 +141,7 @@ module Masks
     end
 
     def login_email
-      emails.for_login.first
+      persisted? ? emails.for_login.first : emails.select(&:for_login?).first
     end
 
     def version_digest
@@ -185,6 +203,10 @@ module Masks
     end
 
     private
+
+    def nickname_required?
+      nickname || (Masks.installation.nicknames? && !Masks.installation.emails?)
+    end
 
     def generate_key
       self.key ||= SecureRandom.uuid

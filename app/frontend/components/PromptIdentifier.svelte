@@ -6,21 +6,20 @@
   export let startOver = null;
   export let avatarOnly;
   export let identifier;
+  export let alternate;
   export let loading;
 
   let { avatar, identiconId } = auth;
 
   $: avatar = auth.avatar;
   $: identiconId = auth.identiconId;
-  $: console.log(identiconId);
 </script>
 
 {#if identifier || auth?.identifier}
   <div
     class={[
-      "flex items-center gap-3 bg-base-100  shadow font-bold",
-      "rounded-lg shadow",
-      avatarOnly ? "" : "py-2 px-3",
+      "flex items-center gap-3 bg-base-100  rounded-lg font-bold border dark:border-neutral border-neutral-content",
+      avatarOnly ? "" : "py-2 pl-3",
       $$props.class,
     ].join(" ")}
   >
@@ -57,10 +56,31 @@
     </div>
 
     {#if !avatarOnly}
-      <div class="text-xl grow mr-3">
-        {identifier || auth.identifier}
+      <div class="grow overflow-hidden">
+        <div class="text-xl truncate">
+          {identifier || auth.identifier}
+        </div>
+
+        {#if alternate}
+          <div class="font-normal truncate">
+            {alternate}
+          </div>
+        {/if}
       </div>
+
+      {#if startOver}
+        <div class="mr-1.5">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            on:click|stopPropagation|preventDefault={startOver}
+            ><RotateCcw size="22" /></button
+          >
+        </div>
+      {/if}
     {/if}
+
+    <slot />
   </div>
 {:else}
   <div

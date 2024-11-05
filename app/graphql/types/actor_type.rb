@@ -5,10 +5,12 @@ module Types
     implements GraphQL::Types::Relay::Node
 
     field :id, ID
+    field :name, String, null: true
     field :nickname, String
     field :identifier, String, null: true
     field :identifier_type, String, null: true
     field :login_email, String, null: true
+    field :login_emails, [EmailType], null: true
     field :identicon_id, String
     field :scopes, String
     field :avatar, String, null: true
@@ -17,6 +19,7 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
     field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true
     field :password, Boolean
+    field :password_changeable, Boolean
     field :password_changed_at, GraphQL::Types::ISO8601DateTime, null: true
     field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
@@ -27,6 +30,10 @@ module Types
 
     def login_email
       object.login_email&.address
+    end
+
+    def login_emails
+      object.emails.for_login
     end
 
     def avatar
@@ -41,8 +48,8 @@ module Types
       object.password_digest.present?
     end
 
-    def password_changed_at
-      object.changed_password_at
+    def password_changeable
+      object.password_changeable?
     end
   end
 end

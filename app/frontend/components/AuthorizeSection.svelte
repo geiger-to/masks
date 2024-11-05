@@ -3,14 +3,17 @@
   import { AlertTriangle, RotateCcw } from "lucide-svelte";
   import Identicon from "./Identicon.svelte";
   import PasswordInput from "./PasswordInput.svelte";
-  import PromptPassword from "./PromptPassword.svelte";
+  import PromptCredential from "./PromptCredential.svelte";
+  import PromptResetPassword from "./PromptResetPassword.svelte";
+  import PromptVerifyEmail from "./PromptVerifyEmail.svelte";
   import PromptLoginLink from "./PromptLoginLink.svelte";
+  import PromptLoginCode from "./PromptLoginCode.svelte";
   import PromptLogin from "./PromptLogin.svelte";
   import PromptLoading from "./PromptLoading.svelte";
+  import PromptLoadingError from "./PromptLoadingError.svelte";
   import PromptSuccess from "./PromptSuccess.svelte";
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
   import PromptScopesRequired from "./PromptScopesRequired.svelte";
-  import PromptInvalidCredentials from "./PromptInvalidCredentials.svelte";
   import PromptInvalidIdentifier from "./PromptInvalidIdentifier.svelte";
   import PromptInvalidRequest from "./PromptInvalidRequest.svelte";
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
@@ -44,24 +47,37 @@
             authenticated
             successful
             settled
+            loginLink {
+              expiresAt
+            }
             redirectUri
             prompt
             settings
+            warnings
             actor {
               id
+              name
               nickname
               identifier
               identifierType
               identiconId
               loginEmail
+              loginEmails {
+                address
+                verifiedAt
+                verifyLink
+              }
               avatar
               avatarCreatedAt
               passwordChangedAt
+              passwordChangeable
             }
             client {
               id
               name
               logo
+              allowPasswords
+              allowLoginLinks
             }
           }
         }
@@ -73,6 +89,7 @@
   let loading = true;
   let identifier;
   let password;
+  let updates;
 
   const startOver = () => {
     auth.identifier = identifier = null;
@@ -85,12 +102,6 @@
   const continueAuth = (args) => {
     return (e) => {
       e.preventDefault();
-
-      console.log(args);
-
-      if (!args.identifier) {
-        return;
-      }
 
       let eventName = e.submitter.dataset.event;
 
@@ -109,13 +120,20 @@
       return;
     }
 
-    auth = result.data.authorize;
+    auth = result.data?.authorize;
     identifier = auth?.identifier;
+    loadingError = result.error;
 
     if (auth?.settled) {
       setTimeout(() => {
         window.location.assign(auth.redirectUri);
-      }, 100);
+      }, 1000);
+    }
+  };
+
+  const onUpdate = (v) => {
+    if (v != updates) {
+      updates = v;
     }
   };
 
@@ -139,20 +157,56 @@
   });
 
   let prompts = {
-    login: PromptLogin,
-    password: PromptPassword,
+    identifier: PromptLogin,
+    credential: PromptCredential,
+    "login-code": PromptLoginCode,
     "login-link": PromptLoginLink,
+    "verify-email": PromptVerifyEmail,
+    "reset-password": PromptResetPassword,
     authorize: PromptAuthorize,
     onboard: PromptOnboard,
     success: PromptSuccess,
     scopes_required: PromptScopesRequired,
     invalid_request: PromptInvalidRequest,
     invalid_identifier: PromptInvalidIdentifier,
-    invalid_credentials: PromptInvalidCredentials,
     invalid_redirect_uri: PromptInvalidRedirectUri,
     access_denied: PromptAccessDenied,
     unsupported_response_type: PromptUnsupportedResponseType,
     nonce_required: PromptNonceRequired,
+  };
+
+  let loadingError;
+  let loadingTimer;
+
+  let computePrompt = (auth, loading, loadingError) => {
+    if (loadingError) {
+      return PromptLoadingError;
+    }
+
+    if (prompts[auth?.prompt]) {
+      return prompts[auth.prompt];
+    }
+
+    return PromptLoading;
+  };
+
+  $: if (!loading && loadingTimer) {
+    clearTimeout(loadingTimer);
+  }
+
+  $: if (loading) {
+    clearTimeout(loadingTimer);
+
+    loadingTimer = setTimeout(() => {
+      if (loading) {
+        loadingError = true;
+      }
+    }, 5000);
+  }
+
+  let defaultEvent;
+  let currentEvent = (name) => {
+    defaultEvent = name;
   };
 
   $: updateAuth($mutation);
@@ -160,19 +214,45 @@
 
 <form
   action="#"
-  on:submit={continueAuth({ identifier, password })}
-  class="flex h-full w-full align-items-center items-center p-1.5 md:p-3"
+  on:submit={continueAuth({ event: defaultEvent, updates })}
+  class="background animate-fade-in flex min-h-full md:p-3 px-[5px] items-center"
 >
-  <div
-    class="bg-base-300 rounded-xl min-w-full md:min-w-[500px] mx-auto p-6 pt-6 md:p-10 shadow"
-  >
-    <svelte:component
-      this={!auth && loading ? PromptLoading : prompts[auth?.prompt]}
-      {auth}
-      {startOver}
-      {loading}
-      bind:identifier
-      bind:password
-    />
+  <div class="w-full md:w-[502px] mx-auto rounded-2xl shadow-2xl p-[1px]">
+    <div
+      class="w-full md:w-[500px] mx-auto rounded-2xl overflow-hidden relative shadow-xl"
+    >
+      <div class="animate-fade-in-slow w-full h-[50px] absolute blur-2xl">
+        <div
+          class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-[.03]"}`}
+        />
+      </div>
+      <div
+        class="bg-base-200 animate-fade-in-slow w-full h-[2px] z-10 absolute"
+      >
+        <div
+          class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-5"}`}
+        />
+      </div>
+      <div class={`bg-base-300 h-[30px]`}></div>
+      <div
+        class="bg-base-300 w-full min-h-[200px] md:w-[500px] mx-auto border-b dark:border-base-100 border-white"
+      >
+        <div class="p-5 md:p-8 pt-0 md:pt-1.5">
+          <svelte:component
+            this={computePrompt(auth, loading, loadingError)}
+            {auth}
+            {startOver}
+            {authorize}
+            {loading}
+            {loadingError}
+            vars={updates}
+            updates={onUpdate}
+            setEvent={currentEvent}
+            bind:identifier
+            bind:password
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </form>
