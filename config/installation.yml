@@ -30,6 +30,7 @@ default: &default
     require_consent: false
     require_verified_email: false
     require_onboarded_actor: false
+    require_second_factor: true
     allow_passwords: true
     allow_login_links: true
   authorize:

@@ -19,8 +19,6 @@ class ActiveStorage::Service::MasksService < ActiveStorage::Service
 
   private
 
-  delegate :installation, to: Masks
-
   def disk_service
     ActiveStorage::Service.configure(
       :disk,

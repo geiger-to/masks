@@ -23,6 +23,7 @@ module Mutations
     field :warnings, [String], null: false
     field :prompt, String, null: false
     field :settings, GraphQL::Types::JSON, null: true
+    field :extras, GraphQL::Types::JSON, null: true
 
     def resolve(**args)
       delay = Masks.installation.authorize_delay

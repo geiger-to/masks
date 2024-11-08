@@ -139,6 +139,12 @@ module Masks
       @warnings.uniq!
     end
 
+    def extras(**additions)
+      @extras ||= {}
+      @extras.deep_merge!(additions)
+      @extras
+    end
+
     def redirect_uri
       return @redirect_uri if @redirect_uri
 
@@ -275,6 +281,8 @@ module Masks
         Authenticators::Identifier.new(self),
         Authenticators::LoginLink.new(self),
         Authenticators::Credential.new(self),
+        Authenticators::SecondFactor.new(self),
+        Authenticators::Webauthn.new(self),
         Authenticators::ResetPassword.new(self),
         Authenticators::Onboard.new(self),
         Authenticators::VerifyEmail.new(self),

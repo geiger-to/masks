@@ -22,6 +22,7 @@ module Masks
       require_consent
       require_onboarded_actor
       require_verified_email
+      require_second_factor
       allow_passwords
       allow_login_links
     ]

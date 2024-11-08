@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require_relative "masks/version"
+require_relative "masks/fido"
 
 # Top-level module for masks.
 module Masks
@@ -11,6 +12,10 @@ module Masks
 
     def url
       env.url
+    end
+
+    def name
+      env.name
     end
 
     def setting(*args, **opts)

@@ -26,11 +26,16 @@
     "vite": "^5.4.7"
   },
   "dependencies": {
+    "@github/webauthn-json": "^2.1.1",
     "@rails/actioncable": "^7.2.102",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
     "@tsconfig/svelte": "^5.0.4",
     "@urql/svelte": "^4.2.1",
+    "aaguids": "^0.0.13",
     "autoprefixer": "^10.4.20",
+    "buffer": "^6.0.3",
+    "cbor2": "^1.7.1",
+    "fido2-lib": "^3.5.3",
     "lodash-es": "^4.17.21",
     "lucide-svelte": "^0.446.0",
     "minidenticons": "^4.2.1",
@@ -42,6 +47,7 @@
     "tslib": "^2.7.0",
     "typescript": "^5.6.2",
     "vite-plugin-full-reload": "^1.2.0",
-    "vite-plugin-rails": "^0.5.0"
+    "vite-plugin-rails": "^0.5.0",
+    "web-streams-polyfill": "^4.0.0"
   }
 }

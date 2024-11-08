@@ -17,10 +17,6 @@ module Masks
       end
     end
 
-    has_one_attached :avatar do |attachable|
-      attachable.variant :preview, resize_to_limit: [350, 350]
-    end
-
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
@@ -35,6 +31,13 @@ module Masks
              autosave: true
 
     has_many :login_links, class_name: "Masks::LoginLink", autosave: true
+    has_many :webauthn_credentials,
+             class_name: "Masks::WebauthnCredential",
+             autosave: true
+
+    has_one_attached :avatar do |attachable|
+      attachable.variant :preview, resize_to_limit: [350, 350]
+    end
 
     has_secure_password validations: false
 
@@ -42,7 +45,7 @@ module Masks
     attribute :session
     attribute :totp_code
 
-    after_initialize :generate_key, unless: :key
+    after_initialize :generate_defaults
     before_validation :reset_version, unless: :version
 
     validates :identifier_type, presence: true
@@ -154,6 +157,10 @@ module Masks
       key
     end
 
+    def second_factor?
+      enabled_second_factor_at.present?
+    end
+
     def factor2?
       backup_codes.present?
     end
@@ -208,8 +215,9 @@ module Masks
       nickname || (Masks.installation.nicknames? && !Masks.installation.emails?)
     end
 
-    def generate_key
+    def generate_defaults
       self.key ||= SecureRandom.uuid
+      self.webauthn_id ||= WebAuthn.generate_user_id
     end
 
     def validates_totp

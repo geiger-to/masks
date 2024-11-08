@@ -23,6 +23,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :password_digest
       t.string :totp_secret
       t.string :version
+      t.string :webauthn_id
       t.string :tz
       t.text :backup_codes
       t.text :scopes
@@ -30,6 +31,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.timestamps
       t.datetime :last_login_at
       t.datetime :password_changed_at
+      t.datetime :enabled_second_factor_at
       t.datetime :added_totp_secret_at
       t.datetime :saved_backup_codes_at
       t.datetime :notified_inactive_at
@@ -84,6 +86,19 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[code email_id device_id client_id], unique: true
     end
 
+    create_table :masks_webauthn_credentials do |t|
+      t.string :name, null: false
+      t.string :aaguid, null: true
+      t.string :external_id, null: false
+      t.string :public_key, null: false
+      t.bigint :sign_count, default: 0, null: false
+
+      t.references :actor
+      t.timestamps
+
+      t.index :external_id, unique: true
+    end
+
     create_table :masks_events do |t|
       t.string :key
       t.text :data
@@ -114,11 +129,14 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :public_url, null: true
       t.text :redirect_uris
       t.text :scopes
+
       t.boolean :require_consent
       t.boolean :require_verified_email
       t.boolean :require_onboarded_actor
+      t.boolean :require_second_factor
       t.boolean :allow_passwords
       t.boolean :allow_login_links
+
       t.string :subject_type
       t.string :sector_identifier
       t.string :code_expires_in
@@ -130,12 +148,14 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :auth_via_login_link_expires_in
       t.string :auth_via_password_expires_in
       t.string :email_verification_expires_in
+
       t.integer :identifier_attempts
       t.integer :password_attempts
       t.integer :login_code_attempts
       t.integer :login_link_attempts
       t.integer :verify_code_attempts
       t.integer :verify_email_attempts
+
       t.text :rsa_private_key
 
       t.timestamps

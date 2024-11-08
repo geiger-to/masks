@@ -16,6 +16,19 @@ Rails.application.routes.draw do
   get "/authorize/:client_id", to: "authorize#new", as: :authorize
   get "/authorize", to: "authorize#new", as: :oidc
 
+  # Webauthn support
+  get "/webauthn", to: "webauth#new"
+  post "/webauthn", to: "webauth#create"
+  delete "/webauthn", to: "webauth#destroy"
+
+  resources :webauthn, only: %i[new create destroy] do
+    post :options, on: :collection, as: "options_for"
+  end
+
+  # resource :webauthn_credential_authentication, controller: 'webauthn_credential_authentication', only: [:new, :create] do
+  # post :options, on: :collection, as: 'options_for'
+  # end
+
   # OAuth/OpenID support
   get "/.well-known/:client/openid-configuration",
       to: "oidc/discoveries#new",

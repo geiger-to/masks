@@ -23,6 +23,8 @@ module Types
     field :password_changed_at, GraphQL::Types::ISO8601DateTime, null: true
     field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :second_factor, Boolean
+    field :webauthn_credentials, [WebauthnCredentialType], null: true
 
     def id
       object.key
@@ -50,6 +52,10 @@ module Types
 
     def password_changeable
       object.password_changeable?
+    end
+
+    def second_factor
+      object.second_factor?
     end
   end
 end

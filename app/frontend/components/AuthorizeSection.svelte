@@ -11,6 +11,7 @@
   import PromptLogin from "./PromptLogin.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import PromptLoadingError from "./PromptLoadingError.svelte";
+  import PromptSecondFactor from "./PromptSecondFactor.svelte";
   import PromptSuccess from "./PromptSuccess.svelte";
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
   import PromptScopesRequired from "./PromptScopesRequired.svelte";
@@ -54,6 +55,7 @@
             prompt
             settings
             warnings
+            extras
             actor {
               id
               name
@@ -71,6 +73,12 @@
               avatarCreatedAt
               passwordChangedAt
               passwordChangeable
+              secondFactor
+              webauthnCredentials {
+                id
+                name
+                createdAt
+              }
             }
             client {
               id
@@ -163,6 +171,7 @@
     "login-link": PromptLoginLink,
     "verify-email": PromptVerifyEmail,
     "reset-password": PromptResetPassword,
+    "second-factor": PromptSecondFactor,
     authorize: PromptAuthorize,
     onboard: PromptOnboard,
     success: PromptSuccess,

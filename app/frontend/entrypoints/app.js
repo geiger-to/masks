@@ -1,4 +1,7 @@
 import "./app.css";
+import { Buffer } from 'Buffer'
+
+globalThis.Buffer = Buffer
 
 import AppComponent from "../components/AppComponent.svelte";
 

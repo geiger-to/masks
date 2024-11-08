@@ -50,6 +50,7 @@ module HistoryHelper
       error_message: history.error ? t("auth.#{history.error}") : nil,
       settings: Masks.installation.public_settings,
       login_link: history.login_link,
+      extras: history.extras,
     }
 
     settled =
