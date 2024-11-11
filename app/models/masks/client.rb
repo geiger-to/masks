@@ -27,11 +27,12 @@ module Masks
       allow_login_links
     ]
 
+    STRING_COLUMNS = %i[client_type subject_type default_region]
+
     SETTING_COLUMNS = [
       *LIFETIME_COLUMNS,
       *BOOLEAN_COLUMNS,
-      :client_type,
-      :subject_type,
+      *STRING_COLUMNS,
       :identifier_attempts,
       :password_attempts,
       :login_code_attempts,

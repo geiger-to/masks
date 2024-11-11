@@ -1,7 +1,6 @@
 <script>
   import _ from "lodash-es";
 
-  export let element;
   export let event = null;
   export let loading;
   export let disabled;
@@ -14,7 +13,6 @@
 </script>
 
 <button
-  bind:this={element}
   {type}
   class={`btn btn-lg min-w-[130px] ${$$props.class} text-center ${denied ? "animate-denied" : ""}`}
   disabled={loading || disabled}

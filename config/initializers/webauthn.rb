@@ -33,11 +33,20 @@ WebAuthn.configure do |config|
   #
   # config.algorithms << "ES384"
   #
-  config.algorithms = %w(ES256 ES384 ES512 PS256 PS384 PS512 RS256 RS384 RS512 RS1)
+  config.algorithms = %w[
+    ES256
+    ES384
+    ES512
+    PS256
+    PS384
+    PS512
+    RS256
+    RS384
+    RS512
+    RS1
+  ]
   config.silent_authentication = true
   config.attestation_root_certificates_finders = Masks::Fido
 end
 
-FidoMetadata.configure do |config|
-  config.cache_backend = Rails.cache
-end
+FidoMetadata.configure { |config| config.cache_backend = Rails.cache }

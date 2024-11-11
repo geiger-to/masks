@@ -10,7 +10,9 @@ module Masks
           if aaguid
             mds.fetch_statement(aaguid: aaguid)
           else
-            mds.fetch_statement(attestation_certificate_key_id: attestation_certificate_key_id)
+            mds.fetch_statement(
+              attestation_certificate_key_id: attestation_certificate_key_id,
+            )
           end
 
         metadata_statement&.attestation_root_certificates || []
@@ -19,13 +21,16 @@ module Masks
       def aaguid_name(aaguid)
         return unless aaguid
         mds_data = mds.fetch_statement(aaguid:)
-        mds_data&.description || aaguids.dig(aaguid, 'name')
+        mds_data&.description || aaguids.dig(aaguid, "name")
       end
 
       private
 
       def aaguids
-        @aaguids ||= JSON.parse(File.read(Rails.root.join('aaguids', 'combined_aaguid.json').to_s))
+        @aaguids ||=
+          JSON.parse(
+            File.read(Rails.root.join("aaguids", "combined_aaguid.json").to_s),
+          )
       end
     end
   end

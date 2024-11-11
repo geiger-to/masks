@@ -21,6 +21,7 @@ module Masks
              class_name: "Masks::AuthorizationCode",
              autosave: true
     has_many :emails, class_name: "Masks::Email", autosave: true
+    has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
     has_many :events, class_name: "Masks::Event"
@@ -34,6 +35,7 @@ module Masks
     has_many :webauthn_credentials,
              class_name: "Masks::WebauthnCredential",
              autosave: true
+    has_many :otp_secrets, class_name: "Masks::OtpSecret", autosave: true
 
     has_one_attached :avatar do |attachable|
       attachable.variant :preview, resize_to_limit: [350, 350]
@@ -43,7 +45,6 @@ module Masks
 
     attribute :signup
     attribute :session
-    attribute :totp_code
 
     after_initialize :generate_defaults
     before_validation :reset_version, unless: :version
@@ -56,10 +57,8 @@ module Masks
                 with: /\A[a-z][a-z0-9\-]+\z/,
               },
               if: :nickname_required?
-    validates :totp_secret, presence: true, if: :totp_code
     validates :version, presence: true
     validate :validates_password, if: :password
-    validate :validates_totp, if: :totp_code
 
     before_save :regenerate_backup_codes
 
@@ -166,9 +165,7 @@ module Masks
     end
 
     def remove_factor2!
-      self.added_totp_secret_at = nil
       self.saved_backup_codes_at = nil
-      self.totp_secret = nil
       self.backup_codes = nil
       save!
     end
@@ -178,35 +175,28 @@ module Masks
       save!
     end
 
-    def totp_uri
-      (totp || random_totp).provisioning_uri(uuid)
-    end
-
-    def totp_svg(**opts)
-      qrcode = RQRCode::QRCode.new(totp_uri)
-      qrcode.as_svg(**opts)
-    end
-
-    def totp
-      return unless totp_secret
-
-      ROTP::TOTP.new(totp_secret, issuer: "TODO")
-    end
-
-    def random_totp
-      ROTP::TOTP.new(random_totp_secret, issuer: "TODO")
-    end
-
-    def random_totp_secret
-      @random_totp_secret ||= ROTP::Base32.random
-    end
-
     def should_save_backup_codes?
       factor2? && saved_backup_codes_at.blank?
     end
 
     def saved_backup_codes?
       factor2? && saved_backup_codes_at.present?
+    end
+
+    def verify_backup_code(code)
+      hash = Digest::SHA256.hexdigest(code)
+
+      if codes.include?(hash)
+        codes.delete(hash)
+        save
+      end
+    end
+
+    def save_backup_codes(codes)
+      self.saved_backup_codes_at = Time.now.utc
+      self.backup_codes = codes.map { |code| Digest::SHA256.hexdigest(code) }
+
+      save
     end
 
     private
@@ -218,10 +208,6 @@ module Masks
     def generate_defaults
       self.key ||= SecureRandom.uuid
       self.webauthn_id ||= WebAuthn.generate_user_id
-    end
-
-    def validates_totp
-      errors.add(:totp_code, :invalid) unless totp.verify(totp_code)
     end
 
     def reset_version

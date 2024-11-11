@@ -25,6 +25,9 @@ module Types
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
     field :second_factor, Boolean
     field :webauthn_credentials, [WebauthnCredentialType], null: true
+    field :otp_secrets, [OtpSecretType], null: true
+    field :phones, [PhoneType], null: true
+    field :remaining_backup_codes, Integer, null: true
 
     def id
       object.key
@@ -56,6 +59,10 @@ module Types
 
     def second_factor
       object.second_factor?
+    end
+
+    def remaining_backup_codes
+      object.backup_codes&.length
     end
   end
 end

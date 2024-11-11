@@ -69,6 +69,12 @@ gem "apollo_upload_server", "~> 2.1"
 
 gem "webauthn", "~> 3.1"
 
-gem "fido_metadata", git: 'https://github.com/bdewater/fido_metadata', branch: 'main'
+gem "fido_metadata",
+    git: "https://github.com/bdewater/fido_metadata",
+    branch: "main"
 
 gem "twilio-ruby", "~> 7.3"
+
+gem "dotenv", groups: %i[development test]
+
+gem "phonelib", "~> 0.9.3"

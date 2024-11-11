@@ -13,11 +13,11 @@
   export let startOver;
   export let denied;
   export let loginLinks = auth?.settings?.email?.enabled;
+  export let authorize;
 
   let seconds = 5;
   let continuing = false;
   let cancelled;
-  let button;
 
   let countdown = setInterval(() => {
     seconds = seconds - 1;
@@ -30,7 +30,7 @@
 
   $: if (seconds == 0 && !cancelled) {
     setTimeout(() => {
-      // button.click();
+      authorize({});
     }, 500);
   }
 
@@ -62,7 +62,6 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <PromptContinue
-    bind:element={button}
     {loading}
     disabled={loading}
     class="btn-primary min-w-[150px]"

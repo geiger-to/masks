@@ -21,7 +21,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
-    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+    t.index %w[record_type record_id name blob_id],
+            name: "index_active_storage_attachments_uniqueness",
+            unique: true
   end
 
   create_table "active_storage_blobs", force: :cascade do |t|
@@ -39,10 +41,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
   create_table "active_storage_variant_records", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
-    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+    t.index %w[blob_id variation_digest],
+            name: "index_active_storage_variant_records_uniqueness",
+            unique: true
   end
 
-  create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_job_batches",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "description"
@@ -58,7 +65,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "jobs_finished_at"
   end
 
-  create_table "good_job_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_job_executions",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "active_job_id", null: false
@@ -72,18 +82,26 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.text "error_backtrace", array: true
     t.uuid "process_id"
     t.interval "duration"
-    t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
-    t.index ["process_id", "created_at"], name: "index_good_job_executions_on_process_id_and_created_at"
+    t.index %w[active_job_id created_at],
+            name: "index_good_job_executions_on_active_job_id_and_created_at"
+    t.index %w[process_id created_at],
+            name: "index_good_job_executions_on_process_id_and_created_at"
   end
 
-  create_table "good_job_processes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_job_processes",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.jsonb "state"
     t.integer "lock_type", limit: 2
   end
 
-  create_table "good_job_settings", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_job_settings",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.text "key"
@@ -91,7 +109,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.index ["key"], name: "index_good_job_settings_on_key", unique: true
   end
 
-  create_table "good_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "good_jobs",
+               id: :uuid,
+               default: -> { "gen_random_uuid()" },
+               force: :cascade do |t|
     t.text "queue_name"
     t.integer "priority"
     t.jsonb "serialized_params"
@@ -115,20 +136,54 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.text "labels", array: true
     t.uuid "locked_by_id"
     t.datetime "locked_at"
-    t.index ["active_job_id", "created_at"], name: "index_good_jobs_on_active_job_id_and_created_at"
-    t.index ["batch_callback_id"], name: "index_good_jobs_on_batch_callback_id", where: "(batch_callback_id IS NOT NULL)"
-    t.index ["batch_id"], name: "index_good_jobs_on_batch_id", where: "(batch_id IS NOT NULL)"
-    t.index ["concurrency_key"], name: "index_good_jobs_on_concurrency_key_when_unfinished", where: "(finished_at IS NULL)"
-    t.index ["cron_key", "created_at"], name: "index_good_jobs_on_cron_key_and_created_at_cond", where: "(cron_key IS NOT NULL)"
-    t.index ["cron_key", "cron_at"], name: "index_good_jobs_on_cron_key_and_cron_at_cond", unique: true, where: "(cron_key IS NOT NULL)"
-    t.index ["finished_at"], name: "index_good_jobs_jobs_on_finished_at", where: "((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL))"
-    t.index ["labels"], name: "index_good_jobs_on_labels", where: "(labels IS NOT NULL)", using: :gin
-    t.index ["locked_by_id"], name: "index_good_jobs_on_locked_by_id", where: "(locked_by_id IS NOT NULL)"
-    t.index ["priority", "created_at"], name: "index_good_job_jobs_for_candidate_lookup", where: "(finished_at IS NULL)"
-    t.index ["priority", "created_at"], name: "index_good_jobs_jobs_on_priority_created_at_when_unfinished", order: { priority: "DESC NULLS LAST" }, where: "(finished_at IS NULL)"
-    t.index ["priority", "scheduled_at"], name: "index_good_jobs_on_priority_scheduled_at_unfinished_unlocked", where: "((finished_at IS NULL) AND (locked_by_id IS NULL))"
-    t.index ["queue_name", "scheduled_at"], name: "index_good_jobs_on_queue_name_and_scheduled_at", where: "(finished_at IS NULL)"
-    t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
+    t.index %w[active_job_id created_at],
+            name: "index_good_jobs_on_active_job_id_and_created_at"
+    t.index ["batch_callback_id"],
+            name: "index_good_jobs_on_batch_callback_id",
+            where: "(batch_callback_id IS NOT NULL)"
+    t.index ["batch_id"],
+            name: "index_good_jobs_on_batch_id",
+            where: "(batch_id IS NOT NULL)"
+    t.index ["concurrency_key"],
+            name: "index_good_jobs_on_concurrency_key_when_unfinished",
+            where: "(finished_at IS NULL)"
+    t.index %w[cron_key created_at],
+            name: "index_good_jobs_on_cron_key_and_created_at_cond",
+            where: "(cron_key IS NOT NULL)"
+    t.index %w[cron_key cron_at],
+            name: "index_good_jobs_on_cron_key_and_cron_at_cond",
+            unique: true,
+            where: "(cron_key IS NOT NULL)"
+    t.index ["finished_at"],
+            name: "index_good_jobs_jobs_on_finished_at",
+            where:
+              "((retried_good_job_id IS NULL) AND (finished_at IS NOT NULL))"
+    t.index ["labels"],
+            name: "index_good_jobs_on_labels",
+            where: "(labels IS NOT NULL)",
+            using: :gin
+    t.index ["locked_by_id"],
+            name: "index_good_jobs_on_locked_by_id",
+            where: "(locked_by_id IS NOT NULL)"
+    t.index %w[priority created_at],
+            name: "index_good_job_jobs_for_candidate_lookup",
+            where: "(finished_at IS NULL)"
+    t.index %w[priority created_at],
+            name: "index_good_jobs_jobs_on_priority_created_at_when_unfinished",
+            order: {
+              priority: "DESC NULLS LAST",
+            },
+            where: "(finished_at IS NULL)"
+    t.index %w[priority scheduled_at],
+            name:
+              "index_good_jobs_on_priority_scheduled_at_unfinished_unlocked",
+            where: "((finished_at IS NULL) AND (locked_by_id IS NULL))"
+    t.index %w[queue_name scheduled_at],
+            name: "index_good_jobs_on_queue_name_and_scheduled_at",
+            where: "(finished_at IS NULL)"
+    t.index ["scheduled_at"],
+            name: "index_good_jobs_on_scheduled_at",
+            where: "(finished_at IS NULL)"
   end
 
   create_table "masks_access_tokens", force: :cascade do |t|
@@ -147,11 +202,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_access_tokens_on_actor_id"
-    t.index ["authorization_code_id"], name: "index_masks_access_tokens_on_authorization_code_id"
+    t.index ["authorization_code_id"],
+            name: "index_masks_access_tokens_on_authorization_code_id"
     t.index ["client_id"], name: "index_masks_access_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_access_tokens_on_device_id"
-    t.index ["refresh_token"], name: "index_masks_access_tokens_on_refresh_token", unique: true
-    t.index ["refreshed_token"], name: "index_masks_access_tokens_on_refreshed_token", unique: true
+    t.index ["refresh_token"],
+            name: "index_masks_access_tokens_on_refresh_token",
+            unique: true
+    t.index ["refreshed_token"],
+            name: "index_masks_access_tokens_on_refreshed_token",
+            unique: true
     t.index ["token"], name: "index_masks_access_tokens_on_token", unique: true
   end
 
@@ -159,6 +219,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "key"
     t.string "name"
     t.string "nickname"
+    t.string "phone_number"
     t.string "password_digest"
     t.string "totp_secret"
     t.string "version"
@@ -170,6 +231,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "updated_at", null: false
     t.datetime "last_login_at"
     t.datetime "password_changed_at"
+    t.datetime "added_phone_number_at"
     t.datetime "enabled_second_factor_at"
     t.datetime "added_totp_secret_at"
     t.datetime "saved_backup_codes_at"
@@ -203,7 +265,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_authorization_codes_on_actor_id"
     t.index ["client_id"], name: "index_masks_authorization_codes_on_client_id"
-    t.index ["code"], name: "index_masks_authorization_codes_on_code", unique: true
+    t.index ["code"],
+            name: "index_masks_authorization_codes_on_code",
+            unique: true
     t.index ["device_id"], name: "index_masks_authorization_codes_on_device_id"
   end
 
@@ -232,6 +296,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "auth_via_login_link_expires_in"
     t.string "auth_via_password_expires_in"
     t.string "email_verification_expires_in"
+    t.string "default_region"
     t.integer "identifier_attempts"
     t.integer "password_attempts"
     t.integer "login_code_attempts"
@@ -251,7 +316,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "version"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["session_id"], name: "index_masks_devices_on_session_id", unique: true
+    t.index ["session_id"],
+            name: "index_masks_devices_on_session_id",
+            unique: true
   end
 
   create_table "masks_emails", force: :cascade do |t|
@@ -265,7 +332,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "updated_at", null: false
     t.bigint "actor_id"
     t.index ["actor_id"], name: "index_masks_emails_on_actor_id"
-    t.index ["address", "group"], name: "index_masks_emails_on_address_and_group", unique: true
+    t.index %w[address group],
+            name: "index_masks_emails_on_address_and_group",
+            unique: true
   end
 
   create_table "masks_events", force: :cascade do |t|
@@ -291,7 +360,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_id_tokens_on_actor_id"
-    t.index ["authorization_code_id"], name: "index_masks_id_tokens_on_authorization_code_id"
+    t.index ["authorization_code_id"],
+            name: "index_masks_id_tokens_on_authorization_code_id"
     t.index ["client_id"], name: "index_masks_id_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_id_tokens_on_device_id"
     t.index ["nonce"], name: "index_masks_id_tokens_on_nonce", unique: true
@@ -321,9 +391,35 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_login_links_on_actor_id"
     t.index ["client_id"], name: "index_masks_login_links_on_client_id"
-    t.index ["code", "email_id", "device_id", "client_id"], name: "idx_on_code_email_id_device_id_client_id_2f61fce223", unique: true
+    t.index %w[code email_id device_id client_id],
+            name: "idx_on_code_email_id_device_id_client_id_2f61fce223",
+            unique: true
     t.index ["device_id"], name: "index_masks_login_links_on_device_id"
     t.index ["email_id"], name: "index_masks_login_links_on_email_id"
+  end
+
+  create_table "masks_otp_secrets", force: :cascade do |t|
+    t.string "public_id", null: false
+    t.string "name"
+    t.string "secret", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "verified_at"
+    t.bigint "actor_id"
+    t.index ["actor_id"], name: "index_masks_otp_secrets_on_actor_id"
+    t.index ["public_id"],
+            name: "index_masks_otp_secrets_on_public_id",
+            unique: true
+    t.index ["secret"], name: "index_masks_otp_secrets_on_secret", unique: true
+  end
+
+  create_table "masks_phones", force: :cascade do |t|
+    t.string "number", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "actor_id"
+    t.index ["actor_id"], name: "index_masks_phones_on_actor_id"
+    t.index ["number"], name: "index_masks_phones_on_number", unique: true
   end
 
   create_table "masks_sessions", force: :cascade do |t|
@@ -331,7 +427,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.text "data"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["session_id"], name: "index_masks_sessions_on_session_id", unique: true
+    t.index ["session_id"],
+            name: "index_masks_sessions_on_session_id",
+            unique: true
     t.index ["updated_at"], name: "index_masks_sessions_on_updated_at"
   end
 
@@ -342,10 +440,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "public_key", null: false
     t.bigint "sign_count", default: 0, null: false
     t.bigint "actor_id"
+    t.bigint "device_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["actor_id"], name: "index_masks_webauthn_credentials_on_actor_id"
-    t.index ["external_id"], name: "index_masks_webauthn_credentials_on_external_id", unique: true
+    t.index ["device_id"], name: "index_masks_webauthn_credentials_on_device_id"
+    t.index %w[external_id aaguid],
+            name: "index_masks_webauthn_credentials_on_external_id_and_aaguid",
+            unique: true
   end
 
   create_table "sessions", force: :cascade do |t|
@@ -357,6 +459,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.index ["updated_at"], name: "index_sessions_on_updated_at"
   end
 
-  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_attachments",
+                  "active_storage_blobs",
+                  column: "blob_id"
+  add_foreign_key "active_storage_variant_records",
+                  "active_storage_blobs",
+                  column: "blob_id"
 end

@@ -282,9 +282,10 @@ module Masks
         Authenticators::LoginLink.new(self),
         Authenticators::Credential.new(self),
         Authenticators::SecondFactor.new(self),
+        Authenticators::Phone.new(self),
         Authenticators::Webauthn.new(self),
-        Authenticators::ResetPassword.new(self),
-        Authenticators::Onboard.new(self),
+        Authenticators::Totp.new(self),
+        Authenticators::BackupCode.new(self),
         Authenticators::VerifyEmail.new(self),
       ].each(&:prepare!).filter(&:enabled?).compact
     end

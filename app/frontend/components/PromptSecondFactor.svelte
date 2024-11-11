@@ -17,14 +17,16 @@
     : "Add secondary credentials...";
 </script>
 
-<PromptHeader {heading} client={auth.client} class="mb-6" />
+<div class="flex flex-col divide-y divide-base-100 divide-dotted">
+  <div>
+    <PromptHeader {heading} client={auth.client} class="mb-3" />
 
-<Alert type="info">
-  Set up one or more of the following secondary credentials to secure your
-  account.
-</Alert>
+    <Alert type="info">
+      Set up one or more of the following secondary credentials to secure your
+      account.
+    </Alert>
+  </div>
 
-<div class="flex flex-col gap-3">
   <OnboardHardwareKey {...$$props} />
   <OnboardPhoneNumber {...$$props} />
   <OnboardAuthenticatorApp {...$$props} />

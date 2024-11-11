@@ -20,7 +20,7 @@ module Types
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
     Masks::Client::LIFETIME_COLUMNS.each { |col| field col, String }
-
+    Masks::Client::STRING_COLUMNS.each { |col| field col, String }
     Masks::Client::BOOLEAN_COLUMNS.each { |col| field col, Boolean }
 
     def id

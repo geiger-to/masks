@@ -62,9 +62,7 @@
 
   <slot name="right" />
 
-  {#if !disabled}
-    <button on:click|preventDefault|stopPropagation={toggle} type="button">
-      <svelte:component this={visible ? EyeOff : Eye} />
-    </button>
-  {/if}
+  <button on:click|preventDefault|stopPropagation={toggle} type="button">
+    <svelte:component this={visible ? EyeOff : Eye} />
+  </button>
 </label>

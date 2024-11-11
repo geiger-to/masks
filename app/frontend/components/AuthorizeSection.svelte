@@ -34,63 +34,88 @@
   let mutation;
 
   const authorize = (vars) => {
-    mutation = mutationStore({
-      client,
-      query: gql`
-        mutation ($input: AuthorizeInput!) {
-          authorize(input: $input) {
-            requestId
-            errorMessage
-            errorCode
-            avatar
-            identifier
-            identiconId
-            authenticated
-            successful
-            settled
-            loginLink {
-              expiresAt
-            }
-            redirectUri
-            prompt
-            settings
-            warnings
-            extras
-            actor {
-              id
-              name
-              nickname
-              identifier
-              identifierType
-              identiconId
-              loginEmail
-              loginEmails {
-                address
-                verifiedAt
-                verifyLink
-              }
+    return new Promise((res, rej) => {
+      mutation = mutationStore({
+        client,
+        query: gql`
+          mutation ($input: AuthorizeInput!) {
+            authorize(input: $input) {
+              requestId
+              errorMessage
+              errorCode
               avatar
-              avatarCreatedAt
-              passwordChangedAt
-              passwordChangeable
-              secondFactor
-              webauthnCredentials {
+              identifier
+              identiconId
+              authenticated
+              successful
+              settled
+              loginLink {
+                expiresAt
+              }
+              redirectUri
+              prompt
+              settings
+              warnings
+              extras
+              actor {
                 id
                 name
-                createdAt
+                nickname
+                identifier
+                identifierType
+                identiconId
+                loginEmail
+                loginEmails {
+                  address
+                  verifiedAt
+                  verifyLink
+                }
+                phones {
+                  number
+                  createdAt
+                }
+                avatar
+                avatarCreatedAt
+                passwordChangedAt
+                passwordChangeable
+                secondFactor
+                savedBackupCodesAt
+                remainingBackupCodes
+                otpSecrets {
+                  id
+                  name
+                  createdAt
+                }
+                webauthnCredentials {
+                  id
+                  name
+                  createdAt
+                }
+              }
+              client {
+                id
+                name
+                logo
+                defaultRegion
+                allowPasswords
+                allowLoginLinks
               }
             }
-            client {
-              id
-              name
-              logo
-              allowPasswords
-              allowLoginLinks
-            }
+          }
+        `,
+        variables: { input: { id: authId, ...vars } },
+      });
+
+      let resolved;
+
+      mutation.subscribe((result) => {
+        if (!result?.fetching && !resolved) {
+          if (result?.data?.authorize) {
+            resolved = true;
+            res(result?.data?.authorize);
           }
         }
-      `,
-      variables: { input: { id: authId, ...vars } },
+      });
     });
   };
 
@@ -149,21 +174,6 @@
     authorize({});
   }
 
-  onMount(() => {
-    if (!authId) {
-      return;
-    }
-
-    return consumer.subscriptions.create(
-      { channel: "AuthorizeChannel", id: authId },
-      {
-        received(data) {
-          console.log(data);
-        },
-      }
-    );
-  });
-
   let prompts = {
     identifier: PromptLogin,
     credential: PromptCredential,
@@ -185,7 +195,6 @@
   };
 
   let loadingError;
-  let loadingTimer;
 
   let computePrompt = (auth, loading, loadingError) => {
     if (loadingError) {
@@ -198,20 +207,6 @@
 
     return PromptLoading;
   };
-
-  $: if (!loading && loadingTimer) {
-    clearTimeout(loadingTimer);
-  }
-
-  $: if (loading) {
-    clearTimeout(loadingTimer);
-
-    loadingTimer = setTimeout(() => {
-      if (loading) {
-        loadingError = true;
-      }
-    }, 5000);
-  }
 
   let defaultEvent;
   let currentEvent = (name) => {
@@ -226,27 +221,22 @@
   on:submit={continueAuth({ event: defaultEvent, updates })}
   class="background animate-fade-in flex min-h-full md:p-3 px-[5px] items-center"
 >
-  <div class="w-full md:w-[502px] mx-auto rounded-2xl shadow-2xl p-[1px]">
-    <div
-      class="w-full md:w-[500px] mx-auto rounded-2xl overflow-hidden relative shadow-xl"
-    >
-      <div class="animate-fade-in-slow w-full h-[50px] absolute blur-2xl">
-        <div
-          class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-[.03]"}`}
-        />
+  <div class="w-full md:w-[502px] mx-auto rounded-b-2xl shadow-2xl p-[1px]">
+    <div class="w-full md:w-[500px] mx-auto relative rounded-b-2xl shadow-xl">
+      <div class={`rounded-t-2xl bg-base-300 h-[30px] overflow-hidden`}>
+        <div class="animate-fade-in-slow w-full h-[50px] absolute blur-2xl">
+          <div
+            class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-[.03]"}`}
+          />
+        </div>
+        <div class="bg-base-200 animate-fade-in-slow w-full h-[2px] z-10">
+          <div
+            class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-5"}`}
+          />
+        </div>
       </div>
-      <div
-        class="bg-base-200 animate-fade-in-slow w-full h-[2px] z-10 absolute"
-      >
-        <div
-          class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-5"}`}
-        />
-      </div>
-      <div class={`bg-base-300 h-[30px]`}></div>
-      <div
-        class="bg-base-300 w-full min-h-[200px] md:w-[500px] mx-auto border-b dark:border-base-100 border-white"
-      >
-        <div class="p-5 md:p-8 pt-0 md:pt-1.5">
+      <div class="bg-base-300 w-full min-h-[200px] md:w-[500px] mx-auto">
+        <div class="px-5 md:px-8 md:pt-1.5">
           <svelte:component
             this={computePrompt(auth, loading, loadingError)}
             {auth}
@@ -262,6 +252,9 @@
           />
         </div>
       </div>
+      <div
+        class={`rounded-b-2xl bg-base-300 h-[30px] overflow-hidden border-b dark:border-base-100 border-white overflow-hidden`}
+      ></div>
     </div>
   </div>
 </form>

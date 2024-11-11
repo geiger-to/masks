@@ -146,6 +146,7 @@ GEM
       irb (~> 1.10)
       reline (>= 0.3.8)
     device_detector (1.1.3)
+    dotenv (3.1.4)
     drb (2.2.1)
     dry-cli (1.2.0)
     em-websocket (0.5.3)
@@ -342,6 +343,7 @@ GEM
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     pg (1.5.9)
+    phonelib (0.9.3)
     premailer (1.27.0)
       addressable
       css_parser (>= 1.19.0)
@@ -583,6 +585,7 @@ DEPENDENCIES
   database_cleaner-active_record (~> 2.2)
   debug
   device_detector (~> 1.1)
+  dotenv
   fido_metadata!
   geocoder (~> 1.8)
   good_job (~> 4.4)
@@ -596,6 +599,7 @@ DEPENDENCIES
   letter_opener (~> 1.10)
   openid_connect (~> 2.3)
   pg (~> 1.1)
+  phonelib (~> 0.9.3)
   premailer-rails (~> 1.12)
   prettier_print (~> 1.2)
   puma (>= 5.0)

@@ -20,6 +20,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :key
       t.string :name, null: true
       t.string :nickname
+      t.string :phone_number
       t.string :password_digest
       t.string :totp_secret
       t.string :version
@@ -31,6 +32,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.timestamps
       t.datetime :last_login_at
       t.datetime :password_changed_at
+      t.datetime :added_phone_number_at
       t.datetime :enabled_second_factor_at
       t.datetime :added_totp_secret_at
       t.datetime :saved_backup_codes_at
@@ -66,6 +68,30 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[address group], unique: true
     end
 
+    create_table :masks_phones do |t|
+      t.string :number, null: false
+
+      t.timestamps
+
+      t.references :actor
+
+      t.index %i[number], unique: true
+    end
+
+    create_table :masks_otp_secrets do |t|
+      t.string :public_id, null: false
+      t.string :name, null: true
+      t.string :secret, null: false
+
+      t.timestamps
+      t.datetime :verified_at
+
+      t.references :actor
+
+      t.index :secret, unique: true
+      t.index :public_id, unique: true
+    end
+
     create_table :masks_login_links do |t|
       t.string :token
       t.string :code
@@ -94,9 +120,10 @@ class Init < ActiveRecord::Migration[7.2]
       t.bigint :sign_count, default: 0, null: false
 
       t.references :actor
+      t.references :device
       t.timestamps
 
-      t.index :external_id, unique: true
+      t.index %i[external_id aaguid], unique: true
     end
 
     create_table :masks_events do |t|
@@ -148,6 +175,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :auth_via_login_link_expires_in
       t.string :auth_via_password_expires_in
       t.string :email_verification_expires_in
+      t.string :default_region
 
       t.integer :identifier_attempts
       t.integer :password_attempts

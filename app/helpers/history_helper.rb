@@ -18,6 +18,8 @@ module HistoryHelper
       identifier_type: actor.identifier_type,
       login_email: actor.login_email&.address,
       login_emails: map_emails(actor.emails.for_login),
+      webauthn_credentials: map_creds(actor.webauthn_credentials),
+      phones: map_phones(actor.phones),
       avatar: actor.avatar_url,
       avatar_created_at: actor.avatar_created_at,
     } if actor
@@ -74,6 +76,16 @@ module HistoryHelper
   def map_emails(emails)
     emails.map do |email|
       { address: email.address, verified_at: email.verified_at }
+    end
+  end
+
+  def map_phones(phones)
+    phones.map { |phone| phone.slice(:number, :created_at) }
+  end
+
+  def map_creds(creds)
+    creds.map do |cred|
+      cred.slice(:name, :created_at).merge(id: cred.external_id)
     end
   end
 end

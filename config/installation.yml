@@ -13,6 +13,7 @@ default: &default
   client:
     client_type: internal
     subject_type: public
+    default_region: "US"
     id_token_expires_in: "1 hour"
     access_token_expires_in: "1 day"
     code_expires_in: "12 hours"
@@ -48,6 +49,10 @@ default: &default
     otp_drift: 60
   sendmail:
     location: ~
+  twilio:
+    account_sid: <%= ENV['TWILIO_ACCOUNT_SID'] %>
+    auth_token: <%= ENV['TWILIO_AUTH_TOKEN'] %>
+    service_sid: <%= ENV['TWILIO_SERVICE_SID'] %>
   smtp:
     address: <%= ENV['MASKS_SMTP_ADDRESS'] %>
     port: <%= ENV['MASKS_SMTP_PORT'] %>

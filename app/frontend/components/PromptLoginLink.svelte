@@ -15,7 +15,6 @@
   let seconds = 5;
   let continuing = false;
   let cancelled;
-  let button;
   let done;
   let invalidCode;
 
@@ -73,7 +72,6 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <PromptContinue
-    bind:element={button}
     {loading}
     disabled={!cancelled}
     class={`min-w-[150px] ${invalidCode ? "animate-denied btn-error" : "btn-primary"}`}

@@ -2,9 +2,11 @@ module Masks
   module Authenticators
     class Webauthn < Base
       event "webauthn:onboard" do
+        next unless actor
+
         options =
           WebAuthn::Credential.options_for_create(
-            attestation: 'direct',
+            attestation: "direct",
             user: {
               id: actor.webauthn_id,
               name: actor.identifier,
@@ -23,12 +25,14 @@ module Masks
         begin
           webauthn.verify(id_session[:webauthn_challenge])
           credential =
-            actor.webauthn_credentials.build(
+            Masks::WebauthnCredential.new(
               name: Masks::Fido.aaguid_name(webauthn.response.aaguid),
               aaguid: webauthn.response.aaguid,
               external_id: webauthn.id,
               public_key: webauthn.public_key,
               sign_count: webauthn.sign_count,
+              device:,
+              actor:,
             )
 
           warn! "webauthn-error" unless credential.save

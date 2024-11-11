@@ -6,6 +6,9 @@
   export let code;
   export let value;
   export let complete;
+  export let length = 7;
+  export let type;
+  export let disabled;
 
   let pinClasses = [
     "no-inc py-3 grow w-[100%] input input-bordered px-1.5 md:px-3 text-center join-item",
@@ -22,16 +25,14 @@
 </script>
 
 <Pincode
+  {type}
   bind:code
   bind:value
   bind:complete
-  class="flex items-center join mb-1.5 rounded-t-none"
+  class="flex items-center join mb-1.5"
+  {disabled}
 >
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
-  <PincodeInput placeholder="•" class={classes.join(" ")} />
+  {#each { length } as _, i}
+    <PincodeInput placeholder="•" class={classes.join(" ")} />
+  {/each}
 </Pincode>
