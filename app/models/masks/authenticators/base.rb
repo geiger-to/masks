@@ -163,6 +163,26 @@ module Masks
           link.save_and_deliver
         end
       end
+
+      def second_factor!(type)
+        second_factors[type] = client.expires_at(type)
+      end
+
+      def second_factors
+        actor_session[:second_factors] ||= {}
+      end
+
+      def second_factor_valid?
+        !second_factor_expired?
+      end
+
+      def second_factor_expired?
+        return false if authenticating?
+        return true if second_factors.keys.none?
+        return true if !actor.second_factor?
+
+        second_factors.values.all? { |time| expired_time?(time) }
+      end
     end
   end
 end

@@ -38,6 +38,7 @@
     "cbor2": "^1.7.1",
     "dayjs": "^1.11.13",
     "fido2-lib": "^3.5.3",
+    "libphonenumber-js": "^1.11.14",
     "lodash-es": "^4.17.21",
     "lucide-svelte": "^0.446.0",
     "luxon": "^3.5.0",

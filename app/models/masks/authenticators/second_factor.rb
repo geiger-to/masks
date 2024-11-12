@@ -6,13 +6,13 @@ module Masks
       end
 
       prompt "second-factor" do
-        expired_second_factor?
+        second_factor_expired?
       end
 
-      private
+      event "second-factor:enable" do
+        return if !actor || actor.second_factor?
 
-      def expired_second_factor?
-        !authenticating? && !id_session&.dig(:second_factor)
+        actor.enable_second_factor!
       end
     end
   end

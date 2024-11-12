@@ -16,6 +16,10 @@ module Masks
       auth_via_login_link_expires_in
       auth_via_password_expires_in
       email_verification_expires_in
+      backup_code_expires_in
+      sms_code_expires_in
+      totp_code_expires_in
+      webauthn_expires_in
     ]
 
     BOOLEAN_COLUMNS = %i[
@@ -195,6 +199,14 @@ module Masks
       scopes.each { |scope| self.scopes.delete(scope) }
 
       save!
+    end
+
+    def expires_at(type)
+      column = "#{type}_expires_in".to_sym
+
+      return unless LIFETIME_COLUMNS.include?(column) && self[column]
+
+      Time.now + ChronicDuration.parse(self[column])
     end
 
     def email_verification_duration

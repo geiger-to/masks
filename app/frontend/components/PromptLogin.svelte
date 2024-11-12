@@ -60,7 +60,7 @@
 
   <input
     class="w-full placeholder:text-sm md:placeholder:text-base"
-    placeholder={`enter your ${identifiers.join(" or ")}...`}
+    placeholder={`Your ${identifiers.join(" or ")}...`}
     type="text"
     bind:value
   />

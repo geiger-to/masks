@@ -279,6 +279,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "public_url"
     t.text "redirect_uris"
     t.text "scopes"
+    t.string "default_region"
     t.boolean "require_consent"
     t.boolean "require_verified_email"
     t.boolean "require_onboarded_actor"
@@ -296,7 +297,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "auth_via_login_link_expires_in"
     t.string "auth_via_password_expires_in"
     t.string "email_verification_expires_in"
-    t.string "default_region"
+    t.string "backup_code_expires_in"
+    t.string "sms_code_expires_in"
+    t.string "totp_code_expires_in"
+    t.string "webauthn_expires_in"
     t.integer "identifier_attempts"
     t.integer "password_attempts"
     t.integer "login_code_attempts"
@@ -417,6 +421,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "number", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "verified_at"
     t.bigint "actor_id"
     t.index ["actor_id"], name: "index_masks_phones_on_actor_id"
     t.index ["number"], name: "index_masks_phones_on_number", unique: true
@@ -443,6 +448,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.bigint "device_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "verified_at"
     t.index ["actor_id"], name: "index_masks_webauthn_credentials_on_actor_id"
     t.index ["device_id"], name: "index_masks_webauthn_credentials_on_device_id"
     t.index %w[external_id aaguid],

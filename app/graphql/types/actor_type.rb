@@ -28,6 +28,7 @@ module Types
     field :otp_secrets, [OtpSecretType], null: true
     field :phones, [PhoneType], null: true
     field :remaining_backup_codes, Integer, null: true
+    field :second_factors, [Types::SecondFactorType], null: false
 
     def id
       object.key

@@ -1,28 +1,32 @@
 module Masks
   module Authenticators
     class Phone < Base
-      event "phone:add" do
-        next warn! "invalid-phone" unless phone.valid?
-
-        warn! "invalid-phone" unless sms_code.send_code
-      end
-
       event "phone:verify" do
         next warn! "invalid-phone" unless phone.valid?
 
         code = updates["code"]
 
-        warn! "invalid-sms-code" unless sms_code.verify_code(code) && phone.save
+        if phone.verify_code(code)
+          second_factor! :sms_code
+        else
+          warn! "invalid-code:#{code || ""}"
+        end
+      end
+
+      event "phone:send" do
+        next warn! "invalid-phone" unless phone.valid?
+
+        warn! "invalid-phone" unless phone.send_code
       end
 
       private
 
-      def sms_code
-        @sms_code ||= Masks::SmsCode.new(phone)
-      end
-
       def phone
-        @phone ||= Masks::Phone.build(actor:, number: updates["phone"])
+        @phone ||=
+          (
+            actor.phones.find_by(number: updates["phone"]) ||
+              Masks::Phone.build(actor:, number: updates["phone"])
+          )
       end
     end
   end

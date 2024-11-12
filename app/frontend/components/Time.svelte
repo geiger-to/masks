@@ -3,26 +3,27 @@
   import { onMount, onDestroy } from "svelte";
 
   export let timestamp;
-  export let interval = 60000;
   export let style = "narrow";
 
   let time;
+  let intervalId;
+  let interval;
 
   function updateTime(ts) {
     time = DateTime.fromISO(ts).toRelative({ style, base: DateTime.now() });
     time = time
       .replace(/ago$/, $$props.ago || "ago")
       .replace(/^in/, $$props.in || "in");
-  }
 
-  let intervalId;
+    interval = time?.includes("sec") ? 1000 : 60 * 1000;
+  }
 
   onMount(() => {
     updateTime(timestamp);
 
     intervalId = setInterval(() => {
       updateTime(timestamp);
-    }, 15000);
+    }, interval);
   });
 
   onDestroy(() => {

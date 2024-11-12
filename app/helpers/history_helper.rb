@@ -18,10 +18,12 @@ module HistoryHelper
       identifier_type: actor.identifier_type,
       login_email: actor.login_email&.address,
       login_emails: map_emails(actor.emails.for_login),
-      webauthn_credentials: map_creds(actor.webauthn_credentials),
-      phones: map_phones(actor.phones),
       avatar: actor.avatar_url,
       avatar_created_at: actor.avatar_created_at,
+      saved_backup_codes_at: actor.saved_backup_codes_at,
+      remaining_backup_codes: actor.backup_codes&.length,
+      second_factor: actor.second_factor?,
+      second_factors: map_second_factor(actor.second_factors),
     } if actor
 
     result[:actor][:avatar] = rails_storage_proxy_url(
@@ -73,19 +75,28 @@ module HistoryHelper
     result.merge(prompt:, settled:)
   end
 
-  def map_emails(emails)
-    emails.map do |email|
-      { address: email.address, verified_at: email.verified_at }
+  def map_second_factor(records)
+    records.map do |record|
+      case record
+      when Masks::WebauthnCredential
+        record.slice(:name, :created_at).merge(
+          id: record.external_id,
+          __typename: "WebauthnCredential",
+        )
+      when Masks::Phone
+        record.slice(:number, :created_at).merge(__typename: "Phone")
+      when Masks::OtpSecret
+        record.slice(:name, :created_at).merge(
+          id: record.public_id,
+          __typename: "OtpSecret",
+        )
+      end
     end
   end
 
-  def map_phones(phones)
-    phones.map { |phone| phone.slice(:number, :created_at) }
-  end
-
-  def map_creds(creds)
-    creds.map do |cred|
-      cred.slice(:name, :created_at).merge(id: cred.external_id)
+  def map_emails(emails)
+    emails.map do |email|
+      { address: email.address, verified_at: email.verified_at }
     end
   end
 end

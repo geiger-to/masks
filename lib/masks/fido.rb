@@ -24,6 +24,15 @@ module Masks
         mds_data&.description || aaguids.dig(aaguid, "name")
       end
 
+      def aaguid_icon(aaguid)
+        return unless aaguid
+
+        {
+          light: aaguids.dig(aaguid, "icon_light"),
+          dark: aaguids.dig(aaguid, "icon_dark"),
+        }
+      end
+
       private
 
       def aaguids

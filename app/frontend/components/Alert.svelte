@@ -19,13 +19,17 @@
       `dark:bg-yellow-950 dark:border-yellow-900 dark:text-yellow-200`,
       `bg-yellow-50 border-yellow-100 text-yellow-800`,
     ],
+    primary: [
+      `dark:bg-indigo-950 dark:border-indigo-900 dark:text-indigo-200`,
+      `bg-indigo-50 border-indigo-100 text-indigo-800`,
+    ],
   };
 </script>
 
 <div
   class={[
     "px-3 py-3 border rounded-lg",
-    "shadow flex items-start gap-3 text-left mb-3 md:text-base text-sm",
+    "shadow flex items-start gap-3 text-left md:text-base text-sm",
     $$props.class,
     ...(classes[type] || []),
   ].join(" ")}

@@ -65,4 +65,6 @@
   <button on:click|preventDefault|stopPropagation={toggle} type="button">
     <svelte:component this={visible ? EyeOff : Eye} />
   </button>
+
+  <slot name="end" />
 </label>

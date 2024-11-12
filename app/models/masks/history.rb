@@ -134,8 +134,8 @@ module Masks
       @warnings ||= []
     end
 
-    def warn!(key)
-      warnings << key
+    def warn!(*keys)
+      warnings << keys.compact.join(":")
       @warnings.uniq!
     end
 

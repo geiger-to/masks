@@ -26,7 +26,11 @@ class AuthorizedController < ApplicationController
   private
 
   def props_json
-    @props.deep_transform_keys { |key| key.to_s.camelize(:lower) }.to_json
+    @props
+      .deep_transform_keys do |key|
+        key.to_s == "__typename" ? key : key.to_s.camelize(:lower)
+      end
+      .to_json
   end
 
   def client=(value)

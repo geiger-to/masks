@@ -72,6 +72,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :number, null: false
 
       t.timestamps
+      t.datetime :verified_at
 
       t.references :actor
 
@@ -122,6 +123,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.references :actor
       t.references :device
       t.timestamps
+      t.datetime :verified_at
 
       t.index %i[external_id aaguid], unique: true
     end
@@ -157,6 +159,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :redirect_uris
       t.text :scopes
 
+      t.string :default_region
       t.boolean :require_consent
       t.boolean :require_verified_email
       t.boolean :require_onboarded_actor
@@ -175,7 +178,10 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :auth_via_login_link_expires_in
       t.string :auth_via_password_expires_in
       t.string :email_verification_expires_in
-      t.string :default_region
+      t.string :backup_code_expires_in
+      t.string :sms_code_expires_in
+      t.string :totp_code_expires_in
+      t.string :webauthn_expires_in
 
       t.integer :identifier_attempts
       t.integer :password_attempts

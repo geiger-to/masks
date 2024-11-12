@@ -70,10 +70,6 @@
                   verifiedAt
                   verifyLink
                 }
-                phones {
-                  number
-                  createdAt
-                }
                 avatar
                 avatarCreatedAt
                 passwordChangedAt
@@ -81,15 +77,25 @@
                 secondFactor
                 savedBackupCodesAt
                 remainingBackupCodes
-                otpSecrets {
-                  id
-                  name
-                  createdAt
-                }
-                webauthnCredentials {
-                  id
-                  name
-                  createdAt
+                secondFactors {
+                  ... on WebauthnCredential {
+                    id
+                    name
+                    createdAt
+                    icons {
+                      light
+                      dark
+                    }
+                  }
+                  ... on Phone {
+                    number
+                    createdAt
+                  }
+                  ... on OtpSecret {
+                    id
+                    name
+                    createdAt
+                  }
                 }
               }
               client {

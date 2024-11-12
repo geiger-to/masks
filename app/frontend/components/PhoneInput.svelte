@@ -109,6 +109,7 @@
         "text-gray-500 bg-base-100 rounded-l-lg",
         "hover:bg-base-200 focus:outline-none",
         "dark:text-white",
+        $$props.countryClass,
       ].join(" ")}
       type="button"
       role="combobox"
@@ -190,8 +191,8 @@
   </div>
 
   <div
-    class="text-base rounded-r-lg block w-full p-1.5
-      focus:outline-none bg-base-100 dark:text-white text-gray-900 flex items-center gap-2"
+    class={`text-base rounded-r-lg block w-full p-1.5
+      focus:outline-none bg-base-100 dark:text-white text-gray-900 flex items-center gap-2 ${$$props.class}`}
   >
     <TelInput
       {placeholder}
@@ -201,8 +202,7 @@
       bind:valid
       {options}
       {disabled}
-      required
-      class="bg-transparent focus:outline-none placeholder:text-sm w-full"
+      class="p-0 bg-transparent focus:outline-none placeholder:text-sm w-full input-sm"
     />
 
     <slot />

@@ -14,7 +14,7 @@ default: &default
     client_type: internal
     subject_type: public
     default_region: "US"
-    id_token_expires_in: "1 hour"
+    id_token_expires_in: "12 hours"
     access_token_expires_in: "1 day"
     code_expires_in: "12 hours"
     refresh_expires_in: "1 week"
@@ -34,6 +34,10 @@ default: &default
     require_second_factor: true
     allow_passwords: true
     allow_login_links: true
+    sms_code_expires_in: "10 seconds"
+    totp_code_expires_in: "10 seconds"
+    webauthn_expires_in: "10 seconds"
+    backup_code_expires_in: "10 seconds"
   authorize:
     delay: 100
   password:

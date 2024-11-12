@@ -60,8 +60,6 @@ module Masks
     validates :version, presence: true
     validate :validates_password, if: :password
 
-    before_save :regenerate_backup_codes
-
     serialize :backup_codes, coder: JSON
 
     include Scoped
@@ -160,14 +158,18 @@ module Masks
       enabled_second_factor_at.present?
     end
 
-    def factor2?
-      backup_codes.present?
+    def enable_second_factor!
+      return if second_factors.none? || backup_codes&.blank?
+
+      touch(:enabled_second_factor_at)
     end
 
-    def remove_factor2!
-      self.saved_backup_codes_at = nil
-      self.backup_codes = nil
-      save!
+    def second_factors
+      @second_factors ||= [
+        *(phones.all.to_a),
+        *(webauthn_credentials.all.to_a),
+        *(otp_secrets.all.to_a),
+      ].compact
     end
 
     def logout_everywhere!
@@ -175,19 +177,13 @@ module Masks
       save!
     end
 
-    def should_save_backup_codes?
-      factor2? && saved_backup_codes_at.blank?
-    end
-
-    def saved_backup_codes?
-      factor2? && saved_backup_codes_at.present?
-    end
-
     def verify_backup_code(code)
+      return false unless code && backup_codes&.any?
+
       hash = Digest::SHA256.hexdigest(code)
 
-      if codes.include?(hash)
-        codes.delete(hash)
+      if backup_codes.include?(hash)
+        backup_codes.delete(hash)
         save
       end
     end
@@ -223,16 +219,6 @@ module Masks
         errors.add(:password, :too_short, count: opts[:min])
       elsif opts[:max] && password.length > opts[:max]
         errors.add(key, :too_long, count: opts[:max])
-      end
-    end
-
-    def regenerate_backup_codes
-      if factor2?
-        self.backup_codes ||=
-          (1..12).to_h { |_i| [SecureRandom.base58(10), true] }
-      else
-        self.backup_codes = nil
-        self.saved_backup_codes_at = nil
       end
     end
   end

@@ -1,7 +1,7 @@
 module Masks
   module Authenticators
     class Webauthn < Base
-      event "webauthn:onboard" do
+      event "webauthn:add" do
         next unless actor
 
         options =
@@ -19,7 +19,7 @@ module Masks
         id_session[:webauthn_challenge] = options.challenge
       end
 
-      event "webauthn:credential" do
+      event "webauthn:verify" do
         webauthn = WebAuthn::Credential.from_create(updates["credential"])
 
         begin
@@ -31,11 +31,50 @@ module Masks
               external_id: webauthn.id,
               public_key: webauthn.public_key,
               sign_count: webauthn.sign_count,
+              verified_at: Time.now.utc,
               device:,
               actor:,
             )
 
-          warn! "webauthn-error" unless credential.save
+          if credential.save
+            second_factor! :webauthn
+          else
+            warn! "webauthn-error"
+          end
+        rescue WebAuthn::Error => e
+          warn! "webauthn-error"
+        end
+      end
+
+      event "webauthn:init" do
+        webauthn =
+          WebAuthn::Credential.options_for_get(
+            allow: actor.webauthn_credentials.map { |c| c.external_id },
+          )
+
+        history.extras(webauthn:)
+
+        id_session[:webauthn_challenge] = webauthn.challenge
+      end
+
+      event "webauthn:auth" do
+        webauthn = WebAuthn::Credential.from_get(updates["credential"])
+        credential =
+          actor.webauthn_credentials.find_by(external_id: webauthn.id)
+
+        begin
+          webauthn.verify(
+            id_session[:webauthn_challenge],
+            public_key: credential.public_key,
+            sign_count: credential.sign_count,
+          )
+
+          credential.update!(
+            sign_count: webauthn.sign_count,
+            verified_at: Time.now.utc,
+          )
+
+          second_factor! :webauthn
         rescue WebAuthn::Error => e
           warn! "webauthn-error"
         end
