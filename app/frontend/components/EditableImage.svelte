@@ -38,8 +38,6 @@
         body: formData,
       })
       .then(async (response) => {
-        console.log(response);
-
         if (response.ok) {
           let json = await response.json();
 
@@ -60,8 +58,6 @@
         .toUpperCase()
         .slice(0, 2)
     : null;
-
-  $: console.log(src, uploadedSrc);
 </script>
 
 <label

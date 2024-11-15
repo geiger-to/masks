@@ -49,7 +49,7 @@ module Masks
     end
 
     def generate_expiry
-      self.expires_at ||= client.code_expires_at
+      self.expires_at ||= client.expires_at(:code)
     end
   end
 end

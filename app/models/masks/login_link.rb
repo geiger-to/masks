@@ -9,7 +9,7 @@ module Masks
 
     scope :for_login, -> { where(log_in: true) }
 
-    attribute :history
+    attribute :auth
 
     belongs_to :client
     belongs_to :email
@@ -51,6 +51,8 @@ module Masks
       email.verify!
 
       touch(:revoked_at)
+
+      true
     end
 
     def authenticated?
@@ -92,13 +94,13 @@ module Masks
     end
 
     def set_defaults
-      return unless history
+      return unless auth
 
       self.code ||= SecureRandom.base36(7).upcase
-      self.settings ||= { path: history.path, params: history.params }
-      self.device ||= history.device
-      self.client ||= history.client
-      self.expires_at ||= client.login_link_expires_at
+      self.settings ||= { path: auth.path, params: auth.params }
+      self.device ||= auth.device
+      self.client ||= auth.client
+      self.expires_at ||= client.expires_at(:login_link)
     end
   end
 end

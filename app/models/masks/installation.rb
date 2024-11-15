@@ -40,7 +40,7 @@ module Masks
     end
 
     def modify!(settings)
-      self.settings = self.settings.deep_merge(settings)
+      self.settings = self.settings.deep_merge(settings.deep_stringify_keys)
       self.save!
     end
 

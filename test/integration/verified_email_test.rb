@@ -1,30 +1,30 @@
 require "test_helper"
 
 class VerifiedEmailTest < MasksTestCase
-  include AuthorizationHelper
+  include AuthHelper
 
-  setup { client.update(require_verified_email: true) }
+  setup { client.add_check!("verified-email") }
 
-  test "verified emails are not required when require_verified_email = false" do
-    client.update(require_verified_email: false)
+  test "verified emails are not required when the check is disabled" do
+    client.remove_check!("verified-email")
 
     log_in "manager"
 
-    assert_authorized
+    assert_login
   end
 
-  test "verified emails are required when require_verified_email = true" do
+  test "verified emails are required when the check is enabled" do
     log_in "manager"
 
     assert_prompt "verify-email"
 
-    refute_authorized
+    refute_settled
 
     address = "masks@example.com"
 
     attempt event: "verified-email:verify", updates: { email: address }
 
-    refute_authorized
+    refute_settled
 
     link =
       manager
@@ -42,7 +42,7 @@ class VerifiedEmailTest < MasksTestCase
               code: link.code,
             }
 
-    assert_authorized
+    assert_login
   end
 
   test "verified-email:verify-code rejects invalid codes" do
@@ -57,7 +57,7 @@ class VerifiedEmailTest < MasksTestCase
               code: "invalid",
             }
 
-    refute_authorized
+    refute_settled
   end
 
   test "verify-email:add adds emails when none exist" do

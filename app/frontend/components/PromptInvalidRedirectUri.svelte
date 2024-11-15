@@ -1,27 +1,21 @@
 <script>
-  import { X } from "lucide-svelte";
+  import { CircleHelp as Icon } from "lucide-svelte";
+  import Alert from "./Alert.svelte";
   import PromptHeader from "./PromptHeader.svelte";
-  import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptBack from "./PromptBack.svelte";
-  import PasswordInput from "./PasswordInput.svelte";
 
   export let auth;
-  export let identifier;
-  export let password;
-  export let startOver;
 </script>
 
 <PromptHeader
-  heading="Invalid request"
+  heading="Invalid request..."
   client={auth.client}
   redirectUri={auth.redirectUri}
+  class="mb-6"
 />
 
-<div class="alert flex items-center gap-3 rounded-lg mb-6">
-  <X class="text-error" />
-  <p class="text-xl">
-    The supplied <code>redirect_uri</code> cannot be used.
-  </p>
-</div>
+<Alert type="error" icon={Icon} class="mb-6">
+  The supplied <code>redirect_uri</code> cannot be used.
+</Alert>
 
 <PromptBack />

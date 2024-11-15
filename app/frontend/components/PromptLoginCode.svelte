@@ -49,7 +49,7 @@
   class="mb-3 md:mb-6"
 />
 
-<Alert icon={Mail} type="info">
+<Alert icon={Mail} type="info" class="mb-3">
   Check your email for a 7-character login code and enter it below. Your login
   code expires <b><Time timestamp={auth?.loginLink?.expiresAt} relative /></b>.
 </Alert>

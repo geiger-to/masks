@@ -7,6 +7,7 @@ class MasksTestCase < ActionDispatch::IntegrationTest
 
   setup do
     Masks.env.url = "http://www.example.com"
+    Masks.installation&.destroy!
     Masks.reset!
     Masks.install!
     seeder.seed_env!

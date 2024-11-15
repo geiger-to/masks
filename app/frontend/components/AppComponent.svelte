@@ -12,8 +12,6 @@
 
   let csrf = document.querySelector('meta[name="csrf-token"]').content;
 
-  console.log(csrf);
-
   function fetchOptions(csrf, options) {
     const update = { ...options };
 

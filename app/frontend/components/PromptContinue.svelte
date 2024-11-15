@@ -9,14 +9,29 @@
   export let denied = false;
   export let deniedLabel = "try again";
   export let auth;
-  export let type = "submit";
+  export let onClick;
+  export let type;
+
+  let handleClick = (e) => {
+    if (onClick) {
+      e.preventDefault();
+      e.stopPropagation();
+
+      return onClick(e);
+    }
+  };
+
+  let defaultType;
+
+  $: defaultType = onClick ? "button" : "submit";
 </script>
 
 <button
-  {type}
+  type={type || defaultType}
   class={`btn btn-lg min-w-[130px] ${$$props.class} text-center ${denied ? "animate-denied" : ""}`}
   disabled={loading || disabled}
   data-event={event}
+  on:click={handleClick}
   {..._.omit($$props, ["disabled", "class", "type", "loading"])}
 >
   {#if loading}

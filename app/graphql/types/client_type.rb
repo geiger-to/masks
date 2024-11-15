@@ -13,7 +13,6 @@ module Types
     field :redirect_uris, String
     field :response_types, [String]
     field :scopes, String
-    field :require_consent, Boolean
     field :consent, Boolean
     field :subject_type, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false

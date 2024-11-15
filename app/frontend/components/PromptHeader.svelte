@@ -4,6 +4,13 @@
   export let redirectUri;
   export let prefix = "to ";
   export let suffix = "";
+
+  let handleClick = (e) => {
+    if (!redirectUri) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  };
 </script>
 
 <div class={`flex items-center gap-3 ${$$props.class}`}>
@@ -17,7 +24,10 @@
     <h1 class="text-xl md:text-2xl">
       <slot name="subheading">
         {#if client}
-          {prefix}<span class="underline decoration-dotted">{client.name}</span
+          {prefix}<a
+            href={redirectUri || "#"}
+            on:click={handleClick}
+            class="underline decoration-dotted">{client.name}</a
           >{suffix}
         {/if}
       </slot>

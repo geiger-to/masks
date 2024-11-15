@@ -122,8 +122,8 @@
           {:else}
             <AaguidIcon icons={credential?.icons} />
 
-            <div class="truncate max-w-[175px]">
-              <span class="truncate">{credential?.name}</span>
+            <div class="truncate max-w-[175px] pl-1.5">
+              {credential?.name}
             </div>
           {/if}
         </summary>

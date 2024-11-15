@@ -277,15 +277,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "secret"
     t.string "client_type"
     t.string "public_url"
+    t.string "version"
     t.text "redirect_uris"
+    t.text "checks"
     t.text "scopes"
     t.string "default_region"
-    t.boolean "require_consent"
-    t.boolean "require_verified_email"
-    t.boolean "require_onboarded_actor"
-    t.boolean "require_second_factor"
     t.boolean "allow_passwords"
     t.boolean "allow_login_links"
+    t.boolean "autofill_redirect_uri"
     t.string "subject_type"
     t.string "sector_identifier"
     t.string "code_expires_in"
@@ -294,19 +293,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "refresh_expires_in"
     t.string "login_link_expires_in"
     t.string "auth_attempt_expires_in"
-    t.string "auth_via_login_link_expires_in"
-    t.string "auth_via_password_expires_in"
+    t.string "login_link_factor_expires_in"
+    t.string "password_factor_expires_in"
+    t.string "second_factor_backup_code_expires_in"
+    t.string "second_factor_sms_code_expires_in"
+    t.string "second_factor_totp_code_expires_in"
+    t.string "second_factor_webauthn_expires_in"
     t.string "email_verification_expires_in"
-    t.string "backup_code_expires_in"
-    t.string "sms_code_expires_in"
-    t.string "totp_code_expires_in"
-    t.string "webauthn_expires_in"
-    t.integer "identifier_attempts"
-    t.integer "password_attempts"
-    t.integer "login_code_attempts"
-    t.integer "login_link_attempts"
-    t.integer "verify_code_attempts"
-    t.integer "verify_email_attempts"
     t.text "rsa_private_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -314,14 +307,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
   end
 
   create_table "masks_devices", force: :cascade do |t|
-    t.string "session_id", null: false
+    t.string "public_id", null: false
     t.string "user_agent"
     t.string "ip_address"
     t.string "version"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["session_id"],
-            name: "index_masks_devices_on_session_id",
+    t.datetime "blocked_at"
+    t.index ["public_id"],
+            name: "index_masks_devices_on_public_id",
             unique: true
   end
 

@@ -19,6 +19,10 @@
       `dark:bg-yellow-950 dark:border-yellow-900 dark:text-yellow-200`,
       `bg-yellow-50 border-yellow-100 text-yellow-800`,
     ],
+    error: [
+      `dark:bg-red-950 dark:border-red-900 dark:text-red-200`,
+      `bg-red-50 border-red-100 text-red-800`,
+    ],
     primary: [
       `dark:bg-indigo-950 dark:border-indigo-900 dark:text-indigo-200`,
       `bg-indigo-50 border-indigo-100 text-indigo-800`,

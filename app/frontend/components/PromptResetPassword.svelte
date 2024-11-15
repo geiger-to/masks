@@ -1,5 +1,5 @@
 <script>
-  import { X, Send, Mail } from "lucide-svelte";
+  import { X, Check, Send, Mail } from "lucide-svelte";
   import Alert from "./Alert.svelte";
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
@@ -8,30 +8,40 @@
 
   export let auth;
   export let loading;
-  export let updates;
+  export let authorize;
 
   let password;
   let valid;
+  let changed;
+  let denied;
 
-  $: if (valid) {
-    updates({ newPassword: password });
-  } else {
-    updates({ newPassword: null });
+  $: if (password) {
+    denied = false;
   }
+
+  let changePassword = () => {
+    if (!valid) {
+      return;
+    }
+
+    authorize({
+      event: "reset-password",
+      updates: { newPassword: password },
+    }).then((result) => {
+      denied = result?.warnings?.includes("invalid-password");
+      changed = result?.warnings?.includes("changed-password");
+    });
+  };
 </script>
 
 <PromptHeader
-  heading="Change your password..."
+  heading={changed ? "Password changed!" : "Change your password..."}
   client={auth.client}
   redirectUri={auth.redirectUri}
-  prefix="before going to "
+  prefix={changed ? "Continue to " : "before going to "}
   suffix="?"
   class="mb-6"
 />
-
-{#if auth?.warnings?.includes("expired-login-link")}
-  <Alert icon={X} type="warn">Your 7-character code has expired.</Alert>
-{/if}
 
 <PromptIdentifier identifier={auth?.identifier} {auth} class="mb-3" />
 
@@ -41,23 +51,35 @@
   placeholder="Your new password"
   bind:value={password}
   bind:valid
-/>
+  disabled={changed}
+>
+  <div slot="right" class="flex items-center gap-3">
+    {#if changed}
+      <span class="text-success text-sm font-bold">changed</span>
+
+      <Check class="text-success" size="20" />
+    {/if}
+  </div>
+</PasswordInput>
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <PromptContinue
-    label="change"
+    onClick={!changed ? changePassword : null}
+    label={changed ? "continue" : "change"}
     {loading}
-    event="reset-password"
-    disabled={!valid}
-    class={"btn-primary"}
+    {denied}
+    disabled={!changed && !valid}
+    class={changed ? "btn-success" : "btn-primary"}
   />
 
-  <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+  {#if !changed}
+    <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
 
-  <PromptContinue
-    event="reset-password:skip"
-    class="btn-link px-0 text-base-content"
-  >
-    continue without changes...
-  </PromptContinue>
+    <PromptContinue
+      event="reset-password:skip"
+      class="btn-link px-0 text-base-content"
+    >
+      continue without changes...
+    </PromptContinue>
+  {/if}
 </div>

@@ -3,30 +3,31 @@
   import { AlertTriangle, RotateCcw } from "lucide-svelte";
   import Identicon from "./Identicon.svelte";
   import PasswordInput from "./PasswordInput.svelte";
-  import PromptCredential from "./PromptCredential.svelte";
+  import PromptDevice from "./PromptDevice.svelte";
+  import PromptIdentify from "./PromptIdentify.svelte";
+  import PromptIdentifierInvalid from "./PromptIdentifierInvalid.svelte";
+  import PromptCredentials from "./PromptCredentials.svelte";
+  import PromptFactor2 from "./PromptFactor2.svelte";
   import PromptResetPassword from "./PromptResetPassword.svelte";
   import PromptVerifyEmail from "./PromptVerifyEmail.svelte";
   import PromptLoginLink from "./PromptLoginLink.svelte";
   import PromptLoginCode from "./PromptLoginCode.svelte";
-  import PromptLogin from "./PromptLogin.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import PromptLoadingError from "./PromptLoadingError.svelte";
-  import PromptSecondFactor from "./PromptSecondFactor.svelte";
   import PromptSuccess from "./PromptSuccess.svelte";
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
-  import PromptScopesRequired from "./PromptScopesRequired.svelte";
-  import PromptInvalidIdentifier from "./PromptInvalidIdentifier.svelte";
+  import PromptMissingScopes from "./PromptMissingScopes.svelte";
   import PromptInvalidRequest from "./PromptInvalidRequest.svelte";
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
   import PromptUnsupportedResponseType from "./PromptUnsupportedResponseType.svelte";
-  import PromptNonceRequired from "./PromptNonceRequired.svelte";
+  import PromptMissingNonce from "./PromptMissingNonce.svelte";
   import PromptAuthorize from "./PromptAuthorize.svelte";
   import PromptOnboard from "./PromptOnboard.svelte";
   import { onMount } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import Time from "svelte-time";
+  import AuthenticateQuery from "../authenticate.gql?raw";
 
-  export let authId;
   export let auth;
 
   let consumer = createConsumer();
@@ -38,87 +39,18 @@
       mutation = mutationStore({
         client,
         query: gql`
-          mutation ($input: AuthorizeInput!) {
-            authorize(input: $input) {
-              requestId
-              errorMessage
-              errorCode
-              avatar
-              identifier
-              identiconId
-              authenticated
-              successful
-              settled
-              loginLink {
-                expiresAt
-              }
-              redirectUri
-              prompt
-              settings
-              warnings
-              extras
-              actor {
-                id
-                name
-                nickname
-                identifier
-                identifierType
-                identiconId
-                loginEmail
-                loginEmails {
-                  address
-                  verifiedAt
-                  verifyLink
-                }
-                avatar
-                avatarCreatedAt
-                passwordChangedAt
-                passwordChangeable
-                secondFactor
-                savedBackupCodesAt
-                remainingBackupCodes
-                secondFactors {
-                  ... on WebauthnCredential {
-                    id
-                    name
-                    createdAt
-                    icons {
-                      light
-                      dark
-                    }
-                  }
-                  ... on Phone {
-                    number
-                    createdAt
-                  }
-                  ... on OtpSecret {
-                    id
-                    name
-                    createdAt
-                  }
-                }
-              }
-              client {
-                id
-                name
-                logo
-                defaultRegion
-                allowPasswords
-                allowLoginLinks
-              }
-            }
-          }
+          ${AuthenticateQuery}
         `,
-        variables: { input: { id: authId, ...vars } },
+        variables: { input: { id: auth.id, ...vars } },
       });
 
       let resolved;
 
       mutation.subscribe((result) => {
         if (!result?.fetching && !resolved) {
-          if (result?.data?.authorize) {
+          if (result?.data?.authenticate) {
             resolved = true;
-            res(result?.data?.authorize);
+            res(result?.data?.authenticate);
           }
         }
       });
@@ -135,7 +67,7 @@
     auth.password = password = null;
     auth.errorCode = null;
     auth.errorMessage = null;
-    auth.prompt = "login";
+    auth.prompt = "identifier";
   };
 
   const continueAuth = (args) => {
@@ -159,15 +91,9 @@
       return;
     }
 
-    auth = result.data?.authorize;
+    auth = result.data?.authenticate;
     identifier = auth?.identifier;
     loadingError = result.error;
-
-    if (auth?.settled) {
-      setTimeout(() => {
-        window.location.assign(auth.redirectUri);
-      }, 1000);
-    }
   };
 
   const onUpdate = (v) => {
@@ -176,28 +102,29 @@
     }
   };
 
-  if (authId) {
+  if (auth?.id) {
     authorize({});
   }
 
   let prompts = {
-    identifier: PromptLogin,
-    credential: PromptCredential,
+    identify: PromptIdentify,
+    device: PromptDevice,
+    credentials: PromptCredentials,
+    "second-factor": PromptFactor2,
     "login-code": PromptLoginCode,
     "login-link": PromptLoginLink,
     "verify-email": PromptVerifyEmail,
     "reset-password": PromptResetPassword,
-    "second-factor": PromptSecondFactor,
+    "invalid-identifier": PromptIdentifierInvalid,
+    "invalid-redirect": PromptInvalidRedirectUri,
+    "missing-scopes": PromptMissingScopes,
+    "missing-nonce": PromptMissingNonce,
+    "access-denied": PromptAccessDenied,
     authorize: PromptAuthorize,
     onboard: PromptOnboard,
     success: PromptSuccess,
-    scopes_required: PromptScopesRequired,
     invalid_request: PromptInvalidRequest,
-    invalid_identifier: PromptInvalidIdentifier,
-    invalid_redirect_uri: PromptInvalidRedirectUri,
-    access_denied: PromptAccessDenied,
     unsupported_response_type: PromptUnsupportedResponseType,
-    nonce_required: PromptNonceRequired,
   };
 
   let loadingError;

@@ -1,28 +1,28 @@
 require "test_helper"
 
 class OnboardingTest < MasksTestCase
-  include AuthorizationHelper
+  include AuthHelper
 
-  setup { client.update(require_onboarded_actor: true) }
+  setup { client.add_check! "onboarded" }
 
-  test "onboarding is not required when require_onboarded_actor = false" do
-    client.update(require_onboarded_actor: false)
+  test "onboarding is not required when the check is missing" do
+    client.remove_check! "onboarded"
 
     log_in "manager"
 
-    assert_authorized
+    assert_login
   end
 
-  test "onboarding is required when require_onboarded_actor = true" do
+  test "onboarding is required when the check is present" do
     log_in "manager"
 
     assert_prompt "onboard"
 
-    refute_authorized
+    refute_settled
 
     attempt event: "onboard:confirm"
 
-    assert_authorized
+    assert_login
   end
 
   test "onboarding allows changing name and password" do

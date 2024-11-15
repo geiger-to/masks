@@ -33,3 +33,5 @@ en:
     invalid_credentials: "invalid credentials"
     invalid_request: the request is malformed
     scopes_required: "unauthorized"
+  scopes:
+    "masks:manage": Manage masks

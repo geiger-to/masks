@@ -1,13 +1,13 @@
 require "test_helper"
 
 class PasswordTest < MasksTestCase
-  include AuthorizationHelper
+  include AuthHelper
 
   test "credential prompt is shown after an identifier is added" do
     authorize
     attempt_identifier("manager")
 
-    assert_prompt "credential"
+    assert_prompt "credentials"
   end
 
   test "password:check rejects invalid passwords" do
@@ -16,7 +16,7 @@ class PasswordTest < MasksTestCase
     attempt_password("invalid")
 
     assert_warning "invalid-credentials"
-    assert_prompt "credential"
+    assert_prompt "credentials"
   end
 
   test "password:check rejects invalid passwords for invalid actors" do
@@ -25,12 +25,12 @@ class PasswordTest < MasksTestCase
     attempt_password("invalid")
 
     assert_warning "invalid-credentials"
-    assert_prompt "credential"
+    assert_prompt "credentials"
   end
 
   test "password:check authenticates valid passwords" do
     log_in "manager"
 
-    assert_authorized
+    assert_login
   end
 end

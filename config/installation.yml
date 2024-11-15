@@ -2,6 +2,21 @@ default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   timezone: America/New_York
+  prompts:
+    - Masks::Prompts::Device
+    - Masks::Prompts::Identifier
+    - Masks::Prompts::LoginLink
+    - Masks::Prompts::Password
+    - Masks::Prompts::Credentials
+      # Masks::Prompts::Factor2
+      # Masks::Prompts::Phone
+      # Masks::Prompts::Webauthn
+      # Masks::Prompts::Totp
+      # Masks::Prompts::BackupCode
+    - Masks::Prompts::ResetPassword
+    - Masks::Prompts::Onboard
+    - Masks::Prompts::VerifyEmail
+    - Masks::Prompts::OIDC
   manager:
     nickname: "<%= ENV['MASKS_MANAGER_NICKNAME'] || 'manager' %>"
     password: "<%= ENV['MASKS_MANAGER_PASSWORD'] %>"
@@ -11,33 +26,35 @@ default: &default
   deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
   salt: "<%= ENV['MASKS_SALT'] %>"
   client:
+    scopes:
+      required: []
+      allowed: []
+    checks:
+      - device
+      - credentials
+      # - second
+      # - consent
+      # - onboarded
+      # - verified-email
     client_type: internal
     subject_type: public
     default_region: "US"
-    id_token_expires_in: "12 hours"
-    access_token_expires_in: "1 day"
-    code_expires_in: "12 hours"
-    refresh_expires_in: "1 week"
+    id_token_expires_in: "6 hours"
+    access_token_expires_in: "6 hours"
+    code_expires_in: "10 minutes"
+    refresh_expires_in: "1 month"
     login_link_expires_in: "10 minutes"
-    auth_attempt_expires_in: "2 hours"
-    auth_via_login_link_expires_in: "12 hours"
-    auth_via_password_expires_in: "1 day"
+    auth_attempt_expires_in: "1 hour"
+    login_link_factor_expires_in: "12 hours"
+    password_factor_expires_in: "1 day"
+    second_factor_backup_code_expires_in: "1 hour"
+    second_factor_sms_code_expires_in: "10 minutes"
+    second_factor_totp_code_expires_in: "10 minutes"
+    second_factor_webauthn_expires_in: "10 minutes"
     email_verification_expires_in: "1 year"
-    verify_email_attempts: 2
-    verify_code_attempts: 5
-    login_link_attempts: 2
-    login_code_attempts: 5
-    password_attempts: 5
-    require_consent: false
-    require_verified_email: false
-    require_onboarded_actor: false
-    require_second_factor: true
     allow_passwords: true
     allow_login_links: true
-    sms_code_expires_in: "10 seconds"
-    totp_code_expires_in: "10 seconds"
-    webauthn_expires_in: "10 seconds"
-    backup_code_expires_in: "10 seconds"
+    autofill_redirect_uri: false
   authorize:
     delay: 100
   password:

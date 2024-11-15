@@ -140,14 +140,15 @@ class Init < ActiveRecord::Migration[7.2]
     end
 
     create_table :masks_devices do |t|
-      t.string :session_id, null: false
+      t.string :public_id, null: false
       t.string :user_agent
       t.string :ip_address
       t.string :version
 
       t.timestamps
+      t.datetime :blocked_at
 
-      t.index %i[session_id], unique: true
+      t.index %i[public_id], unique: true
     end
 
     create_table :masks_clients do |t|
@@ -156,16 +157,15 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :secret
       t.string :client_type
       t.string :public_url, null: true
+      t.string :version
       t.text :redirect_uris
+      t.text :checks
       t.text :scopes
 
       t.string :default_region
-      t.boolean :require_consent
-      t.boolean :require_verified_email
-      t.boolean :require_onboarded_actor
-      t.boolean :require_second_factor
       t.boolean :allow_passwords
       t.boolean :allow_login_links
+      t.boolean :autofill_redirect_uri
 
       t.string :subject_type
       t.string :sector_identifier
@@ -175,20 +175,13 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :refresh_expires_in
       t.string :login_link_expires_in
       t.string :auth_attempt_expires_in
-      t.string :auth_via_login_link_expires_in
-      t.string :auth_via_password_expires_in
+      t.string :login_link_factor_expires_in
+      t.string :password_factor_expires_in
+      t.string :second_factor_backup_code_expires_in
+      t.string :second_factor_sms_code_expires_in
+      t.string :second_factor_totp_code_expires_in
+      t.string :second_factor_webauthn_expires_in
       t.string :email_verification_expires_in
-      t.string :backup_code_expires_in
-      t.string :sms_code_expires_in
-      t.string :totp_code_expires_in
-      t.string :webauthn_expires_in
-
-      t.integer :identifier_attempts
-      t.integer :password_attempts
-      t.integer :login_code_attempts
-      t.integer :login_link_attempts
-      t.integer :verify_code_attempts
-      t.integer :verify_email_attempts
 
       t.text :rsa_private_key
 

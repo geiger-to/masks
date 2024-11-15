@@ -3,8 +3,6 @@
   import PromptHeader from "./PromptHeader.svelte";
 
   export let loadingError;
-
-  console.log(loadingError);
 </script>
 
 <PromptHeader heading="An error occurred..." class="mb-6">

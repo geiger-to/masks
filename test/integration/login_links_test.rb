@@ -1,7 +1,7 @@
 require "test_helper"
 
 class LoginLinksTest < MasksTestCase
-  include AuthorizationHelper
+  include AuthHelper
 
   test "login-link:password switches to password entry" do
     authorize
@@ -9,7 +9,7 @@ class LoginLinksTest < MasksTestCase
     attempt event: "login-link:authenticate"
     assert_prompt "login-code"
     attempt event: "login-link:password"
-    assert_prompt "credential"
+    assert_prompt "credentials"
   end
 
   test "login-link:authenticate sends an email" do
@@ -93,7 +93,7 @@ class LoginLinksTest < MasksTestCase
 
     attempt event: "login-link:verify", updates: { code: link.code }
 
-    assert_authorized
+    assert_login
   end
 
   test "login-link:verify authenticates given a valid code over GET params" do
@@ -103,9 +103,9 @@ class LoginLinksTest < MasksTestCase
     link = manager.login_email.login_links.for_login.active.first
 
     attempt event: "login-link:verify", updates: { login_code: "invalid" }
-    refute_authorized
+    refute_settled
 
     attempt event: "login-link:verify", params: { login_code: link.code }
-    assert_authorized
+    assert_login
   end
 end

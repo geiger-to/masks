@@ -9,24 +9,8 @@ module Masks
       @env = env
     end
 
-    def seed_client(
-      key:,
-      name:,
-      type:,
-      redirect_uris: nil,
-      require_consent: true,
-      scopes: nil,
-      logo: nil
-    )
-      client =
-        Masks::Client.create!(
-          key:,
-          name:,
-          scopes:,
-          redirect_uris:,
-          require_consent:,
-          client_type: type,
-        )
+    def seed_client(key:, name:, type:, logo: nil, **attrs)
+      client = Masks::Client.create!(key:, name:, client_type: type, **attrs)
 
       if logo
         client.logo.attach(io: File.open(Rails.root.join(logo)), filename: logo)
@@ -73,26 +57,25 @@ module Masks
             type: "internal",
             key: Masks::Client::MANAGE_KEY,
             name: "Manage masks",
-            scopes: Masks::Scoped::MANAGE,
+            scopes: {
+              required: [Masks::Scoped::MANAGE],
+            },
             redirect_uris: "/manage",
             logo: "app/assets/images/masks.png",
-            require_consent: false,
           )
         seed_client(
           type: "confidential",
           key: "confidential",
           name: "Confidential",
-          scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          require_consent: true,
+          checks: %w[device credentials client-consent],
         )
         seed_client(
           type: "public",
           key: "public",
           name: "Public",
-          scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          require_consent: true,
+          checks: %w[device credentials client-consent],
         )
       end
     end

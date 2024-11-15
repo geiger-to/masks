@@ -68,6 +68,10 @@ module Masks
       super || Masks.installation.settings["timezone"]
     end
 
+    def session_key
+      version
+    end
+
     def onboarded!
       touch(:onboarded_at)
     end

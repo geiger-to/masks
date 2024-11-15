@@ -14,6 +14,7 @@
   heading="Invalid request"
   client={auth.client}
   redirectUri={auth.redirectUri}
+  class="mb-6"
 />
 
 <div class="alert flex items-center gap-3 rounded-lg mb-6">

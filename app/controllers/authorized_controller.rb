@@ -3,7 +3,6 @@ class AuthorizedController < ApplicationController
 
   helper_method :client
   before_action :render_404, unless: :client
-  before_action :verify_device, unless: :verified_device?
 
   helper_method :props_json
 
@@ -42,8 +41,8 @@ class AuthorizedController < ApplicationController
   end
 
   def authorization
-    @authorization ||=
-      Masks::AuthorizationCode.active.where(client: client, device: device).last
+    @authorization ||= nil
+    # Masks::AuthorizationCode.active.where(client: client, device: device).last
   end
 
   def redirect_to_login
@@ -53,32 +52,9 @@ class AuthorizedController < ApplicationController
                 )
   end
 
-  def history
-    @history ||= Masks::History.new(request:, device:, client:)
-  end
-
   def render_404
     @props = { section: "Error", code: 404 }
 
     render "app", status: 404
-  end
-
-  def verify_device
-    render json: { device: "needs verification" }
-  end
-
-  def verified_device?
-    device.known?
-  end
-
-  def device
-    # writing data to the session will ensure an ID is present
-    session[:written] = true unless session.id
-
-    @device ||=
-      Masks::Device.create_with(
-        user_agent: request.user_agent,
-        ip_address: request.remote_ip,
-      ).find_or_create_by!(session_id: session.id.to_s)
   end
 end

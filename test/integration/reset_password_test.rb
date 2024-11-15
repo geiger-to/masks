@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ResetPasswordTest < MasksTestCase
-  include AuthorizationHelper
+  include AuthHelper
 
   test "login-link:verify allows prompting for reset password" do
     log_in_via_link(manager)
