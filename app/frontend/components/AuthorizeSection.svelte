@@ -5,7 +5,6 @@
   import PasswordInput from "./PasswordInput.svelte";
   import PromptDevice from "./PromptDevice.svelte";
   import PromptIdentify from "./PromptIdentify.svelte";
-  import PromptIdentifierInvalid from "./PromptIdentifierInvalid.svelte";
   import PromptCredentials from "./PromptCredentials.svelte";
   import PromptFactor2 from "./PromptFactor2.svelte";
   import PromptResetPassword from "./PromptResetPassword.svelte";
@@ -17,7 +16,6 @@
   import PromptSuccess from "./PromptSuccess.svelte";
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
   import PromptMissingScopes from "./PromptMissingScopes.svelte";
-  import PromptInvalidRequest from "./PromptInvalidRequest.svelte";
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
   import PromptUnsupportedResponseType from "./PromptUnsupportedResponseType.svelte";
   import PromptMissingNonce from "./PromptMissingNonce.svelte";
@@ -26,7 +24,7 @@
   import { onMount } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import Time from "svelte-time";
-  import AuthenticateQuery from "../authenticate.gql?raw";
+  import AuthenticateQuery from "../authenticate.graphql?raw";
 
   export let auth;
 
@@ -115,7 +113,6 @@
     "login-link": PromptLoginLink,
     "verify-email": PromptVerifyEmail,
     "reset-password": PromptResetPassword,
-    "invalid-identifier": PromptIdentifierInvalid,
     "invalid-redirect": PromptInvalidRedirectUri,
     "missing-scopes": PromptMissingScopes,
     "missing-nonce": PromptMissingNonce,
@@ -123,7 +120,6 @@
     authorize: PromptAuthorize,
     onboard: PromptOnboard,
     success: PromptSuccess,
-    invalid_request: PromptInvalidRequest,
     unsupported_response_type: PromptUnsupportedResponseType,
   };
 

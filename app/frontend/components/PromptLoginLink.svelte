@@ -6,10 +6,7 @@
   import { onDestroy } from "svelte";
 
   export let auth;
-  export let identifier;
   export let loading;
-  export let startOver;
-  export let denied;
   export let authorize;
 
   let seconds = 5;

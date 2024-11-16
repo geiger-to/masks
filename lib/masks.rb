@@ -108,7 +108,7 @@ module Masks
 
     def authenticate_gql
       @authenticate_gql ||=
-        File.read(Rails.root.join("app", "frontend", "authenticate.gql"))
+        File.read(Rails.root.join("app", "frontend", "authenticate.graphql"))
     end
   end
 end

@@ -5,10 +5,8 @@
   export let loading;
   export let disabled;
   export let label = "continue";
-  export let approve;
   export let denied = false;
   export let deniedLabel = "try again";
-  export let auth;
   export let onClick;
   export let type;
 

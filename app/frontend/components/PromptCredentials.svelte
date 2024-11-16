@@ -11,7 +11,6 @@
   export let loading;
   export let startOver;
   export let updates;
-  export let setEvent;
 
   let allowLoginLinks;
   let allowPasswords;

@@ -137,12 +137,13 @@
               class="tabs tabs-bordered tabs-xs justify-start w-full"
             >
               {#each Object.values(enabledFactors) as { component, choose }, index}
-                <a
+                <button
                   on:click|preventDefault|stopPropagation={() =>
                     switchFactor(lockedTab ? currentFactor : component)}
+                  type="button"
                   role="tab"
                   class={`${component == currentFactor ? "tab tab-active" : lockedTab ? "tab tab-disabled" : "tab opacity-75"} whitespace-nowrap pb-6 text-left`}
-                  >{choose}</a
+                  >{choose}</button
                 >
               {/each}
             </div>

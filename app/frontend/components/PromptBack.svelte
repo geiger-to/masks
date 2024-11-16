@@ -6,7 +6,8 @@
   export let label = "go back";
 </script>
 
-<a
+<button
+  type="button"
   class="btn btn-lg btn-error w-[130px] text-center"
   disabled={loading || disabled}
   on:click|preventDefault|stopPropagation={() => history.back()}
@@ -17,4 +18,4 @@
   {:else}
     {label}
   {/if}
-</a>
+</button>

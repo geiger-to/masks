@@ -7,7 +7,6 @@
   export let avatarOnly;
   export let identifier;
   export let alternate;
-  export let loading;
 
   let { avatar, identiconId } = auth;
 
@@ -23,9 +22,8 @@
       $$props.class,
     ].join(" ")}
   >
-    <div
+    <button
       class={["avatar relative", startOver ? "cursor-pointer" : ""].join(" ")}
-      role="button"
       on:click|preventDefault|stopPropagation={startOver}
     >
       <div
@@ -33,7 +31,7 @@
       >
         <div class={startOver ? "group-hover:hidden" : ""}>
           {#if avatar}
-            <img src={avatar} class="object-cover" />
+            <img src={avatar} class="object-cover" alt="avatar" />
           {:else if identiconId}
             {#key identiconId}
               <Identicon id={identiconId} />
@@ -53,7 +51,7 @@
           </div>
         {/if}
       </div>
-    </div>
+    </button>
 
     {#if !avatarOnly}
       <div class="grow overflow-hidden">

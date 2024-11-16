@@ -12,5 +12,5 @@
 </script>
 
 {#if svgURI}
-  <img src={svgURI} {...others} />
+  <img src={svgURI} {...others} alt={`identicon id #${id}`} />
 {/if}

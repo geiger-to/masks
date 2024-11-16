@@ -7,8 +7,6 @@
 
   export let auth;
   export let identifier;
-  export let password;
-  export let startOver;
 </script>
 
 <PromptHeader

@@ -13,7 +13,6 @@
   export let identifier;
   export let loading;
   export let updates;
-  export let vars;
   export let startOver;
 
   let value;

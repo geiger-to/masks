@@ -5,7 +5,9 @@
     "watch:email": "tailwindcss -i app/frontend/entrypoints/app.css -o public/email.css -w",
     "build:email": "tailwindcss -i app/frontend/entrypoints/app.css -o public/email.css",
     "build": "bin/vite build",
-    "format": "prettier --write .",
+    "prettier:fmt": "prettier --write .",
+    "biome:fmt": "biome format --write .",
+    "format": "bin/fmt",
     "lint": "prettier --check .",
     "rails": "PORT=1111 bin/rails s",
     "test": "bin/rails test",
@@ -16,6 +18,7 @@
     "postinstall": "cd docs && npm install"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "@prettier/plugin-ruby": "^4.0.4",
     "@tailwindcss/typography": "^0.5.15",
     "daisyui": "^4.12.10",

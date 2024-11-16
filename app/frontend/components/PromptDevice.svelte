@@ -5,8 +5,6 @@
   import { AlertTriangle, User } from "lucide-svelte";
 
   export let auth;
-  export let identifier;
-  export let loading;
 
   $: denied = auth?.warnings?.includes("invalid-device");
 </script>

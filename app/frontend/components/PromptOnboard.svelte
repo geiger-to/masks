@@ -33,9 +33,7 @@
 
   export let auth;
   export let loading;
-  export let startOver;
   export let authorize;
-  export let updates;
 
   let actor = auth?.actor;
   let name = actor?.name;

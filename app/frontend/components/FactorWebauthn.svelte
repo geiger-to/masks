@@ -26,7 +26,6 @@
   export let auth;
   export let authorize;
   export let authorizing;
-  export let loading;
 
   let webauthnOpts;
   let credential;

@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -xe
+
+npm run biome:fmt
+npm run prettier:fmt

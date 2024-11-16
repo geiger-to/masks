@@ -85,7 +85,7 @@
       <div class="bg-neutral text-neutral-content rounded text-center">
         {#if src || uploadedSrc}
           {#key src || uploadedSrc}
-            <img src={uploadedSrc || src} class="object-cover" />
+            <img src={uploadedSrc || src} class="object-cover" alt="uploaded" />
           {/key}
         {:else}
           <span

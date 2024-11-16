@@ -5,8 +5,6 @@
   import PasswordInput from "./PasswordInput.svelte";
 
   export let auth;
-  export let password;
-  export let startOver;
 </script>
 
 <PromptHeader

@@ -9,9 +9,6 @@
 
   export let auth;
   export let authorize;
-  export let loading;
-  export let identifier;
-  export let updates;
 
   let extras = [];
   let primary;
