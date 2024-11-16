@@ -3,8 +3,8 @@
 module Types
   class ScopeType < Types::BaseObject
     field :name, String, null: false
-    field :detail, String, null: false
-    field :hidden, String, null: true
+    field :detail, String, null: true
+    field :hidden, Boolean, null: true
 
     def name
       object

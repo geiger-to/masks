@@ -1,13 +1,15 @@
 module Masks
   module Prompts
-    class Phone < Base
+    class Phone < SecondFactor
+      checks "second-factor"
+
       event "phone:verify" do
         next warn! "invalid-phone" unless phone.valid?
 
         code = updates["code"]
 
         if phone.verify_code(code)
-          second_factor! :sms_code
+          checked! "second-factor", with: :sms_code
         else
           warn! "invalid-code:#{code || ""}"
         end

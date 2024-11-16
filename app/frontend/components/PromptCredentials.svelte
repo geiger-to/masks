@@ -98,6 +98,7 @@
 {:else}
   <div class="flex flex-col md:flex-row md:items-center md:gap-4">
     <PromptContinue
+      type="button"
       label={auth?.loginLink ? "enter your login code" : "email a login code"}
       {loading}
       {denied}

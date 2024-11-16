@@ -18,6 +18,7 @@ module Masks
       second_factor_sms_code_expires_in
       second_factor_totp_code_expires_in
       second_factor_webauthn_expires_in
+      internal_session_expires_in
     ]
 
     BOOLEAN_COLUMNS = %i[

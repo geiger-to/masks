@@ -1,8 +1,4 @@
-class ManageController < AuthorizedController
-  delegate :actor, to: :authorization, allow_nil: true
-
-  managers_only
-
+class ManageController < ManagersController
   def index
     @theme = "luxury"
     @props = {

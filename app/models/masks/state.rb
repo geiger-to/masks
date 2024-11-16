@@ -12,19 +12,31 @@ module Masks
              :identifier,
              to: :auth
 
+    def [](key)
+      @current ||= {}
+      @current[key.to_s]
+    end
+
+    def []=(key, value)
+      @current ||= {}
+      @current[key.to_s] = value
+    end
+
     def redirect_uri
       attempt_bag&.dig(:settlement, :redirect_uri)
     end
 
-    def settled!(redirect_uri:, prompt:, error: nil)
+    def settled!(redirect_uri:, prompt:, error: nil, approved: false)
       auth.prompt = prompt if prompt
+      auth.error = error if error
 
       attempt_bag[:settlement] = {
+        settled: true,
         prompt:,
         identifier:,
         redirect_uri:,
+        approved:,
         error:,
-        settled: true,
       }
     end
 
@@ -133,6 +145,13 @@ module Masks
     def auth_bag
       attempt_bag[:auth] ||= {}
       attempt_bag[:auth][identifier] ||= {} if identifier && attempt_bag
+    end
+
+    def client_bag
+      return unless client
+
+      rails_session[:clients] ||= {}
+      rails_session[:clients][client.key] ||= {}
     end
 
     def reset!(error = nil)

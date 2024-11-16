@@ -3,7 +3,21 @@ require "test_helper"
 class ClientConsentTest < MasksTestCase
   include AuthHelper
 
+  auth_opts redirect_uri: "https://example.com",
+            response_type: "code",
+            nonce: SecureRandom.uuid
+
   setup { client.add_check!("client-consent") }
+
+  def client
+    @client ||=
+      seeder.seed_client(
+        key: "testing",
+        name: "testing",
+        type: "confidential",
+        redirect_uris: "https://example.com",
+      )
+  end
 
   test "client consent must be approved" do
     log_in "manager"

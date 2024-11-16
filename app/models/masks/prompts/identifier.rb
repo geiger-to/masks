@@ -1,7 +1,7 @@
 module Masks
   module Prompts
     class Identifier < Base
-      before_update do
+      before_auth do
         identifier =
           (
             if event?("identifier:add")

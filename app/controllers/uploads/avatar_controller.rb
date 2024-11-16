@@ -1,5 +1,5 @@
 module Uploads
-  class AvatarController < AuthorizedController
+  class AvatarController < ManagersController
     managers_only
 
     def create

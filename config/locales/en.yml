@@ -35,3 +35,15 @@ en:
     scopes_required: "unauthorized"
   scopes:
     "masks:manage": Manage masks
+  activerecord:
+    attributes:
+      masks/actor:
+        backup_codes: Backup codes
+    errors:
+      models:
+        masks/actor:
+          attributes:
+            backup_codes:
+              length: must be replaced by a list of exactly %{total} codes
+              too_short: must be longer than %{count} characters
+              too_long: must be shorter than %{count} characters

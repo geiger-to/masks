@@ -20,6 +20,14 @@ module Masks
       settings["name"]
     end
 
+    def backup_codes
+      {
+        min: setting("backup_codes", "min", default: 8),
+        max: setting("backup_codes", "max", default: 100),
+        total: setting("backup_codes", "total", default: 10),
+      }
+    end
+
     def passwords
       {
         min: setting("password", "min", default: 8),

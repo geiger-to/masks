@@ -1,10 +1,12 @@
 module Masks
   class Auth < ApplicationModel
+    APPROVED_PROMPTS = ["success"]
+
     include ActiveSupport::Callbacks
 
-    define_callbacks :update
+    define_callbacks :session, :auth
 
-    attribute :updated
+    attribute :locked
     attribute :request
     attribute :device
     attribute :client
@@ -56,31 +58,39 @@ module Masks
       !!(error || state.settled?)
     end
 
-    def update!(id: nil, event: nil, upload: nil, updates: {}, resume: false)
-      return updated if updated
+    def approved?
+      settled? && state.settlement[:approved]
+    end
 
-      self.updated = true
+    def session!(&block)
+      return if locked
 
-      raise InvalidPromptError unless prompts.any?
+      lock!
 
-      if resume
-        state.resume!(id)
-
-        self.event = event
-        self.updates = updates || {}
-        self.upload = upload
-      else
-        state.init!
-      end
-
-      run_callbacks(:update) do
-        filtered = prompts.values.filter(&:enabled?)
-        filtered.each { |prompt| prompt.event!(event) } if event
-        filtered.each(&:prompt!)
-      end
+      run_callbacks(:session, &block)
     rescue AuthError => e
       self.prompt = e.code
       self.error = e.code
+    end
+
+    def update!(id: nil, event: nil, upload: nil, updates: {}, resume: false)
+      session! do
+        if resume
+          state.resume!(id)
+
+          self.event = event
+          self.updates = updates || {}
+          self.upload = upload
+        else
+          state.init!
+        end
+
+        run_callbacks(:auth) do
+          filtered = prompts.values.filter(&:enabled?)
+          filtered.each { |prompt| prompt.event!(event) } if event
+          filtered.each(&:prompt!)
+        end
+      end
     end
 
     def rails_session
@@ -123,11 +133,10 @@ module Masks
     end
 
     def authenticated?
-      if !error && !prompt && actor&.persisted? && client.checks&.any?
-        return checked?(*client.checks)
-      end
+      return false if error || !actor&.persisted? || !client.checks&.any?
+      return false if prompt && APPROVED_PROMPTS.exclude?(prompt)
 
-      false
+      return checked?(*client.checks)
     end
 
     def prompt_for(cls)
@@ -136,8 +145,16 @@ module Masks
 
     private
 
+    def lock!
+      raise if locked
+
+      self.locked = true
+
+      raise InvalidPromptError unless prompts.any?
+    end
+
     def prompts
-      return [] unless updated
+      return [] unless locked
 
       @prompts ||= Masks.prompts.map { |cls| [cls.to_s, cls.new(self)] }.to_h
     end

@@ -6,7 +6,7 @@ module Masks
           checking?("credentials")
       end
 
-      after_update do
+      after_auth do
         next unless auth_bag
 
         # Ensure actors that don't exist still appear to receive a login link
@@ -25,7 +25,7 @@ module Masks
       end
 
       prompt "login-code" do
-        valid_link?
+        valid_link? && !checked?("credentials")
       end
 
       event "login-link:password" do

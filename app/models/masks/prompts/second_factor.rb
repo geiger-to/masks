@@ -1,13 +1,15 @@
 module Masks
   module Prompts
-    class Factor2 < Base
+    class SecondFactor < Base
+      checks "second-factor"
+
       def enabled?
-        (client.require_second_factor? || actor.second_factor?) &&
-          checked?(:identifier, :first) && !checked?(:second)
+        super && second_factor_enabled?
       end
 
       prompt "second-factor" do
-        !checked?(:second)
+        checking?("second-factor") || !actor.second_factor? ||
+          actor.review_second_factor?
       end
 
       event "second-factor:enable" do

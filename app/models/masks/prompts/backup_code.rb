@@ -1,13 +1,13 @@
 module Masks
   module Prompts
-    class BackupCode < Base
+    class BackupCode < SecondFactor
+      checks "second-factor"
+
       event "backup-codes:replace" do
         next unless actor
 
-        if actor.save_backup_codes(updates["codes"])
-          second_factor! :backup_code
-        else
-          warn! "invalid-codes"
+        unless actor.save_backup_codes(updates["codes"])
+          actor.errors.full_messages.each { |error| warn! error }
         end
       end
 
@@ -17,7 +17,7 @@ module Masks
         next unless actor && code
 
         if actor.verify_backup_code(code)
-          second_factor! :backup_code
+          checked! "second-factor", with: :backup_code
         else
           warn! "invalid-code", code
         end

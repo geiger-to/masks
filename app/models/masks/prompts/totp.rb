@@ -1,22 +1,22 @@
 module Masks
   module Prompts
-    class Totp < Base
-      event "totp:verify" do
-        next unless actor
+    class Totp < SecondFactor
+      checks "second-factor"
 
+      event "totp:verify" do
         if actor.second_factor? && !otp_secret.persisted?
           next warn! "invalid-totp"
         end
 
         if otp_secret.verify_totp(updates["code"])
-          second_factor! :totp_code
+          checked! "second-factor", with: :totp_code
         else
           warn! "invalid-code:#{updates["code"]}"
         end
       end
 
       event "totp:name" do
-        next unless actor && otp_secret.persisted?
+        next unless otp_secret.persisted?
 
         otp_secret.name = updates["name"]
         otp_secret.save

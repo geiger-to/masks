@@ -91,6 +91,25 @@ module AuthHelper
     attempt_authorize if authorize
   end
 
+  def setup_totp(*args)
+    travel_to Time.parse("2024-11-17T19:57:11+0000") do
+      log_in *args
+
+      attempt event: "totp:verify",
+              updates: {
+                secret: "JBSWY3DPEHPK3PXP",
+                code: "247086",
+              }
+      attempt event: "backup-codes:replace",
+              updates: {
+                codes: Array.new(10) { SecureRandom.uuid },
+              }
+      attempt event: "second-factor:enable"
+    end
+
+    integration_session.reset!
+  end
+
   def attempt_identifier(identifier)
     attempt(event: "identifier:add", updates: { identifier: })
   end

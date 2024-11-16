@@ -60,12 +60,12 @@ class IdentifierTest < MasksTestCase
 
   test "emails from the 'login' group are valid identifiers" do
     assert_login log_in("masks@example.com")
-    assert_artifacts devices: 1, codes: 1
+    assert_artifacts devices: 1
   end
 
   test "nicknames are valid identifiers" do
     assert_login log_in("manager")
-    assert_artifacts devices: 1, codes: 1
+    assert_artifacts devices: 1
   end
 
   test "only emails from the 'login' group are valid identifiers" do

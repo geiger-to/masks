@@ -32,6 +32,7 @@ module Masks
                :auth_bag,
                :id_bag,
                :actor_bag,
+               :client_bag,
                :check,
                :checked!,
                :checked?,
@@ -72,29 +73,56 @@ module Masks
           prompt_config[:check]
         end
 
-        def around_update(**args, &block)
+        def around_session(**args, &block)
           cls = self
 
-          Masks::Auth.set_callback(:update, :around, **args) do |_, inner|
-            next if self.error || self.prompt
+          Masks::Auth.set_callback(:session, :around, **args) do |_, inner|
+            next if (self.error || self.prompt) && !args[:always]
             prompt_for(cls).instance_exec(self, inner, &block)
           end
         end
 
-        def before_update(**args, &block)
+        def before_session(**args, &block)
           cls = self
 
-          Masks::Auth.set_callback(:update, :before, **args) do |_, &inner|
-            next if self.error || self.prompt
+          Masks::Auth.set_callback(:session, :before, **args) do |_, &inner|
+            next if (self.error || self.prompt) && !args[:always]
             prompt_for(cls).instance_exec(self, inner, &block)
           end
         end
 
-        def after_update(**args, &block)
+        def after_session(**args, &block)
           cls = self
 
-          Masks::Auth.set_callback(:update, :after, **args) do |_, &inner|
-            next if self.error || self.prompt
+          Masks::Auth.set_callback(:session, :after, **args) do |_, &inner|
+            next if (self.error || self.prompt) && !args[:always]
+            prompt_for(cls).instance_exec(self, inner, &block)
+          end
+        end
+
+        def around_auth(**args, &block)
+          cls = self
+
+          Masks::Auth.set_callback(:auth, :around, **args) do |_, inner|
+            next if (self.error || self.prompt) && !args[:always]
+            prompt_for(cls).instance_exec(self, inner, &block)
+          end
+        end
+
+        def before_auth(**args, &block)
+          cls = self
+
+          Masks::Auth.set_callback(:auth, :before, **args) do |_, &inner|
+            next if (self.error || self.prompt) && !args[:always]
+            prompt_for(cls).instance_exec(self, inner, &block)
+          end
+        end
+
+        def after_auth(**args, &block)
+          cls = self
+
+          Masks::Auth.set_callback(:auth, :after, **args) do |_, &inner|
+            next if (self.error || self.prompt) && !args[:always]
             prompt_for(cls).instance_exec(self, inner, &block)
           end
         end
@@ -152,6 +180,10 @@ module Masks
         when Proc
           instance_exec(&handler)
         end
+      end
+
+      def second_factor_enabled?
+        (client&.check?("second-factor") || actor&.second_factor?)
       end
 
       def add_email

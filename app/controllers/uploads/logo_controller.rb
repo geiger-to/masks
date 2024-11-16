@@ -1,5 +1,5 @@
 module Uploads
-  class LogoController < AuthorizedController
+  class LogoController < ManagersController
     managers_only
 
     def create

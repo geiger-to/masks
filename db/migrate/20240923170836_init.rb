@@ -182,6 +182,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :second_factor_totp_code_expires_in
       t.string :second_factor_webauthn_expires_in
       t.string :email_verification_expires_in
+      t.string :internal_session_expires_in
 
       t.text :rsa_private_key
 

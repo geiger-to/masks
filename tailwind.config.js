@@ -34,6 +34,7 @@ export default {
       animation: {
         "fade-in-fast": "fadeIn 100ms ease-in",
         "fade-in-slow": "fadeIn 5s linear",
+        "fade-in-1s": "fadeIn 1s linear",
         "fade-in": "fadeIn 500ms ease-in",
         spin: "spin 3s linear infinite",
         "bounce-some": "bounce 1s 5 reverse",

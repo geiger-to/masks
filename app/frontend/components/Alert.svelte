@@ -38,7 +38,7 @@
     ...(classes[type] || []),
   ].join(" ")}
 >
-  <p class="md:ml-1 ml-0.5 grow">
+  <p class="md:ml-1 ml-0.5 grow w-full">
     <slot />
   </p>
 

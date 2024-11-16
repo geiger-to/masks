@@ -78,6 +78,10 @@ module Masks
       req.access_denied!
     end
 
+    def original_redirect_uri
+      req&.redirect_uri&.to_s
+    end
+
     def redirect_uri
       return unless @response
 
@@ -96,27 +100,34 @@ module Masks
       end
     end
 
+    def validate_scopes!(actor)
+      scopes_required! if !actor.scopes?(*@scopes)
+    end
+
     def approved!(actor)
       @approved = true
-
-      return scopes_required! if !actor.scopes?(*@scopes)
 
       client.save if client.redirect_uris_changed?
 
       response_types = Array(req.response_type)
 
       if response_types.include? :code
-        @authorization_code =
-          actor.authorization_codes.create!(
-            client:,
-            device:,
-            actor:,
-            redirect_uri: res.redirect_uri,
-            nonce: req.nonce,
-            scopes: scopes.join(" "),
-          )
+        res.code =
+          if client.internal?
+            prompt.state.attempt_id
+          else
+            @authorization_code =
+              actor.authorization_codes.create!(
+                client:,
+                device:,
+                actor:,
+                redirect_uri: res.redirect_uri,
+                nonce: req.nonce,
+                scopes: scopes.join(" "),
+              )
 
-        res.code = authorization_code.code
+            authorization_code.code
+          end
       end
 
       if response_types.include? :token

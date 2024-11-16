@@ -19,6 +19,7 @@
   import PromptInvalidRedirectUri from "./PromptInvalidRedirectUri.svelte";
   import PromptUnsupportedResponseType from "./PromptUnsupportedResponseType.svelte";
   import PromptMissingNonce from "./PromptMissingNonce.svelte";
+  import PromptExpiredState from "./PromptExpiredState.svelte";
   import PromptAuthorize from "./PromptAuthorize.svelte";
   import PromptOnboard from "./PromptOnboard.svelte";
   import { onMount } from "svelte";
@@ -116,6 +117,7 @@
     "invalid-redirect": PromptInvalidRedirectUri,
     "missing-scopes": PromptMissingScopes,
     "missing-nonce": PromptMissingNonce,
+    "expired-state": PromptExpiredState,
     "access-denied": PromptAccessDenied,
     authorize: PromptAuthorize,
     onboard: PromptOnboard,

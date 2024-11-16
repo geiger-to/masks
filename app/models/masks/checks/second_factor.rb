@@ -9,7 +9,10 @@ module Masks
       end
 
       def checked?
-        !Masks.time.expired?(state.actor_bag&.dig(:second_factor, :expires_at))
+        state.actor&.second_factor? &&
+          !Masks.time.expired?(
+            state.actor_bag&.dig(:second_factor, :expires_at),
+          )
       end
     end
   end

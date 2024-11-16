@@ -4,26 +4,49 @@
   import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
+  import PromptLoading from "./PromptLoading.svelte";
+  import Identicon from "./Identicon.svelte";
+  import Avatar from "./Avatar.svelte";
+  import { onMount } from "svelte";
+  import { redirectTimeout } from "../util";
 
   export let auth;
-  export let identifier;
+
+  onMount(() => {
+    redirectTimeout(() => {
+      window.location.replace(auth.redirectUri);
+    }, 2000);
+  });
 </script>
 
-<PromptHeader
-  heading="Access granted..."
-  client={auth.client}
-  redirectUri={auth.redirectUri}
-  class="mb-6"
-/>
+<div class="py-12 animate-fade-in-1s">
+  <div class="mb-6">
+    <div
+      class="mx-auto text-center w-[100px] h-[100px] bg-black rounded-lg shadow-xl"
+    >
+      {#if auth?.actor?.avatar}
+        <img src={auth.actor.avatar} class="object-cover" alt="avatar" />
+      {:else}
+        <Identicon id={auth.actor.identiconId} />
+      {/if}
+    </div>
 
-<PromptIdentifier
-  {identifier}
-  {auth}
-  class="mb-6 pr-3 bg-success text-success-content"
->
-  <div class="rounded-full w-12 h-12 bg-success flex items-center">
-    <Check size="30" class="mx-auto" />
+    <div class="text-center pt-1.5 opacity-75 text-sm">
+      {auth?.actor?.identifier}
+    </div>
   </div>
-</PromptIdentifier>
 
-<PromptContinue loading />
+  <div class="text-center">
+    <div class="text-2xl leading-relaxed animate-pulse">
+      Continuing to<br /><a href={auth.redirectUri} class="font-bold"
+        >{auth?.client?.name}</a
+      >
+    </div>
+  </div>
+
+  <div class="text-center pt-6">
+    <span
+      class="loading loading-spinner loading-lg mx-auto loading-dots text-success"
+    ></span>
+  </div>
+</div>

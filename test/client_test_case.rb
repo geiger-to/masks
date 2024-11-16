@@ -115,14 +115,16 @@ class ClientTestCase < MasksTestCase
       test "#{prefix} - rejects actors without required scopes" do
         client.update(scopes: { required: [SecureRandom.uuid] })
 
-        log_in "tester", authorize: true
+        log_in "tester"
 
         assert_prompt "missing-scopes"
         assert_error "missing-scopes"
         assert_artifacts(devices: 1)
         assert_settled
 
-        assert_includes auth_result[:redirectUri], "invalid_request"
+        unless client.internal?
+          assert_includes auth_result[:redirectUri], "invalid_request"
+        end
         refute_includes auth_result[:redirectUri], "token"
         refute_includes auth_result[:redirectUri], "code"
       end

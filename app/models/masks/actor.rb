@@ -59,6 +59,7 @@ module Masks
               if: :nickname_required?
     validates :version, presence: true
     validate :validates_password, if: :password
+    validate :validates_backup_codes, if: :backup_codes
 
     serialize :backup_codes, coder: JSON
 
@@ -162,6 +163,10 @@ module Masks
       enabled_second_factor_at.present?
     end
 
+    def review_second_factor?
+      second_factor? && !backup_codes&.any?
+    end
+
     def enable_second_factor!
       return if second_factors.none? || backup_codes&.blank?
 
@@ -193,10 +198,18 @@ module Masks
     end
 
     def save_backup_codes(codes)
+      @new_backup_codes = true
+
+      self.backup_codes = codes
+
+      return unless valid?
+
       self.saved_backup_codes_at = Time.now.utc
       self.backup_codes = codes.map { |code| Digest::SHA256.hexdigest(code) }
 
       save
+    ensure
+      @new_backup_codes = false
     end
 
     private
@@ -214,16 +227,40 @@ module Masks
       self.version = SecureRandom.hex
     end
 
+    def validates_length(value, key:, min:, max:)
+      return unless value
+
+      if min && value.length < min
+        errors.add(key, :too_short, count: min)
+      elsif max && value.length > max
+        errors.add(key, :too_long, count: max)
+      end
+    end
+
     def validates_password
       opts = Masks.installation.passwords
 
       return unless password && opts
 
-      if opts[:min] && password.length < opts[:min]
-        errors.add(:password, :too_short, count: opts[:min])
-      elsif opts[:max] && password.length > opts[:max]
-        errors.add(key, :too_long, count: opts[:max])
+      validates_length(password, key: :password, **opts.slice(:min, :max))
+    end
+
+    def validates_backup_codes
+      opts = Masks.installation.backup_codes
+
+      return unless backup_codes && opts && @new_backup_codes
+
+      if opts[:total]
+        unless backup_codes.length == opts[:total]
+          errors.add(:backup_codes, :length, total: opts[:total])
+        end
       end
+
+      validates_length(
+        backup_codes,
+        key: :backup_codes,
+        **opts.slice(:min, :max),
+      )
     end
   end
 end

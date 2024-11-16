@@ -1,5 +1,9 @@
 default: &default
-  "masks:manage": test
+  "openid": "Your unique account identifier"
+  "email": "Your email address"
+  "nickname": "Your nickname"
+  "name": "Your full name"
+  "profile": "Your profile—including name and email"
 
 development:
   <<: *default

@@ -3,7 +3,7 @@ module Masks
     class Device < Base
       checks "device"
 
-      around_update do |auth, block|
+      around_session do |auth, block|
         self.device = identify_device
 
         next if prompt

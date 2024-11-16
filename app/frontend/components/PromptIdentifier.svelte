@@ -23,7 +23,11 @@
     ].join(" ")}
   >
     <button
-      class={["avatar relative", startOver ? "cursor-pointer" : ""].join(" ")}
+      type="button"
+      class={[
+        "avatar outline-none relative",
+        startOver ? "cursor-pointer" : "",
+      ].join(" ")}
       on:click|preventDefault|stopPropagation={startOver}
     >
       <div

@@ -11,7 +11,7 @@
     "lint": "prettier --check .",
     "rails": "PORT=1111 bin/rails s",
     "test": "bin/rails test",
-    "jobs": "...",
+    "jobs": "bin/bundle exec good_job start",
     "dev": "overmind start -f Procfile.dev",
     "dev:reset": "MASKS_MANAGER_EMAIL=masks@example.com MASKS_MANAGER_PASSWORD=password bin/rails db:drop db:create db:migrate db:reset",
     "dev:fresh": "npm run dev:reset && npm run dev",

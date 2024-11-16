@@ -7,7 +7,6 @@
   } from "@urql/svelte";
   import ErrorSection from "./ErrorSection.svelte";
   import AuthorizeSection from "./AuthorizeSection.svelte";
-  import ManageSection from "./ManageSection.svelte";
   import { setContext } from "svelte";
 
   let csrf = document.querySelector('meta[name="csrf-token"]').content;
@@ -26,7 +25,6 @@
   let sections = {
     Error: ErrorSection,
     Authorize: AuthorizeSection,
-    Manage: ManageSection,
   };
 
   export let section;

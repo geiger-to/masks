@@ -8,15 +8,16 @@ default: &default
     - Masks::Prompts::LoginLink
     - Masks::Prompts::Password
     - Masks::Prompts::Credentials
-      # Masks::Prompts::Factor2
-      # Masks::Prompts::Phone
-      # Masks::Prompts::Webauthn
-      # Masks::Prompts::Totp
-      # Masks::Prompts::BackupCode
+    - Masks::Prompts::SecondFactor
+    - Masks::Prompts::Phone
+    - Masks::Prompts::Webauthn
+    - Masks::Prompts::Totp
+    - Masks::Prompts::BackupCode
     - Masks::Prompts::ResetPassword
     - Masks::Prompts::Onboard
     - Masks::Prompts::VerifyEmail
     - Masks::Prompts::OIDC
+    - Masks::Prompts::InternalSession
   manager:
     nickname: "<%= ENV['MASKS_MANAGER_NICKNAME'] || 'manager' %>"
     password: "<%= ENV['MASKS_MANAGER_PASSWORD'] %>"
@@ -32,8 +33,8 @@ default: &default
     checks:
       - device
       - credentials
-      # - second
-      # - consent
+      # - second-factor
+      # - client-consent
       # - onboarded
       # - verified-email
     client_type: internal
@@ -52,11 +53,17 @@ default: &default
     second_factor_totp_code_expires_in: "10 minutes"
     second_factor_webauthn_expires_in: "10 minutes"
     email_verification_expires_in: "1 year"
+    internal_session_expires_in: "1 day"
     allow_passwords: true
     allow_login_links: true
     autofill_redirect_uri: false
   authorize:
     delay: 100
+  backup_code:
+    min: 8
+    max: 100
+    total: 10
+    change_cooldown: "15 minutes"
   password:
     min: 8
     max: 100
