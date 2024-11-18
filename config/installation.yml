@@ -34,10 +34,10 @@ default: &default
     checks:
       - device
       - credentials
-      # - second-factor
-      # - client-consent
-      # - onboarded
-      # - verified-email
+      - second-factor
+      - client-consent
+      - onboarded
+      - verified-email
     client_type: internal
     subject_type: public
     default_region: "US"

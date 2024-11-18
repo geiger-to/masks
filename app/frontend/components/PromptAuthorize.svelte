@@ -7,8 +7,7 @@
   import PasswordInput from "./PasswordInput.svelte";
   import PromptBack from "./PromptBack.svelte";
 
-  export let auth;
-  export let loading;
+  let { auth, loading } = $props();
 </script>
 
 <PromptHeader

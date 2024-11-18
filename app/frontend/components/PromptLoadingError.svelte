@@ -1,18 +1,22 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import { XCircle } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
 
-  export let loadingError;
+  let { loadingError } = $props();
 </script>
 
 <PromptHeader heading="An error occurred..." class="mb-6">
-  <div slot="logo">
-    <XCircle size="50" class="text-error" />
-  </div>
+  {#snippet logo()}
+    <div>
+      <XCircle size="50" class="text-error" />
+    </div>
+  {/snippet}
 
-  <p slot="subheading">
-    Your issue has been reported. It may be fixed by refreshing the page.
-  </p>
+  {#snippet subheading()}
+    <p>Your issue has been reported. It may be fixed by refreshing the page.</p>
+  {/snippet}
 </PromptHeader>
 
 <div class="font-bold uppercase mb-3 text-xs">error message</div>
@@ -22,7 +26,7 @@
 
 <button
   class="btn btn-lg"
-  on:click|preventDefault|stopPropagation={() => window.location.reload()}
+  onclick={stopPropagation(preventDefault(() => window.location.reload()))}
 >
   refresh the page
 </button>

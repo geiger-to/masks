@@ -1,17 +1,20 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import Identicon from "./Identicon.svelte";
   import { ImageOff, RotateCcw } from "lucide-svelte";
 
-  export let auth;
-  export let startOver = null;
-  export let avatarOnly;
-  export let identifier;
-  export let alternate;
-
-  let { avatar, identiconId } = auth;
-
-  $: avatar = auth.avatar;
-  $: identiconId = auth.identiconId;
+  let {
+    children,
+    auth,
+    startOver,
+    avatarOnly,
+    identifier,
+    alternate,
+    class: cls,
+  } = $props();
+  let avatar = $derived(auth.avatar);
+  let identiconId = $derived(auth.identiconId);
 </script>
 
 {#if identifier || auth?.identifier}
@@ -19,7 +22,7 @@
     class={[
       "flex items-center gap-3 bg-base-100  rounded-lg font-bold border dark:border-neutral border-neutral-content",
       avatarOnly ? "" : "py-2 pl-3",
-      $$props.class,
+      cls,
     ].join(" ")}
   >
     <button
@@ -28,7 +31,7 @@
         "avatar outline-none relative",
         startOver ? "cursor-pointer" : "",
       ].join(" ")}
-      on:click|preventDefault|stopPropagation={startOver}
+      onclick={stopPropagation(preventDefault(startOver))}
     >
       <div
         class={`${avatarOnly ? "w-10" : "w-10"} rounded bg-black my-1 group`}
@@ -75,14 +78,14 @@
           <button
             type="button"
             class="btn btn-ghost"
-            on:click|stopPropagation|preventDefault={startOver}
+            onclick={stopPropagation(preventDefault(startOver))}
             ><RotateCcw size="22" /></button
           >
         </div>
       {/if}
     {/if}
 
-    <slot />
+    {@render children?.()}
   </div>
 {:else}
   <div
@@ -90,7 +93,7 @@
       "flex items-center gap-3 bg-neutral text-neutral-content shadow font-bold opacity-70",
       "rounded-lg shadow",
       avatarOnly ? "" : "py-2 px-3",
-      $$props.class,
+      cls,
     ].join(" ")}
   >
     <div class={["avatar relative"].join(" ")}>

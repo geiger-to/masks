@@ -3,7 +3,7 @@
   import { onMount } from "svelte";
   import { redirectTimeout } from "../util";
 
-  export let auth;
+  let { auth } = $props();
 
   onMount(() => {
     redirectTimeout(() => {

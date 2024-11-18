@@ -1,6 +1,26 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
-  export let type = "info";
-  export let icon = null;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [type]
+   * @property {any} [icon]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { type = "info", icon = null, children, class: cls } = $props();
 
   let classes = {
     info: [
@@ -34,17 +54,18 @@
   class={[
     "px-3 py-3 border rounded-lg",
     "shadow flex items-start gap-3 text-left md:text-base text-sm",
-    $$props.class,
+    cls,
     ...(classes[type] || []),
   ].join(" ")}
 >
   <p class="md:ml-1 ml-0.5 grow w-full">
-    <slot />
+    {@render children?.()}
   </p>
 
   {#if icon}
+    {@const SvelteComponent = icon}
     <div>
-      <svelte:component this={icon} />
+      <SvelteComponent />
     </div>
   {/if}
 </div>

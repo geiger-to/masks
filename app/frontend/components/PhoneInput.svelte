@@ -5,23 +5,47 @@
   import { TelInput, isSelected, normalizedCountries } from "svelte-tel-input";
   import "svelte-tel-input/styles/flags.css";
 
-  export let clickOutside = true;
-  export let closeOnClick = true;
-  export let disabled = false;
-  export let detailedValue = null;
-  export let value;
-  export let searchPlaceholder = "Search country codes...";
-  export let selectedCountry = "CA";
-  export let valid;
-  export let options = { format: "national", autoPlaceholder: false };
-  export let placeholder = "Your phone number";
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [clickOutside]
+   * @property {boolean} [closeOnClick]
+   * @property {boolean} [disabled]
+   * @property {any} [detailedValue]
+   * @property {any} value
+   * @property {string} [searchPlaceholder]
+   * @property {string} [selectedCountry]
+   * @property {any} valid
+   * @property {any} [options]
+   * @property {string} [placeholder]
+   * @property {any} inputClass
+   * @property {any} cls
+   * @property {import('svelte').Snippet} [children]
+   */
 
-  let searchText = "";
-  let isOpen = false;
+  /** @type {Props} */
+  let {
+    clickOutside = true,
+    closeOnClick = true,
+    disabled = false,
+    detailedValue = $bindable(null),
+    value = $bindable(),
+    searchPlaceholder = "Search country codes...",
+    selectedCountry = $bindable("CA"),
+    valid = $bindable(),
+    options = { format: "national", autoPlaceholder: false },
+    placeholder = "Your phone number",
+    inputClass,
+    class: cls,
+    children,
+  } = $props();
 
-  $: selectedCountryDialCode =
+  let searchText = $state("");
+  let isOpen = $state(false);
+
+  let selectedCountryDialCode = $derived(
     normalizedCountries.find((el) => el.iso2 === selectedCountry)?.dialCode ||
-    null;
+      null
+  );
 
   const toggleDropDown = (e) => {
     e?.preventDefault();
@@ -109,20 +133,20 @@
         "text-gray-500 bg-base-100 rounded-l-lg",
         "hover:bg-base-200 focus:outline-none",
         "dark:text-white",
-        $$props.countryClass,
+        countryClass,
       ].join(" ")}
       type="button"
       role="combobox"
       aria-controls="dropdown-countries"
       aria-expanded="false"
       aria-haspopup="false"
-      on:click={toggleDropDown}
+      onclick={toggleDropDown}
     >
       {#if selectedCountry && selectedCountry !== null}
         <div class="inline-flex items-center text-left">
           <span
             class="flag flag-{selectedCountry.toLowerCase()} flex-shrink-0 mr-1.5"
-          />
+          ></span>
           {#if options?.format === "national"}
             <span class=" text-gray-600 dark:text-gray-400"
               >+{selectedCountryDialCode}</span
@@ -171,14 +195,14 @@
                             {isActive
                   ? 'bg-gray-600 dark:text-white'
                   : 'dark:hover:text-white dark:text-gray-400'}"
-                on:click={(e) => {
+                onclick={(e) => {
                   handleSelect(country.iso2, e);
                 }}
               >
                 <div class="inline-flex items-center text-left">
                   <span
                     class="flag flag-{country.iso2.toLowerCase()} flex-shrink-0 mr-3"
-                  />
+                  ></span>
                   <span class="mr-2">{country.name}</span>
                   <span class="text-gray-500">+{country.dialCode}</span>
                 </div>
@@ -192,7 +216,7 @@
 
   <div
     class={`text-base rounded-r-lg block w-full p-1.5
-      focus:outline-none bg-base-100 dark:text-white text-gray-900 flex items-center gap-2 ${$$props.class}`}
+      focus:outline-none bg-base-100 dark:text-white text-gray-900 flex items-center gap-2 ${cls}`}
   >
     <TelInput
       {placeholder}
@@ -205,6 +229,6 @@
       class="p-0 bg-transparent focus:outline-none placeholder:text-sm w-full input-sm"
     />
 
-    <slot />
+    {@render children?.()}
   </div>
 </div>

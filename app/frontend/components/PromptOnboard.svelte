@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
   import {
     AlertTriangle,
@@ -31,27 +33,25 @@
   import PasswordInput from "./PasswordInput.svelte";
   import PromptBack from "./PromptBack.svelte";
 
-  export let auth;
-  export let loading;
-  export let authorize;
+  let { auth, loading, authorize } = $props();
 
-  let actor = auth?.actor;
-  let name = actor?.name;
-  let nickname = actor?.nickname;
+  let actor = $state(auth?.actor);
+  let name = $state(actor?.name);
+  let nickname = $state(actor?.nickname);
   let loginEmail = actor?.loginEmail;
   let newEmail;
   let addingEmail;
   let password;
-  let avatarUploaded;
-  let nicknameEnabled;
-  let emailEnabled;
-  let installName;
+  let avatarUploaded = $derived(actor.avatar);
+  let nicknameEnabled = $derived(auth?.settings?.nickname?.enabled);
+  let emailEnabled = $derived(auth?.settings?.email?.enabled);
+  let installName = $derived(auth?.settings?.name);
   let secondIdentifierType;
-  let nameUpdated = false;
+  let nameUpdated = $state(false);
   let nameTimeout;
-  let newPassword;
-  let validPassword;
-  let passwordChanged;
+  let newPassword = $state();
+  let validPassword = $state();
+  let passwordChanged = $state();
 
   let uploadAvatar = (file) => {
     authorize({
@@ -60,11 +60,9 @@
     });
   };
 
-  $: installName = auth?.settings?.name;
-  $: actor = auth.actor;
-  $: emailEnabled = auth?.settings?.email?.enabled;
-  $: nicknameEnabled = auth?.settings?.nickname?.enabled;
-  $: avatarUploaded = actor.avatar;
+  run(() => {
+    actor = auth.actor;
+  });
 
   let updateName = _.debounce((e) => {
     authorize({
@@ -153,7 +151,7 @@
       class="w-full"
       placeholder="Add your name..."
       bind:value={name}
-      on:input={updateName}
+      oninput={updateName}
     />
 
     {#if loading}
@@ -181,7 +179,7 @@
           type="button"
           disabled={!validPassword}
           class="btn btn-success"
-          on:click|preventDefault|stopPropagation={changePassword}
+          onclick={stopPropagation(preventDefault(changePassword))}
         >
           {#if passwordChanged}
             <Check />
@@ -270,14 +268,15 @@
   </div>
 </div>
 
-<div class="divider my-1.5" />
+<div class="divider my-1.5"></div>
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <button
     type="button"
     class="btn btn-lg btn-primary"
-    on:click|preventDefault|stopPropagation={() =>
-      authorize({ event: "onboard:confirm" })}
+    onclick={stopPropagation(
+      preventDefault(() => authorize({ event: "onboard:confirm" }))
+    )}
   >
     continue
   </button>

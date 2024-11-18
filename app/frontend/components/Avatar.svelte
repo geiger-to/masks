@@ -1,6 +1,6 @@
 <script>
   import Identicon from "./Identicon.svelte";
-  export let actor;
+  let { actor } = $props();
 </script>
 
 <div class="avatar placeholder w-full h-full">

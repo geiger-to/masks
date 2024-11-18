@@ -1,21 +1,23 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Unlink, Link, Send, Mail } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
   import { onDestroy } from "svelte";
 
-  export let auth;
-  export let loading;
-  export let authorize;
+  let { auth, loading, authorize } = $props();
 
-  let seconds = 5;
+  let seconds = $state(5);
   let continuing = false;
-  let cancelled;
-  let done;
-  let invalidCode;
+  let cancelled = $state();
+  let done = $state();
+  let invalidCode = $state();
 
-  $: invalidCode = auth?.warnings?.includes("invalid-code");
+  run(() => {
+    invalidCode = auth?.warnings?.includes("invalid-code");
+  });
 
   let countdown = setInterval(() => {
     seconds = seconds - 1;
@@ -26,13 +28,15 @@
     }
   }, 1000);
 
-  $: if (seconds == 0 && !cancelled && !done && !invalidCode) {
-    setTimeout(() => {
-      authorize({ event: "login-link:verify" });
+  run(() => {
+    if (seconds == 0 && !cancelled && !done && !invalidCode) {
+      setTimeout(() => {
+        authorize({ event: "login-link:verify" });
 
-      done = true;
-    }, 500);
-  }
+        done = true;
+      }, 500);
+    }
+  });
 
   let cancel = () => {
     clearInterval(countdown);
@@ -61,8 +65,8 @@
   {auth}
   class="my-6 pr-3"
 >
-  <svelte:component
-    this={invalidCode ? Unlink : Link}
+  {@const SvelteComponent = invalidCode ? Unlink : Link}
+  <SvelteComponent
     class={`mr-1.5 ${invalidCode ? "text-error" : ""} ${!cancelled && !done ? "animate-pulse" : ""}`}
   />
 </PromptIdentifier>
@@ -86,7 +90,7 @@
       <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
 
       <button
-        on:click|preventDefault|stopPropagation={cancel}
+        onclick={stopPropagation(preventDefault(cancel))}
         class="px-0 !min-w-0 btn-link text-base-content"
       >
         cancel

@@ -1,4 +1,6 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import _ from "lodash-es";
   import Time from "svelte-time";
   import { ImageUp, Save, ChevronRight, X } from "lucide-svelte";
@@ -7,14 +9,24 @@
   import { getContext } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
 
-  let result;
+  let result = $state();
   let errors;
   let page = getContext("page");
   let loading;
 
-  export let client;
-  export let editing = false;
-  export let isEditing = () => {};
+  /**
+   * @typedef {Object} Props
+   * @property {any} client
+   * @property {boolean} [editing]
+   * @property {any} [isEditing]
+   */
+
+  /** @type {Props} */
+  let {
+    client = $bindable(),
+    editing = false,
+    isEditing = () => {},
+  } = $props();
 
   const updateClient = (input) => {
     result = mutationStore({
@@ -76,15 +88,18 @@
     }
   }, 500);
 
-  $: handleResult($result);
-  $: updateName(form.name);
-
-  let form = { ...client };
+  let form = $state({ ...client });
   let ICON_TYPES = {
     internal: "",
     public: "",
     confidential: "",
   };
+  run(() => {
+    handleResult($result);
+  });
+  run(() => {
+    updateName(form.name);
+  });
 </script>
 
 <div
@@ -119,11 +134,11 @@
 
     <div class="group join">
       {#if editing}
-        <button class="btn join-item btn-primary" on:click={save(form)}
+        <button class="btn join-item btn-primary" onclick={save(form)}
           ><Save size="15" /> save</button
         >
       {:else}
-        <button class="btn btn-ghost" on:click={() => isEditing({ client })}
+        <button class="btn btn-ghost" onclick={() => isEditing({ client })}
           ><ChevronRight /></button
         >
       {/if}
@@ -131,7 +146,7 @@
   </div>
 
   {#if editing}
-    <div class="divider my-1.5" />
+    <div class="divider my-1.5"></div>
 
     <div class="flex flex-col gap-1.5 mb-3">
       <div

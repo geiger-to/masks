@@ -1,5 +1,5 @@
 <script>
-  export let code;
+  let { code } = $props();
 
   let codes = {
     404: "404 not found",

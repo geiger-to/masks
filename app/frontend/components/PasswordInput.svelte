@@ -1,36 +1,64 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Eye, EyeOff } from "lucide-svelte";
 
-  let visible = false;
+  let visible = $state(false);
   let toggle = () => {
     visible = !visible;
   };
 
-  export let value;
-  export let label = null;
-  export let disabled;
-  export let auth;
-  export let placeholder;
-  export let valid;
-  export let onChange;
+  /**
+   * @typedef {Object} Props
+   * @property {any} value
+   * @property {any} [label]
+   * @property {any} disabled
+   * @property {any} auth
+   * @property {any} placeholder
+   * @property {any} valid
+   * @property {any} onChange
+   * @property {import('svelte').Snippet} [before]
+   * @property {import('svelte').Snippet} [right]
+   * @property {import('svelte').Snippet} [end]
+   */
 
-  let min;
-  let max;
-  let info;
+  /** @type {Props} */
+  let {
+    value = $bindable(),
+    label = null,
+    disabled,
+    auth,
+    placeholder,
+    valid = $bindable(),
+    onChange,
+    before,
+    right,
+    end,
+    inputClass,
+    class: cls,
+  } = $props();
 
-  $: min = auth?.settings?.passwords?.min;
-  $: max = auth?.settings?.passwords?.max;
+  let min = $state();
+  let max = $state();
+  let info = $state();
 
-  $: if (!disabled && min && max) {
-    valid = value && value.length >= min && value.length <= max;
-    info = `(${min} to ${max} characters)`;
-  } else {
-    valid = true;
-  }
+  $effect(() => {
+    min = auth?.settings?.passwords?.min;
+    max = auth?.settings?.passwords?.max;
+
+    if (!disabled && min && max) {
+      valid = value && value.length >= min && value.length <= max;
+      info = `(${min} to ${max} characters)`;
+    } else {
+      valid = true;
+    }
+  });
+
+  const SvelteComponent = $derived(visible ? EyeOff : Eye);
 </script>
 
-<label class={`input input-bordered flex items-center gap-3 ${$$props.class}`}>
-  <slot name="before" />
+<label class={`input input-bordered flex items-center gap-3 ${cls}`}>
+  {@render before?.()}
 
   {#if label}
     <span class="label-text opacity-70 w-[70px]">{label}</span>
@@ -40,31 +68,29 @@
     <input
       minlength={min}
       maxlength={max}
-      {...$$props}
       type="text"
       placeholder={`${[placeholder, info].filter(Boolean).join(" ")}`}
-      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${$$props.inputClass}`}
+      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${inputClass}`}
       bind:value
-      on:input={onChange}
+      oninput={onChange}
     />
   {:else}
     <input
       minlength={min}
       maxlength={max}
-      {...$$props}
       type="password"
       placeholder={`${[placeholder, info].filter(Boolean).join(" ")}`}
-      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${$$props.inputClass}`}
+      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${inputClass}`}
       bind:value
-      on:input={onChange}
+      oninput={onChange}
     />
   {/if}
 
-  <slot name="right" />
+  {@render right?.()}
 
-  <button on:click|preventDefault|stopPropagation={toggle} type="button">
-    <svelte:component this={visible ? EyeOff : Eye} />
+  <button onclick={stopPropagation(preventDefault(toggle))} type="button">
+    <SvelteComponent />
   </button>
 
-  <slot name="end" />
+  {@render end?.()}
 </label>

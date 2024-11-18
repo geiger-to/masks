@@ -10,7 +10,7 @@ class PasswordTest < MasksTestCase
     assert_prompt "credentials"
   end
 
-  test "password:check rejects invalid passwords" do
+  test "password:verify rejects invalid passwords" do
     authorize
     attempt_identifier("manager")
     attempt_password("invalid")
@@ -19,7 +19,7 @@ class PasswordTest < MasksTestCase
     assert_prompt "credentials"
   end
 
-  test "password:check rejects invalid passwords for invalid actors" do
+  test "password:verify rejects invalid passwords for invalid actors" do
     authorize
     attempt_identifier("invalid")
     attempt_password("invalid")
@@ -28,7 +28,7 @@ class PasswordTest < MasksTestCase
     assert_prompt "credentials"
   end
 
-  test "password:check authenticates valid passwords" do
+  test "password:verify authenticates valid passwords" do
     log_in "manager"
 
     assert_login

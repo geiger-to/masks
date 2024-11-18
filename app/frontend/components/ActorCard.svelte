@@ -5,11 +5,17 @@
   import EditableImage from "./EditableImage.svelte";
   import { Save, ChevronRight, X } from "lucide-svelte";
 
-  export let actor;
-  export let editing = false;
-  export let isEditing = () => {};
+  /**
+   * @typedef {Object} Props
+   * @property {any} actor
+   * @property {boolean} [editing]
+   * @property {any} [isEditing]
+   */
 
-  let form = { ...actor };
+  /** @type {Props} */
+  let { actor, editing = false, isEditing = () => {} } = $props();
+
+  let form = $state({ ...actor });
 </script>
 
 <div class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3">
@@ -56,7 +62,7 @@
           ><Save size="15" /> save</button
         >
       {:else}
-        <button class="btn btn-ghost" on:click={() => isEditing({ actor })}
+        <button class="btn btn-ghost" onclick={() => isEditing({ actor })}
           ><ChevronRight /></button
         >
       {/if}
@@ -64,7 +70,7 @@
   </div>
 
   {#if editing}
-    <div class="divider my-1.5" />
+    <div class="divider my-1.5"></div>
 
     <div class="flex flex-col gap-1.5">
       <PasswordInput
@@ -72,17 +78,19 @@
         placeholder="enter a new password..."
         bind:value={form.newPassword}
       >
-        <div class="text-xs" slot="right">
-          <span class="italic">
-            {#if actor.passwordChangedAt}
-              changed <Time timestamp={actor.passwordChangedAt} />
-            {:else if actor.password}
-              never changed
-            {:else}
-              not set
-            {/if}
-          </span>
-        </div>
+        {#snippet right()}
+          <div class="text-xs">
+            <span class="italic">
+              {#if actor.passwordChangedAt}
+                changed <Time timestamp={actor.passwordChangedAt} />
+              {:else if actor.password}
+                never changed
+              {:else}
+                not set
+              {/if}
+            </span>
+          </div>
+        {/snippet}
       </PasswordInput>
 
       <div
@@ -90,7 +98,8 @@
         input-bordered max-h-full h-auto"
       >
         <span class="label-text opacity-70 w-[60px]">scopes</span>
-        <textarea class="w-full textarea text-base" bind:value={form.scopes} />
+        <textarea class="w-full textarea text-base" bind:value={form.scopes}
+        ></textarea>
       </div>
 
       <div class="rounded-md pl-4 pr-1.5 py-3 flex items-baseline gap-3">

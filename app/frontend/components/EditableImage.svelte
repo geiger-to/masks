@@ -1,18 +1,54 @@
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
+<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
   import Time from "svelte-time";
   import { Image, ImageUp, Save, ChevronDown, X } from "lucide-svelte";
   import { getContext } from "svelte";
 
-  export let endpoint;
-  export let src;
-  export let name;
-  export let params = {};
-  export let uploaded = () => {};
-  export let disabled = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} endpoint
+   * @property {any} src
+   * @property {any} name
+   * @property {any} [params]
+   * @property {any} [uploaded]
+   * @property {boolean} [disabled]
+   * @property {any} cls
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    endpoint,
+    src = $bindable(),
+    name,
+    params = {},
+    uploaded = () => {},
+    disabled = false,
+    class: cls,
+    children,
+  } = $props();
 
   let id = crypto.randomUUID();
   let page = getContext("page");
-  let uploadedSrc;
+  let uploadedSrc = $state();
 
   let uploadFile = (e) => {
     const file = e.target.files[0];
@@ -68,7 +104,7 @@
     class={[
       "rounded shadow relative",
       disabled ? "" : "cursor-pointer",
-      $$props.class,
+      cls,
     ].join(" ")}
   >
     <div
@@ -91,7 +127,7 @@
           <span
             class={[
               "flex items-center justify-center text-xl opacity-70",
-              $$props.class,
+              cls,
             ].join(" ")}
           >
             {#if disabled}
@@ -111,10 +147,10 @@
       type="file"
       accept="image/*"
       style="visibility: hidden"
-      on:change={uploadFile}
+      onchange={uploadFile}
       {disabled}
     />
   </div>
 
-  <slot />
+  {@render children?.()}
 </label>

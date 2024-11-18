@@ -1,10 +1,11 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Save, ChevronDown, X } from "lucide-svelte";
   import Time from "svelte-time";
   import DeviceCard from "./DeviceCard.svelte";
 
-  export let event;
-  export let search;
+  let { event, search } = $props();
 
   let form = { ...event };
 </script>
@@ -15,7 +16,7 @@
     <span class="opacity-70">via</span>
     <div class="grow">
       <button
-        on:click|preventDefault|stopPropagation={search(event.clientId)}
+        onclick={stopPropagation(preventDefault(search(event.clientId)))}
         class="btn btn-link underline">{event.clientId}</button
       >
     </div>

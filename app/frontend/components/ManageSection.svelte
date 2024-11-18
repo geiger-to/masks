@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import Avatar from "./Avatar.svelte";
   import PasswordInput from "./PasswordInput.svelte";
   import AddClientComponent from "./AddClientComponent.svelte";
@@ -27,58 +29,58 @@
   } from "lucide-svelte";
   import _ from "lodash-es";
 
-  export let actor;
+  let { actor } = $props();
 
   let { nickname } = actor;
 
-  let isConfiguring;
-  let isAdding;
-  let isAddOpen;
-  let isEditing;
-  let input;
-  let query;
-  let result;
-  let loading;
-
-  $: query = queryStore({
-    client: getContextClient(),
-    query: gql`
-      query ($input: String!) {
-        search(query: $input) {
-          actors {
-            id
-            nickname
-            identiconId
-            password
-            scopes
-            avatar
-            lastLoginAt
-            createdAt
-            updatedAt
-            passwordChangedAt
-            addedTotpSecretAt
-            savedBackupCodesAt
-          }
-          clients {
-            id
-            name
-            type
-            logo
-            secret
-            redirectUris
-            scopes
-            consent
-            createdAt
-            updatedAt
+  let isConfiguring = $state();
+  let isAdding = $state();
+  let isAddOpen = $state();
+  let isEditing = $state();
+  let input = $state();
+  let query = $derived(
+    queryStore({
+      client: getContextClient(),
+      query: gql`
+        query ($input: String!) {
+          search(query: $input) {
+            actors {
+              id
+              nickname
+              identiconId
+              password
+              scopes
+              avatar
+              lastLoginAt
+              createdAt
+              updatedAt
+              passwordChangedAt
+              addedTotpSecretAt
+              savedBackupCodesAt
+            }
+            clients {
+              id
+              name
+              type
+              logo
+              secret
+              redirectUris
+              scopes
+              consent
+              createdAt
+              updatedAt
+            }
           }
         }
-      }
-    `,
-    variables: {
-      input: input || "",
-    },
-    requestPolicy: "network-only",
-  });
+      `,
+      variables: {
+        input: input || "",
+      },
+      requestPolicy: "network-only",
+    })
+  );
+  let result = $state();
+  let loading = $state();
 
   const search = (value) => {
     input = value;
@@ -154,7 +156,9 @@
     return search && !search.actors?.length && !search.clients?.length;
   };
 
-  $: autocomplete(input, $query);
+  run(() => {
+    autocomplete(input, $query);
+  });
 </script>
 
 <div class="dark:bg-black bg-base-300 h-full">
@@ -167,7 +171,7 @@
       <button
         class={`btn btn-sm px-0 w-8 ${isConfiguring ? "btn-neutral" : "btn-ghost"}`}
         type="button"
-        on:click|preventDefault|stopPropagation={configuring}
+        onclick={stopPropagation(preventDefault(configuring))}
       >
         {#if isConfiguring}
           <X size="20" />
@@ -179,7 +183,7 @@
       <div class={`dropdown ${isAddOpen ? "dropdown-open" : ""} dropdown-end`}>
         <button
           tabindex="0"
-          on:click|stopPropagation|preventDefault={toggleMenu}
+          onclick={stopPropagation(preventDefault(toggleMenu))}
           class={`btn ${!isAdding && "focus:btn-success hover:btn-success"} btn-sm px-0 w-8 py-0`}
         >
           {#if isAddOpen || isAdding}
@@ -197,13 +201,13 @@
             <ul class="menu gap-3">
               <li>
                 <button
-                  on:click|stopPropagation|preventDefault={adding("actor")}
+                  onclick={stopPropagation(preventDefault(adding("actor")))}
                   class="btn text-lg whitespace-nowrap">new actor</button
                 >
               </li>
               <li>
                 <button
-                  on:click|stopPropagation|preventDefault={adding("client")}
+                  onclick={stopPropagation(preventDefault(adding("client")))}
                   class="btn text-lg whitespace-nowrap">new client</button
                 >
               </li>
@@ -226,7 +230,7 @@
     {:else if isConfiguring}
       <SettingsCard />
     {:else if isEditing}
-      <button on:click={() => editing(false)}>
+      <button onclick={() => editing(false)}>
         <div class="flex items-center gap-1.5">
           <ChevronLeft size="18" />
 
@@ -258,7 +262,7 @@
               type="text"
               class="grow"
               placeholder="search for actors, clients, devices, and more..."
-              on:input={console.log}
+              oninput={console.log}
             />
           </label>
         </div>

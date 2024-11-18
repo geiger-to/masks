@@ -1,4 +1,6 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { X, Check, Send, Mail } from "lucide-svelte";
   import Alert from "./Alert.svelte";
   import PromptHeader from "./PromptHeader.svelte";
@@ -6,18 +8,18 @@
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
 
-  export let auth;
-  export let loading;
-  export let authorize;
+  let { auth, loading, authorize } = $props();
 
-  let password;
-  let valid;
-  let changed;
-  let denied;
+  let password = $state();
+  let valid = $state();
+  let changed = $state();
+  let denied = $state();
 
-  $: if (password) {
-    denied = false;
-  }
+  run(() => {
+    if (password) {
+      denied = false;
+    }
+  });
 
   let changePassword = () => {
     if (!valid) {
@@ -53,13 +55,15 @@
   bind:valid
   disabled={changed}
 >
-  <div slot="right" class="flex items-center gap-3">
-    {#if changed}
-      <span class="text-success text-sm font-bold">changed</span>
+  {#snippet right()}
+    <div class="flex items-center gap-3">
+      {#if changed}
+        <span class="text-success text-sm font-bold">changed</span>
 
-      <Check class="text-success" size="20" />
-    {/if}
-  </div>
+        <Check class="text-success" size="20" />
+      {/if}
+    </div>
+  {/snippet}
 </PasswordInput>
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">

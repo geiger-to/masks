@@ -1,4 +1,6 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import { OctagonAlert as Icon } from "lucide-svelte";
   import Alert from "./Alert.svelte";
   import PromptLoading from "./PromptLoading.svelte";
@@ -8,9 +10,9 @@
   import { onMount } from "svelte";
   import { redirectTimeout } from "../util";
 
-  export let auth;
+  let { auth } = $props();
 
-  let loading = true;
+  let loading = $state(true);
 
   onMount(() => {
     redirectTimeout(() => {
@@ -39,7 +41,7 @@
 
   <button
     class="btn btn-lg"
-    on:click|preventDefault|stopPropagation={() => window.location.reload()}
+    onclick={stopPropagation(preventDefault(() => window.location.reload()))}
   >
     refresh the page
   </button>

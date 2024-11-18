@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import "web-streams-polyfill/polyfill";
   import * as WebAuthnJSON from "@github/webauthn-json/browser-ponyfill";
 
@@ -23,20 +25,19 @@
   import AaguidIcon from "./AaguidIcon.svelte";
   import Dropdown from "./Dropdown.svelte";
 
-  export let auth;
-  export let authorize;
-  export let authorizing;
+  let { auth, authorize, authorizing } = $props();
 
-  let webauthnOpts;
-  let credential;
-  let credentials;
-  let empty;
-  let existing = false;
+  let webauthnOpts = $state();
+  let credential = $state();
+  let credentials = $state();
+  let empty = $derived(!credentials?.length);
+  let existing = $state(false);
 
-  $: credentials = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "WebauthnCredential"
-  );
-  $: empty = !credentials?.length;
+  run(() => {
+    credentials = auth?.actor?.secondFactors?.filter(
+      (f) => f.__typename == "WebauthnCredential"
+    );
+  });
 
   let add = () => {
     authorize({ event: "webauthn:add" });
@@ -80,13 +81,17 @@
     };
   };
 
-  $: if (auth?.extras?.webauthn) {
-    webauthnOpts = auth?.extras?.webauthn;
-  }
+  run(() => {
+    if (auth?.extras?.webauthn) {
+      webauthnOpts = auth?.extras?.webauthn;
+    }
+  });
 
-  $: if (authorizing && credentials) {
-    credential = credentials[0];
-  }
+  run(() => {
+    if (authorizing && credentials) {
+      credential = credentials[0];
+    }
+  });
 
   let dropdown;
 
@@ -107,54 +112,57 @@
   <Alert type="primary">
     <div class="flex items-center gap-1.5 mb-1.5">
       <Dropdown value={credential}>
-        <summary
-          slot="summary"
-          class="flex items-center gap-0.5 btn btn-xs bg-primary-content border-primary-content text-primary pl-0.5 rounded"
-        >
-          {#if credentials?.length > 1}
-            {#each credentials as cred}
-              <AaguidIcon icons={cred.icons} />
-            {/each}
-
-            <span class="pl-1.5">{credentials.length} keys</span>
-            <ChevronDown size="16" />
-          {:else}
-            <AaguidIcon icons={credential?.icons} />
-
-            <div class="truncate max-w-[175px] pl-1.5">
-              {credential?.name}
-            </div>
-          {/if}
-        </summary>
-
-        <div slot="dropdown">
-          {#if credentials?.length > 1}
-            <ul class="">
-              {#each credentials as c}
-                <li
-                  class="p-1.5 flex items-center gap-3 text-sm font-bold text-neutral-content"
-                >
-                  <AaguidIcon icons={c?.icons} />
-                  <span class="truncate">{c.name}</span>
-                </li>
+        {#snippet summary()}
+          <summary
+            class="flex items-center gap-0.5 btn btn-xs bg-primary-content border-primary-content text-primary pl-0.5 rounded"
+          >
+            {#if credentials?.length > 1}
+              {#each credentials as cred}
+                <AaguidIcon icons={cred.icons} />
               {/each}
-            </ul>
-          {:else if !empty}
-            <div class="text-xs whitespace-nowrap flex items-center gap-1.5">
-              <Info size="16" />
-              <span>
-                You added this key <Time timestamp={credential?.createdAt} />.
-              </span>
-            </div>
-          {/if}
-        </div>
+
+              <span class="pl-1.5">{credentials.length} keys</span>
+              <ChevronDown size="16" />
+            {:else}
+              <AaguidIcon icons={credential?.icons} />
+
+              <div class="truncate max-w-[175px] pl-1.5">
+                {credential?.name}
+              </div>
+            {/if}
+          </summary>
+        {/snippet}
+
+        {#snippet dropdown()}
+          <div>
+            {#if credentials?.length > 1}
+              <ul class="">
+                {#each credentials as c}
+                  <li
+                    class="p-1.5 flex items-center gap-3 text-sm font-bold text-neutral-content"
+                  >
+                    <AaguidIcon icons={c?.icons} />
+                    <span class="truncate">{c.name}</span>
+                  </li>
+                {/each}
+              </ul>
+            {:else if !empty}
+              <div class="text-xs whitespace-nowrap flex items-center gap-1.5">
+                <Info size="16" />
+                <span>
+                  You added this key <Time timestamp={credential?.createdAt} />.
+                </span>
+              </div>
+            {/if}
+          </div>
+        {/snippet}
       </Dropdown>
     </div>
 
     <button
       class="btn btn-primary w-full btn-lg mb-1.5"
       disabled={!webauthnOpts}
-      on:click|preventDefault|stopPropagation={verify(webauthnOpts)}
+      onclick={stopPropagation(preventDefault(verify(webauthnOpts)))}
     >
       <Fingerprint size="20" /> verify
     </button>
@@ -212,7 +220,7 @@
       type="button"
       class={"btn btn-sm w-full"}
       disabled={!webauthnOpts}
-      on:click|preventDefault|stopPropagation={setUp(webauthnOpts)}
+      onclick={stopPropagation(preventDefault(setUp(webauthnOpts)))}
     >
       {empty ? "add your key" : "add another key"}
     </button>

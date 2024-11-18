@@ -2,7 +2,7 @@
   import { Save, ChevronDown, X } from "lucide-svelte";
   import Time from "svelte-time";
 
-  export let token;
+  let { token } = $props();
 
   let form = { ...token };
 </script>

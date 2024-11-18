@@ -3,12 +3,10 @@
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
-  import PromptAlert from "./PromptAlert.svelte";
   import OnboardEmail from "./OnboardEmail.svelte";
   import { MailCheck as Mail, User } from "lucide-svelte";
 
-  export let auth;
-  export let authorize;
+  let { auth, authorize } = $props();
 
   let extras = [];
   let primary;

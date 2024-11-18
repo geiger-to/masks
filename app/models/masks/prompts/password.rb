@@ -5,7 +5,7 @@ module Masks
         client.allow_passwords? && identifier && checking?("credentials")
       end
 
-      event "password:check" do
+      event "password:verify" do
         password = updates["password"]
 
         unless actor && password && actor.authenticate(password)

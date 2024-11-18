@@ -1,17 +1,25 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
 
-  export let loading;
-  export let disabled;
-  export let label = "go back";
+  /**
+   * @typedef {Object} Props
+   * @property {any} loading
+   * @property {any} disabled
+   * @property {string} [label]
+   */
+
+  /** @type {Props} */
+  let { loading, disabled, label = "go back", ...extras } = $props();
 </script>
 
 <button
+  {...extras}
   type="button"
   class="btn btn-lg btn-error w-[130px] text-center"
   disabled={loading || disabled}
-  on:click|preventDefault|stopPropagation={() => history.back()}
-  {..._.omit($$props, ["label", "loading", "disabled", "class"])}
+  onclick={stopPropagation(preventDefault(() => history.back()))}
 >
   {#if loading}
     <span class="loading loading-spinner loading-md mx-auto"></span>

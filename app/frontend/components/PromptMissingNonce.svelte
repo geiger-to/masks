@@ -3,7 +3,7 @@
   import Alert from "./Alert.svelte";
   import PromptHeader from "./PromptHeader.svelte";
 
-  export let auth;
+  let { auth } = $props();
 </script>
 
 <PromptHeader

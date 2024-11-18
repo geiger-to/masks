@@ -1,12 +1,12 @@
 <script>
-  export let value;
+  let { value, class: cls, summary, dropdown } = $props();
 
-  let dropdown;
+  let element;
   let setValue = (v, cb) => {
     value = v;
 
-    if (dropdown) {
-      dropdown.open = false;
+    if (element) {
+      element.open = false;
     }
 
     if (cb) {
@@ -15,11 +15,11 @@
   };
 </script>
 
-<details class={`dropdown ${$$props.class}`} bind:this={dropdown}>
-  <slot name="summary" {value} />
+<details class={`dropdown ${cls}`} bind:this={element}>
+  {@render summary?.({value})}
   <div
     class="dropdown-content dark:bg-black bg-neutral p-1.5 px-3 rounded-lg shadow-xl mt-1.5 z-20"
   >
-    <slot name="dropdown" {value} {setValue} />
+    {@render dropdown?.({value, setValue})}
   </div>
 </details>

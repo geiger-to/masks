@@ -1,13 +1,15 @@
 <script>
+  import { run, preventDefault } from "svelte/legacy";
+
   import { AlertTriangle, X, UserPlus, Save } from "lucide-svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
 
-  export let search = () => {};
+  let { search = () => {} } = $props();
 
-  let result;
-  let input = { signup: true };
+  let result = $state();
+  let input = $state({ signup: true });
   let client = getContextClient();
-  let errors;
+  let errors = $state();
   let loading;
 
   const addActor = ({ nickname }) => {
@@ -51,12 +53,14 @@
     loading = false;
   };
 
-  $: handleResult($result);
+  run(() => {
+    handleResult($result);
+  });
 </script>
 
 <form
   action="#"
-  on:submit|preventDefault={() => addActor(input)}
+  onsubmit={preventDefault(() => addActor(input))}
   class="w-full"
 >
   <div class="flex items-center join w-full grow">

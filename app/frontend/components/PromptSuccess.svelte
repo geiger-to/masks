@@ -2,14 +2,13 @@
   import { ShieldCheck as Check } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
-  import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import Identicon from "./Identicon.svelte";
   import { onMount } from "svelte";
   import { redirectTimeout } from "../util";
 
-  export let auth;
+  let { auth } = $props();
 
   onMount(() => {
     redirectTimeout(() => {

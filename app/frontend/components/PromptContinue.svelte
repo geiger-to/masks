@@ -1,42 +1,43 @@
 <script>
   import _ from "lodash-es";
 
-  export let event = null;
-  export let loading;
-  export let disabled;
-  export let label = "continue";
-  export let denied = false;
-  export let deniedLabel = "try again";
-  export let onClick;
-  export let type;
+  let {
+    children,
+    loading,
+    disabled,
+    event = null,
+    label = "continue",
+    denied = false,
+    deniedLabel = "try again",
+    updates = {},
+    authorize,
+    type = "button",
+    class: cls,
+    ...extraProps
+  } = $props();
 
-  let handleClick = (e) => {
-    if (onClick) {
+  let onclick = (e) => {
+    if (extraProps.onclick) {
+      return extraProps.onclick(e);
+    } else if (authorize) {
       e.preventDefault();
       e.stopPropagation();
 
-      return onClick(e);
+      authorize({ event, updates });
     }
   };
-
-  let defaultType;
-
-  $: defaultType = onClick ? "button" : "submit";
 </script>
 
 <button
-  type={type || defaultType}
-  class={`btn btn-lg min-w-[130px] ${$$props.class} text-center ${denied ? "animate-denied" : ""}`}
+  {...extraProps}
+  {type}
+  class={`btn btn-lg min-w-[130px] ${cls} text-center ${denied ? "animate-denied" : ""}`}
   disabled={loading || disabled}
-  data-event={event}
-  on:click={handleClick}
-  {..._.omit($$props, ["disabled", "class", "type", "loading"])}
+  {onclick}
 >
   {#if loading}
     <span class="loading loading-spinner loading-md mx-auto"></span>
-  {:else}
-    <slot>
-      {denied ? deniedLabel : label}
-    </slot>
+  {:else if children}{@render children()}{:else}
+    {denied ? deniedLabel : label}
   {/if}
 </button>

@@ -6,37 +6,28 @@
   import PromptContinue from "./PromptContinue.svelte";
   import PasswordInput from "./PasswordInput.svelte";
 
-  export let auth;
-  export let identifier;
-  export let loading;
-  export let startOver;
-  export let updates;
+  let { auth, authorize, identifier, loading, startOver } = $props();
 
-  let allowLoginLinks;
-  let allowPasswords;
+  let allowLoginLinks = $derived(auth?.client?.allowLoginLinks);
+  let allowPasswords = $derived(auth?.client?.allowPasswords);
 
-  $: allowLoginLinks = auth?.client?.allowLoginLinks;
-  $: allowPasswords = auth?.client?.allowPasswords;
+  let valid = $state(false);
+  let password = $state();
+  let denied = $state();
+  let onsubmit = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-  let valid = false;
-  let password;
-  let denied;
+    if (!valid) {
+      return;
+    }
 
-  $: if (auth?.warnings?.includes("invalid-credentials")) {
-    denied = true;
-  } else {
-    denied = false;
-  }
+    authorize({ event: "password:verify", updates: { password } });
+  };
 
-  $: if (password) {
-    denied = false;
-  }
-
-  $: if (valid) {
-    updates({ password });
-  } else {
-    updates({ password: null });
-  }
+  $effect(() => {
+    denied = auth?.warnings?.includes("invalid-credentials");
+  });
 </script>
 
 <PromptHeader
@@ -51,50 +42,54 @@
 {/if}
 
 <PromptIdentifier
-  bind:identifier
+  {identifier}
   {auth}
   {startOver}
   class={allowPasswords ? "mb-3" : "mb-6"}
 />
 
 {#if allowPasswords}
-  <PasswordInput
-    {auth}
-    class="input-lg mb-6"
-    placeholder="Your password"
-    bind:value={password}
-    bind:valid
-  />
-
-  <div class="flex flex-col md:flex-row md:items-center md:gap-4">
-    <PromptContinue
-      {loading}
-      {denied}
-      event={allowPasswords ? "password:check" : "login-link:authenticate"}
-      disabled={allowPasswords && !valid}
-      class={denied ? "btn-warning" : "btn-primary"}
+  <form action="#" {onsubmit}>
+    <PasswordInput
+      {auth}
+      class="input-lg mb-6"
+      placeholder="Your password"
+      bind:value={password}
+      bind:valid
     />
 
-    {#if auth?.loginLink}
-      <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
-
+    <div class="flex flex-col md:flex-row md:items-center md:gap-4">
       <PromptContinue
-        class="px-0 w-auto btn-link text-base-content"
-        event="login-link:authenticate"
-      >
-        enter your login code...
-      </PromptContinue>
-    {:else if allowLoginLinks}
-      <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+        type="submit"
+        {loading}
+        {denied}
+        disabled={allowPasswords && !valid}
+        class={denied ? "btn-warning" : "btn-primary"}
+      />
 
-      <PromptContinue
-        class="px-0 w-auto btn-link text-base-content"
-        event="login-link:authenticate"
-      >
-        send an email to log in...
-      </PromptContinue>
-    {/if}
-  </div>
+      {#if auth?.loginLink}
+        <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+
+        <PromptContinue
+          class="px-0 w-auto btn-link text-base-content"
+          event="login-link:authenticate"
+          {authorize}
+        >
+          enter your login code...
+        </PromptContinue>
+      {:else if allowLoginLinks}
+        <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
+
+        <PromptContinue
+          class="px-0 w-auto btn-link text-base-content"
+          event="login-link:authenticate"
+          {authorize}
+        >
+          send an email to log in...
+        </PromptContinue>
+      {/if}
+    </div>
+  </form>
 {:else}
   <div class="flex flex-col md:flex-row md:items-center md:gap-4">
     <PromptContinue
@@ -102,6 +97,7 @@
       label={auth?.loginLink ? "enter your login code" : "email a login code"}
       {loading}
       {denied}
+      {authorize}
       event={"login-link:authenticate"}
       class={"btn-primary"}
     />

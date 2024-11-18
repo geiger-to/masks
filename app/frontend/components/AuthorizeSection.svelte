@@ -1,4 +1,6 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { createConsumer } from "@rails/actioncable";
   import { AlertTriangle, RotateCcw } from "lucide-svelte";
   import Identicon from "./Identicon.svelte";
@@ -27,11 +29,11 @@
   import Time from "svelte-time";
   import AuthenticateQuery from "../authenticate.graphql?raw";
 
-  export let auth;
+  let { auth = $bindable() } = $props();
 
   let consumer = createConsumer();
   let client = getContextClient();
-  let mutation;
+  let mutation = $state();
 
   const authorize = (vars) => {
     return new Promise((res, rej) => {
@@ -43,30 +45,35 @@
         variables: { input: { id: auth.id, ...vars } },
       });
 
-      let resolved;
-
       mutation.subscribe((result) => {
-        if (!result?.fetching && !resolved) {
-          if (result?.data?.authenticate) {
-            resolved = true;
-            res(result?.data?.authenticate);
-          }
+        loading = !result || result.fetching;
+
+        if (loading) {
+          return;
+        }
+
+        auth = result.data?.authenticate;
+        identifier = auth?.identifier;
+        loadingError = result.error;
+
+        if (auth) {
+          res(auth);
         }
       });
     });
   };
 
-  let loading = true;
-  let identifier;
-  let password;
-  let updates;
+  let loading = $state(true);
+  let identifier = $state();
+  let password = $state();
+  let updates = $state();
 
   const startOver = () => {
     auth.identifier = identifier = null;
     auth.password = password = null;
     auth.errorCode = null;
     auth.errorMessage = null;
-    auth.prompt = "identifier";
+    auth.prompt = "identify";
   };
 
   const continueAuth = (args) => {
@@ -81,18 +88,6 @@
 
       authorize(args);
     };
-  };
-
-  const updateAuth = (result) => {
-    loading = !result || result.fetching;
-
-    if (loading) {
-      return;
-    }
-
-    auth = result.data?.authenticate;
-    identifier = auth?.identifier;
-    loadingError = result.error;
   };
 
   const onUpdate = (v) => {
@@ -125,7 +120,7 @@
     unsupported_response_type: PromptUnsupportedResponseType,
   };
 
-  let loadingError;
+  let loadingError = $state();
 
   let computePrompt = (auth, loading, loadingError) => {
     if (loadingError) {
@@ -139,17 +134,15 @@
     return PromptLoading;
   };
 
-  let defaultEvent;
+  let defaultEvent = $state();
   let currentEvent = (name) => {
     defaultEvent = name;
   };
 
-  $: updateAuth($mutation);
+  const SvelteComponent = $derived(computePrompt(auth, loading, loadingError));
 </script>
 
-<form
-  action="#"
-  on:submit={continueAuth({ event: defaultEvent, updates })}
+<div
   class="background animate-fade-in flex min-h-full md:p-3 px-[5px] items-center"
 >
   <div class="w-full md:w-[502px] mx-auto rounded-b-2xl shadow-2xl p-[1px]">
@@ -158,18 +151,17 @@
         <div class="animate-fade-in-slow w-full h-[50px] absolute blur-2xl">
           <div
             class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-[.03]"}`}
-          />
+          ></div>
         </div>
         <div class="bg-base-200 animate-fade-in-slow w-full h-[2px] z-10">
           <div
             class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-5"}`}
-          />
+          ></div>
         </div>
       </div>
       <div class="bg-base-300 w-full min-h-[200px] md:w-[500px] mx-auto">
         <div class="px-5 md:px-8 md:pt-1.5">
-          <svelte:component
-            this={computePrompt(auth, loading, loadingError)}
+          <SvelteComponent
             {auth}
             {startOver}
             {authorize}
@@ -178,8 +170,8 @@
             vars={updates}
             updates={onUpdate}
             setEvent={currentEvent}
-            bind:identifier
-            bind:password
+            {identifier}
+            {password}
           />
         </div>
       </div>
@@ -188,4 +180,4 @@
       ></div>
     </div>
   </div>
-</form>
+</div>

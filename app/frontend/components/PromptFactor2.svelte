@@ -1,4 +1,6 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
 
   import {
@@ -20,82 +22,76 @@
   import FactorBackupCodes from "./FactorBackupCodes.svelte";
   import Card from "./Card.svelte";
 
-  export let auth;
-  export let loading;
+  let props = $props();
+  let { auth, authorize, loading } = props;
 
-  let enabled;
-  $: enabled = auth?.actor?.secondFactor;
+  let enabled = $derived(auth?.actor?.secondFactor);
 
-  let securityKeys;
-  $: securityKeys = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "WebauthnCredential"
+  let securityKeys = $derived(
+    auth?.actor?.secondFactors?.filter(
+      (f) => f.__typename == "WebauthnCredential"
+    )
   );
 
-  let phones;
-  $: phones = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "Phone"
+  let phones = $derived(
+    auth?.actor?.secondFactors?.filter((f) => f.__typename == "Phone")
   );
 
-  let totp;
-  $: totp = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "OtpSecret"
+  let totp = $derived(
+    auth?.actor?.secondFactors?.filter((f) => f.__typename == "OtpSecret")
   );
 
-  let backupCodes;
-  $: backupCodes = auth?.actor?.savedBackupCodesAt;
+  let backupCodes = $derived(auth?.actor?.savedBackupCodesAt);
 
-  let enabledFactors;
+  let enabledFactors = $derived(
+    [
+      securityKeys?.length
+        ? {
+            component: FactorWebauthn,
+            choose: "security key",
+          }
+        : null,
+      phones?.length
+        ? {
+            component: FactorPhoneNumber,
+            choose: "phone number",
+          }
+        : null,
+      totp?.length
+        ? {
+            component: FactorTotp,
+            choose: "one-time code",
+          }
+        : null,
+    ].filter(Boolean)
+  );
 
-  $: enabledFactors = [
-    securityKeys?.length
-      ? {
-          component: FactorWebauthn,
-          choose: "security key",
-        }
-      : null,
-    phones?.length
-      ? {
-          component: FactorPhoneNumber,
-          choose: "phone number",
-        }
-      : null,
-    totp?.length
-      ? {
-          component: FactorTotp,
-          choose: "one-time code",
-        }
-      : null,
-  ].filter(Boolean);
+  let secondFactor = $derived(auth?.actor?.secondFactors?.length);
 
-  let secondFactor;
-  $: secondFactor = auth?.actor?.secondFactors?.length;
+  let canContinue = $derived(!enabled && backupCodes && secondFactor);
 
-  let canContinue;
-  $: canContinue = !enabled && backupCodes && secondFactor;
+  let heading = $derived(
+    enabled ? "Verify your credentials..." : "Add your credentials..."
+  );
 
-  let heading;
-  $: heading = enabled
-    ? "Verify your credentials..."
-    : "Add your credentials...";
-
-  let factors = [
+  let factors = $derived([
     FactorWebauthn,
     FactorPhoneNumber,
     FactorTotp,
     FactorBackupCodes,
-  ];
+  ]);
 
-  let factor;
-  let defaultFactor;
-  let previousFactor;
-
-  $: defaultFactor = securityKeys?.length
-    ? FactorWebauthn
-    : phones?.length
-      ? FactorPhoneNumber
-      : totp?.length
-        ? FactorTotp
-        : FactorBackupCodes;
+  let factor = $state();
+  let defaultFactor = $derived(
+    securityKeys?.length
+      ? FactorWebauthn
+      : phones?.length
+        ? FactorPhoneNumber
+        : totp?.length
+          ? FactorTotp
+          : FactorBackupCodes
+  );
+  let previousFactor = $state();
 
   let switchFactor = (v) => {
     previousFactor = factor;
@@ -106,10 +102,9 @@
     switchFactor(null);
   };
 
-  let currentFactor;
-  $: currentFactor = factor || defaultFactor;
+  let currentFactor = $derived(factor || defaultFactor);
 
-  let lockedTab;
+  let lockedTab = $state();
   let setLocked = (v) => {
     lockedTab = v;
   };
@@ -129,6 +124,7 @@
     <PromptIdentifier {auth} class="my-3" />
 
     {#if enabled}
+      {@const Factor = factor || defaultFactor}
       <div>
         {#if Object.values(enabledFactors).length > 1}
           <div class="overflow-auto pt-1.5 pl-3">
@@ -138,8 +134,11 @@
             >
               {#each Object.values(enabledFactors) as { component, choose }, index}
                 <button
-                  on:click|preventDefault|stopPropagation={() =>
-                    switchFactor(lockedTab ? currentFactor : component)}
+                  onclick={stopPropagation(
+                    preventDefault(() =>
+                      switchFactor(lockedTab ? currentFactor : component)
+                    )
+                  )}
                   type="button"
                   role="tab"
                   class={`${component == currentFactor ? "tab tab-active" : lockedTab ? "tab tab-disabled" : "tab opacity-75"} whitespace-nowrap pb-6 text-left`}
@@ -149,12 +148,7 @@
             </div>
           </div>
         {/if}
-        <svelte:component
-          this={factor || defaultFactor}
-          {...$$props}
-          authorizing
-          {setLocked}
-        />
+        <Factor {...props} authorizing {setLocked} />
       </div>
 
       <div class="text-center pt-1.5 rounded mt-3 text-xs opacity-75">
@@ -162,15 +156,19 @@
           <button
             type="button"
             class="btn btn-xs text-error"
-            on:click|stopPropagation|preventDefault={() =>
-              switchFactor(previousFactor || defaultFactor)}>cancel</button
+            onclick={stopPropagation(
+              preventDefault(() =>
+                switchFactor(previousFactor || defaultFactor)
+              )
+            )}>cancel</button
           >
         {:else}
           <button
             type="button"
             class="btn btn-xs"
-            on:click|stopPropagation|preventDefault={() =>
-              switchFactor(FactorBackupCodes)}>enter a backup code</button
+            onclick={stopPropagation(
+              preventDefault(() => switchFactor(FactorBackupCodes))
+            )}>enter a backup code</button
           >
         {/if}
       </div>
@@ -178,8 +176,8 @@
   </div>
 
   {#if !enabled}
-    {#each factors as component}
-      <svelte:component this={component} {...$$props} />
+    {#each factors as Factor}
+      <Factor {...props} />
     {/each}
 
     <Card class="-mt-3 pt-6 pb-0">
@@ -188,6 +186,7 @@
         disabled={loading || !canContinue}
         class="btn-primary"
         event="second-factor:enable"
+        {authorize}
       />
     </Card>
   {/if}

@@ -4,9 +4,9 @@
   import PromptContinue from "./PromptContinue.svelte";
   import { AlertTriangle, User } from "lucide-svelte";
 
-  export let auth;
+  let { auth } = $props();
 
-  $: denied = auth?.warnings?.includes("invalid-device");
+  let denied = $derived(auth?.warnings?.includes("invalid-device"));
 </script>
 
 <PromptHeader

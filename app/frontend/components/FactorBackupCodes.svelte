@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
 
   import {
@@ -20,16 +22,12 @@
   import Alert from "./Alert.svelte";
   import Card from "./Card.svelte";
 
-  export let auth;
-  export let authorize;
-  export let authorizing;
+  let { auth, authorize, authorizing } = $props();
 
   let copied;
-  let generating;
-  let generated;
+  let generating = $state();
+  let generated = $derived(auth?.actor?.savedBackupCodesAt);
   let entering;
-
-  $: generated = auth?.actor?.savedBackupCodesAt;
 
   function generateCodes(count, length) {
     const codes = new Set();
@@ -73,9 +71,9 @@
   }
 
   let codes = generateCodes(10, 20);
-  let enableCta;
-  let denied;
-  let code;
+  let enableCta = $derived(auth?.actor?.savedBackupCodesAt ? "save" : "enable");
+  let denied = $state();
+  let code = $state();
 
   let verifyCode = () => {
     authorize({ event: "backup-code:verify", updates: { code } }).then(
@@ -87,15 +85,15 @@
     );
   };
 
-  $: if (code) {
-    denied = false;
-  }
+  run(() => {
+    if (code) {
+      denied = false;
+    }
+  });
 
-  let warnEntry;
-
-  $: warnEntry =
-    !auth?.actor?.savedBackupCodesAt && auth?.actor?.secondFactors?.length;
-  $: enableCta = auth?.actor?.savedBackupCodesAt ? "save" : "enable";
+  let warnEntry = $derived(
+    !auth?.actor?.savedBackupCodesAt && auth?.actor?.secondFactors?.length
+  );
 </script>
 
 {#if authorizing}
@@ -138,18 +136,19 @@
         placeholder={`Enter a backup code...`}
         bind:value={code}
       >
-        <button
-          slot="end"
-          class="btn btn-sm px-1.5 btn-success -mr-1.5"
-          disabled={!code || denied}
-          on:click|stopPropagation|preventDefault={verifyCode}
-        >
-          {#if denied}
-            <X />
-          {:else}
-            <Check />
-          {/if}
-        </button>
+        {#snippet end()}
+          <button
+            class="btn btn-sm px-1.5 btn-success -mr-1.5"
+            disabled={!code || denied}
+            onclick={stopPropagation(preventDefault(verifyCode))}
+          >
+            {#if denied}
+              <X />
+            {:else}
+              <Check />
+            {/if}
+          </button>
+        {/snippet}
       </PasswordInput>
     </div>
   </Alert>
@@ -195,7 +194,7 @@
             disabled={!generating}
             class="btn btn-sm btn-success"
             type="button"
-            on:click|preventDefault|stopPropagation={() => saveCodes(codes)}
+            onclick={stopPropagation(preventDefault(() => saveCodes(codes)))}
           >
             {enableCta}
           </button>
@@ -203,8 +202,9 @@
             <button
               class="btn btn-sm btn-link whitepsace-nowrap !btn-neutral flex items-center gap-0"
               type="button"
-              on:click|preventDefault|stopPropagation={() =>
-                (generating = false)}>cancel</button
+              onclick={stopPropagation(
+                preventDefault(() => (generating = false))
+              )}>cancel</button
             >
           {/if}
         </div>
@@ -212,7 +212,7 @@
         <button
           class="btn btn-xs"
           type="button"
-          on:click|preventDefault|stopPropagation={() => (generating = true)}
+          onclick={stopPropagation(preventDefault(() => (generating = true)))}
           >generate new codes</button
         >
       {/if}
@@ -224,13 +224,14 @@
           <button
             class="btn btn-sm grow"
             type="button"
-            on:click|preventDefault|stopPropagation={() => downloadCodes(codes)}
-            ><Download size="14" /> download</button
+            onclick={stopPropagation(
+              preventDefault(() => downloadCodes(codes))
+            )}><Download size="14" /> download</button
           >
           <button
             class="btn btn-sm grow"
             type="button"
-            on:click|preventDefault|stopPropagation={() => copyCodes(codes)}
+            onclick={stopPropagation(preventDefault(() => copyCodes(codes)))}
             ><Copy size="14" /> copy</button
           >
         </div>
@@ -246,7 +247,7 @@
       <button
         class={`btn btn-sm w-full mb-3 ${warnEntry ? "btn-warning" : ""}`}
         type="button"
-        on:click|preventDefault|stopPropagation={() => (generating = true)}
+        onclick={stopPropagation(preventDefault(() => (generating = true)))}
         >generate backup codes</button
       >
     {/if}

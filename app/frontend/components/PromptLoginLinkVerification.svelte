@@ -1,4 +1,6 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { Send, MailCheck as Mail } from "lucide-svelte";
   import Time from "svelte-time";
   import Pincode from "svelte-pincode/unstyled/Pincode.svelte";
@@ -7,20 +9,21 @@
   import PromptIdentifier from "./PromptIdentifier.svelte";
   import PromptContinue from "./PromptContinue.svelte";
 
-  export let auth;
-  export let identifier;
-  export let loading;
-  export let updates;
+  let { auth, identifier, loading, updates } = $props();
 
-  let code = [];
-  let value;
-  let complete;
+  let code = $state([]);
+  let value = $state();
+  let complete = $state();
   let error;
 
-  $: code = code.map((s) => s?.toUpperCase());
-  $: if (complete) {
-    updates({ code: value });
-  }
+  run(() => {
+    code = code.map((s) => s?.toUpperCase());
+  });
+  run(() => {
+    if (complete) {
+      updates({ code: value });
+    }
+  });
 </script>
 
 <PromptHeader

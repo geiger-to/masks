@@ -4,7 +4,7 @@ module Masks
       before_auth do
         identifier =
           (
-            if event?("identifier:add")
+            if event?("identify")
               updates["identifier"]
             else
               attempt_bag[:identifier]
@@ -14,6 +14,12 @@ module Masks
 
         self.identifier = identifier
         self.actor = actor
+
+        if actor&.new_record? && !actor&.valid?
+          self.identifier = nil
+
+          warn!("invalid-identifier", prompt: "identify")
+        end
       end
 
       def enabled?
@@ -21,16 +27,10 @@ module Masks
       end
 
       prompt "identify" do
-        if actor&.new_record? && !actor&.valid?
-          self.identifier = nil
-
-          warn!("invalid-identifier")
-        end
-
         !identifier
       end
 
-      event "identifier:add" do
+      event "identify" do
         attempt_bag[:identifier] = updates["identifier"] if updates[
           "identifier"
         ]

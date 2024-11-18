@@ -114,11 +114,11 @@ module AuthHelper
   end
 
   def attempt_identifier(identifier)
-    attempt(event: "identifier:add", updates: { identifier: })
+    attempt(event: "identify", updates: { identifier: })
   end
 
   def attempt_password(password)
-    attempt(event: "password:check", updates: { password: })
+    attempt(event: "password:verify", updates: { password: })
   end
 
   def attempt_authorize(r = nil)

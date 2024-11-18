@@ -4,9 +4,15 @@
   import Avatar from "../components/Avatar.svelte";
   import { Save, ChevronRight, X } from "lucide-svelte";
 
-  export let actor;
-  export let editing = false;
-  export let isEditing = () => {};
+  /**
+   * @typedef {Object} Props
+   * @property {any} actor
+   * @property {boolean} [editing]
+   * @property {any} [isEditing]
+   */
+
+  /** @type {Props} */
+  let { actor, editing = false, isEditing = () => {} } = $props();
 
   let form = { ...actor };
 </script>

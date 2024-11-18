@@ -1,7 +1,8 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
   import * as OTPAuth from "otpauth";
-  import { QRCodeImage as QrCode } from "svelte-qrcode-image";
 
   import {
     X,
@@ -26,19 +27,16 @@
   import Time from "./Time.svelte";
   import Alert from "./Alert.svelte";
 
-  export let auth;
-  export let authorize;
-  export let authorizing;
-  export let loading;
+  let { auth, authorize, authorizing, loading } = $props();
 
-  let adding;
-  let verifying;
-  let showSecret;
-  let code;
-  let value;
-  let empty;
-  let secret;
-  let secrets;
+  let adding = $state();
+  let verifying = $state();
+  let showSecret = $state();
+  let code = $state();
+  let value = $state();
+  let empty = $derived(!secrets?.length);
+  let secret = $state();
+  let secrets = $state();
 
   let resetOTP = () => {
     adding = false;
@@ -52,15 +50,19 @@
     });
   };
 
-  let totp = resetOTP();
+  let totp = $state(resetOTP());
 
-  $: secrets = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "OtpSecret"
-  );
-  $: empty = !secrets?.length;
-  $: if (authorizing) {
-    secret = secrets[0];
-  }
+  run(() => {
+    secrets = auth?.actor?.secondFactors?.filter(
+      (f) => f.__typename == "OtpSecret"
+    );
+  });
+
+  run(() => {
+    if (authorizing) {
+      secret = secrets[0];
+    }
+  });
 
   let debounceName = _.debounce((id, name) => {
     authorize({ event: "totp:name", updates: { name, id } });
@@ -93,7 +95,7 @@
     });
   };
 
-  let denied;
+  let denied = $state();
 
   let debounceVerify = _.debounce((secret, inputCode) => {
     if (!secret.id || !inputCode) {
@@ -114,9 +116,11 @@
     });
   }, 150);
 
-  $: if (code && !verifying) {
-    denied = false;
-  }
+  run(() => {
+    if (code && !verifying) {
+      denied = false;
+    }
+  });
 
   let dropdown;
 
@@ -135,56 +139,57 @@
   <Alert type="primary">
     <div class="flex items-center gap-1.5 mb-1.5">
       <Dropdown value={secret}>
-        <summary
-          slot="summary"
-          class="flex items-center gap-1.5 btn btn-xs btn-primary"
-        >
-          <div class="truncate max-w-[175px]">
-            {#if secret.name}
-              <span class="truncate">{secret.name}</span>
+        {#snippet summary()}
+          <summary class="flex items-center gap-1.5 btn btn-xs btn-primary">
+            <div class="truncate max-w-[175px]">
+              {#if secret.name}
+                <span class="truncate">{secret.name}</span>
+              {:else}
+                <span class="truncate opacity-75 italic">unnamed</span>
+              {/if}
+            </div>
+
+            {#if secrets?.length > 1}
+              <ChevronDown size="16" class="opacity-75" />
+            {/if}
+          </summary>
+        {/snippet}
+
+        {#snippet dropdown()}
+          <div>
+            {#if secrets?.length > 1}
+              <ul class="">
+                <li class="py-0.5 text-xs opacity-75 whitespace-nowrap pl-1.5">
+                  Choose another authenticator...
+                </li>
+                {#each secrets as s}
+                  <li class="py-0.5">
+                    <button
+                      class={`${s == secret ? "text-primary" : ""} btn btn-xs max-w-[200px] w-auto overflow-hidden`}
+                      type="button"
+                      onclick={stopPropagation(preventDefault(chooseSecret(s)))}
+                    >
+                      {#if s.name}
+                        <span class="truncate">{s.name}</span>
+                      {:else}
+                        <span class="truncate opacity-75 italic">unnamed</span>
+                      {/if}
+                    </button>
+                  </li>
+                {/each}
+              </ul>
             {:else}
-              <span class="truncate opacity-75 italic">unnamed</span>
+              <div class="text-xs whitespace-nowrap flex items-center gap-1.5">
+                <Info size="16" />
+                <span>
+                  You added this authenticator <Time
+                    timestamp={secret.createdAt}
+                  />.
+                </span>
+              </div>
             {/if}
           </div>
-
-          {#if secrets?.length > 1}
-            <ChevronDown size="16" class="opacity-75" />
-          {/if}
-        </summary>
-
-        <div slot="dropdown">
-          {#if secrets?.length > 1}
-            <ul class="">
-              <li class="py-0.5 text-xs opacity-75 whitespace-nowrap pl-1.5">
-                Choose another authenticator...
-              </li>
-              {#each secrets as s}
-                <li class="py-0.5">
-                  <button
-                    class={`${s == secret ? "text-primary" : ""} btn btn-xs max-w-[200px] w-auto overflow-hidden`}
-                    type="button"
-                    on:click|preventDefault|stopPropagation={chooseSecret(s)}
-                  >
-                    {#if s.name}
-                      <span class="truncate">{s.name}</span>
-                    {:else}
-                      <span class="truncate opacity-75 italic">unnamed</span>
-                    {/if}
-                  </button>
-                </li>
-              {/each}
-            </ul>
-          {:else}
-            <div class="text-xs whitespace-nowrap flex items-center gap-1.5">
-              <Info size="16" />
-              <span>
-                You added this authenticator <Time
-                  timestamp={secret.createdAt}
-                />.
-              </span>
-            </div>
-          {/if}
-        </div>
+        {/snippet}
       </Dropdown>
 
       {#if denied}
@@ -235,7 +240,7 @@
                 class="w-full pl-1.5 text-base dark:text-white text-black placeholder:text-sm placeholder:text-warning"
                 placeholder="Enter a name for this authenticator..."
                 value={otpSecret.name}
-                on:input={updateName(otpSecret.id)}
+                oninput={updateName(otpSecret.id)}
                 disabled={loading}
               />
               <span
@@ -261,16 +266,16 @@
 
           <button
             type="button"
-            on:click|preventDefault|stopPropagation={() => (adding = false)}
+            onclick={stopPropagation(preventDefault(() => (adding = false)))}
             class="btn btn-sm px-1"><X /></button
           >
         </div>
 
-        <QrCode
+        <!-- QrCode
           text={totp.toString()}
           displayClass="mb-1.5 w-full h-full max-w-[250px] mx-auto rounded"
           width="5"
-        />
+        /> -->
 
         <div class="max-w-[250px] mx-auto">
           {#if showSecret}
@@ -283,13 +288,14 @@
             <button
               type="button"
               class="btn btn-link w-full text-center !text-base-content opacity-75 btn-sm"
-              on:click|preventDefault|stopPropagation={() =>
-                (showSecret = true)}>show secret</button
+              onclick={stopPropagation(
+                preventDefault(() => (showSecret = true))
+              )}>show secret</button
             >
           {/if}
         </div>
 
-        <div class="divider mb-1.5 mt-0" />
+        <div class="divider mb-1.5 mt-0"></div>
 
         <p class="text-sm mb-1.5">
           <b>Step two:</b>
@@ -309,7 +315,7 @@
       <button
         type="button"
         class="btn btn-sm w-full"
-        on:click|preventDefault|stopPropagation={() => (adding = true)}
+        onclick={stopPropagation(preventDefault(() => (adding = true)))}
       >
         {#if empty}
           add an authenticator

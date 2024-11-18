@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Send, Mail } from "lucide-svelte";
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
@@ -6,18 +8,20 @@
   import PasswordInput from "./PasswordInput.svelte";
   import { onDestroy } from "svelte";
 
-  export let auth;
-  export let identifier;
-  export let password;
-  export let loading;
-  export let startOver;
-  export let denied;
-  export let loginLinks = auth?.settings?.email?.enabled;
-  export let authorize;
+  let {
+    auth,
+    identifier,
+    password,
+    loading,
+    startOver,
+    denied,
+    loginLinks = auth?.settings?.email?.enabled,
+    authorize,
+  } = $props();
 
-  let seconds = 5;
+  let seconds = $state(5);
   let continuing = false;
-  let cancelled;
+  let cancelled = $state();
 
   let countdown = setInterval(() => {
     seconds = seconds - 1;
@@ -28,11 +32,13 @@
     }
   }, 1000);
 
-  $: if (seconds == 0 && !cancelled) {
-    setTimeout(() => {
-      authorize({});
-    }, 500);
-  }
+  run(() => {
+    if (seconds == 0 && !cancelled) {
+      setTimeout(() => {
+        authorize({});
+      }, 500);
+    }
+  });
 
   let cancel = () => {
     clearInterval(countdown);
@@ -78,7 +84,7 @@
     <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
 
     <button
-      on:click|preventDefault|stopPropagation={cancel}
+      onclick={stopPropagation(preventDefault(cancel))}
       class="px-0 !min-w-0 btn-link text-base-content"
     >
       cancel

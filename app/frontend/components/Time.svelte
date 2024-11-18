@@ -1,19 +1,19 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { DateTime } from "luxon";
   import { onMount, onDestroy } from "svelte";
 
-  export let timestamp;
-  export let style = "narrow";
+  let { ...props } = $props();
+  let { timestamp, style = "narrow", ago = "ago" } = props;
 
-  let time;
+  let time = $state();
   let intervalId;
   let interval;
 
   function updateTime(ts) {
     time = DateTime.fromISO(ts).toRelative({ style, base: DateTime.now() });
-    time = time
-      .replace(/ago$/, $$props.ago || "ago")
-      .replace(/^in/, $$props.in || "in");
+    time = time.replace(/ago$/, ago || "ago");
 
     interval = time?.includes("sec") ? 1000 : 60 * 1000;
   }
@@ -30,7 +30,9 @@
     clearInterval(intervalId);
   });
 
-  $: updateTime(timestamp);
+  run(() => {
+    updateTime(timestamp);
+  });
 </script>
 
 <span>{time}</span>

@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import {
     Send,
     User,
@@ -30,22 +32,42 @@
   import PromptBack from "./PromptBack.svelte";
   import CodeInput from "./CodeInput.svelte";
 
-  export let auth;
-  export let authorize;
-  export let email;
-  export let prefix = "onboard-email";
-  export let deletable = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} auth
+   * @property {any} authorize
+   * @property {any} email
+   * @property {string} [prefix]
+   * @property {boolean} [deletable]
+   * @property {any} btnClass
+   * @property {any} inputClass
+   * @property {any} verifyClass
+   * @property {any} cls
+   */
 
-  let newEmail;
-  let code, value, complete, verifying;
+  /** @type {Props} */
+  let {
+    auth,
+    authorize,
+    email,
+    prefix = "onboard-email",
+    deletable = false,
+    btnClass,
+    inputClass,
+    verifyClass,
+    cls,
+  } = $props();
 
-  let warning;
-  let tooMany;
+  let newEmail = $state();
+  let code = $state(),
+    value = $state(),
+    complete = $state(),
+    verifying;
 
-  $: tooMany = auth?.warnings?.includes(`${prefix}-limit`);
-  $: warning = auth?.warnings?.includes(
-    `invalid-email:${newEmail || email?.address}`
+  let warning = $derived(
+    auth?.warnings?.includes(`invalid-email:${newEmail || email?.address}`)
   );
+  let tooMany = $derived(auth?.warnings?.includes(`${prefix}-limit`));
 
   let deleteEmail = () => {
     authorize({
@@ -79,9 +101,11 @@
     });
   };
 
-  $: if (complete) {
-    verifyCode(value);
-  }
+  run(() => {
+    if (complete) {
+      verifyCode(value);
+    }
+  });
 </script>
 
 {#if email}
@@ -129,8 +153,8 @@
       {#if !email?.verifiedAt && !email?.verifyLink}
         <button
           type="button"
-          class={`btn w-auto ${$$props.verifyClass}`}
-          on:click|preventDefault|stopPropagation={verifyEmail}>verify</button
+          class={`btn w-auto ${verifyClass}`}
+          onclick={stopPropagation(preventDefault(verifyEmail))}>verify</button
         >
       {/if}
 
@@ -138,7 +162,7 @@
         <button
           type="button"
           class="btn btn-link text-error btn-xs"
-          on:click|preventDefault|stopPropagation={deleteEmail}
+          onclick={stopPropagation(preventDefault(deleteEmail))}
         >
           <Trash2 size="18" />
         </button>
@@ -162,9 +186,9 @@
 {:else}
   <div>
     <div class={[warning ? "animate-denied" : ""].join(" ")}>
-      <div class={`flex items-center gap-1.5 grow ${$$props.class}`}>
+      <div class={`flex items-center gap-1.5 grow ${cls}`}>
         <label
-          class={`input input-ghost flex items-center gap-3 grow ${$$props.inputClass} input-bordered my-0 min-w-0 w-0`}
+          class={`input input-ghost flex items-center gap-3 grow ${inputClass} input-bordered my-0 min-w-0 w-0`}
         >
           <MailPlus size="20" class="" />
           <input
@@ -177,8 +201,8 @@
 
         <button
           type="button"
-          class={`btn btn-success ${$$props.btnClass} ${warning ? "btn-warning" : ""}`}
-          on:click|preventDefault|stopPropagation={addEmail}
+          class={`btn btn-success ${btnClass} ${warning ? "btn-warning" : ""}`}
+          onclick={stopPropagation(preventDefault(addEmail))}
           disabled={tooMany || !newEmail?.includes("@")}
         >
           add email

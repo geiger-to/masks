@@ -1,11 +1,13 @@
 <script>
+  import { run, preventDefault } from "svelte/legacy";
+
   import { X, Plus, Save } from "lucide-svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
 
-  export let search = () => {};
+  let { search = () => {} } = $props();
 
-  let result;
-  let input = {};
+  let result = $state();
+  let input = $state({});
   let client = getContextClient();
   let errors;
   let loading;
@@ -52,12 +54,14 @@
     loading = false;
   };
 
-  $: handleResult($result);
+  run(() => {
+    handleResult($result);
+  });
 </script>
 
 <form
   action="#"
-  on:submit|preventDefault={() => addClient(input)}
+  onsubmit={preventDefault(() => addClient(input))}
   class="w-full"
 >
   <div class="flex items-center w-full grow join">

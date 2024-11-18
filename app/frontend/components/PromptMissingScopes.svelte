@@ -4,7 +4,7 @@
   import PromptHeader from "./PromptHeader.svelte";
   import PromptIdentifier from "./PromptIdentifier.svelte";
 
-  export let auth;
+  let { auth } = $props();
 </script>
 
 <PromptHeader

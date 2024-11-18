@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import Avatar from "../components/Avatar.svelte";
   import PasswordInput from "../components/PasswordInput.svelte";
   import AddClientComponent from "../components/AddClientComponent.svelte";
@@ -31,58 +33,61 @@
   import _ from "lodash-es";
   import { Router, Link, Route } from "svelte-routing";
 
-  export let actor;
-  export let url = "";
+  /**
+   * @typedef {Object} Props
+   * @property {any} actor
+   * @property {string} [url]
+   */
 
+  /** @type {Props} */
+  let { actor, url = "" } = $props();
   let { nickname } = actor;
-
-  let isConfiguring;
-  let isAdding;
-  let isAddOpen;
-  let isEditing;
-  let input;
-  let query;
-  let result;
-  let loading;
-  let variables = { input: "" };
-
-  $: query = queryStore({
-    client: getContextClient(),
-    query: gql`
-      query ($input: String!) {
-        search(query: $input) {
-          actors {
-            id
-            nickname
-            identiconId
-            password
-            scopes
-            avatar
-            lastLoginAt
-            createdAt
-            updatedAt
-            passwordChangedAt
-            addedTotpSecretAt
-            savedBackupCodesAt
-          }
-          clients {
-            id
-            name
-            type
-            logo
-            secret
-            redirectUris
-            scopes
-            consent
-            createdAt
-            updatedAt
+  let isAddOpen = $state();
+  let input = $state();
+  let query = $derived(
+    queryStore({
+      client: getContextClient(),
+      query: gql`
+        query ($input: String!) {
+          search(query: $input) {
+            actors {
+              id
+              nickname
+              identiconId
+              password
+              scopes
+              avatar
+              lastLoginAt
+              createdAt
+              updatedAt
+              passwordChangedAt
+              addedTotpSecretAt
+              savedBackupCodesAt
+            }
+            clients {
+              id
+              name
+              type
+              logo
+              secret
+              redirectUris
+              scopes
+              consent
+              createdAt
+              updatedAt
+            }
           }
         }
-      }
-    `,
-    variables,
-    requestPolicy: "network-only",
-  });
+      `,
+      variables,
+      requestPolicy: "network-only",
+    })
+  );
+
+  let result = $state();
+  let loading = $state();
+  let variables = $state({ input: "" });
+  let client = getContextClient();
 
   let search = (value) => {
     isAddOpen = false;
@@ -91,14 +96,12 @@
   };
 
   let toggleMenu = () => {
-    if (isAddOpen || isAdding) {
+    if (isAddOpen) {
       isAddOpen = false;
     } else {
       isAddOpen = true;
     }
   };
-
-  let client = getContextClient();
 
   let autocomplete = (i, query) => {
     if (i) {
@@ -111,7 +114,7 @@
     }
   };
 
-  let isSearching;
+  let isSearching = $state();
 
   let toggleSearch = (current) => {
     return () => {
@@ -146,10 +149,9 @@
     return search && !search.actors?.length && !search.clients?.length;
   };
 
-  $: autocomplete(input, $query);
-  $: if (input) {
-    openSearch();
-  }
+  run(() => {
+    autocomplete(input, $query);
+  });
 </script>
 
 <Router {url} basepath="manage">
@@ -179,13 +181,13 @@
             class="grow w-full"
             placeholder="search..."
             bind:value={input}
-            on:input={debounceInput}
+            oninput={debounceInput}
           />
 
           {#if isSearching}
             <button
               tabindex="0"
-              on:click|stopPropagation|preventDefault={closeSearch}
+              onclick={stopPropagation(preventDefault(closeSearch))}
               class={`btn btn-xs px-0 w-6 py-0 md:hidden`}
             >
               <X size="20" />
@@ -202,7 +204,7 @@
         >
           <button
             tabindex="0"
-            on:click|stopPropagation|preventDefault={toggleSearch(isSearching)}
+            onclick={stopPropagation(preventDefault(toggleSearch(isSearching)))}
             class={`btn btn-sm px-0 w-8 py-0 md:hidden`}
           >
             {#if isAddOpen}
@@ -214,7 +216,7 @@
 
           <button
             tabindex="0"
-            on:click|stopPropagation|preventDefault={toggleMenu}
+            onclick={stopPropagation(preventDefault(toggleMenu))}
             class={`btn btn-sm px-0 w-8 py-0 ${isAddOpen ? "btn-success" : "btn-ghost"}`}
           >
             {#if isAddOpen}

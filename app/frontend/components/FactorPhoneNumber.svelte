@@ -1,4 +1,6 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import _ from "lodash-es";
 
   import {
@@ -22,34 +24,33 @@
   import Card from "./Card.svelte";
   import parsePhoneNumber from "libphonenumber-js";
 
-  export let auth;
-  export let authorize;
-  export let authorizing;
-  export let loading;
-  export let setLocked;
+  let { auth, authorize, authorizing, loading, setLocked } = $props();
 
-  let adding;
-  let verifying;
-  let phone;
-  let code;
-  let validPhone;
-  let validCode;
-  let empty;
-  let invalid;
-  let phones;
+  let adding = $state();
+  let verifying = $state();
+  let phone = $state();
+  let code = $state();
+  let validPhone = $state();
+  let validCode = $state();
+  let empty = $derived(!phones?.length);
+  let invalid = $state();
+  let phones = $state();
 
-  $: phones = auth?.actor?.secondFactors?.filter(
-    (f) => f.__typename == "Phone"
-  );
-  $: empty = !phones?.length;
+  run(() => {
+    phones = auth?.actor?.secondFactors?.filter((f) => f.__typename == "Phone");
+  });
 
-  $: if (phone) {
-    invalid = false;
-  }
+  run(() => {
+    if (phone) {
+      invalid = false;
+    }
+  });
 
-  $: if (authorizing) {
-    phone = phones[0];
-  }
+  run(() => {
+    if (authorizing) {
+      phone = phones[0];
+    }
+  });
 
   let addNumber = () => {
     authorize({ event: "phone:send", updates: { phone } }).then((result) => {
@@ -87,9 +88,11 @@
     );
   }, 150);
 
-  $: if (validCode && verifying) {
-    debounceVerify();
-  }
+  run(() => {
+    if (validCode && verifying) {
+      debounceVerify();
+    }
+  });
 
   let formatPhone = (phone) => {
     return parsePhoneNumber(phone?.number)?.formatInternational();
@@ -99,49 +102,52 @@
 {#if authorizing}
   <Alert type="primary">
     <Dropdown value={phone}>
-      <summary
-        slot="summary"
-        class="btn btn-xs bg-primary-content text-primary mb-1.5 border-primary-content"
-        let:value
-      >
-        <span>
-          {formatPhone(value)}
-        </span>
-
-        {#if verifying}
-          <p class="text-xs whitespace-nowrap opacity-75">enter the code...</p>
-        {/if}
-
-        {#if phones?.length > 1}
-          <ChevronDown size="16" />
-        {/if}
-      </summary>
-
-      <div slot="dropdown" class="" let:setValue let:value>
-        {#if phones?.length > 1}
-          <div class="flex flex-col space-y-1.5 my-1.5">
-            <div class="text-xs whitespace-nowrap mb-1.5">
-              Choose a phone number...
-            </div>
-            {#each phones as p}
-              <button
-                type="button"
-                class={`btn btn-sm whitespace-nowrap ${p == value ? "text-primary" : ""}`}
-                on:click|preventDefault|stopPropagation={setValue(
-                  p,
-                  (v) => (phone = v)
-                )}
-              >
-                {formatPhone(p)}
-              </button>
-            {/each}
-          </div>
-        {:else}
-          <span class="whitespace-nowrap opacity-75 text-xs block">
-            Phone added <Time timestamp={phone?.createdAt} />
+      {#snippet summary({ value })}
+        <summary
+          class="btn btn-xs bg-primary-content text-primary mb-1.5 border-primary-content"
+        >
+          <span>
+            {formatPhone(value)}
           </span>
-        {/if}
-      </div>
+
+          {#if verifying}
+            <p class="text-xs whitespace-nowrap opacity-75">
+              enter the code...
+            </p>
+          {/if}
+
+          {#if phones?.length > 1}
+            <ChevronDown size="16" />
+          {/if}
+        </summary>
+      {/snippet}
+
+      {#snippet dropdown({ setValue, value })}
+        <div class="">
+          {#if phones?.length > 1}
+            <div class="flex flex-col space-y-1.5 my-1.5">
+              <div class="text-xs whitespace-nowrap mb-1.5">
+                Choose a phone number...
+              </div>
+              {#each phones as p}
+                <button
+                  type="button"
+                  class={`btn btn-sm whitespace-nowrap ${p == value ? "text-primary" : ""}`}
+                  onclick={stopPropagation(
+                    preventDefault(setValue(p, (v) => (phone = v)))
+                  )}
+                >
+                  {formatPhone(p)}
+                </button>
+              {/each}
+            </div>
+          {:else}
+            <span class="whitespace-nowrap opacity-75 text-xs block">
+              Phone added <Time timestamp={phone?.createdAt} />
+            </span>
+          {/if}
+        </div>
+      {/snippet}
     </Dropdown>
 
     {#if verifying}
@@ -160,14 +166,14 @@
       <div class="text-center text-sm opacity-75">
         or <button
           class="underline"
-          on:click|preventDefault|stopPropagation={cancelSend}
+          onclick={stopPropagation(preventDefault(cancelSend))}
           type="button">cancel</button
         >
       </div>
     {:else}
       <button
         class="btn btn-primary w-full btn-lg mb-1.5"
-        on:click|preventDefault|stopPropagation={debounceSend}
+        onclick={stopPropagation(preventDefault(debounceSend))}
       >
         <div class="flex items-center gap-3 text-left">
           <MessageSquare size="16" /> send verification code
@@ -241,7 +247,7 @@
         <button
           type="button"
           class={"btn btn-sm w-full"}
-          on:click|preventDefault|stopPropagation={() => (adding = true)}
+          onclick={stopPropagation(preventDefault(() => (adding = true)))}
         >
           add another phone
         </button>
@@ -263,7 +269,7 @@
                   ? "btn btn-sm btn-success"
                   : "btn btn-sm"}
               disabled={!phone || !validPhone}
-              on:click|preventDefault|stopPropagation={addNumber}
+              onclick={stopPropagation(preventDefault(addNumber))}
             >
               verify
             </button>

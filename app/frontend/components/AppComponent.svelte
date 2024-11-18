@@ -20,7 +20,7 @@
     return update;
   }
 
-  export let component;
+  let { component, ...props } = $props();
 
   const graphql = new Client({
     url: `/graphql${window.location.search}`,
@@ -41,6 +41,8 @@
   });
 
   setContextClient(graphql);
+
+  const SvelteComponent = $derived(component);
 </script>
 
-<svelte:component this={component} {...$$props} />
+<SvelteComponent {...props} />
