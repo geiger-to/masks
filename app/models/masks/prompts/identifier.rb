@@ -12,10 +12,6 @@ module Masks
           )
         actor = Masks.identify(identifier) if identifier
 
-        if actor&.new_record? && !actor&.valid?
-          next warn!("invalid-identifier", prompt: "identify")
-        end
-
         self.identifier = identifier
         self.actor = actor
       end
@@ -25,6 +21,12 @@ module Masks
       end
 
       prompt "identify" do
+        if actor&.new_record? && !actor&.valid?
+          self.identifier = nil
+
+          warn!("invalid-identifier")
+        end
+
         !identifier
       end
 

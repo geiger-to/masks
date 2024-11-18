@@ -6,8 +6,11 @@ module AuthHelper
   attr_reader :auth_id
 
   def user_agent
-    @user_agent ||=
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15"
+    @user_agent ||= [
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
+      "AppleWebKit/605.1.15 (KHTML, like Gecko)",
+      "Version/17.4 Safari/605.1.15",
+    ].join(" ")
   end
 
   def client
@@ -24,7 +27,7 @@ module AuthHelper
   end
 
   def refute_error(r = nil)
-    refute auth_result(r).dig(:error)
+    assert_not auth_result(r).dig(:error)
   end
 
   def assert_actor(id, r = nil)
@@ -40,7 +43,7 @@ module AuthHelper
   end
 
   def refute_settled(r = nil)
-    refute auth_result(r).dig(:settled)
+    assert_not auth_result(r).dig(:settled)
   end
 
   def assert_settled(r = nil)
@@ -53,13 +56,13 @@ module AuthHelper
     assert data.dig(:redirectUri)
     assert_equal redirect_uri, data.dig(:redirectUri) if redirect_uri
     assert data.dig(:client)
-    refute data.dig(:error)
+    assert_not data.dig(:error)
     assert_prompt "success", r
   end
 
   def refute_prompt(prompt, r = nil)
     assert auth_result(r).dig(:prompt)
-    refute_equal prompt, auth_result(r).dig(:prompt)
+    assert_not_equal prompt, auth_result(r).dig(:prompt)
   end
 
   def assert_prompt(prompt, r = nil)
@@ -76,7 +79,7 @@ module AuthHelper
 
   def assert_logged_in(method, path)
     send(method, path)
-    refute_equal 302, status
+    assert_not_equal 302, status
   end
 
   def refute_logged_in(method, path)

@@ -3,9 +3,10 @@ class ManageController < ManagersController
     @theme = "luxury"
     @props = {
       section: "Manage",
-      actor: actor.slice(:identicon_id, :nickname, :login_email, :avatar_url),
+      url: params[:url],
+      actor: current_actor.slice(:identifier, :identicon_id, :avatar_url),
     }
 
-    render "app"
+    render "manage"
   end
 end

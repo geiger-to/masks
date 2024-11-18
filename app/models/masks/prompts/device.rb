@@ -6,8 +6,6 @@ module Masks
       around_session do |auth, block|
         self.device = identify_device
 
-        next if prompt
-
         block.call
 
         check.persist!(device) unless auth.error
@@ -26,7 +24,7 @@ module Masks
           warn! "blocked-device", prompt: "device"
         elsif !device.valid?
           warn! "invalid-device", prompt: "device"
-        elsif !check.checked?
+        elsif checking?("device")
           check.checked!(device:)
         end
 

@@ -12,7 +12,7 @@ class BackupCodeTest < MasksTestCase
 
     assert_equal 2, auth_result[:warnings].length
     assert_predicate seeder.manager.reload.backup_codes, :blank?
-    refute auth_result.dig(:actor, :savedBackupCodesAt)
+    assert_not auth_result.dig(:actor, :savedBackupCodesAt)
 
     attempt event: "backup-codes:replace",
             updates: {

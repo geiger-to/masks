@@ -36,7 +36,7 @@ class OnboardingTest < MasksTestCase
 
     assert_equal "tester", seeder.manager.reload.name
     assert seeder.manager.authenticate("testing123")
-    refute seeder.manager.authenticate("password")
+    assert_not seeder.manager.authenticate("password")
   end
 
   test "onboarding allows password changes after a cooldown period" do
@@ -60,7 +60,7 @@ class OnboardingTest < MasksTestCase
 
     log_in "manager"
 
-    refute seeder.manager.emails.for_login.find_by(address: email)
+    assert_not seeder.manager.emails.for_login.find_by(address: email)
 
     attempt event: "onboard-email:add", updates: { email: }
 
@@ -98,7 +98,7 @@ class OnboardingTest < MasksTestCase
     log_in "manager"
 
     email = seeder.manager.emails.for_login.find_by(address:)
-    refute email.verified?
+    assert_not email.verified?
 
     assert_equal 0, email.login_links.active.for_verification.count
 
@@ -133,6 +133,6 @@ class OnboardingTest < MasksTestCase
 
     assert_warning "invalid-code:invalid"
 
-    refute email.reload.verified?
+    assert_not email.reload.verified?
   end
 end

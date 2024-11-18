@@ -131,17 +131,14 @@
         result = query?.data?.search;
       }
 
-      loading = false;
+      doQuery(query);
     }
   };
 
-  let debounceQuery = _.debounce((i) => {
-    console.log(i);
-    if (!i) {
+  let doQuery = _.debounce((query) => {
+    if (!input) {
       return;
     }
-
-    makeQuery(i);
 
     loading = false;
   }, 300);
@@ -211,8 +208,6 @@
           </div>
         {/if}
       </div>
-
-      <Avatar {actor} onClick={() => search(`@${nickname}`)} />
     </div>
   </div>
 
@@ -258,7 +253,7 @@
               type="text"
               class="grow"
               placeholder="search for actors, clients, devices, and more..."
-              on:input={console.log}
+              bind:value={input}
             />
           </label>
         </div>

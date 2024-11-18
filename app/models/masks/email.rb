@@ -83,7 +83,7 @@ module Masks
     private
 
     def within_limits
-      return errors.add(:base, "login-email-limit") if too_many?
+      errors.add(:base, "login-email-limit") if too_many?
     end
   end
 end

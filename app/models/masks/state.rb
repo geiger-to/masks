@@ -26,9 +26,17 @@ module Masks
       attempt_bag&.dig(:settlement, :redirect_uri)
     end
 
-    def settled!(redirect_uri:, prompt:, error: nil, approved: false)
+    def approved?
+      self[:approved]
+    end
+
+    def settled!(prompt:, redirect_uri: nil, error: nil, approved: false)
       auth.prompt = prompt if prompt
       auth.error = error if error
+
+      self[:approved] = approved
+
+      return unless attempt_bag
 
       attempt_bag[:settlement] = {
         settled: true,
@@ -60,7 +68,11 @@ module Masks
     end
 
     def checking?(name)
+      return false unless client
+
       current = client.checks.find { |c| !check(c).checked? }
+
+      return false unless current
 
       Masks::Checks.to_name(name) == Masks::Checks.to_name(current)
     end
@@ -122,12 +134,12 @@ module Masks
         end
 
       validate_state!
-    rescue ExpiredStateError
+    rescue ExpiredStateError => e
       if attempt_id && attempts_bag&.dig(attempt_id, :settlement)
         attempts_bag[attempt_id][:settlement] = nil
       end
 
-      raise # continues to raise until init! is called, so when the page is refreshed
+      raise
     end
 
     def id_bag

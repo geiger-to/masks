@@ -2,26 +2,9 @@ class ManagersController < ApplicationController
   attr_accessor :logged_in, :client
 
   before_action :render_404, unless: :client
-
-  around_action { |controller, block| auth.session!(&block) }
-
-  before_action :redirect_to_login, unless: :actor
+  before_action :redirect_to_login, unless: :current_actor
 
   private
-
-  def auth
-    @auth ||= Masks::Auth.new(request:, client:)
-  end
-
-  def internal_session
-    @internal_session = auth.prompt_for(Masks::Prompts::InternalSession)
-  end
-
-  def actor
-    internal_session.current_actor
-  end
-
-  delegate :device, to: :auth
 
   def client
     Masks::Client.manage

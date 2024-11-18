@@ -28,6 +28,8 @@ module Masks
              :actor_bag,
              :id_bag,
              :redirect_uri,
+             :approved?,
+             :settled?,
              :settled!,
              :checked!,
              :checked?,
@@ -54,10 +56,6 @@ module Masks
       identifier && state.checked?("credentials")
     end
 
-    def settled?
-      !!(error || state.settled?)
-    end
-
     def approved?
       settled? && state.settlement[:approved]
     end
@@ -68,29 +66,28 @@ module Masks
       lock!
 
       run_callbacks(:session, &block)
-    rescue AuthError => e
-      self.prompt = e.code
-      self.error = e.code
     end
 
     def update!(id: nil, event: nil, upload: nil, updates: {}, resume: false)
-      session! do
-        if resume
-          state.resume!(id)
+      if resume
+        state.resume!(id)
 
-          self.event = event
-          self.updates = updates || {}
-          self.upload = upload
-        else
-          state.init!
-        end
-
-        run_callbacks(:auth) do
-          filtered = prompts.values.filter(&:enabled?)
-          filtered.each { |prompt| prompt.event!(event) } if event
-          filtered.each(&:prompt!)
-        end
+        self.event = event
+        self.updates = updates || {}
+        self.upload = upload
+      else
+        state.init!
       end
+
+      run_callbacks(:auth) do
+        return if settled?
+
+        filtered = prompts.values.filter(&:enabled?)
+        filtered.each { |prompt| prompt.event!(event) } if event
+        filtered.each(&:prompt!)
+      end
+    rescue AuthError => e
+      settled!(prompt: e.code, error: e.code)
     end
 
     def rails_session
@@ -136,7 +133,7 @@ module Masks
       return false if error || !actor&.persisted? || !client.checks&.any?
       return false if prompt && APPROVED_PROMPTS.exclude?(prompt)
 
-      return checked?(*client.checks)
+      checked?(*client.checks)
     end
 
     def prompt_for(cls)

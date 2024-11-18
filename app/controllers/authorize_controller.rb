@@ -8,8 +8,7 @@ class AuthorizeController < ApplicationController
           },
         },
         context: {
-          client: client,
-          request: request,
+          auth:,
         },
       )
 

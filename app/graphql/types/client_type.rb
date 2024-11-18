@@ -35,5 +35,9 @@ module Types
         rails_storage_proxy_url(object.logo.variant(:preview))
       end
     end
+
+    def consent
+      !object.auto_consent?
+    end
   end
 end

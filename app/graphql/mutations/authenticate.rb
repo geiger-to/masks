@@ -23,6 +23,8 @@ module Mutations
     field :extras, GraphQL::Types::JSON, null: true
 
     def resolve(**args)
+      auth = context[:auth]
+
       Masks.min_runtime(Masks.installation.authorize_delay) do
         auth.update!(**args.merge(resume: context[:resume]))
 
@@ -30,15 +32,6 @@ module Mutations
         result[:request_id] = SecureRandom.uuid
         result
       end
-    end
-
-    def auth
-      @auth ||=
-        Masks::Auth.new(
-          client: context[:client],
-          device: context[:device],
-          request: context[:request],
-        )
     end
   end
 end

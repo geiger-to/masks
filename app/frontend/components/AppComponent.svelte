@@ -5,8 +5,6 @@
     cacheExchange,
     fetchExchange,
   } from "@urql/svelte";
-  import ErrorSection from "./ErrorSection.svelte";
-  import AuthorizeSection from "./AuthorizeSection.svelte";
   import { setContext } from "svelte";
 
   let csrf = document.querySelector('meta[name="csrf-token"]').content;
@@ -22,12 +20,7 @@
     return update;
   }
 
-  let sections = {
-    Error: ErrorSection,
-    Authorize: AuthorizeSection,
-  };
-
-  export let section;
+  export let component;
 
   const graphql = new Client({
     url: `/graphql${window.location.search}`,
@@ -41,7 +34,6 @@
 
   setContext("page", {
     csrf,
-    section,
     graphql,
     fetch: (url, options) => {
       return fetch(url, fetchOptions(csrf, options));
@@ -51,4 +43,4 @@
   setContextClient(graphql);
 </script>
 
-<svelte:component this={sections[section]} {...$$props} />
+<svelte:component this={component} {...$$props} />

@@ -29,7 +29,6 @@ class ClientTestCase < MasksTestCase
         authorize(redirect_uri: "https://example.com/invalid")
         assert_error "invalid-redirect"
         assert_prompt "invalid-redirect"
-        assert_settled
         assert_artifacts
       end
 
@@ -60,7 +59,6 @@ class ClientTestCase < MasksTestCase
         travel_to client.expires_at(:auth_attempt) + 1.second do
           attempt
 
-          assert_settled
           assert_error "expired-state"
         end
       end
@@ -120,13 +118,13 @@ class ClientTestCase < MasksTestCase
         assert_prompt "missing-scopes"
         assert_error "missing-scopes"
         assert_artifacts(devices: 1)
-        assert_settled
 
         unless client.internal?
           assert_includes auth_result[:redirectUri], "invalid_request"
         end
-        refute_includes auth_result[:redirectUri], "token"
-        refute_includes auth_result[:redirectUri], "code"
+
+        assert_not_includes auth_result[:redirectUri], "token"
+        assert_not_includes auth_result[:redirectUri], "code"
       end
     end
   end

@@ -5,7 +5,7 @@ class GraphqlController < ApplicationController
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = { request:, resume: true }
+    context = { request:, auth:, resume: true }
     result =
       MasksSchema.execute(
         query,

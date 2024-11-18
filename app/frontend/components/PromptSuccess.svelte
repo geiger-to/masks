@@ -6,7 +6,6 @@
   import PasswordInput from "./PasswordInput.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import Identicon from "./Identicon.svelte";
-  import Avatar from "./Avatar.svelte";
   import { onMount } from "svelte";
   import { redirectTimeout } from "../util";
 

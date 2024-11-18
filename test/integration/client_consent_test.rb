@@ -34,6 +34,6 @@ class ClientConsentTest < MasksTestCase
     assert_settled
     assert_error "access-denied"
     assert_includes auth_result[:redirectUri], "error=access_denied"
-    refute_includes auth_result[:redirectUri], "code="
+    assert_not_includes auth_result[:redirectUri], "code="
   end
 end
