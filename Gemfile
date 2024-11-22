@@ -41,7 +41,7 @@ group :jekyll_plugins do
 end
 
 gem "vite_rails", "~> 3.0"
-gem "good_job", "~> 4.4"
+gem "good_job", "~> 4.5"
 gem "graphql", "~> 2.3"
 gem "bcrypt", "~> 3.1"
 gem "ulid", "~> 1.4"
