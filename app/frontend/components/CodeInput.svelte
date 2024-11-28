@@ -28,6 +28,8 @@
     value = $bindable(),
     complete = $bindable(),
     class: cls,
+    verify,
+    ...rest
   } = $props();
 
   let lastValue;
@@ -36,25 +38,25 @@
     "no-inc py-3 grow w-[100%] input input-bordered px-1.5 md:px-3 text-center join-item font-bold",
   ];
 
-  run(() => {
-    if (code) {
-      code = code.map((v) => v.toUpperCase()).slice(0, 7);
-    }
-  });
+  // run(() => {
+  //   if (code) {
+  //     code = code.map((v) => v.toUpperCase()).slice(0, 7);
+  //   }
+  // });
 
   let classes = $derived([
     ...pinClasses,
-    auth?.warnings?.includes(`invalid-code:${value}`) ? "animate-denied" : "",
+    auth?.warnings?.includes(`inverify-code:${value}`) ? "animate-denied" : "",
   ]);
 
   let handleComplete = (e) => {
-    if (!onComplete) {
+    if (!verify) {
       return;
     }
 
     if (e.detail.value != lastValue) {
-      onComplete(e);
       lastValue = e.detail.value;
+      verify(lastValue);
     }
   };
 </script>

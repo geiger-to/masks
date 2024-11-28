@@ -1,7 +1,5 @@
 class MasksTestCase < ActionDispatch::IntegrationTest
-  def seeder
-    @seeder ||= Masks::Seeder.new
-  end
+  attr_reader :seeder
 
   delegate :manager, :tester, to: :seeder
 
@@ -10,6 +8,8 @@ class MasksTestCase < ActionDispatch::IntegrationTest
     Masks.installation&.destroy!
     Masks.reset!
     Masks.install!
-    seeder.seed_env!
+
+    @seeder = Masks::Seeder.new(Masks.installation)
+    @seeder.seed_env!
   end
 end

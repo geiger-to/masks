@@ -281,12 +281,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.text "redirect_uris"
     t.text "checks"
     t.text "scopes"
-    t.string "default_region"
     t.boolean "allow_passwords"
     t.boolean "allow_login_links"
     t.boolean "autofill_redirect_uri"
+    t.boolean "fuzzy_redirect_uri"
     t.string "subject_type"
     t.string "sector_identifier"
+    t.string "pairwise_salt"
     t.string "code_expires_in"
     t.string "id_token_expires_in"
     t.string "access_token_expires_in"
@@ -301,6 +302,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.string "second_factor_webauthn_expires_in"
     t.string "email_verification_expires_in"
     t.string "internal_session_expires_in"
+    t.text "bg_light"
+    t.text "bg_dark"
     t.text "rsa_private_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -323,10 +326,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
   create_table "masks_emails", force: :cascade do |t|
     t.string "address", null: false
     t.string "group"
-    t.string "otp_secret"
-    t.datetime "last_otp_at"
     t.datetime "verified_at"
-    t.datetime "verification_sent_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "actor_id"
@@ -334,19 +334,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.index %w[address group],
             name: "index_masks_emails_on_address_and_group",
             unique: true
-  end
-
-  create_table "masks_events", force: :cascade do |t|
-    t.string "key"
-    t.text "data"
-    t.bigint "actor_id"
-    t.bigint "device_id"
-    t.bigint "client_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_events_on_actor_id"
-    t.index ["client_id"], name: "index_masks_events_on_client_id"
-    t.index ["device_id"], name: "index_masks_events_on_device_id"
   end
 
   create_table "masks_id_tokens", force: :cascade do |t|
@@ -379,8 +366,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_09_020408) do
     t.boolean "log_in", default: false, null: false
     t.text "settings"
     t.bigint "client_id"
-    t.bigint "email_id"
     t.bigint "actor_id"
+    t.bigint "email_id"
     t.bigint "device_id"
     t.datetime "revoked_at"
     t.datetime "expires_at"

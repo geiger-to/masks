@@ -1,5 +1,5 @@
 <script>
-  import Identicon from "./Identicon.svelte";
+  import Identicon from "@/components/Identicon.svelte";
   let { actor } = $props();
 </script>
 

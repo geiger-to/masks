@@ -5,6 +5,7 @@ module Types
     implements GraphQL::Types::Relay::Node
 
     field :id, ID
+    field :node_id, ID
     field :name, String, null: true
     field :nickname, String
     field :identifier, String, null: true
@@ -32,6 +33,10 @@ module Types
 
     def id
       object.key
+    end
+
+    def node_id
+      context.schema.id_from_object(object)
     end
 
     def login_email

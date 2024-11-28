@@ -10,21 +10,23 @@ module Masks
     class << self
       def from_login_email(address)
         email = Masks::Email.for_login.where(address:).first
-        email&.actor ||
-          Masks::Actor
-            .new(identifier: address)
-            .tap { |a| a.emails.build(address:).for_login }
+        email&.actor || with_login_email(address)
+      end
+
+      def with_login_email(address)
+        Masks::Actor
+          .new(identifier: address)
+          .tap { |a| a.emails.build(address:).for_login }
       end
     end
 
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
-    has_many :emails, class_name: "Masks::Email", autosave: true
+    has_many :emails, class_name: "Masks::Email"
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
-    has_many :events, class_name: "Masks::Event"
     has_many :clients, class_name: "Masks::Client", through: :events
     has_many :devices,
              class_name: "Masks::Device",
@@ -60,6 +62,7 @@ module Masks
     validates :version, presence: true
     validate :validates_password, if: :password
     validate :validates_backup_codes, if: :backup_codes
+    validates_associated :emails
 
     serialize :backup_codes, coder: JSON
 
@@ -93,7 +96,7 @@ module Masks
     end
 
     def password_changeable?
-      cooldown = Masks.setting(:password, :change_cooldown)
+      cooldown = Masks.setting(:passwords, :change_cooldown)
 
       return true unless password_changed_at && cooldown
 

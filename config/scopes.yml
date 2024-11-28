@@ -1,4 +1,5 @@
 default: &default
+  "masks:manage": "Your management privileges"
   "openid": "Your unique account identifier"
   "email": "Your email address"
   "nickname": "Your nickname"

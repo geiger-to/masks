@@ -3,7 +3,7 @@ class ManageController < ManagersController
     @theme = "luxury"
     @props = {
       section: "Manage",
-      url: params[:url],
+      url: params[:url] || "",
       actor: current_actor.slice(:identifier, :identicon_id, :avatar_url),
     }
 

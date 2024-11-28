@@ -10,6 +10,7 @@ end
 
 require_relative "masks_test_case"
 require_relative "client_test_case"
+require_relative "graphql_test_case"
 
 module ActiveSupport
   class TestCase

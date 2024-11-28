@@ -30,9 +30,7 @@
     clearInterval(intervalId);
   });
 
-  run(() => {
-    updateTime(timestamp);
-  });
+  updateTime(timestamp);
 </script>
 
 <span>{time}</span>

@@ -1,12 +1,21 @@
 # frozen_string_literal: true
 
 class MasksSchema < GraphQL::Schema
-  mutation(Types::MutationType)
-  query(Types::QueryType)
+  class << self
+    def manager?(context)
+      context[:auth]
+        .prompt_for(Masks::Prompts::InternalSession)
+        .current_actor
+        &.masks_manager?
+    end
+  end
 
   # For batch-loading (see https://graphql-ruby.org/dataloader/overview.html)
   use GraphQL::Dataloader
   use GraphQL::Schema::Visibility
+
+  mutation(Types::MutationType)
+  query(Types::QueryType)
 
   orphan_types Types::ClientType
 
@@ -38,10 +47,12 @@ class MasksSchema < GraphQL::Schema
   # Relay-style Object Identification:
 
   # Return a string UUID for `object`
-  def self.id_from_object(object, type_definition, query_ctx)
+  def self.id_from_object(object, type_definition = nil, query_ctx = nil)
     case object
     when Masks::Client
-      client.to_gqlid
+      "client:#{object.id}"
+    when Masks::Actor
+      "actor:#{object.id}"
     end
   end
 
@@ -51,7 +62,9 @@ class MasksSchema < GraphQL::Schema
 
     case type
     when "client"
-      Masks::Client.find_by(key: id)
+      Masks::Client.find_by(id: id)
+    when "actor"
+      Masks::Actor.find_by(id: id)
     end
   end
 end

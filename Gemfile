@@ -78,3 +78,7 @@ gem "twilio-ruby", "~> 7.3"
 gem "dotenv", groups: %i[development test]
 
 gem "phonelib", "~> 0.9.3"
+
+gem "fuzzyurl", "~> 0.9.0"
+
+gem "validate_url", "~> 1.0"

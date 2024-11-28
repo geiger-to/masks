@@ -13,12 +13,7 @@ module Types
     end
 
     def visible?(context)
-      if @managers_only
-        context[:auth]
-          .prompt_for(Masks::Prompts::InternalSession)
-          .current_actor
-          &.masks_manager?
-      end
+      return MasksSchema.manager?(context) if @managers_only
 
       true
     end

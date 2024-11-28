@@ -3,6 +3,10 @@ class ApplicationRecord < ActiveRecord::Base
 
   scope :latest, -> { order(created_at: :desc) }
 
+  def url_helpers
+    Rails.application.routes.url_helpers
+  end
+
   def obfuscate(key)
     return unless self[key]
 

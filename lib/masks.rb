@@ -69,6 +69,16 @@ module Masks
       time.min_time(*args, **opts, &block)
     end
 
+    def signup(identifier)
+      if identifier.include?("@") && installation.emails?
+        Actor.with_login_email(identifier)
+      elsif installation.nicknames?
+        Actor.new(nickname: identifier)
+      else
+        Actor.new(identifier: identifier)
+      end
+    end
+
     def identify(identifier)
       if identifier.include?("@") && installation.emails?
         Actor.from_login_email(identifier)

@@ -3,7 +3,7 @@ module Masks
     class OIDC < Base
       checks "client-consent"
 
-      around_auth prepend: true do |auth, block|
+      around_auth do |auth, block|
         oidc =
           Masks::OIDCRequest.update(self) do |oidc|
             auth.scopes = oidc.scopes

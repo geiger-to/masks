@@ -57,10 +57,7 @@ class Init < ActiveRecord::Migration[7.2]
     create_table :masks_emails do |t|
       t.string :address, null: false
       t.string :group
-      t.string :otp_secret
-      t.datetime :last_otp_at
       t.datetime :verified_at
-      t.datetime :verification_sent_at
       t.timestamps
 
       t.references :actor
@@ -100,8 +97,8 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :settings
 
       t.references :client
-      t.references :email
       t.references :actor
+      t.references :email
       t.references :device
 
       t.datetime :revoked_at
@@ -128,17 +125,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[external_id aaguid], unique: true
     end
 
-    create_table :masks_events do |t|
-      t.string :key
-      t.text :data
-
-      t.references :actor
-      t.references :device
-      t.references :client
-
-      t.timestamps
-    end
-
     create_table :masks_devices do |t|
       t.string :public_id, null: false
       t.string :user_agent
@@ -162,13 +148,14 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :checks
       t.text :scopes
 
-      t.string :default_region
       t.boolean :allow_passwords
       t.boolean :allow_login_links
       t.boolean :autofill_redirect_uri
+      t.boolean :fuzzy_redirect_uri
 
       t.string :subject_type
       t.string :sector_identifier
+      t.string :pairwise_salt
       t.string :code_expires_in
       t.string :id_token_expires_in
       t.string :access_token_expires_in
@@ -183,6 +170,9 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :second_factor_webauthn_expires_in
       t.string :email_verification_expires_in
       t.string :internal_session_expires_in
+
+      t.text :bg_light
+      t.text :bg_dark
 
       t.text :rsa_private_key
 
@@ -214,8 +204,8 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :data
 
       t.references :client
-      t.references :actor, null: true
-      t.references :device, null: true
+      t.references :actor
+      t.references :device
       t.references :authorization_code, null: true
       t.datetime :expires_at
       t.datetime :revoked_at

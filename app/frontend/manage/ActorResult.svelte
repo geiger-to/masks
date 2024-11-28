@@ -1,5 +1,4 @@
 <script>
-  import { Link } from "svelte-routing";
   import Time from "../components/Time.svelte";
   import Avatar from "../components/Avatar.svelte";
   import { Save, ChevronRight, X } from "lucide-svelte";
@@ -17,8 +16,8 @@
   let form = { ...actor };
 </script>
 
-<Link to={`actor/${actor.identifier}`}>
-  <div class="my-3 dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3">
+<a href={`/manage/actor/${actor.identifier}`}>
+  <div class="dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3">
     <div class="flex items-center">
       <div class="grow flex items-center gap-3">
         <div class="w-12 h-12">
@@ -46,4 +45,4 @@
       </div>
     </div>
   </div>
-</Link>
+</a>

@@ -1,22 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
-<!-- @migration-task Error while migrating Svelte code: $$props is used together with named props in a way that cannot be automatically migrated. -->
 <script>
   import Time from "svelte-time";
   import { Image, ImageUp, Save, ChevronDown, X } from "lucide-svelte";
@@ -48,7 +29,7 @@
 
   let id = crypto.randomUUID();
   let page = getContext("page");
-  let uploadedSrc = $state();
+  let uploadedSrc = $state(src);
 
   let uploadFile = (e) => {
     const file = e.target.files[0];
@@ -98,19 +79,17 @@
 
 <label
   for={id}
-  class="flex items-center cursor-pointer justify-center gap-1 group"
+  class="flex items-center cursor-pointer justify-center gap-1 group/im"
 >
   <div
-    class={[
-      "rounded shadow relative",
-      disabled ? "" : "cursor-pointer",
-      cls,
-    ].join(" ")}
+    class={["rounded relative", disabled ? "" : "cursor-pointer", cls].join(
+      " "
+    )}
   >
     <div
       class={[
-        "bg-black text-white z-10 flex items-center justify-center",
-        "rounded absolute w-full h-full opacity-0 group-hover:opacity-70",
+        "bg-black text-white z-10 flex items-center justify-center left-0 right-0 top-0 bottom-0",
+        "rounded absolute w-full h-full opacity-0 group-hover/im:opacity-70",
         disabled ? "hidden" : "",
       ].join(" ")}
     >
@@ -118,7 +97,7 @@
     </div>
 
     <div class="avatar placeholder">
-      <div class="bg-neutral text-neutral-content rounded text-center">
+      <div class="text-neutral-content rounded text-center">
         {#if src || uploadedSrc}
           {#key src || uploadedSrc}
             <img src={uploadedSrc || src} class="object-cover" alt="uploaded" />
@@ -126,7 +105,7 @@
         {:else}
           <span
             class={[
-              "flex items-center justify-center text-xl opacity-70",
+              "flex items-center justify-center text-xl opacity-70 animate-pulse dark:border-neutral border-neutral-content border-2 border-dotted",
               cls,
             ].join(" ")}
           >

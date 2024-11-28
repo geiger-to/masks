@@ -65,7 +65,6 @@ mutation ($input: AuthenticateInput!) {
       id
       name
       logo
-      defaultRegion
       allowPasswords
       allowLoginLinks
     }

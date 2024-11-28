@@ -5,6 +5,11 @@ class InternalClientTest < ClientTestCase
 
   def client
     @client ||=
-      seeder.seed_client(key: "testing", name: "testing", type: "internal")
+      seeder.seed_client(
+        key: "testing",
+        name: "testing",
+        type: "internal",
+        redirect_uris: "/foobar",
+      )
   end
 end

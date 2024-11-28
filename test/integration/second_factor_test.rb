@@ -27,9 +27,4 @@ class SecondFactorTest < MasksTestCase
     attempt event: "second-factor:enable"
     assert_settled
   end
-
-  private
-
-  def codes
-  end
 end

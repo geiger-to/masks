@@ -25,9 +25,16 @@ module Masks
       allow_passwords
       allow_login_links
       autofill_redirect_uri
+      fuzzy_redirect_uri
     ]
 
-    STRING_COLUMNS = %i[client_type subject_type default_region]
+    STRING_COLUMNS = %i[
+      client_type
+      sector_identifier
+      subject_type
+      bg_light
+      bg_dark
+    ]
 
     SETTING_COLUMNS = [
       *LIFETIME_COLUMNS,
@@ -58,10 +65,14 @@ module Masks
     validates :key, uniqueness: true
     validates :client_type,
               inclusion: {
-                in: %w[internal public confidential],
+                in: -> { Masks.setting(:clients, :types) },
               },
               presence: true
-    validates :subject_type, inclusion: { in: :subject_types }, presence: true
+    validates :subject_type,
+              inclusion: {
+                in: -> { Masks.setting(:clients, :subject_types) },
+              },
+              presence: true
     validate :validate_expiries
 
     has_many :access_tokens,
@@ -81,11 +92,11 @@ module Masks
     end
 
     def checks
-      super || []
+      Masks::Checks.names(super || [])
     end
 
     def check?(cls)
-      Masks::Checks.names(checks).include?(Masks::Checks.to_name(cls))
+      checks.include?(Masks::Checks.to_name(cls))
     end
 
     def remove_check!(name)
@@ -97,9 +108,7 @@ module Masks
     end
 
     def add_check!(name)
-      checks << Masks::Checks.to_name(name)
-      checks.uniq!
-      save!
+      update!(checks: [*checks, Masks::Checks.to_name(name)])
     end
 
     def logo_url
@@ -141,13 +150,19 @@ module Masks
     def valid_redirect_uri?(uri)
       uri = uri.to_s
 
-      return true if redirect_uris_a.include?(uri)
+      return false if uri.start_with?("/") && !internal?
 
-      internal? && uri.start_with?("/")
+      if fuzzy_redirect_uri?
+        redirect_uris_a.any? do |redirect_uri|
+          Fuzzyurl.matches?(Fuzzyurl.mask(redirect_uri), uri)
+        end
+      else
+        redirect_uris_a.include?(uri)
+      end
     end
 
     def subject_types
-      pairwise_subject? ? ["pairwise"] : ["public"]
+      [subject_type.split("-").first] # one of pairwise or public
     end
 
     def response_types
@@ -184,16 +199,22 @@ module Masks
     delegate :public_key, to: :private_key
 
     def subject(actor)
-      case subject_type
+      type, attr = subject_type.split("-")
+      value =
+        case attr
+        when "identifier"
+          actor.identifier
+        when "uuid"
+          actor.uuid
+        end
+
+      case type
       when "public"
-        actor.key
+        value
       else
+        "pairwise"
         Digest::SHA256.hexdigest(
-          [
-            sector_identifier,
-            actor.uuid,
-            setting(:openid, :pairwise_salt),
-          ].join("/"),
+          [sector_identifier, value, pairwise_salt].join("+"),
         )
       end
     end
@@ -202,16 +223,16 @@ module Masks
       key
     end
 
-    def auto_consent?
-      !check?("client-consent")
+    def login_links?
+      allow_login_links? && Masks.installation.login_links?
     end
 
-    def pairwise_subject?
-      sector_identifier && subject_type == "pairwise"
+    def auto_consent?
+      internal? || !check?("client-consent")
     end
 
     def expires_at(type)
-      column = "#{type}_expires_in".to_sym
+      column = "#{type.to_s.delete_suffix("_expires_in")}_expires_in".to_sym
 
       return unless LIFETIME_COLUMNS.include?(column) && self[column]
 
@@ -240,19 +261,11 @@ module Masks
       self.version ||= SecureRandom.uuid
       self.secret ||= SecureRandom.base58(64)
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
-      self.sector_identifier ||=
-        begin
-          URI.parse(ENV["MASKS_URL"]).host
-        rescue StandardError
-          "masks"
-        end
+      self.checks = Masks.installation.client_checks unless checks.any?
+      self.sector_identifier ||= Masks.url
+      self.pairwise_salt ||= SecureRandom.hex(10)
 
-      self.checks =
-        (Masks.setting(:client, :checks) || []).map do |check|
-          Masks::Checks.to_name(check)
-        end unless checks.any?
-
-      SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:client, key) }
+      SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:clients, key) }
     end
 
     def generate_key

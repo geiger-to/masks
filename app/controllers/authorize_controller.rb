@@ -15,6 +15,8 @@ class AuthorizeController < ApplicationController
     auth = gql.as_json.dig("data", "authenticate").with_indifferent_access
 
     @props = { section: "Authorize", auth: }
+    @bg_dark = client&.bg_dark
+    @bg_light = client&.bg_light
 
     headers["X-Masks-Auth-Id"] = auth[:id] unless auth[:error]
 

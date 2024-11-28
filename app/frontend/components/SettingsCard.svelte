@@ -3,7 +3,7 @@
 
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import { Mail, AlertTriangle } from "lucide-svelte";
-  import PasswordInput from "./PasswordInput.svelte";
+  import PasswordInput from "@/components/PasswordInput.svelte";
 
   let result = $state();
   let loading = $state(true);

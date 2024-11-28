@@ -1,15 +1,12 @@
 import "./app.css";
-import { Buffer } from "Buffer";
 
-globalThis.Buffer = Buffer;
-
-import AppComponent from "../components/AppComponent.svelte";
-import AuthorizeSection from "../components/AuthorizeSection.svelte";
+import App from "@/App.svelte";
+import Page from "@/authenticate/Page.svelte";
 import { mount } from "svelte";
 
 const target = document.getElementById("app");
 
-mount(AppComponent, {
+mount(App, {
   target: target,
-  props: { ...window.APP, component: AuthorizeSection },
+  props: { ...window.APP, Component: Page },
 });

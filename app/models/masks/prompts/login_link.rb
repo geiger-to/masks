@@ -2,8 +2,7 @@ module Masks
   module Prompts
     class LoginLink < Base
       def enabled?
-        Masks.installation.emails? && client.allow_login_links? && identifier &&
-          checking?("credentials")
+        client.allow_login_links? && identifier && checking?("credentials")
       end
 
       after_auth do

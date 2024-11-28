@@ -61,7 +61,7 @@
   {@render before?.()}
 
   {#if label}
-    <span class="label-text opacity-70 w-[70px]">{label}</span>
+    <span class="label-text-alt opacity-70 w-[70px]">{label}</span>
   {/if}
 
   {#if visible}
@@ -89,7 +89,7 @@
   {@render right?.()}
 
   <button onclick={stopPropagation(preventDefault(toggle))} type="button">
-    <SvelteComponent />
+    <SvelteComponent size="16" />
   </button>
 
   {@render end?.()}

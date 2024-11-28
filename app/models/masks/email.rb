@@ -1,17 +1,8 @@
 module Masks
   class Email < ApplicationRecord
-    include Masks::OneTimePasswordable
-
     LOGIN_GROUP = "login"
 
     self.table_name = "masks_emails"
-
-    otp_code do
-      {
-        interval: Masks.installation.settings.dig(:email, :otp_interval) || 300,
-        drift: Masks.installation.settings.dig(:email, :otp_drift) || 300,
-      }
-    end
 
     scope :for_login, -> { where(group: LOGIN_GROUP) }
 
@@ -53,12 +44,6 @@ module Masks
 
     def for_login?
       group == LOGIN_GROUP
-    end
-
-    def send_verification!(client:)
-      EmailVerificationMailer.with(email: self, client:).verify.deliver_later
-
-      touch(:verification_sent_at)
     end
 
     def verify!

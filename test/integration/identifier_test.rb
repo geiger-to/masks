@@ -37,7 +37,7 @@ class IdentifierTest < MasksTestCase
   end
 
   test "nickname identifiers are ignored when the feature is disabled" do
-    Masks.installation.modify!(nickname: { enabled: false })
+    Masks.installation.modify!(nicknames: { enabled: false })
 
     identify("manager")
 
@@ -48,7 +48,7 @@ class IdentifierTest < MasksTestCase
   end
 
   test "email identifiers are ignored when the feature is disabled" do
-    Masks.installation.modify!(email: { enabled: false })
+    Masks.installation.modify!(emails: { enabled: false })
 
     identify("masks@example.com")
 

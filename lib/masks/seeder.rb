@@ -3,18 +3,24 @@
 # Top-level module for masks.
 module Masks
   class Seeder
-    attr_accessor :manage_client, :manager, :tester
+    attr_accessor :manage_client, :manager, :tester, :install
 
-    def initialize(env: Rails.env)
-      @env = env
+    def initialize(install)
+      @install = install
+    end
+
+    def seed_attached(object, attachment, path)
+      object.try(attachment).attach(
+        io: File.open(Rails.root.join(path)),
+        filename: path,
+      )
     end
 
     def seed_client(key:, name:, type:, logo: nil, **attrs)
       client = Masks::Client.create!(key:, name:, client_type: type, **attrs)
 
-      if logo
-        client.logo.attach(io: File.open(Rails.root.join(logo)), filename: logo)
-      end
+      seed_attached(client, :logo, logo) if logo
+
       client
     end
 
@@ -33,9 +39,9 @@ module Masks
       manager =
         seed_actor(
           **args,
-          nickname: Masks.env.manager.nickname,
-          password: Masks.env.manager.password,
-          email: Masks.env.manager.email,
+          nickname: install.env.manager.nickname,
+          password: install.env.manager.password,
+          email: install.env.manager.email,
         )
       manager.assign_scopes(Masks::Scoped::MANAGE)
       manager.save!
@@ -43,7 +49,7 @@ module Masks
     end
 
     def seed_env!
-      case @env.to_sym
+      case Rails.env.to_sym
       when :development, :test
         self.manager = seed_manager
         self.tester =
@@ -60,8 +66,8 @@ module Masks
             scopes: {
               required: [Masks::Scoped::MANAGE],
             },
-            redirect_uris: "/manage",
-            logo: "app/assets/images/masks.png",
+            redirect_uris: "/manage*",
+            fuzzy_redirect_uri: true,
           )
         seed_client(
           type: "confidential",
@@ -77,6 +83,10 @@ module Masks
           redirect_uris: "http://localhost:1111/test",
           checks: %w[device credentials client-consent],
         )
+
+        seed_attached(install, :light_logo, "app/assets/images/masks.png")
+        seed_attached(install, :dark_logo, "app/assets/images/masks.png")
+        seed_attached(install, :favicon, "app/assets/images/masks.png")
       end
     end
   end

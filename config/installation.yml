@@ -2,6 +2,16 @@ default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   timezone: America/New_York
+  region: "US"
+  theme:
+    name: masks
+  checks:
+    - device
+    - credentials
+    - second-factor
+    - client-consent
+    - onboarded
+    - verified-email
   prompts:
     - Masks::Prompts::Device
     - Masks::Prompts::Identifier
@@ -27,20 +37,24 @@ default: &default
   encryption_key: "<%= ENV['MASKS_ENCRYPTION_KEY'] %>"
   deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
   salt: "<%= ENV['MASKS_SALT'] %>"
-  client:
+  clients:
+    types:
+      - internal
+      - public
+      - confidential
     scopes:
       required: []
       allowed: []
     checks:
       - device
       - credentials
-      - second-factor
-      - client-consent
-      - onboarded
-      - verified-email
+    subject_types:
+      - public-uuid
+      - public-identifier
+      - pairwise-uuid
+    sector_identifier: masks
     client_type: internal
-    subject_type: public
-    default_region: "US"
+    subject_type: pairwise-uuid
     id_token_expires_in: "6 hours"
     access_token_expires_in: "6 hours"
     code_expires_in: "10 minutes"
@@ -58,24 +72,56 @@ default: &default
     allow_passwords: true
     allow_login_links: true
     autofill_redirect_uri: false
+    bg_dark: |
+      background: radial-gradient(
+        circle,
+        rgba(62, 65, 55, 1) 0%,
+        rgba(54, 47, 40, 1) 25%,
+        rgba(31, 41, 55, 1) 50%,
+        rgba(10, 8, 14, 1) 100%
+      );
+    bg_light: |
+      background: radial-gradient(
+        circle,
+        #00cdb7,
+        #00c6d2,
+        #00bcea,
+        #00b0fb,
+        #009fff,
+        #2e8eef,
+        #407dde,
+        #4c6ccc,
+        #365ca5,
+        #294b7f,
+        #233a5a,
+        #1f2937
+      );
   authorize:
     delay: 100
-  backup_code:
+  totp_codes:
+    enabled: true
+  sms_codes:
+    enabled: true
+  passkeys:
+    enabled: true
+  webauthn:
+    enabled: true
+  backup_codes:
     min: 8
     max: 100
     total: 10
     change_cooldown: "15 minutes"
-  password:
+  login_links:
+    enabled: true
+  passwords:
     min: 8
     max: 100
     change_cooldown: "15 minutes"
-  nickname:
+  nicknames:
     enabled: true
-  email:
+  emails:
     enabled: true
     max_for_login: 5
-    otp_interval: 60
-    otp_drift: 60
   sendmail:
     location: ~
   twilio:

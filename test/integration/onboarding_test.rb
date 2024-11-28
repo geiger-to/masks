@@ -47,7 +47,7 @@ class OnboardingTest < MasksTestCase
 
     assert seeder.manager.reload.authenticate("testing123")
 
-    travel ChronicDuration.parse(Masks.setting(:password, :change_cooldown))
+    travel ChronicDuration.parse(Masks.setting(:passwords, :change_cooldown))
     travel 1.second
 
     attempt event: "onboard:profile", updates: { password: "testing456" }

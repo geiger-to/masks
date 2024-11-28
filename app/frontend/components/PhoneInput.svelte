@@ -35,6 +35,7 @@
     options = { format: "national", autoPlaceholder: false },
     placeholder = "Your phone number",
     inputClass,
+    countryClass,
     class: cls,
     children,
   } = $props();

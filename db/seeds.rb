@@ -4,10 +4,10 @@ end
 
 ENV["MASKS_URL"] ||= "http://localhost:#{ENV.fetch("PORT", 1111)}"
 
-Masks.install! do |installation|
-  log "installing '#{installation.name}'..."
+Masks.install! do |install|
+  log "installing '#{install.name}'..."
 
-  seeder = Masks::Seeder.new
+  seeder = Masks::Seeder.new(install)
   seeder.seed_env!
 
   log "installation complete."

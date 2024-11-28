@@ -6,7 +6,9 @@ Rails.application.routes.draw do
   post "/graphql", to: "graphql#execute"
 
   # Image uploads
-  post "/upload/logo", to: "uploads/logo#create"
+  post "/upload/logo", to: "uploads/installation#logo"
+  post "/upload/favicon", to: "uploads/installation#favicon"
+  post "/upload/client", to: "uploads/client#create"
   post "/upload/avatar", to: "uploads/avatar#create"
 
   # Manage accounts, sessions, and more...
@@ -16,11 +18,6 @@ Rails.application.routes.draw do
   # Authorize (including using the OIDC spec)
   get "/authorize/:client_id", to: "authorize#new", as: :authorize
   get "/authorize", to: "authorize#new", as: :oidc
-
-  # Webauthn support
-  get "/webauthn", to: "webauth#new"
-  post "/webauthn", to: "webauth#create"
-  delete "/webauthn", to: "webauth#destroy"
 
   # OAuth/OpenID support
   get "/.well-known/:client/openid-configuration",
@@ -35,9 +32,6 @@ Rails.application.routes.draw do
   # Render dynamic PWA files from app/views/pwa/*
   get "service-worker" => "rails/pwa#service_worker", :as => :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", :as => :pwa_manifest
-
-  # Defines the root path route ("/")
-  # root "posts#index"
 end
 
 Rails.application.routes.default_url_options = {
