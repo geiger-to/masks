@@ -583,7 +583,7 @@ DEPENDENCIES
   capybara
   chronic_duration (~> 0.10.6)
   csv (~> 3.3)
-  database_cleaner (~> 2.0)
+  database_cleaner (~> 2.1)
   database_cleaner-active_record (~> 2.2)
   debug
   device_detector (~> 1.1)
