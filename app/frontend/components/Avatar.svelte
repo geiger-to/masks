@@ -1,13 +1,10 @@
 <script>
-  import Identicon from "./Identicon.svelte";
-  export let onClick;
-  export let actor;
+  import Identicon from "@/components/Identicon.svelte";
+  let { actor } = $props();
 </script>
 
-<button on:click|preventDefault|stopPropagation={onClick} class="leading-none">
-  <div class="avatar placeholder">
-    <div class="bg-black text-neutral-content rounded-lg w-8 p-0.5">
-      <Identicon id={actor.identiconId} />
-    </div>
+<div class="avatar placeholder w-full h-full">
+  <div class="bg-black text-neutral-content p-0.5 rounded-lg">
+    <Identicon id={actor?.identiconId} />
   </div>
-</button>
+</div>

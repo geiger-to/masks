@@ -1,13 +1,12 @@
 <!DOCTYPE html>
-<html>
+<html class="bg-base-300" data-theme="dark">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
+    <link rel="stylesheet" href="email.css">
   </head>
-
   <body>
-    <%= yield %>
+    <div class="px-6 pt-4">
+      <%= yield %>
+    </div>
   </body>
 </html>

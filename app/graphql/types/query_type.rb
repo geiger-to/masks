@@ -2,28 +2,48 @@
 
 module Types
   class QueryType < Types::BaseObject
-    include GraphQL::Types::Relay::HasNodeField
-
-    field :node,
-          Types::NodeType,
+    field :actor,
+          Types::ActorType,
           null: true,
-          description: "Fetches an object given its ID." do
-      argument :id, ID, required: true, description: "ID of the object."
+          managers_only: true,
+          description: "Fetches an actor given its identifier." do
+      argument :identifier,
+               String,
+               required: true,
+               description: "identifier of the actor."
     end
 
-    def node(id:)
-      context.schema.object_from_id(id, context)
+    def actor(identifier:)
+      actor = Masks.identify(identifier)
+      actor if actor.persisted?
     end
 
-    def nodes(ids:)
-      ids.map { |id| context.schema.object_from_id(id, context) }
+    field :client,
+          Types::ClientType,
+          null: true,
+          managers_only: true,
+          description: "Fetches a client given its id." do
+      argument :id, String, required: true, description: "id of the client."
     end
 
-    field :search, Types::SearchType, null: true do
+    def client(id:)
+      Masks::Client.find_by(key: id)
+    end
+
+    field :install,
+          Types::InstallationType,
+          description: "Returns the current installation",
+          managers_only: true,
+          null: true
+
+    def install
+      Masks.installation
+    end
+
+    field :search, Types::SearchType, null: true, managers_only: true do
       argument :jwts, Boolean, required: false
       argument :tokens, Boolean, required: false
       argument :codes, Boolean, required: false
-      argument :events, Boolean, required: false
       argument :devices, Boolean, required: false
       argument :query,
                String,
@@ -34,7 +54,6 @@ module Types
     def search(**args)
       query, connections = parse_query(args[:query])
 
-      return unless context[:authorization]&.masks_manager?
       return unless query.length > 0
 
       actors = find_actors(query)
@@ -43,10 +62,6 @@ module Types
       one_of = clients.one? || actors.one?
 
       if one_of
-        if connections.include?("events") || args[:events]
-          result[:events] = connect_events(actors, clients)
-        end
-
         if connections.include?("tokens") || args[:tokens]
           result[:tokens] = connect_tokens(actors, clients)
         end
@@ -71,39 +86,31 @@ module Types
 
     def connect_tokens(actors, clients)
       if actors.any?
-        return Masks::AccessToken.latest.where(actor: actors)
+        Masks::AccessToken.latest.where(actor: actors)
       elsif clients.any?
-        return Masks::AccessToken.latest.where(client: clients)
+        Masks::AccessToken.latest.where(client: clients)
       end
     end
 
     def connect_codes(actors, clients)
       if actors.any?
-        return Masks::AuthorizationCode.latest.where(actor: actors)
+        Masks::AuthorizationCode.latest.where(actor: actors)
       elsif clients.any?
-        return Masks::AuthorizationCode.latest.where(client: clients)
-      end
-    end
-
-    def connect_events(actors, clients)
-      if actors.any?
-        return Masks::Event.latest.where(actor: actors)
-      elsif clients.any?
-        return Masks::Event.latest.where(client: clients)
+        Masks::AuthorizationCode.latest.where(client: clients)
       end
     end
 
     def connect_jwts(actors, clients)
       if actors.any?
-        return Masks::IdToken.latest.where(actor: actors)
+        Masks::IdToken.latest.where(actor: actors)
       elsif clients.any?
-        return Masks::IdToken.latest.where(client: clients)
+        Masks::IdToken.latest.where(client: clients)
       end
     end
 
     def connect_devices(actors, clients)
       if actors.any?
-        return(
+        (
           Masks::Device
             .latest
             .joins(:actors)
@@ -111,7 +118,7 @@ module Types
             .distinct
         )
       elsif clients.any?
-        return(
+        (
           Masks::Device
             .latest
             .joins(:clients)

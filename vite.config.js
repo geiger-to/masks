@@ -5,7 +5,6 @@ import { svelte } from "@sveltejs/vite-plugin-svelte";
 import tailwindcss from "tailwindcss";
 
 export default defineConfig({
-  mode: "development",
   plugins: [
     RubyPlugin(),
     FullReload(["config/routes.rb", "app/views/**/*"]),

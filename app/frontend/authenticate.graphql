@@ -1,0 +1,72 @@
+mutation ($input: AuthenticateInput!) {
+  authenticate(input: $input) {
+    id
+    requestId
+    error
+    avatar
+    identifier
+    identiconId
+    settled
+    loginLink {
+      expiresAt
+    }
+    redirectUri
+    prompt
+    settings
+    warnings
+    extras
+    scopes {
+      name
+      detail
+      hidden
+    }
+    actor {
+      id
+      name
+      nickname
+      identifier
+      identifierType
+      identiconId
+      loginEmail
+      loginEmails {
+        address
+        verifiedAt
+        verifyLink
+      }
+      avatar
+      avatarCreatedAt
+      passwordChangedAt
+      passwordChangeable
+      secondFactor
+      savedBackupCodesAt
+      remainingBackupCodes
+      secondFactors {
+        ... on WebauthnCredential {
+          id
+          name
+          createdAt
+          icons {
+            light
+            dark
+          }
+        }
+        ... on Phone {
+          number
+          createdAt
+        }
+        ... on OtpSecret {
+          id
+          name
+          createdAt
+        }
+      }
+    }
+    client {
+      id
+      name
+      logo
+      allowPasswords
+      allowLoginLinks
+    }
+  }
+}

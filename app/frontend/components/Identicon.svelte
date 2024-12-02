@@ -1,13 +1,18 @@
 <script>
   import { minidenticon } from "minidenticons";
+  /** @type {{ [key: string]: any }} */
+  let { ...props } = $props();
 
-  let { id, saturation = 95, lightness = 45, ...others } = $$props;
+  let { id, saturation = 95, lightness = 45, ...others } = props;
 
-  let svgURI =
-    "data:image/svg+xml;utf8," +
-    encodeURIComponent(minidenticon(`@${id}`, saturation, lightness));
+  let svgURI = $derived(
+    id
+      ? "data:image/svg+xml;utf8," +
+          encodeURIComponent(minidenticon(id, saturation, lightness))
+      : null
+  );
 </script>
 
-{#key id}
-  <img src={svgURI} {...others} />
-{/key}
+{#if svgURI}
+  <img src={svgURI} {...others} alt={`identicon id #${id}`} />
+{/if}

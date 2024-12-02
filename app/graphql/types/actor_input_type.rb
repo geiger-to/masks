@@ -3,7 +3,7 @@
 module Types
   class ActorInputType < Types::BaseInputObject
     argument :signup, Boolean, required: false
-    argument :nickname, String, required: true
+    argument :identifier, String, required: true
     argument :password, String, required: false
     argument :scopes, String, required: false
   end

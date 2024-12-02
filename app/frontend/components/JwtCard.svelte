@@ -1,9 +1,10 @@
 <script>
+  import { preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Save, ChevronDown, X } from "lucide-svelte";
   import Time from "svelte-time";
 
-  export let event;
-  export let search;
+  let { event, search } = $props();
 
   let form = { ...event };
 </script>
@@ -12,7 +13,7 @@
   <div class="flex items-center pl-1.5 gap-3">
     <h2 class="font-bold font-mono">{event.name}</h2>
     <button
-      on:click|preventDefault|stopPropagation={search(event.clientId)}
+      onclick={stopPropagation(preventDefault(search(event.clientId)))}
       class="btn btn-link underline">{event.clientId}</button
     >
     <span class="text-sm" alt={event.device.userAgent}

@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-class GraphqlController < AuthorizedController
+class GraphqlController < ApplicationController
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = { history:, authorization: }
+    context = { request:, auth:, resume: true }
     result =
       MasksSchema.execute(
         query,
@@ -20,10 +20,6 @@ class GraphqlController < AuthorizedController
   end
 
   private
-
-  def client
-    @client ||= Masks::Client.manage
-  end
 
   # Handle variables in form data, JSON body, or a blank value
   def prepare_variables(variables_param)

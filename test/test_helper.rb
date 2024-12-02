@@ -1,13 +1,16 @@
 ENV["RAILS_ENV"] ||= "test"
 
 require_relative "../config/environment"
-require_relative "masks_test_case"
 require "rails/test_help"
 require "byebug"
 
 Dir[Rails.root.join("test", "helpers", "**", "*.rb")].each do |file|
   require file
 end
+
+require_relative "masks_test_case"
+require_relative "client_test_case"
+require_relative "graphql_test_case"
 
 module ActiveSupport
   class TestCase

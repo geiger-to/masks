@@ -1,7 +1,5 @@
 module Uploads
-  class AvatarController < AuthorizedController
-    managers_only
-
+  class AvatarController < ManagersController
     def create
       actor = Masks::Actor.find_by!(key: params[:actor_id])
       actor.avatar.attach(params[:file])

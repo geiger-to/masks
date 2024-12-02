@@ -1,33 +1,96 @@
 <script>
+  import { run, preventDefault, stopPropagation } from "svelte/legacy";
+
   import { Eye, EyeOff } from "lucide-svelte";
 
-  let visible = false;
+  let visible = $state(false);
   let toggle = () => {
     visible = !visible;
   };
 
-  export let value;
-  export let label = null;
-  export let disabled;
+  /**
+   * @typedef {Object} Props
+   * @property {any} value
+   * @property {any} [label]
+   * @property {any} disabled
+   * @property {any} auth
+   * @property {any} placeholder
+   * @property {any} valid
+   * @property {any} onChange
+   * @property {import('svelte').Snippet} [before]
+   * @property {import('svelte').Snippet} [right]
+   * @property {import('svelte').Snippet} [end]
+   */
+
+  /** @type {Props} */
+  let {
+    value = $bindable(),
+    label = null,
+    disabled,
+    auth,
+    placeholder,
+    valid = $bindable(),
+    onChange,
+    before,
+    right,
+    end,
+    inputClass,
+    class: cls,
+  } = $props();
+
+  let min = $state();
+  let max = $state();
+  let info = $state();
+
+  $effect(() => {
+    min = auth?.settings?.passwords?.min;
+    max = auth?.settings?.passwords?.max;
+
+    if (!disabled && min && max) {
+      valid = value && value.length >= min && value.length <= max;
+      info = `(${min} to ${max} characters)`;
+    } else {
+      valid = true;
+    }
+  });
+
+  const SvelteComponent = $derived(visible ? EyeOff : Eye);
 </script>
 
-<label class={`input input-bordered flex items-center gap-3 ${$$props.class}`}>
+<label class={`input input-bordered flex items-center gap-3 ${cls}`}>
+  {@render before?.()}
+
   {#if label}
-    <span class="label-text opacity-70 w-[70px]">{label}</span>
+    <span class="label-text-alt opacity-70 w-[70px]">{label}</span>
   {/if}
 
   {#if visible}
-    <input type="text" {...$$props} class="grow" bind:value />
+    <input
+      minlength={min}
+      maxlength={max}
+      type="text"
+      placeholder={`${[placeholder, info].filter(Boolean).join(" ")}`}
+      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${inputClass}`}
+      bind:value
+      oninput={onChange}
+    />
   {:else}
-    <input type="password" {...$$props} class="grow" bind:value />
+    <input
+      minlength={min}
+      maxlength={max}
+      type="password"
+      placeholder={`${[placeholder, info].filter(Boolean).join(" ")}`}
+      class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${inputClass}`}
+      bind:value
+      oninput={onChange}
+    />
   {/if}
-  <slot name="right" />
 
-  <button
-    on:click|preventDefault|stopPropagation={toggle}
-    type="button"
-    {disabled}
-  >
-    <svelte:component this={visible ? EyeOff : Eye} />
+  {@render right?.()}
+
+  <button onclick={stopPropagation(preventDefault(toggle))} type="button">
+    <SvelteComponent size="16" />
   </button>
+
+  {@render end?.()}
 </label>

@@ -2,10 +2,46 @@
 
 module Masks
   class Client < ApplicationRecord
-    include Masks::Scoped
-
     MANAGE_KEY = "manage"
     DEFAULT_KEY = "default"
+    LIFETIME_COLUMNS = %i[
+      code_expires_in
+      id_token_expires_in
+      access_token_expires_in
+      refresh_expires_in
+      login_link_expires_in
+      auth_attempt_expires_in
+      email_verification_expires_in
+      login_link_factor_expires_in
+      password_factor_expires_in
+      second_factor_backup_code_expires_in
+      second_factor_sms_code_expires_in
+      second_factor_totp_code_expires_in
+      second_factor_webauthn_expires_in
+      internal_session_expires_in
+    ]
+
+    BOOLEAN_COLUMNS = %i[
+      allow_passwords
+      allow_login_links
+      autofill_redirect_uri
+      fuzzy_redirect_uri
+    ]
+
+    STRING_COLUMNS = %i[
+      client_type
+      sector_identifier
+      subject_type
+      bg_light
+      bg_dark
+    ]
+
+    SETTING_COLUMNS = [
+      *LIFETIME_COLUMNS,
+      *BOOLEAN_COLUMNS,
+      *STRING_COLUMNS,
+      :scopes,
+    ]
 
     self.table_name = "masks_clients"
 
@@ -18,7 +54,7 @@ module Masks
     scope :default, -> { find_by(key: DEFAULT_KEY) }
     scope :manage, -> { find_by(key: MANAGE_KEY) }
 
-    validates :name, presence: true
+    validates :name, :version, presence: true
 
     encrypts :secret
 
@@ -29,10 +65,14 @@ module Masks
     validates :key, uniqueness: true
     validates :client_type,
               inclusion: {
-                in: %w[internal public confidential],
+                in: -> { Masks.setting(:clients, :types) },
               },
               presence: true
-    validates :subject_type, inclusion: { in: :subject_types }, presence: true
+    validates :subject_type,
+              inclusion: {
+                in: -> { Masks.setting(:clients, :subject_types) },
+              },
+              presence: true
     validate :validate_expiries
 
     has_many :access_tokens,
@@ -42,6 +82,42 @@ module Masks
              class_name: "Masks::AuthorizationCode",
              inverse_of: :client
     has_many :devices, class_name: "Masks::Device", through: :access_tokens
+    has_many :login_links, class_name: "Masks::LoginLink"
+
+    serialize :checks, coder: JSON
+    serialize :scopes, coder: JSON
+
+    def scope
+      @scope ||= ClientScope.new(self)
+    end
+
+    def checks
+      Masks::Checks.names(super || [])
+    end
+
+    def check?(cls)
+      checks.include?(Masks::Checks.to_name(cls))
+    end
+
+    def remove_check!(name)
+      name = Masks::Checks.to_name(name)
+
+      self.checks = checks.filter { |c| c != name }
+
+      save!
+    end
+
+    def add_check!(name)
+      update!(checks: [*checks, Masks::Checks.to_name(name)])
+    end
+
+    def logo_url
+      if logo&.attached?
+        Rails.application.routes.url_helpers.rails_storage_proxy_url(
+          logo.variant(:preview),
+        )
+      end
+    end
 
     def to_gqlid
       "client:#{key}"
@@ -74,13 +150,19 @@ module Masks
     def valid_redirect_uri?(uri)
       uri = uri.to_s
 
-      return true if redirect_uris_a.include?(uri)
+      return false if uri.start_with?("/") && !internal?
 
-      internal? && uri.start_with?("/")
+      if fuzzy_redirect_uri?
+        redirect_uris_a.any? do |redirect_uri|
+          Fuzzyurl.matches?(Fuzzyurl.mask(redirect_uri), uri)
+        end
+      else
+        redirect_uris_a.include?(uri)
+      end
     end
 
     def subject_types
-      pairwise_subject? ? ["pairwise"] : ["public"]
+      [subject_type.split("-").first] # one of pairwise or public
     end
 
     def response_types
@@ -117,16 +199,22 @@ module Masks
     delegate :public_key, to: :private_key
 
     def subject(actor)
-      case subject_type
+      type, attr = subject_type.split("-")
+      value =
+        case attr
+        when "identifier"
+          actor.identifier
+        when "uuid"
+          actor.uuid
+        end
+
+      case type
       when "public"
-        actor.key
+        value
       else
+        "pairwise"
         Digest::SHA256.hexdigest(
-          [
-            sector_identifier,
-            actor.uuid,
-            setting(:openid, :pairwise_salt),
-          ].join("/"),
+          [sector_identifier, value, pairwise_salt].join("+"),
         )
       end
     end
@@ -135,54 +223,32 @@ module Masks
       key
     end
 
+    def login_links?
+      allow_login_links? && Masks.installation.login_links?
+    end
+
     def auto_consent?
-      internal? || !consent
+      internal? || !check?("client-consent")
     end
 
-    def pairwise_subject?
-      sector_identifier && subject_type == "pairwise"
+    def expires_at(type)
+      column = "#{type.to_s.delete_suffix("_expires_in")}_expires_in".to_sym
+
+      return unless LIFETIME_COLUMNS.include?(column) && self[column]
+
+      Time.now + ChronicDuration.parse(self[column])
     end
 
-    def assign_scopes!(*scopes)
-      self.scopes = [*scopes, *self.scopes].uniq.compact
-      save!
+    def email_verification_duration
+      ChronicDuration.parse(email_verification_expires_in)
     end
 
-    def remove_scopes!(*scopes)
-      scopes.each { |scope| self.scopes.delete(scope) }
+    def authorize_params(params)
+      params = params.merge(scope: scope.minimum(params[:scope]).join(" "))
 
-      save!
-    end
-
-    def history_expires_at
-      Time.now + ChronicDuration.parse("1 hour")
-    end
-
-    def password_expires_at
-      Time.now + ChronicDuration.parse("1 day")
-    end
-
-    def code_expires_at
-      Time.now + ChronicDuration.parse(code_expires_in)
-    end
-
-    def id_token_expires_at
-      Time.now + ChronicDuration.parse(id_token_expires_in)
-    end
-
-    def access_token_expires_at
-      Time.now + ChronicDuration.parse(access_token_expires_in)
-    end
-
-    def refresh_expires_at
-      Time.now + ChronicDuration.parse(refresh_expires_in)
-    end
-
-    def oidc_params(params)
-      case client_type
-      when "internal"
-        { redirect_uri: default_redirect_uri }.merge(
-          **params.merge({ response_type: "code", scope: scopes_a.join(" ") }),
+      if internal?
+        { redirect_uri: default_redirect_uri }.merge(params).merge(
+          response_type: "code",
         )
       else
         params
@@ -192,21 +258,14 @@ module Masks
     private
 
     def generate_credentials
+      self.version ||= SecureRandom.uuid
       self.secret ||= SecureRandom.base58(64)
-      self.client_type ||= "internal"
-      self.subject_type ||= "public"
-      self.scopes ||= setting(:openid, :scopes) || []
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
-      self.sector_identifier ||=
-        begin
-          URI.parse(ENV["MASKS_URL"]).host
-        rescue StandardError
-          "masks"
-        end
-      self.code_expires_in ||= "12 hours"
-      self.access_token_expires_in ||= "1 day"
-      self.id_token_expires_in ||= "1 hour"
-      self.refresh_expires_in ||= "1 week"
+      self.checks = Masks.installation.client_checks unless checks.any?
+      self.sector_identifier ||= Masks.url
+      self.pairwise_salt ||= SecureRandom.hex(10)
+
+      SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:clients, key) }
     end
 
     def generate_key
@@ -224,14 +283,10 @@ module Masks
     end
 
     def validate_expiries
-      %i[
-        code_expires_in
-        id_token_expires_in
-        access_token_expires_in
-        refresh_expires_in
-      ].each do |param|
-        value = send(param)
-        errors.add(param, :invalid) unless value && ChronicDuration.parse(value)
+      LIFETIME_COLUMNS.each do |param|
+        unless self[param] && ChronicDuration.parse(self[param])
+          errors.add(param, :invalid)
+        end
       end
     end
   end

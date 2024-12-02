@@ -1,12 +1,14 @@
 <script>
+  import { run } from "svelte/legacy";
+
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
   import { Mail, AlertTriangle } from "lucide-svelte";
-  import PasswordInput from "./PasswordInput.svelte";
+  import PasswordInput from "@/components/PasswordInput.svelte";
 
-  let result;
-  let loading = true;
+  let result = $state();
+  let loading = $state(true);
   let errors;
-  let settings;
+  let settings = $state();
   let client = getContextClient();
 
   const updateSettings = (settings) => {
@@ -45,7 +47,9 @@
 
   updateSettings();
 
-  $: handleResult($result);
+  run(() => {
+    handleResult($result);
+  });
 </script>
 
 <div class="flex flex-col gap-3 mb-3 max-w-prose mx-auto">

@@ -1,15 +1,12 @@
-class ManageController < AuthorizedController
-  delegate :actor, to: :authorization, allow_nil: true
-
-  managers_only
-
+class ManageController < ManagersController
   def index
     @theme = "luxury"
     @props = {
       section: "Manage",
-      actor: actor.slice(:identicon_id, :nickname, :login_email, :avatar_url),
+      url: params[:url] || "",
+      actor: current_actor.slice(:identifier, :identicon_id, :avatar_url),
     }
 
-    render "app"
+    render "manage"
   end
 end

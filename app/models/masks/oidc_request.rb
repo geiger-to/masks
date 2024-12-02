@@ -2,75 +2,63 @@
 module Masks
   # Manages authorizations for OpenID/OAuth2 requests.
   class OIDCRequest
-    attr_accessor :client,
-                  :actor,
-                  :device,
-                  :scopes,
+    attr_accessor :scopes,
                   :response,
                   :response_type,
                   :authorization_code,
                   :access_token,
                   :id_token,
-                  :error
+                  :error,
+                  :req,
+                  :res
+
+    delegate :client, :device, to: :prompt
+
+    attr_reader :prompt
+
+    ERRORS = { unsupported_response_type: "invalid-response" }
 
     class << self
-      def authorize(history, &block)
-        request = new(history, &block)
-        request.authorize
-        request
+      def update(prompt, &block)
+        oidc = new(prompt, &block)
+        oidc.update!
+        oidc
       end
     end
 
-    delegate :client, :device, to: :history
-
-    attr_reader :history
-
-    def actor
-      history.actor if history.authenticated?
-    end
-
-    def initialize(history, &block)
-      @history = history
-      @params = history.oidc_params
+    def initialize(prompt, &block)
+      @prompt = prompt
+      @params = prompt.params
       @env = make_env(@params)
       @block = block
       @app =
-        Rack::OAuth2::Server::Authorize.new do |req, res|
-          invalid_redirect_uri!(req) unless req.redirect_uri
+        Rack::OAuth2::Server::Authorize.new do |oidc_request, oidc_response|
+          self.req = oidc_request
+          self.res = oidc_response
 
-          unless client.redirect_uris_a.any?
+          @scopes = client.scope.minimum(req.scope)
+
+          invalid_redirect_uri! unless req.redirect_uri
+
+          if client.redirect_uris_a.none? && client.autofill_redirect_uri?
             client.redirect_uris = req.redirect_uri.to_s
-            client.valid? || invalid_redirect_uri!(req)
+            client.valid? || invalid_redirect_uri!
           end
 
           if client.valid_redirect_uri?(req.redirect_uri)
             res.redirect_uri = req.verified_redirect_uri = req.redirect_uri.to_s
           else
-            invalid_redirect_uri!(req)
+            invalid_redirect_uri!
           end
 
-          @scopes = req.scope & client.scopes_a
-
-          scopes_required!(req) if actor && !actor.scopes?(*@scopes)
-
           if res.protocol_params_location == :fragment && req.nonce.blank?
-            nonce_required!(req)
+            nonce_required!
           end
 
           if client.response_types.include?(
                Array(req.response_type).collect(&:to_s).join(" "),
              )
-            if !@validate && actor
-              if @approve || history.authorized? || client.auto_consent?
-                client.save if client.redirect_uris_changed?
-
-                approved! req, res
-                @approved = true
-              elsif @deny
-                @denied = true
-                access_denied!(req)
-              end
-            end
+            prompt.instance_exec(self, &@block)
           else
             unsupported_response_type!
           end
@@ -78,36 +66,20 @@ module Masks
     end
 
     def approved?
-      @approved
+      !error && @approved
     end
 
     def denied?
-      @denied || error
+      error
     end
 
-    def access_denied!(req)
-      self.error = "access_denied"
+    def denied!
+      self.error = "access-denied"
       req.access_denied!
     end
 
-    def nonce_required!(req)
-      self.error = "nonce_required"
-      req.invalid_request! "nonce required"
-    end
-
-    def scopes_required!(req)
-      self.error = "scopes_required"
-      req.invalid_request! "scopes required"
-    end
-
-    def invalid_redirect_uri!(req)
-      self.error = "invalid_redirect_uri"
-      req.invalid_request!("invalid redirect_uri")
-    end
-
-    def unsupported_response_type!(req)
-      self.error = "unsupported_response_type"
-      req.unsupported_response_type!
+    def original_redirect_uri
+      req&.redirect_uri&.to_s
     end
 
     def redirect_uri
@@ -118,46 +90,44 @@ module Masks
       header["Location"]
     end
 
-    def validate!
-      @validate = true
-      perform
-    end
-
-    def authorize!(approve: nil, deny: nil)
-      @validate = false
-      @approve = approve
-      @deny = deny
-
-      perform
-    end
-
-    def perform
+    def update!
       return if error || @response
 
       begin
         @response ||= @app.call(@env)
       rescue Rack::OAuth2::Server::Authorize::BadRequest => e
-        self.error = e.error.to_s if !error
+        self.error ||= ERRORS.fetch(e.error, e.error.to_s)
       end
-
-      history.instance_exec(self, &@block) if @approved || @denied
     end
 
-    def approved!(req, res)
+    def validate_scopes!(actor)
+      scopes_required! if !actor.scopes?(*@scopes)
+    end
+
+    def approved!(actor)
+      @approved = true
+
+      client.save if client.redirect_uris_changed?
+
       response_types = Array(req.response_type)
 
       if response_types.include? :code
-        @authorization_code =
-          actor.authorization_codes.create!(
-            client:,
-            device:,
-            actor:,
-            redirect_uri: res.redirect_uri,
-            nonce: req.nonce,
-            scopes: scopes.join(" "),
-          )
+        res.code =
+          if client.internal?
+            prompt.state.attempt_id
+          else
+            @authorization_code =
+              actor.authorization_codes.create!(
+                client:,
+                device:,
+                actor:,
+                redirect_uri: res.redirect_uri,
+                nonce: req.nonce,
+                scopes: scopes.join(" "),
+              )
 
-        res.code = authorization_code.code
+            authorization_code.code
+          end
       end
 
       if response_types.include? :token
@@ -189,6 +159,26 @@ module Masks
     end
 
     private
+
+    def nonce_required!
+      self.error = "missing-nonce"
+      req.invalid_request! "nonce required"
+    end
+
+    def scopes_required!
+      self.error = "missing-scopes"
+      req.invalid_request! "scopes required"
+    end
+
+    def invalid_redirect_uri!
+      self.error = "invalid-redirect"
+      req.invalid_request!("invalid redirect_uri")
+    end
+
+    def unsupported_response_type!
+      self.error = "invalid-response"
+      req.unsupported_response_type!
+    end
 
     def make_env(params)
       {

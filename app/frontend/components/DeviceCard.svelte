@@ -16,8 +16,7 @@
   } from "lucide-svelte";
   import Time from "svelte-time";
 
-  export let device;
-  export let inline;
+  let { device, inline } = $props();
 
   let form = { ...device };
   let icon = {
@@ -36,11 +35,13 @@
     wearable: Bluetooth,
     peripheral: Bluetooth,
   };
+
+  const SvelteComponent = $derived(icon[device.deviceType] || HelpCircle);
 </script>
 
 <div class={inline ? "" : "my-1.5 bg-base-200 rounded-lg p-3 px-3"}>
   <div class="flex items-center gap-3 text-sm">
-    <svelte:component this={icon[device.deviceType] || HelpCircle} size="15" />
+    <SvelteComponent size="15" />
     <span class="" alt={device.userAgent}
       ><i>{device.name}</i> on <i>{device.osName}</i></span
     >

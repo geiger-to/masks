@@ -3,40 +3,32 @@
 # Top-level module for masks.
 module Masks
   class Seeder
-    attr_accessor :manage_client, :manager
+    attr_accessor :manage_client, :manager, :tester, :install
 
-    def initialize(env: Rails.env)
-      @env = env
+    def initialize(install)
+      @install = install
     end
 
-    def seed_client(
-      key:,
-      name:,
-      type:,
-      redirect_uris: nil,
-      consent: true,
-      scopes: nil,
-      logo: nil
-    )
-      client =
-        Masks::Client.create!(
-          key:,
-          name:,
-          scopes:,
-          redirect_uris:,
-          consent:,
-          client_type: type,
-        )
+    def seed_attached(object, attachment, path)
+      object.try(attachment).attach(
+        io: File.open(Rails.root.join(path)),
+        filename: path,
+      )
+    end
 
-      if logo
-        client.logo.attach(io: File.open(Rails.root.join(logo)), filename: logo)
-      end
+    def seed_client(key:, name:, type:, logo: nil, **attrs)
+      client = Masks::Client.create!(key:, name:, client_type: type, **attrs)
+
+      seed_attached(client, :logo, logo) if logo
+
       client
     end
 
     def seed_actor(nickname:, password:, scopes: nil, email: nil)
       actor = Masks::Actor.new(nickname:)
-      actor.emails.build(email:, group: Masks::Email::LOGIN_GROUP) if email
+      if email
+        actor.emails.build(address: email, group: Masks::Email::LOGIN_GROUP)
+      end
       actor.password = password
       actor.assign_scopes(*scopes)
       actor.save!
@@ -47,9 +39,9 @@ module Masks
       manager =
         seed_actor(
           **args,
-          nickname: Masks.env.manager.nickname,
-          password: Masks.env.manager.password,
-          email: Masks.env.manager.email,
+          nickname: install.env.manager.nickname,
+          password: install.env.manager.password,
+          email: install.env.manager.email,
         )
       manager.assign_scopes(Masks::Scoped::MANAGE)
       manager.save!
@@ -57,35 +49,44 @@ module Masks
     end
 
     def seed_env!
-      case @env.to_sym
+      case Rails.env.to_sym
       when :development, :test
         self.manager = seed_manager
+        self.tester =
+          seed_actor(
+            nickname: "tester",
+            password: "password",
+            email: "test@example.com",
+          )
         self.manage_client =
           seed_client(
             type: "internal",
             key: Masks::Client::MANAGE_KEY,
             name: "Manage masks",
-            scopes: Masks::Scoped::MANAGE,
-            redirect_uris: "/manage",
-            logo: "app/assets/images/masks.png",
-            consent: false,
+            scopes: {
+              required: [Masks::Scoped::MANAGE],
+            },
+            redirect_uris: "/manage*",
+            fuzzy_redirect_uri: true,
           )
         seed_client(
           type: "confidential",
           key: "confidential",
           name: "Confidential",
-          scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          consent: true,
+          checks: %w[device credentials client-consent],
         )
         seed_client(
           type: "public",
           key: "public",
           name: "Public",
-          scopes: "",
           redirect_uris: "http://localhost:1111/test",
-          consent: true,
+          checks: %w[device credentials client-consent],
         )
+
+        seed_attached(install, :light_logo, "app/assets/images/masks.png")
+        seed_attached(install, :dark_logo, "app/assets/images/masks.png")
+        seed_attached(install, :favicon, "app/assets/images/masks.png")
       end
     end
   end

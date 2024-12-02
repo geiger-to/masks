@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+
+set -xe
+
+npm run biome:lint
+npm run prettier:lint

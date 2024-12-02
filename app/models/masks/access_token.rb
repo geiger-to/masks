@@ -41,7 +41,7 @@ module Masks
     end
 
     def generate_defaults
-      self.expires_at ||= client.access_token_expires_at
+      self.expires_at ||= client.expires_at(:access_token)
       self.scopes ||= []
     end
   end

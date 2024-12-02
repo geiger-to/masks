@@ -4,69 +4,135 @@ module Masks
   class Actor < ApplicationRecord
     self.table_name = "masks_actors"
 
-    class << self
-      def from_login_email(email)
-        actor =
-          includes(:emails).where(
-            "emails.email" => email,
-            "emails.group" => Masks::Email::LOGIN_GROUP,
-          ).first
-        actor ||= Masks::Actor.new.tap { |a| a.emails.build(email:) }
-      end
-    end
+    EMAIL_ID = "email"
+    NICKNAME_ID = "nickname"
 
-    has_one_attached :avatar do |attachable|
-      attachable.variant :preview, resize_to_limit: [350, 350]
+    class << self
+      def from_login_email(address)
+        email = Masks::Email.for_login.where(address:).first
+        email&.actor || with_login_email(address)
+      end
+
+      def with_login_email(address)
+        Masks::Actor
+          .new(identifier: address)
+          .tap { |a| a.emails.build(address:).for_login }
+      end
     end
 
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
-    has_many :emails, class_name: "Masks::Email", autosave: true
+    has_many :emails, class_name: "Masks::Email"
+    has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
-    has_many :events, class_name: "Masks::Event"
     has_many :clients, class_name: "Masks::Client", through: :events
     has_many :devices,
              class_name: "Masks::Device",
              through: :events,
              autosave: true
 
+    has_many :login_links, class_name: "Masks::LoginLink", autosave: true
+    has_many :webauthn_credentials,
+             class_name: "Masks::WebauthnCredential",
+             autosave: true
+    has_many :otp_secrets, class_name: "Masks::OtpSecret", autosave: true
+
+    has_one_attached :avatar do |attachable|
+      attachable.variant :preview, resize_to_limit: [350, 350]
+    end
+
     has_secure_password validations: false
 
     attribute :signup
     attribute :session
-    attribute :totp_code
 
-    after_initialize :generate_key, unless: :key
+    after_initialize :generate_defaults
     before_validation :reset_version, unless: :version
 
+    validates :identifier_type, presence: true
     validates :nickname,
               uniqueness: true,
+              presence: true,
               format: {
                 with: /\A[a-z][a-z0-9\-]+\z/,
-              }
-    validates :password, length: { minimum: 8, maximum: 128 }, if: :password
-    validates :totp_secret, presence: true, if: :totp_code
+              },
+              if: :nickname_required?
     validates :version, presence: true
-    validate :validates_totp, if: :totp_code
-
-    before_save :regenerate_backup_codes
+    validate :validates_password, if: :password
+    validate :validates_backup_codes, if: :backup_codes
+    validates_associated :emails
 
     serialize :backup_codes, coder: JSON
 
     include Scoped
 
+    def tz
+      super || Masks.installation.settings["timezone"]
+    end
+
+    def session_key
+      version
+    end
+
+    def onboarded!
+      touch(:onboarded_at)
+    end
+
+    def onboarded?
+      onboarded_at
+    end
+
+    def unverified_email?
+      emails.verified_for_login.none?
+    end
+
+    def change_password(v)
+      return unless password_changeable?
+
+      self.password = v
+      self.password_changed_at = Time.now.utc
+    end
+
+    def password_changeable?
+      cooldown = Masks.setting(:passwords, :change_cooldown)
+
+      return true unless password_changed_at && cooldown
+
+      password_changed_at + ChronicDuration.parse(cooldown) < Time.now.utc
+    rescue => e
+      true
+    end
+
     def public_id
       key
     end
 
-    def identifier
+    def identifier_type
       if Masks.installation.nicknames? && nickname
-        nickname
-      elsif Masks.installation.emails? && login_email
-        login_email
+        NICKNAME_ID
+      elsif Masks.installation.emails? && login_email&.valid?
+        EMAIL_ID
       end
+    end
+
+    attr_writer :identifier
+
+    def identifier
+      @identifier ||=
+        begin
+          case identifier_type
+          when EMAIL_ID
+            login_email.address
+          when NICKNAME_ID
+            nickname
+          end
+        end
+    end
+
+    def avatar_created_at
+      avatar.created_at if avatar&.attached?
     end
 
     def avatar_url
@@ -78,11 +144,12 @@ module Masks
     end
 
     def identicon_id
-      @identicon_id ||= Digest::MD5.hexdigest("identicon-#{key}")
+      @identicon_id ||=
+        (Digest::MD5.hexdigest("identicon-#{identifier}") if identifier)
     end
 
     def login_email
-      emails.where(group: Masks::Email::LOGIN_GROUP).first
+      persisted? ? emails.for_login.first : emails.select(&:for_login?).first
     end
 
     def version_digest
@@ -95,16 +162,26 @@ module Masks
       key
     end
 
-    def factor2?
-      backup_codes.present?
+    def second_factor?
+      enabled_second_factor_at.present?
     end
 
-    def remove_factor2!
-      self.added_totp_secret_at = nil
-      self.saved_backup_codes_at = nil
-      self.totp_secret = nil
-      self.backup_codes = nil
-      save!
+    def review_second_factor?
+      second_factor? && !backup_codes&.any?
+    end
+
+    def enable_second_factor!
+      return if second_factors.none? || backup_codes&.blank?
+
+      touch(:enabled_second_factor_at)
+    end
+
+    def second_factors
+      @second_factors ||= [
+        *(phones.all.to_a),
+        *(webauthn_credentials.all.to_a),
+        *(otp_secrets.all.to_a),
+      ].compact
     end
 
     def logout_everywhere!
@@ -112,59 +189,81 @@ module Masks
       save!
     end
 
-    def totp_uri
-      (totp || random_totp).provisioning_uri(uuid)
+    def verify_backup_code(code)
+      return false unless code && backup_codes&.any?
+
+      hash = Digest::SHA256.hexdigest(code)
+
+      if backup_codes.include?(hash)
+        backup_codes.delete(hash)
+        save
+      end
     end
 
-    def totp_svg(**opts)
-      qrcode = RQRCode::QRCode.new(totp_uri)
-      qrcode.as_svg(**opts)
-    end
+    def save_backup_codes(codes)
+      @new_backup_codes = true
 
-    def totp
-      return unless totp_secret
+      self.backup_codes = codes
 
-      ROTP::TOTP.new(totp_secret, issuer: "TODO")
-    end
+      return unless valid?
 
-    def random_totp
-      ROTP::TOTP.new(random_totp_secret, issuer: "TODO")
-    end
+      self.saved_backup_codes_at = Time.now.utc
+      self.backup_codes = codes.map { |code| Digest::SHA256.hexdigest(code) }
 
-    def random_totp_secret
-      @random_totp_secret ||= ROTP::Base32.random
-    end
-
-    def should_save_backup_codes?
-      factor2? && saved_backup_codes_at.blank?
-    end
-
-    def saved_backup_codes?
-      factor2? && saved_backup_codes_at.present?
+      save
+    ensure
+      @new_backup_codes = false
     end
 
     private
 
-    def generate_key
-      self.key ||= SecureRandom.uuid
+    def nickname_required?
+      nickname || (Masks.installation.nicknames? && !Masks.installation.emails?)
     end
 
-    def validates_totp
-      errors.add(:totp_code, :invalid) unless totp.verify(totp_code)
+    def generate_defaults
+      self.key ||= SecureRandom.uuid
+      self.webauthn_id ||= WebAuthn.generate_user_id
     end
 
     def reset_version
       self.version = SecureRandom.hex
     end
 
-    def regenerate_backup_codes
-      if factor2?
-        self.backup_codes ||=
-          (1..12).to_h { |_i| [SecureRandom.base58(10), true] }
-      else
-        self.backup_codes = nil
-        self.saved_backup_codes_at = nil
+    def validates_length(value, key:, min:, max:)
+      return unless value
+
+      if min && value.length < min
+        errors.add(key, :too_short, count: min)
+      elsif max && value.length > max
+        errors.add(key, :too_long, count: max)
       end
+    end
+
+    def validates_password
+      opts = Masks.installation.passwords
+
+      return unless password && opts
+
+      validates_length(password, key: :password, **opts.slice(:min, :max))
+    end
+
+    def validates_backup_codes
+      opts = Masks.installation.backup_codes
+
+      return unless backup_codes && opts && @new_backup_codes
+
+      if opts[:total]
+        unless backup_codes.length == opts[:total]
+          errors.add(:backup_codes, :length, total: opts[:total])
+        end
+      end
+
+      validates_length(
+        backup_codes,
+        key: :backup_codes,
+        **opts.slice(:min, :max),
+      )
     end
   end
 end

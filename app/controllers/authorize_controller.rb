@@ -1,26 +1,37 @@
-class AuthorizeController < AuthorizedController
-  include HistoryHelper
-
+class AuthorizeController < ApplicationController
   def new
-    history.start!
+    gql =
+      MasksSchema.execute(
+        Masks.authenticate_gql,
+        variables: {
+          input: {
+          },
+        },
+        context: {
+          auth:,
+        },
+      )
 
-    @props = { section: "Authorize", auth: history_json }
+    auth = gql.as_json.dig("data", "authenticate").with_indifferent_access
 
-    unless history.error
-      @props[:auth_id] = history.auth_id
+    @props = { section: "Authorize", auth: }
+    @bg_dark = client&.bg_dark
+    @bg_light = client&.bg_light
 
-      headers["X-Masks-Auth-Id"] = history.auth_id
-    end
+    headers["X-Masks-Auth-Id"] = auth[:id] unless auth[:error]
 
     status =
-      case history.error
+      case auth[:error]
       when nil
         200
       else
         400
       end
 
-    respond_to { |format| format.html { render "app", status: } }
+    respond_to do |format|
+      format.html { render "app", status: }
+      format.json { render json: auth, status: }
+    end
   end
 
   private

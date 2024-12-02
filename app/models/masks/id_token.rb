@@ -41,7 +41,7 @@ module Masks
     private
 
     def generate_expires_at
-      self.expires_at ||= client.id_token_expires_at
+      self.expires_at ||= client.expires_at(:id_token)
     end
   end
 end

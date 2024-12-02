@@ -20,8 +20,6 @@ module Masks
 
     private
 
-    delegate :installation, to: Masks
-
     def disk_service
       ActiveStorage::Service.configure(
         :disk,

@@ -1,10 +1,12 @@
 import "./app.css";
 
-import AppComponent from "../components/AppComponent.svelte";
+import App from "@/App.svelte";
+import Page from "@/authenticate/Page.svelte";
+import { mount } from "svelte";
 
 const target = document.getElementById("app");
 
-new AppComponent({
+mount(App, {
   target: target,
-  props: window.APP,
+  props: { ...window.APP, Component: Page },
 });

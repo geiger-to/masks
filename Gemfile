@@ -58,3 +58,27 @@ gem "csv", "~> 3.3"
 gem "recursive-open-struct", "~> 2.0"
 
 gem "image_processing", "~> 1.13"
+
+gem "geocoder", "~> 1.8"
+
+gem "letter_opener", "~> 1.10"
+
+gem "premailer-rails", "~> 1.12"
+
+gem "apollo_upload_server", "~> 2.1"
+
+gem "webauthn", "~> 3.1"
+
+gem "fido_metadata",
+    git: "https://github.com/bdewater/fido_metadata",
+    branch: "main"
+
+gem "twilio-ruby", "~> 7.3"
+
+gem "dotenv", groups: %i[development test]
+
+gem "phonelib", "~> 0.9.3"
+
+gem "fuzzyurl", "~> 0.9.0"
+
+gem "validate_url", "~> 1.0"

@@ -10,11 +10,17 @@ module Masks
     end
 
     def masks_manager?
-      scopes.include?(MANAGE)
+      scopes_a.include?(MANAGE)
     end
 
     def scopes_a
-      scopes.split("\n").map { |line| line.split(" ") }.flatten.compact
+      scopes
+        .split("\n")
+        .map { |line| line.split(" ") }
+        .flatten
+        .compact
+        .uniq
+        .sort
     end
 
     def scope?(scope)

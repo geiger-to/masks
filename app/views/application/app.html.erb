@@ -1,4 +1,16 @@
-<%= content_tag :div, "", id: "app", class: 'h-full', data: @props %>
+<style>
+  .background {
+    <%= @bg_light ||Masks.setting(:light, :bg) %>
+  }
+
+@media (prefers-color-scheme: dark) {
+  .background {
+    <%= @bg_dark || Masks.setting(:dark, :bg) %>
+  }
+}
+</style>
+
+<%= content_tag :div, "", id: "app", class: 'h-full' %>
 
 <%= javascript_tag("window.APP = #{props_json}") %>
 
