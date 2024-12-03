@@ -344,7 +344,7 @@ GEM
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
     pg (1.5.9)
-    phonelib (0.9.3)
+    phonelib (0.10.1)
     premailer (1.27.0)
       addressable
       css_parser (>= 1.19.0)
@@ -602,7 +602,7 @@ DEPENDENCIES
   letter_opener (~> 1.10)
   openid_connect (~> 2.3)
   pg (~> 1.1)
-  phonelib (~> 0.9.3)
+  phonelib (~> 0.10.1)
   premailer-rails (~> 1.12)
   prettier_print (~> 1.2)
   puma (>= 5.0)
