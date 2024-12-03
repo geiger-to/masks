@@ -26,6 +26,7 @@ module Masks
                :prompt=,
                :state,
                :rails_session,
+               :install,
                to: :auth
 
       delegate :attempt_bag,

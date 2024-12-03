@@ -52,5 +52,9 @@ module Types
     def lifetime_types
       Masks::Client::LIFETIME_COLUMNS.map { |c| c.to_s.camelize(:lower) }
     end
+
+    def allow_login_links
+      object.login_links?
+    end
   end
 end

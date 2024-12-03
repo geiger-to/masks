@@ -26,6 +26,10 @@ module Masks
                 in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name },
               }
 
+    def enabled?(key)
+      setting(key, :enabled)
+    end
+
     def favicon_url
       url_helpers.rails_storage_proxy_url(favicon) if favicon.attached?
     end
@@ -47,7 +51,7 @@ module Masks
       (settings.dig("authorize", "delay")&.to_i || 0)
     end
 
-    %i[name url timezone region theme].each do |key|
+    %i[name url timezone region theme storage integration].each do |key|
       define_method key do
         setting(key)
       end
@@ -67,6 +71,10 @@ module Masks
 
     def sms_codes
       setting(:sms_codes, default: { enabled: false })
+    end
+
+    def sms_codes?
+      sms_codes["enabled"]
     end
 
     def totp_codes
@@ -115,7 +123,7 @@ module Masks
     end
 
     def emails?
-      setting("emails", "enabled")
+      setting(:emails, :enabled)
     end
 
     def login_links

@@ -78,6 +78,18 @@
 
   <label class="label cursor-pointer pl-0">
     <div class="flex flex-col gap-1">
+      <span class="label-text"> Login links </span>
+    </div>
+    <input
+      type="checkbox"
+      class="toggle toggle-xs"
+      checked={settings.loginLinks.enabled}
+      onclick={(e) => change({ loginLinks: { enabled: e.target.checked } })}
+    />
+  </label>
+
+  <label class="label cursor-pointer pl-0">
+    <div class="flex flex-col gap-1">
       <span class="label-text">
         Hardware keys <i>(Webauthn)</i>
       </span>

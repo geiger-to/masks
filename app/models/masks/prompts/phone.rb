@@ -3,6 +3,10 @@ module Masks
     class Phone < SecondFactor
       checks "second-factor"
 
+      def enabled?
+        super && install.enabled?(:sms_codes)
+      end
+
       event "phone:verify" do
         next warn! "invalid-phone" unless phone.valid?
 
@@ -11,7 +15,7 @@ module Masks
         if phone.verify_code(code)
           checked! "second-factor", with: :sms_code
         else
-          warn! "invalid-code:#{code || ""}"
+          warn! "invalid-code", code
         end
       end
 

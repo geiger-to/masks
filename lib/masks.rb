@@ -4,6 +4,7 @@ require_relative "masks/version"
 require_relative "masks/fido"
 require_relative "masks/timing"
 require_relative "masks/scopes"
+require_relative "masks/mailer"
 
 # Top-level module for masks.
 module Masks

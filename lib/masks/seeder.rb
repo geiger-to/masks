@@ -66,7 +66,7 @@ module Masks
             scopes: {
               required: [Masks::Scoped::MANAGE],
             },
-            redirect_uris: "/manage*",
+            redirect_uris: "/manage\n/manage*",
             fuzzy_redirect_uri: true,
           )
         seed_client(

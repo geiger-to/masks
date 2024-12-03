@@ -3904,6 +3904,11 @@ input.tab:checked + .tab-content,
   margin-bottom: -0.75rem;
 }
 
+.mx-0\.5 {
+  margin-left: 0.125rem;
+  margin-right: 0.125rem;
+}
+
 .mx-1\.5 {
   margin-left: 0.375rem;
   margin-right: 0.375rem;
@@ -3937,6 +3942,11 @@ input.tab:checked + .tab-content,
 .my-6 {
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
+}
+
+.my-2 {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .-ml-1 {
@@ -4041,6 +4051,14 @@ input.tab:checked + .tab-content,
 
 .mt-\[5px\] {
   margin-top: 5px;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.mb-1 {
+  margin-bottom: 0.25rem;
 }
 
 .block {
@@ -5666,16 +5684,17 @@ input.no-inc[type="number"] {
     margin-right: -2rem;
   }
 
+  .md\:mx-1 {
+    margin-left: 0.25rem;
+    margin-right: 0.25rem;
+  }
+
   .md\:mb-1 {
     margin-bottom: 0.25rem;
   }
 
   .md\:mb-6 {
     margin-bottom: 1.5rem;
-  }
-
-  .md\:ml-1 {
-    margin-left: 0.25rem;
   }
 
   .md\:mt-0 {
@@ -5718,6 +5737,18 @@ input.no-inc[type="number"] {
     flex-direction: row;
   }
 
+  .md\:flex-col {
+    flex-direction: column;
+  }
+
+  .md\:items-start {
+    align-items: flex-start;
+  }
+
+  .md\:items-end {
+    align-items: flex-end;
+  }
+
   .md\:items-center {
     align-items: center;
   }
@@ -5732,6 +5763,10 @@ input.no-inc[type="number"] {
 
   .md\:p-3 {
     padding: 0.75rem;
+  }
+
+  .md\:p-6 {
+    padding: 1.5rem;
   }
 
   .md\:px-1\.5 {
