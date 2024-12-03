@@ -42,9 +42,14 @@ module Masks
     # config.time_zone = "Central Time (US & Canada)"
     config.eager_load_paths << Rails.root.join("app/prompts")
 
-    # Used for file storage—avatars.
+    # Used for file storage—avatars, logos, and other uploads.
     config.active_storage.service = "masks"
     config.active_job.queue_adapter = :good_job unless Rails.env.test?
+
+    # Use a custom delivery_method, which allows switching
+    # between methods and dynamic configuration from
+    # the Masks::Installation.
+    config.action_mailer.delivery_method = Masks::Mailer
 
     # Used for signing values, cookies, etc
     credentials.secret_key_base = Masks.env.secret_key if Masks

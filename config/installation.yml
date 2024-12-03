@@ -1,3 +1,35 @@
+integration: &integration
+  email: "<%= ENV['MASKS_EMAIL_INTEGRATION'] || 'smtp' %>"
+  phone: "<%= ENV['MASKS_PHONE_INTEGRATION'] || 'twilio' %>"
+  storage: "<%= ENV['MASKS_STORAGE_INTEGRATION'] || 'disk' %>"
+  sendmail: {}
+  smtp:
+    address: <%= ENV['MASKS_SMTP_ADDRESS'] %>
+    port: <%= ENV['MASKS_SMTP_PORT'] %>
+    domain: <%= ENV['MASKS_SMTP_DOMAIN'] %>
+    user_name: <%= ENV['MASKS_SMTP_USER_NAME'] %>
+    password: <%= ENV['MASKS_SMTP_PASSWORD'] %>
+    authentication: <%= ENV['MASKS_SMTP_MODE'] %>
+  twilio:
+    account_sid: <%= ENV['TWILIO_ACCOUNT_SID'] %>
+    auth_token: <%= ENV['TWILIO_AUTH_TOKEN'] %>
+    service_sid: <%= ENV['TWILIO_SERVICE_SID'] %>
+  disk:
+    root: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('storage') %>"
+  s3:
+    access_key_id: <%= ENV['MASKS_AWS_KEY_ID'] %>
+    secret_access_key: <%= ENV['MASKS_AWS_SECRET'] %>
+    region: <%= ENV['MASKS_AWS_BUCKET'] || 'us-east-1' %>
+    bucket: <%= ENV['MASKS_AWS_BUCKET'] %>
+  gcs:
+    project: <%= ENV['MASKS_GCS_PROJECT'] %>
+    credentials: <%= ENV['MASKS_GCS_KEYFILE'] %>
+    bucket: <%= ENV['MASKS_GCS_BUCKET'] %>
+  azure_storage:
+    storage_account_name: <%= ENV['MASKS_AZURE_ACCOUNT'] %>
+    storage_access_key: <%= ENV['MASKS_AZURE_KEY'] %>
+    container: <%= ENV['MASKS_AZURE_CONTAINER'] %>
+
 default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
@@ -122,38 +154,16 @@ default: &default
   emails:
     enabled: true
     max_for_login: 5
-  sendmail:
-    location: ~
-  twilio:
-    account_sid: <%= ENV['TWILIO_ACCOUNT_SID'] %>
-    auth_token: <%= ENV['TWILIO_AUTH_TOKEN'] %>
-    service_sid: <%= ENV['TWILIO_SERVICE_SID'] %>
-  smtp:
-    address: <%= ENV['MASKS_SMTP_ADDRESS'] %>
-    port: <%= ENV['MASKS_SMTP_PORT'] %>
-    domain: <%= ENV['MASKS_SMTP_DOMAIN'] %>
-    user_name: <%= ENV['MASKS_SMTP_USER_NAME'] %>
-    password: <%= ENV['MASKS_SMTP_PASSWORD'] %>
-    authentication: <%= ENV['MASKS_SMTP_MODE'] %>
-  storage:
-    dir: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('storage') %>"
-    s3:
-      access_key_id: <%= ENV['MASKS_AWS_KEY_ID'] %>
-      secret_access_key: <%= ENV['MASKS_AWS_SECRET'] %>
-      region: <%= ENV['MASKS_AWS_BUCKET'] || 'us-east-1' %>
-      bucket: <%= ENV['MASKS_AWS_BUCKET'] %>
-    gcs:
-      project: <%= ENV['MASKS_GCS_PROJECT'] %>
-      credentials: <%= ENV['MASKS_GCS_KEYFILE'] %>
-      bucket: <%= ENV['MASKS_GCS_BUCKET'] %>
-    azure:
-      storage_account_name: <%= ENV['MASKS_AZURE_ACCOUNT'] %>
-      storage_access_key: <%= ENV['MASKS_AZURE_KEY'] %>
-      container: <%= ENV['MASKS_AZURE_CONTAINER'] %>
+  integration:
+    <<: *integration
 
 development:
   <<: *default
   url: "http://localhost:1111"
+  integration:
+    <<: *integration
+    email: "dev"
+    storage: "disk"
   manager:
     nickname: manager
     email: masks@example.com
@@ -166,6 +176,11 @@ test:
     nickname: manager
     email: masks@example.com
     password: password
+  integration:
+    <<: *integration
+    email: "test"
+    storage: "disk"
+    phone: "test"
 
 production:
   <<: *default

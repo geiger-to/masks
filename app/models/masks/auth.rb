@@ -109,7 +109,7 @@ module Masks
         warnings:,
         extras:,
         scopes:,
-        settings: Masks.installation.public_settings,
+        settings: install.public_settings,
       }.merge(state.settlement || {})
     end
 
@@ -138,6 +138,10 @@ module Masks
 
     def prompt_for(cls)
       prompts.fetch(cls.to_s)
+    end
+
+    def install
+      @install ||= Masks.installation.reload
     end
 
     private

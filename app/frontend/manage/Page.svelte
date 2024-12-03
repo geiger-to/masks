@@ -331,7 +331,7 @@
     </div>
   </div>
 
-  <div class={`bg-base-300 text-base-content shadow-inner p-6 mb-6`}>
+  <div class={`bg-base-300 text-base-content shadow-inner p-1.5 md:p-6 mb-6`}>
     {#if isLoading || loading}
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-4">

@@ -73,6 +73,7 @@
               backupCodes
               checks
               clients
+              integration
               createdAt
               updatedAt
             }
@@ -101,6 +102,7 @@
       original = data.install;
       install = _.cloneDeep(data.install);
       changes = {};
+      change({});
       loading = false;
     });
   };

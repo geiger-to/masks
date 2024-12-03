@@ -7,15 +7,13 @@ module Masks
     belongs_to :actor
 
     def send_code
-      send_via_twilio if twilio
+      integration.notify
     end
 
     def verify_code(code)
       return unless valid?
 
-      verified = verify_via_twilio(code) if twilio
-
-      if verified
+      if integration.verify(code)
         self.verified_at = Time.now.utc
         save
       end
@@ -29,41 +27,16 @@ module Masks
 
     private
 
-    def twilio
-      account_sid = Masks.setting(:twilio, :account_sid)
-      auth_token = Masks.setting(:twilio, :auth_token)
-
-      @twilio ||=
-        Twilio::REST::Client.new(account_sid, auth_token) if account_sid &&
-        auth_token
-    end
-
-    def send_via_twilio
-      @verification ||=
-        twilio
-          .verify
-          .v2
-          .services(service_sid)
-          .verifications
-          .create(to: number, channel: "sms")
-
-      @verification.status == "pending"
-    end
-
-    def verify_via_twilio(code)
-      @check ||=
-        twilio
-          .verify
-          .v2
-          .services(service_sid)
-          .verification_checks
-          .create(to: number, code:)
-
-      @check.status == "approved"
-    end
-
-    def service_sid
-      Masks.setting(:twilio, :service_sid)
+    def integration
+      @integration ||=
+        case Masks.setting(:integration, :phone)
+        when "twilio"
+          Masks::Integration::TwilioPhone.new(self)
+        when "test"
+          Masks::Integration::TestPhone.new(self)
+        else
+          Masks::Integration::NilPhone.new(self)
+        end
     end
   end
 end

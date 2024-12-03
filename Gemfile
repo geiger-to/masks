@@ -82,3 +82,7 @@ gem "phonelib", "~> 0.10.1"
 gem "fuzzyurl", "~> 0.9.0"
 
 gem "validate_url", "~> 1.0"
+
+gem "vcr", "~> 6.3"
+
+gem "webmock", "~> 3.24"

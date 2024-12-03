@@ -32,7 +32,6 @@
       type="checkbox"
       class="toggle toggle-xs"
       checked={settings.clients.allowLoginLinks}
-      disabled={!settings.emails.enabled}
       onclick={(e) =>
         change({ clients: { allowLoginLinks: e.target.checked } })}
     />
