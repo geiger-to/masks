@@ -50,12 +50,7 @@ module Masks
     # between methods and dynamic configuration from
     # the Masks::Installation.
     config.action_mailer.delivery_method = Masks::Mailer
-
-    # Used for signing values, cookies, etc
-    credentials.secret_key_base = Masks.env.secret_key if Masks
-      .env
-      .secret_key
-      &.present?
+    config.secret_key_base = Masks.keys.secret_key
 
     def fake_key
       "masks-#{Rails.env}" unless Rails.env.production?
@@ -63,10 +58,10 @@ module Masks
 
     # Used for ActiveRecord models that encrypt and secure data
     config.active_record.encryption.primary_key =
-      Masks.env.encryption_key&.presence || fake_key
+      Masks.keys.encryption_key&.presence || fake_key
     config.active_record.encryption.deterministic_key =
-      Masks.env.deterministic_key&.presence || fake_key
+      Masks.keys.deterministic_key&.presence || fake_key
     config.active_record.encryption.key_derivation_salt =
-      Masks.env.salt&.presence || fake_key
+      Masks.keys.salt&.presence || fake_key
   end
 end

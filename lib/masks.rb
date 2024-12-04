@@ -5,6 +5,7 @@ require_relative "masks/fido"
 require_relative "masks/timing"
 require_relative "masks/scopes"
 require_relative "masks/mailer"
+require_relative "masks/private_key"
 
 # Top-level module for masks.
 module Masks
@@ -66,6 +67,10 @@ module Masks
       Timing.new
     end
 
+    def keys
+      @keys ||= PrivateKey.new(env)
+    end
+
     def min_runtime(*args, **opts, &block)
       time.min_time(*args, **opts, &block)
     end
@@ -114,6 +119,7 @@ module Masks
       @prompts = nil
       @installation = nil
       @authenticate_gql = nil
+      @key = nil
       @env = nil
     end
 

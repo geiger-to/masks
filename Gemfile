@@ -86,3 +86,5 @@ gem "validate_url", "~> 1.0"
 gem "vcr", "~> 6.3"
 
 gem "webmock", "~> 3.24"
+
+gem "foreman", "~> 0.88.1"

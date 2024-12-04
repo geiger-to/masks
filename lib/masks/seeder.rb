@@ -49,25 +49,30 @@ module Masks
     end
 
     def seed_env!
+      self.manager = seed_manager if install.manager?
+      self.manage_client =
+        seed_client(
+          type: "internal",
+          key: Masks::Client::MANAGE_KEY,
+          name: "Manage masks",
+          scopes: {
+            required: [Masks::Scoped::MANAGE],
+          },
+          redirect_uris: "/manage\n/manage*",
+          fuzzy_redirect_uri: true,
+        )
+
+      seed_attached(install, :light_logo, "app/assets/images/masks.png")
+      seed_attached(install, :dark_logo, "app/assets/images/masks.png")
+      seed_attached(install, :favicon, "app/assets/images/masks.png")
+
       case Rails.env.to_sym
       when :development, :test
-        self.manager = seed_manager
         self.tester =
           seed_actor(
             nickname: "tester",
             password: "password",
             email: "test@example.com",
-          )
-        self.manage_client =
-          seed_client(
-            type: "internal",
-            key: Masks::Client::MANAGE_KEY,
-            name: "Manage masks",
-            scopes: {
-              required: [Masks::Scoped::MANAGE],
-            },
-            redirect_uris: "/manage\n/manage*",
-            fuzzy_redirect_uri: true,
           )
         seed_client(
           type: "confidential",
@@ -83,10 +88,6 @@ module Masks
           redirect_uris: "http://localhost:1111/test",
           checks: %w[device credentials client-consent],
         )
-
-        seed_attached(install, :light_logo, "app/assets/images/masks.png")
-        seed_attached(install, :dark_logo, "app/assets/images/masks.png")
-        seed_attached(install, :favicon, "app/assets/images/masks.png")
       end
     end
   end
