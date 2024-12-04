@@ -16,7 +16,7 @@ class TotpCodeTest < MasksTestCase
               secret: "JBSWY3DPEHPK3PXP",
               code: "247085",
             }
-    assert seeder.manager.otp_secrets.count == 0
+    assert manager.otp_secrets.count == 0
     assert_warning "invalid-code:247085"
 
     attempt event: "totp:verify",
@@ -24,7 +24,7 @@ class TotpCodeTest < MasksTestCase
               secret: "JBSWY3DPEHPK3PXP",
               code: "247086",
             }
-    assert seeder.manager.otp_secrets.count == 1
+    assert manager.otp_secrets.count == 1
   end
 
   test "saved secrets can be used after verification" do
@@ -33,7 +33,7 @@ class TotpCodeTest < MasksTestCase
     log_in "manager"
     assert_prompt "second-factor"
 
-    id = seeder.manager.otp_secrets.first.public_id
+    id = manager.otp_secrets.first.public_id
 
     travel_to Time.parse("2024-11-17T20:12:35+0000") do
       attempt event: "totp:verify", updates: { id:, code: "789355" }
@@ -55,7 +55,7 @@ class TotpCodeTest < MasksTestCase
                 secret: "JBSWY3DPEHPK3PXP",
                 code: "247086",
               }
-      assert seeder.manager.otp_secrets.count == 1
+      assert manager.otp_secrets.count == 1
       assert_warning "invalid-totp"
     end
   end
@@ -69,7 +69,7 @@ class TotpCodeTest < MasksTestCase
               code: "247086",
             }
 
-    assert secret = seeder.manager.otp_secrets.first
+    assert secret = manager.otp_secrets.first
 
     attempt event: "totp:name",
             updates: {

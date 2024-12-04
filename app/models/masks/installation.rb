@@ -36,15 +36,23 @@ module Masks
     end
 
     def favicon_url
-      url_helpers.rails_storage_proxy_url(favicon) if favicon.attached?
+      return url_helpers.rails_storage_proxy_url(favicon) if favicon.attached?
+
+      setting(:theme, :favicon_url)
     end
 
     def light_logo_url
-      url_helpers.rails_storage_proxy_url(light_logo) if light_logo.attached?
+      if light_logo.attached?
+        return url_helpers.rails_storage_proxy_url(light_logo)
+      end
+
+      setting(:theme, :light_logo_url)
     end
 
     def dark_logo_url
       url_helpers.rails_storage_proxy_url(dark_logo) if dark_logo.attached?
+
+      setting(:theme, :dark_logo_url)
     end
 
     def setting(*names, default: nil)
@@ -96,16 +104,16 @@ module Masks
 
     def backup_codes
       {
-        min: setting("backup_codes", "min", default: 8),
-        max: setting("backup_codes", "max", default: 100),
+        min_chars: setting("backup_codes", "min_chars", default: 8),
+        max_chars: setting("backup_codes", "max_chars", default: 100),
         total: setting("backup_codes", "total", default: 10),
       }
     end
 
     def passwords
       {
-        min: setting("passwords", "min", default: 8),
-        max: setting("passwords", "max", default: 100),
+        min_chars: setting("passwords", "min_chars", default: 8),
+        max_chars: setting("passwords", "max_chars", default: 100),
       }
     end
 
@@ -158,6 +166,8 @@ module Masks
 
     def seed!
       save!
+
+      seeds.import!
     end
 
     def public_settings

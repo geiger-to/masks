@@ -7,8 +7,7 @@ services:
       - "1111:1111"
     environment:
       MASKS_URL: https://masks.localhost
-      MASKS_MANAGER_EMAIL: "masks@example.com"
-      MASKS_MANAGER_PASSWORD: "password"
+      MASKS_MANAGER_PASSWORD: password
       DATABASE_URL: postgres://masks:masks@db:5432/masks
       REDIS_URL: redis://redis:6379/1
     volumes:

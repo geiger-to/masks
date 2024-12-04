@@ -11,7 +11,7 @@ class BackupCodeTest < MasksTestCase
     attempt event: "backup-codes:replace", updates: { codes: %w[test test] }
 
     assert_equal 2, auth_result[:warnings].length
-    assert_predicate seeder.manager.reload.backup_codes, :blank?
+    assert_predicate manager.reload.backup_codes, :blank?
     assert_not auth_result.dig(:actor, :savedBackupCodesAt)
 
     attempt event: "backup-codes:replace",
@@ -20,13 +20,13 @@ class BackupCodeTest < MasksTestCase
             }
 
     assert auth_result.dig(:actor, :savedBackupCodesAt)
-    assert_predicate seeder.manager.reload.backup_codes, :present?
+    assert_predicate manager.reload.backup_codes, :present?
   end
 
   test "backup codes can be used in lieu of other 2fa options" do
     codes = Array.new(10) { SecureRandom.uuid }
     setup_totp "manager"
-    seeder.manager.save_backup_codes(codes)
+    manager.save_backup_codes(codes)
     log_in "manager"
 
     attempt event: "backup-code:verify", updates: { code: codes.first }
@@ -46,7 +46,7 @@ class BackupCodeTest < MasksTestCase
   test "backup codes must be replaced after using the last one" do
     codes = Array.new(10) { SecureRandom.uuid }
     setup_totp "manager"
-    actor = seeder.manager.reload
+    actor = manager.reload
     actor.save_backup_codes(codes)
     actor.update(backup_codes: [actor.backup_codes.first])
 

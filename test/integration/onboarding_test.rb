@@ -34,9 +34,9 @@ class OnboardingTest < MasksTestCase
               password: "testing123",
             }
 
-    assert_equal "tester", seeder.manager.reload.name
-    assert seeder.manager.authenticate("testing123")
-    assert_not seeder.manager.authenticate("password")
+    assert_equal "tester", manager.reload.name
+    assert manager.authenticate("testing123")
+    assert_not manager.authenticate("password")
   end
 
   test "onboarding allows password changes after a cooldown period" do
@@ -45,14 +45,14 @@ class OnboardingTest < MasksTestCase
     attempt event: "onboard:profile", updates: { password: "testing123" }
     attempt event: "onboard:profile", updates: { password: "testing456" }
 
-    assert seeder.manager.reload.authenticate("testing123")
+    assert manager.reload.authenticate("testing123")
 
     travel ChronicDuration.parse(Masks.setting(:passwords, :change_cooldown))
     travel 1.second
 
     attempt event: "onboard:profile", updates: { password: "testing456" }
 
-    assert seeder.manager.reload.authenticate("testing456")
+    assert manager.reload.authenticate("testing456")
   end
 
   test "onboarding allows adding login emails" do
@@ -60,11 +60,11 @@ class OnboardingTest < MasksTestCase
 
     log_in "manager"
 
-    assert_not seeder.manager.emails.for_login.find_by(address: email)
+    assert_not manager.emails.for_login.find_by(address: email)
 
     attempt event: "onboard-email:add", updates: { email: }
 
-    assert seeder.manager.emails.for_login.find_by(address: email)
+    assert manager.emails.for_login.find_by(address: email)
   end
 
   test "onboarding warns when adding invalid emails" do
@@ -82,7 +82,7 @@ class OnboardingTest < MasksTestCase
 
     log_in "manager"
 
-    email = seeder.manager.emails.for_login.find_by(address:)
+    email = manager.emails.for_login.find_by(address:)
 
     attempt event: "onboard-email:verify", updates: { email: address }
     attempt event: "onboard-email:verify", updates: { email: address }
@@ -97,7 +97,7 @@ class OnboardingTest < MasksTestCase
 
     log_in "manager"
 
-    email = seeder.manager.emails.for_login.find_by(address:)
+    email = manager.emails.for_login.find_by(address:)
     assert_not email.verified?
 
     assert_equal 0, email.login_links.active.for_verification.count
@@ -129,7 +129,7 @@ class OnboardingTest < MasksTestCase
               email: address,
             }
 
-    email = seeder.manager.emails.for_login.find_by(address:)
+    email = manager.emails.for_login.find_by(address:)
 
     assert_warning "invalid-code:invalid"
 

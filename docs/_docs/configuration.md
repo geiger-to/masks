@@ -3,122 +3,212 @@ category: guides
 title: Configuration
 description: how to configure masks
 toc: true
+order: -2
 ---
 
-You can run masks as a standalone container or inside your Rails app. Either
-way, masks expects at least some of the following to run properly:
+Although masks will boot without any configuration, you will likely need to
+make some changes to suit your specific setup. Configuration can be supplied
+using `ENV` variables and/or a `masks.yml` file.
 
-- A `PostgreSQL`, `SQLite`, or `MySQL` database
-- `SMTP` credentials or a working `sendmail` for email
-- Disk-space or an `S3` bucket for avatar storage
-- A reasonably fast `Linux` or `MacOS` machine
-- An optional `redis` for caching and queuing
+## masks.yml
 
-## Docker
+All of the settings outlined below can be overridden in your `masks.yml`. You
+can view all of the defaults in the [masks source code](#).
 
-### [`docker.io/geigerto/masks`](https://hub.docker.com/r/geigerto/masks)
+{% capture masks_yml_info %}
+<span>
+<b class="text-warning">Note:</b> Most settings in your <code>masks.yml</code>
+are only applied on initial setup. They will not override any changes made
+after installation.
+</span>
+{% endcapture %}
 
-Take a look at the sample `compose.yml` files for examples.
+{% include alert.html class="" content=masks_yml_info %}
 
-### Environment variables
+## Environment variables
 
-The following environment variables _must_ be set:
+There are a few settings that are only controlled with environment variables:
 
-#### `PORT` 1111
+| name            | description                   | default          |
+| --------------- | ----------------------------- | ---------------- |
+| `MASKS_YML`     | path to `masks.yml`           | /masks/masks.yml |
+| `MASKS_PORT`    | port for the web server       | 1111             |
+| `MASKS_THREADS` | number of threads per process | 5                |
 
-#### `MASKS_URL` http://localhost:1111
+---
 
-#### `MASKS_DATABASE_URL` sqlite3://db/production.sqlite
+## Minimal settings
 
-#### `MASKS_KEY`
+At minimum, provide the name and public URL of your installation, along with
+any settings required to access dependencies like the database and redis.
 
-The rest are optional:
+| name     | ENV var        | default                |
+| -------- | -------------- | ---------------------- |
+| url      | `MASKS_URL`    | https://localhost:1111 |
+| name     | `MASKS_NAME`   | masks                  |
+| timezone | `MASKS_TZ`     | America/New_York       |
+| region   | `MASKS_REGION` | US                     |
 
-#### `MASKS_ENCRYPTION_KEY`
+{% capture masks_yml_info %}
+<span>
+<b class="text-warning">Note</b> To change your installation url after
+initial setup, change it in your <code>masks.yml</code> or with the
+<code>MASKS_URL</code> var, then re-deploy. Cookies and devices will be
+lost if the domain changes.
+</span>
+{% endcapture %}
 
-#### `MASKS_DETERMINISTIC_KEY`
+{% include alert.html class="" content=masks_yml_info %}
 
-#### `MASKS_SALT`
+### Database
 
-#### `MASKS_STORAGE` disk
+The following database adapters are supported:
 
-#### `MASKS_STORAGE_DIR` ./storage
+- PostgreSQL: `db.adapter=postgresql`
+- SQLite: `db.adapter=sqlite3`
 
-#### `MASKS_LOG_LEVEL` info
+A redis is recommended, especially if you're not using PostgreSQL. It will be
+used for caching and background work.
 
-#### `MASKS_AWS_BUCKET`
+| name       | ENV var            | default                                         |
+| ---------- | ------------------ | ----------------------------------------------- |
+| redis.url  | `REDIS_URL`        |                                                 |
+| db.url     | `DATABASE_URL`     |                                                 |
+| db.adapter | `MASKS_DB_ADAPTER` | `sqlite3` unless specified via the `url`        |
+| db.name    | `MASKS_DB_NAME`    | `masks_production` or `data/production.sqlite3` |
 
-#### `MASKS_AWS_KEY_ID`
+### Default data
 
-#### `MASKS_AWS_SECRET`
+The first time masks boots it will populate the database with default data, including:
 
-#### `MASKS_GCS_PROJECT`
+- a [management client](clients.html#management-client)
+- a default manager (if specified)
+- any seed data found in `seeds`/`MASKS_SEEDS` directory
+- settings, populated from `ENV` and `masks.yml`
 
-#### `MASKS_GCS_BUCKET`
+| name             | ENV var                  | default |
+| ---------------- | ------------------------ | ------- |
+| seeds            | `MASKS_SEEDS`            |
+| manager.nickname | `MASKS_MANAGER_NICKNAME` | manager |
+| manager.password | `MASKS_MANAGER_PASSWORD` |
+| manager.email    | `MASKS_MANAGER_EMAIL`    |
+| manager.nickname | `MASKS_MANAGER_NICKNAME` |
+| manager.password | `MASKS_MANAGER_PASSWORD` |
 
-#### `MASKS_GCS_KEYFILE`
+You can disable this behaviour with the `SKIP_MIGRATIONS` environment variable.
 
-#### `MASKS_AZURE_ACCOUNT`
+## Advanced settings
 
-#### `MASKS_AZURE_KEY`
+### Feature toggles
 
-#### `MASKS_AZURE_CONTAINER`
+You can customize some of the features available to end-users depending on your use-case:
 
-#### `MASKS_SENDMAIL`
+| name                   | default                |
+| ---------------------- | ---------------------- |
+| nicknames.enabled      | true                   |
+| emails.enabled         | true                   |
+| emails.max_for_login   | 5                      |
+| passwords.min_chars    | 8                      |
+| passwords.max_chars    | 100                    |
+| passkeys.enabled       | true                   |
+| login_links.enabled    | true                   |
+| totp_codes.enabled     | true                   |
+| sms_codes.enabled      | true                   |
+| webauthn.enabled       | true                   |
+| webauthn.rp_name       | `name` or `MASKS_NAME` |
+| backup_codes.min_chars | 8                      |
+| backup_codes.max_chars | 100                    |
+| backup_codes.total     | 10                     |
 
-#### `MASKS_SMTP_ADDRESS`
+### Encryption
 
-#### `MASKS_SMTP_USER_NAME`
+A `private_key`—stored on the filesystem—is used to encrypt and hash data
+stored in masks. Additional keys are derived from the private key if they are
+not supplied.
 
-#### `MASKS_SMTP_PASSWORD`
+| name              | ENV var                   | default                    |
+| ----------------- | ------------------------- | -------------------------- |
+| private_key       | `MASKS_PRIVATE_KEY`       | ./data/private.key         |
+| secret_key        | `MASKS_SECRET_KEY`        | _derived from private key_ |
+| encryption_key    | `MASKS_ENCRYPTION_KEY`    | _derived from private key_ |
+| deterministic_key | `MASKS_DETERMINISTIC_KEY` | _derived from private key_ |
+| salt              | `MASKS_SALT`              | _derived from private key_ |
 
-#### `MASKS_SMTP_PORT`
+A private key will be created and saved automatically on first boot. If you're
+using `docker compose`, make sure to store it on a local volume (along with
+other masks data). For example:
 
-#### `MASKS_SMTP_DOMAIN`
-
-#### `MASKS_SMTP_MODE`
-
-### Container
-
-```
-version: "3"
-
+```yml
+# docker-compose.yml
 services:
   masks:
-    image: docker.io/masks/masks:latest
+    ...
     volumes:
-      - /path/to/data:/masks/storage
-      - /path/to/db:/masks/db
-    restart: "unless-stopped"
-    environment:
-      MASKS_URL: https://masks.example.com
-      MASKS_KEY: secret
-    ports:
-      - "1111:1111"
+      - /example/masks/data:/masks/data
 ```
 
-## Rails engine
+### Theming
 
-When installed as a Rails engine masks can be configured using
-a `config/masks.yml` file. Anything found in this file will
-be
-ruby and an initiailizer:
+Masks can be customized with your organization's name, branding, and more.
 
-```ruby
-# config/initializers/masks.rb
-Masks.configure do |masks|
-  masks.url =
-end
-```
+| name                 | ENV var      | default |
+| -------------------- | ------------ | ------- |
+| theme.url            |              |         |
+| theme.name           | `MASKS_NAME` | masks   |
+| theme.light_logo_url |              |         |
+| theme.dark_logo_url  |              |         |
+| theme.favicon_url    |              |         |
 
-## Web-based
+Take a look at client configuration to customize the look and feel of client interactions.
 
-After installation, much of masks can be configured using its
-web-based management interface. With it you can add actors,
-clients, change settings, and more.
+### Clients
 
-### GraphQL API
+Take a look at the [guide to clients](clients.html#defaults) for information on
+the default settings for clients. Like most configuration, you can set them in
+your `masks.yml`.
 
-The masks manager is built on top of a GraphQL API. Any actor
-with the `masks:manage` scope can interact with it. This scope
-should be granted judiciously.
+## Integrations
+
+There are several integrations with other services that expand Masks'
+functionality. All settings for them are housed under the `integration` key in
+`masks.yml`.
+
+### Asset storage
+
+Logos, avatars, and other uploads are stored on the local filesystem by default. You can
+change the location or configure masks to store assets with a cloud
+provider.
+
+| name                                           | ENV var                            | default |
+| ---------------------------------------------- | ---------------------------------- | ------- |
+| integration.storage                            | `MASKS_STORAGE_INTEGRATION`        | disk    |
+| integration.s3.access_key_id                   | `MASKS_S3_ACCESS_KEY_ID`           |
+| integration.s3.secret_access_key               | `MASKS_S3_SECRET_ACCESS_KEY`       |
+| integration.s3.region                          | `MASKS_S3_REGION`                  |
+| integration.s3.bucket                          | `MASKS_S3_BUCKET`                  |
+| integration.gcs.project                        | `MASKS_GCS_PROJECT`                |
+| integration.gcs.credentials                    | `MASKS_GCS_CREDENTIALS`            |
+| integration.gcs.bucket                         | `MASKS_GCS_BUCKET`                 |
+| integration.azure_storage.storage_account_name | `MASKS_AZURE_STORAGE_ACCOUNT_NAME` |
+| integration.azure_storage.storage_access_key   | `MASKS_AZURE_STORAGE_ACCESS_KEY`   |
+| integration.azure_storage.container            | `MASKS_AZURE_STORAGE_CONTAINER`    |
+
+### Email and phone
+
+While masks can be used without sending email or SMS, it's recommended to
+configure support for it. SMS & email verification, login links, and some
+notifications depend on it.
+
+| name                            | ENV var                     | default |
+| ------------------------------- | --------------------------- | ------- |
+| integration.email               | `MASKS_EMAIL_INTEGRATION`   | smtp    |
+| integration.phone               | `MASKS_PHONE_INTEGRATION`   | twilio  |
+| integration.smtp.address        | `MASKS_SMTP_ADDRESS`        |
+| integration.smtp.port           | `MASKS_SMTP_PORT`           |
+| integration.smtp.domain         | `MASKS_SMTP_DOMAIN`         |
+| integration.smtp.user_name      | `MASKS_SMTP_USER_NAME`      |
+| integration.smtp.password       | `MASKS_SMTP_PASSWORD`       |
+| integration.smtp.authentication | `MASKS_SMTP_AUTHENTICATION` |
+| integration.twilio.account_sid  | `MASKS_TWILIO_ACCOUNT_SID`  |
+| integration.twilio.auth_token   | `MASKS_TWILIO_AUTH_TOKEN`   |
+| integration.twilio.service_sid  | `MASKS_TWILIO_SERVICE_SID`  |

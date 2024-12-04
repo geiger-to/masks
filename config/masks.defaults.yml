@@ -9,7 +9,7 @@ integration: &integration
     domain: <%= ENV['MASKS_SMTP_DOMAIN'] %>
     user_name: <%= ENV['MASKS_SMTP_USER_NAME'] %>
     password: <%= ENV['MASKS_SMTP_PASSWORD'] %>
-    authentication: <%= ENV['MASKS_SMTP_MODE'] %>
+    authentication: <%= ENV['MASKS_SMTP_AUTHENTICATION'] %>
   twilio:
     account_sid: <%= ENV['TWILIO_ACCOUNT_SID'] %>
     auth_token: <%= ENV['TWILIO_AUTH_TOKEN'] %>
@@ -17,27 +17,34 @@ integration: &integration
   disk:
     root: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('data', 'storage') %>"
   s3:
-    access_key_id: <%= ENV['MASKS_AWS_KEY_ID'] %>
-    secret_access_key: <%= ENV['MASKS_AWS_SECRET'] %>
-    region: <%= ENV['MASKS_AWS_BUCKET'] || 'us-east-1' %>
-    bucket: <%= ENV['MASKS_AWS_BUCKET'] %>
+    access_key_id: <%= ENV['MASKS_S3_ACCESS_KEY_ID'] %>
+    secret_access_key: <%= ENV['MASKS_S3_SECRET_ACCESS_KEY'] %>
+    region: <%= ENV['MASKS_S3_REGION'] %>
+    bucket: <%= ENV['MASKS_S3_BUCKET'] %>
   gcs:
     project: <%= ENV['MASKS_GCS_PROJECT'] %>
-    credentials: <%= ENV['MASKS_GCS_KEYFILE'] %>
+    credentials: <%= ENV['MASKS_GCS_CREDENTIALS'] %>
     bucket: <%= ENV['MASKS_GCS_BUCKET'] %>
   azure_storage:
-    storage_account_name: <%= ENV['MASKS_AZURE_ACCOUNT'] %>
-    storage_access_key: <%= ENV['MASKS_AZURE_KEY'] %>
-    container: <%= ENV['MASKS_AZURE_CONTAINER'] %>
+    storage_account_name: <%= ENV['MASKS_AZURE_STORAGE_ACCOUNT_NAME'] %>
+    storage_access_key: <%= ENV['MASKS_AZURE_STORAGE_ACCESS_KEY'] %>
+    container: <%= ENV['MASKS_AZURE_STORAGE_CONTAINER'] %>
 
 default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
-  timezone: America/New_York
-  region: "US"
+  timezone: "<%= ENV['MASKS_TZ'] || 'America/New_York' %>"
+  region: "<%= ENV['MASKS_REGION'] || 'US' %>"
   private_key: "<%= ENV['MASKS_PRIVATE_KEY'] || Rails.root.join('data', 'private.key') %>"
+  seeds_dir: "<%= ENV['MASKS_SEEDS_DIR'] %>"
+  db:
+    adapter: <%= ENV['MASKS_DB_ADAPTER'] %>
+    name: <%= ENV['MASKS_DB_NAME'] %>
+    url: <%= ENV['MASKS_DB_URL'] %>
+  redis:
+    url: "<%= ENV['REDIS_URL'] %>"
   theme:
-    name: masks
+    name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   checks:
     - device
     - credentials
@@ -85,7 +92,6 @@ default: &default
       - public-uuid
       - public-identifier
       - pairwise-uuid
-    sector_identifier: masks
     client_type: internal
     subject_type: pairwise-uuid
     id_token_expires_in: "6 hours"
@@ -129,8 +135,6 @@ default: &default
         #233a5a,
         #1f2937
       );
-  authorize:
-    delay: 100
   totp_codes:
     enabled: true
   sms_codes:
@@ -140,15 +144,14 @@ default: &default
   webauthn:
     enabled: true
   backup_codes:
-    min: 8
-    max: 100
+    min_chars: 8
+    max_chars: 100
     total: 10
-    change_cooldown: "15 minutes"
   login_links:
     enabled: true
   passwords:
-    min: 8
-    max: 100
+    min_chars: 8
+    max_chars: 100
     change_cooldown: "15 minutes"
   nicknames:
     enabled: true
@@ -161,6 +164,7 @@ default: &default
 development:
   <<: *default
   url: "http://localhost:1111"
+  private_key: "<%= Rails.root.join('config', 'private.development.key') %>"
   integration:
     <<: *integration
     email: "dev"
@@ -173,6 +177,7 @@ development:
 test:
   <<: *default
   url: "http://localhost:1111"
+  private_key: "<%= Rails.root.join('config', 'private.test.key') %>"
   manager:
     nickname: manager
     email: masks@example.com

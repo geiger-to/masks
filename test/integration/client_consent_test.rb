@@ -11,10 +11,10 @@ class ClientConsentTest < MasksTestCase
 
   def client
     @client ||=
-      seeder.seed_client(
+      Masks::Client.create!(
         key: "testing",
         name: "testing",
-        type: "confidential",
+        client_type: "confidential",
         redirect_uris: "https://example.com",
       )
   end

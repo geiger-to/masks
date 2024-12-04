@@ -5,10 +5,10 @@ class InternalClientTest < ClientTestCase
 
   def client
     @client ||=
-      seeder.seed_client(
+      Masks::Client.create!(
         key: "testing",
         name: "testing",
-        type: "internal",
+        client_type: "internal",
         redirect_uris: "/foobar",
       )
   end

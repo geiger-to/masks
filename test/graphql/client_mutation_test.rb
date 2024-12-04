@@ -19,8 +19,8 @@ class ClientMutationTest < GraphQLTestCase
   test "masks:manage is required" do
     log_in "manager"
 
-    seeder.manager.scopes = ""
-    seeder.manager.save!
+    manager.scopes = ""
+    manager.save!
 
     gql query, input: {}
 
@@ -61,9 +61,9 @@ class ClientMutationTest < GraphQLTestCase
 
     assert_equal "manage", gql_result("client", "client", "id")
     assert_equal "Testing", gql_result("client", "client", "name")
-    assert_equal "Testing", seeder.manage_client.reload.name
-    assert_equal "public", seeder.manage_client.reload.client_type
-    assert_not seeder.manage_client.reload.internal?
+    assert_equal "Testing", manage_client.reload.name
+    assert_equal "public", manage_client.reload.client_type
+    assert_not manage_client.reload.internal?
   end
 
   Masks::Client::LIFETIME_COLUMNS.each do |col|
@@ -86,8 +86,8 @@ class ClientMutationTest < GraphQLTestCase
 
       freeze_time
 
-      assert_equal "1 hour", seeder.manage_client.reload[col]
-      assert_equal 1.hour.from_now, seeder.manage_client.reload.expires_at(col)
+      assert_equal "1 hour", manage_client.reload[col]
+      assert_equal 1.hour.from_now, manage_client.reload.expires_at(col)
     end
   end
 
@@ -96,7 +96,7 @@ class ClientMutationTest < GraphQLTestCase
 
     gql query, input: { id: "manage", type: "invalid" }
 
-    assert seeder.manage_client.reload.internal?
+    assert manage_client.reload.internal?
     assert gql_result("client", "errors")
   end
 end

@@ -7,11 +7,11 @@ class PublicTokenConsentTest < ClientTestCase
 
   def client
     @client ||=
-      seeder
-        .seed_client(
+      Masks::Client
+        .create!(
           key: "testing",
           name: "testing",
-          type: "public",
+          client_type: "public",
           redirect_uris: "https://example.com",
         )
         .tap { |c| c.add_check! "client-consent" }
