@@ -30,6 +30,11 @@ module Masks
       setting(key, :enabled)
     end
 
+    def manager?
+      (env.manager.nickname&.present? || env.manager.email&.present?) &&
+        env.manager.password&.present?
+    end
+
     def favicon_url
       url_helpers.rails_storage_proxy_url(favicon) if favicon.attached?
     end

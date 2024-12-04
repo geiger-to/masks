@@ -46,7 +46,7 @@ COPY . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 RUN npm install
-RUN SECRET_KEY_BASE=`bundle exec rails secret` bundle exec rails assets:precompile
+RUN MASKS_SECRET_KEY=`bundle exec rails secret` bundle exec rails assets:precompile
 
 # Final stage for app image
 FROM base
@@ -58,12 +58,12 @@ COPY --from=build /masks /masks
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 masks && \
     useradd masks --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R masks:masks db log storage tmp
+    chown -R masks:masks /masks
 USER 1000:1000
 
 # Entrypoint prepares the database.
 ENTRYPOINT ["/masks/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 3000
-CMD ["./bin/rails", "server"]
+EXPOSE 1111
+CMD ["npm", "run", "masks"]

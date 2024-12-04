@@ -15,7 +15,7 @@ integration: &integration
     auth_token: <%= ENV['TWILIO_AUTH_TOKEN'] %>
     service_sid: <%= ENV['TWILIO_SERVICE_SID'] %>
   disk:
-    root: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('storage') %>"
+    root: "<%= ENV['MASKS_STORAGE_DIR'] || Rails.root.join('data', 'storage') %>"
   s3:
     access_key_id: <%= ENV['MASKS_AWS_KEY_ID'] %>
     secret_access_key: <%= ENV['MASKS_AWS_SECRET'] %>
@@ -35,6 +35,7 @@ default: &default
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   timezone: America/New_York
   region: "US"
+  private_key: "<%= ENV['MASKS_PRIVATE_KEY'] || Rails.root.join('data', 'private.key') %>"
   theme:
     name: masks
   checks:
