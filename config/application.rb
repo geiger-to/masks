@@ -1,6 +1,10 @@
 require_relative "boot"
 
 require "rails/all"
+require "graphql"
+
+# Seemingly required way up here, before MasksSchema or GraphQL::Schema are autoloaded
+GraphQL.eager_load! if Rails.env.production?
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -10,6 +14,7 @@ require_relative "../lib/masks"
 
 module Masks
   class Application < Rails::Application
+    config.active_record.encryption.support_unencrypted_data = true
     config.active_record.query_log_tags_enabled = true
     config.active_record.query_log_tags = [
       # Rails query log tags:
@@ -44,7 +49,17 @@ module Masks
 
     # Used for file storage—avatars, logos, and other uploads.
     config.active_storage.service = "masks"
-    config.active_job.queue_adapter = :good_job unless Rails.env.test?
+
+    unless Rails.env.test?
+      config.active_job.queue_adapter =
+        if Masks.env.redis.url.present?
+          :sidekiq
+        elsif Masks.env.db.adapter == "postgresql"
+          :good_job
+        else
+          :delayed_job
+        end
+    end
 
     # Use a custom delivery_method, which allows switching
     # between methods and dynamic configuration from
@@ -55,6 +70,9 @@ module Masks
     def fake_key
       "masks-#{Rails.env}" unless Rails.env.production?
     end
+
+    # opt-in for Rails 8.1
+    config.active_support.to_time_preserves_timezone = :zone
 
     # Used for ActiveRecord models that encrypt and secure data
     config.active_record.encryption.primary_key =

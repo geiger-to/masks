@@ -52,11 +52,16 @@ module Masks
     end
 
     scope :default, -> { find_by(key: DEFAULT_KEY) }
-    scope :manage, -> { find_by(key: MANAGE_KEY) }
+
+    class << self
+      def manage
+        find_by(key: MANAGE_KEY)
+      end
+    end
 
     validates :name, :version, presence: true
 
-    encrypts :secret
+    encrypts :secret, :pairwise_salt, :rsa_private_key
 
     after_initialize :generate_credentials
     before_validation :generate_key, unless: :key, on: :create

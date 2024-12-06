@@ -1,15 +1,31 @@
 class MasksTestCase < ActionDispatch::IntegrationTest
-  attr_reader :seeder
-
-  delegate :manager, :tester, to: :seeder
-
   setup do
-    Masks.env.url = "http://www.example.com"
-    Masks.installation&.destroy!
-    Masks.reset!
-    Masks.install!
+    DatabaseCleaner.clean
 
-    @seeder = Masks::Seeder.new(Masks.installation)
-    @seeder.seed_env!
+    Masks.env.url = "http://www.example.com"
+    Masks.reset!
+    Masks.seed!
+
+    seeds.actor!(
+      nickname: "tester",
+      email: "test@example.com",
+      password: "password",
+    )
+  end
+
+  def seeds
+    Masks.seeds
+  end
+
+  def manage_client
+    @manage_client ||= Masks::Client.manage
+  end
+
+  def manager
+    @manager ||= Masks::Actor.find_by!(nickname: "manager")
+  end
+
+  def tester
+    @tester ||= Masks::Actor.find_by!(nickname: "tester")
   end
 end

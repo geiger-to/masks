@@ -70,8 +70,7 @@ class IdentifierTest < MasksTestCase
 
   test "only emails from the 'login' group are valid identifiers" do
     email = "masks@example.com"
-    seeder
-      .manager
+    manager
       .emails
       .for_login
       .find_by!(address: email)

@@ -24,14 +24,11 @@ module Mutations
 
     def resolve(**args)
       auth = context[:auth]
+      auth.update!(**args.merge(resume: context[:resume]))
 
-      Masks.min_runtime(Masks.installation.authorize_delay) do
-        auth.update!(**args.merge(resume: context[:resume]))
-
-        result = auth.as_json
-        result[:request_id] = SecureRandom.uuid
-        result
-      end
+      result = auth.as_json
+      result[:request_id] = SecureRandom.uuid
+      result
     end
   end
 end

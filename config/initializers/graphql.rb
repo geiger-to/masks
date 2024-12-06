@@ -6,5 +6,3 @@ module GraphQL
     end
   end
 end
-
-GraphQL.eager_load! if Rails.env.production?

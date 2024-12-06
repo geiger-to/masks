@@ -1,11 +1,15 @@
 # frozen_string_literal: true
 
+require "recursive-open-struct"
+
 require_relative "masks/version"
 require_relative "masks/fido"
 require_relative "masks/timing"
 require_relative "masks/scopes"
 require_relative "masks/mailer"
 require_relative "masks/private_key"
+require_relative "masks/seeds"
+require_relative "masks/env"
 
 # Top-level module for masks.
 module Masks
@@ -71,10 +75,6 @@ module Masks
       @keys ||= PrivateKey.new(env)
     end
 
-    def min_runtime(*args, **opts, &block)
-      time.min_time(*args, **opts, &block)
-    end
-
     def signup(identifier)
       if identifier.include?("@") && installation.emails?
         Actor.with_login_email(identifier)
@@ -96,29 +96,42 @@ module Masks
     end
 
     def installation
-      @installation ||=
-        Masks::Installation.active.last ||
-          Masks::Installation.new(settings: env)
+      @installation ||= Masks::Installation.active.last
     end
 
     def env
-      @env ||=
-        RecursiveOpenStruct.new(Rails.application.config_for("installation"))
+      @env ||= Masks::Env.new(masks_yml)
     end
 
-    def install!
-      return unless installation.new_record?
+    def masks_yml
+      @masks_yml ||=
+        begin
+          defaults = Rails.application.config_for("masks.defaults")
+          path = ENV.fetch("MASKS_YML", Rails.root.join("masks.yml"))
+          data = YAML.safe_lode_file(path) if File.exist?(path)
+          defaults.deep_symbolize_keys.deep_merge(
+            (data || {}).deep_symbolize_keys,
+          )
+        end
+    end
 
-      installation.seed!
+    def seeds
+      @seeds ||= Masks::Seeds.new(env)
+    end
 
-      yield installation if block_given?
+    def seed!
+      seeds.seed!
+      seeds
     end
 
     def reset!
+      @seeds = nil
       @scopes = nil
       @prompts = nil
       @installation = nil
       @authenticate_gql = nil
+      @masks_yml = nil
+      @seeds = nil
       @key = nil
       @env = nil
     end

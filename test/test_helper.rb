@@ -1,6 +1,7 @@
 ENV["RAILS_ENV"] ||= "test"
 
 require_relative "../config/environment"
+require "database_cleaner/active_record"
 require "rails/test_help"
 require "byebug"
 require "vcr"
@@ -12,6 +13,8 @@ end
 require_relative "masks_test_case"
 require_relative "client_test_case"
 require_relative "graphql_test_case"
+
+DatabaseCleaner.strategy = :deletion
 
 VCR.configure do |config|
   config.cassette_library_dir = "fixtures/vcr_cassettes"
@@ -39,9 +42,6 @@ module ActiveSupport
   class TestCase
     # Run tests in parallel with specified workers
     # parallelize(workers: :number_of_processors)
-
-    # Setup all fixtures in test/fixtures/*.yml for all tests in alphabetical order.
-    fixtures :all
 
     teardown do
       DatabaseCleaner.clean

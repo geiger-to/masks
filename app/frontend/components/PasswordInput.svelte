@@ -43,8 +43,8 @@
   let info = $state();
 
   $effect(() => {
-    min = auth?.settings?.passwords?.min;
-    max = auth?.settings?.passwords?.max;
+    min = auth?.settings?.passwords?.minChars;
+    max = auth?.settings?.passwords?.maxChars;
 
     if (!disabled && min && max) {
       valid = value && value.length >= min && value.length <= max;

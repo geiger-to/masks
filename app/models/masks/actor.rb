@@ -230,13 +230,13 @@ module Masks
       self.version = SecureRandom.hex
     end
 
-    def validates_length(value, key:, min:, max:)
+    def validates_length(value, key:, min_chars:, max_chars:)
       return unless value
 
-      if min && value.length < min
-        errors.add(key, :too_short, count: min)
-      elsif max && value.length > max
-        errors.add(key, :too_long, count: max)
+      if min_chars && value.length < min_chars
+        errors.add(key, :too_short, count: min_chars)
+      elsif max_chars && value.length > max_chars
+        errors.add(key, :too_long, count: max_chars)
       end
     end
 
@@ -245,7 +245,11 @@ module Masks
 
       return unless password && opts
 
-      validates_length(password, key: :password, **opts.slice(:min, :max))
+      validates_length(
+        password,
+        key: :password,
+        **opts.slice(:min_chars, :max_chars),
+      )
     end
 
     def validates_backup_codes
@@ -262,7 +266,7 @@ module Masks
       validates_length(
         backup_codes,
         key: :backup_codes,
-        **opts.slice(:min, :max),
+        **opts.slice(:min_chars, :max_chars),
       )
     end
   end

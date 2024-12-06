@@ -18,8 +18,8 @@ class ActorMutationTest < GraphQLTestCase
   test "masks:manage is required" do
     log_in "manager"
 
-    seeder.manager.scopes = ""
-    seeder.manager.save!
+    manager.scopes = ""
+    manager.save!
 
     gql query, input: { identifier: "testing", signup: true }
 

@@ -58,8 +58,8 @@
         type="text"
         placeholder="..."
         class="input input-xs max-w-[60px]"
-        value={settings.passwords.min}
-        oninput={(e) => change({ passwords: { min: e.target.value } })}
+        value={settings.passwords.minChars}
+        oninput={(e) => change({ passwords: { minChars: e.target.value } })}
       />
       <span class="opacity-75">min</span>
     </label>
@@ -68,8 +68,8 @@
         type="text"
         placeholder="..."
         class="input input-xs max-w-[60px]"
-        value={settings.passwords.max}
-        oninput={(e) => change({ passwords: { max: e.target.value } })}
+        value={settings.passwords.maxChars}
+        oninput={(e) => change({ passwords: { maxChars: e.target.value } })}
       />
 
       <span class="opacity-75">max</span>
@@ -136,8 +136,8 @@
         type="text"
         placeholder="..."
         class="input input-xs max-w-[60px]"
-        value={settings.backupCodes.min}
-        oninput={(e) => change({ backupCodes: { min: e.target.value } })}
+        value={settings.backupCodes.minChars}
+        oninput={(e) => change({ backupCodes: { minChars: e.target.value } })}
       />
       <span class="opacity-75">min</span>
     </label>
@@ -146,8 +146,8 @@
         type="text"
         placeholder="..."
         class="input input-xs max-w-[60px]"
-        value={settings.backupCodes.max}
-        oninput={(e) => change({ backupCodes: { max: e.target.value } })}
+        value={settings.backupCodes.maxChars}
+        oninput={(e) => change({ backupCodes: { maxChars: e.target.value } })}
       />
       <span class="opacity-75">max</span>
     </label>

@@ -34,6 +34,8 @@ group :development, :doc do
   gem "yard", "~> 0.9.36"
 end
 
+gem "recursive-open-struct", "~> 2.0", group: %i[default jekyll_plugins]
+
 group :jekyll_plugins do
   gem "jekyll-feed", "~> 0.12"
   gem "jekyll-postcss"
@@ -54,8 +56,6 @@ gem "rotp", "~> 6.3"
 gem "openid_connect", "~> 2.3"
 gem "rqrcode", "~> 2.2"
 gem "csv", "~> 3.3"
-
-gem "recursive-open-struct", "~> 2.0"
 
 gem "image_processing", "~> 1.13"
 
@@ -87,4 +87,10 @@ gem "vcr", "~> 6.3"
 
 gem "webmock", "~> 3.24"
 
-gem "foreman", "~> 0.88.1"
+gem "sqlite3", "~> 2.4"
+
+gem "sidekiq", "~> 7.3"
+
+gem "delayed_job_active_record", "~> 4.1"
+
+gem "daemons", "~> 1.4"
