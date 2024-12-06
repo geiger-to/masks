@@ -52,7 +52,6 @@ class InstallMutationTest < GraphQLTestCase
 
     gql query, input: {}
 
-    assert_equal "http://localhost:1111",
-                 gql_result("install", "install", "url")
+    assert_equal Masks.url, gql_result("install", "install", "url")
   end
 end

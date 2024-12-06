@@ -2,7 +2,6 @@ class MasksTestCase < ActionDispatch::IntegrationTest
   setup do
     DatabaseCleaner.clean
 
-    Masks.env.url = "http://www.example.com"
     Masks.reset!
     Masks.seed!
 

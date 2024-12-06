@@ -373,6 +373,8 @@ GEM
     raabro (1.4.0)
     racc (1.8.1)
     rack (3.1.8)
+    rack-cors (2.0.2)
+      rack (>= 2.0.0)
     rack-oauth2 (2.2.1)
       activesupport
       attr_required
@@ -637,6 +639,7 @@ DEPENDENCIES
   premailer-rails (~> 1.12)
   prettier_print (~> 1.2)
   puma (>= 5.0)
+  rack-cors (~> 2.0)
   rails (~> 8.0.0)
   recursive-open-struct (~> 2.0)
   rotp (~> 6.3)

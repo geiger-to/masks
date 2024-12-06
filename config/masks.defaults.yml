@@ -176,7 +176,7 @@ development:
 
 test:
   <<: *default
-  url: "http://localhost:1111"
+  url: "http://www.example.com"
   private_key: "<%= Rails.root.join('config', 'private.test.key') %>"
   manager:
     nickname: manager
