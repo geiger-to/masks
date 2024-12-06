@@ -106,13 +106,13 @@ this behaviour, set `SKIP_MIGRATIONS=true` and run migrations manually with
 the following command:
 
 ```
-$ masks db:migrate
+$ masks migrate
 ```
 
 You could, for example, run the tasks manually on the command line (assuming you're hosting with docker):
 
 ```sh
-$ docker run masks masks db:migrate
+$ docker run masks masks migrate
 ```
 
 Another option is to run it as a task before deploying the masks server. For example, in `docker-compose.yml`:
@@ -121,7 +121,7 @@ Another option is to run it as a task before deploying the masks server. For exa
 services:
   migrate:
     image: masksrb/masks:latest
-    command: ["masks", "db:migrate"]
+    command: ["masks", "migrate"]
     restart: "no"
     # etc...
 
@@ -148,11 +148,11 @@ the following changes:
 
 - Increase the number of replicas with your container orchestration tool
 - Override the boot command to start more processes:
-  - `foreman start web=2,job=2` will start 2 web and processes
+  - `masks start web=2,job=2` will start 2 web and processes
 - Increase the number of threads per-process with `MASKS_THREADS=n`
 - Deploy the containers handling web requests and jobs independently
-  - `foreman start job=1` will start one job process
-  - `foreman start web=1` will start one web process
+  - `masks start job=1` will start one job process
+  - `masks start web=1` will start one web process
 
 For example, in a `docker-compose.yml`:
 
@@ -160,11 +160,11 @@ For example, in a `docker-compose.yml`:
 services:
   masks-job:
     image: masksrb/masks:latest
-    command: ["foreman", "start", "job=5"]
+    command: ["masks", "start", "job=5"]
     # etc...
 
   masks-web:
     image: masksrb/masks:latest
-    command: ["foreman", "start", "web=5"]
+    command: ["masks", "start", "web=5"]
     # etc...
 ```
