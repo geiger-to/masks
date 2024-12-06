@@ -50,7 +50,9 @@ module Masks
     end
 
     def dark_logo_url
-      url_helpers.rails_storage_proxy_url(dark_logo) if dark_logo.attached?
+      if dark_logo.attached?
+        return url_helpers.rails_storage_proxy_url(dark_logo)
+      end
 
       setting(:theme, :dark_logo_url)
     end
