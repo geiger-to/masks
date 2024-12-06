@@ -2,7 +2,26 @@ def info(*args)
   puts ["masks:", *args].join(" ")
 end
 
-namespace :masks do
+task :start, [:formation] do |t, args|
+  sh(["foreman", "start", args[:formation]].compact.join(" "))
+end
+
+task worker: :environment do
+  case Rails.application.config.active_job.queue_adapter
+  when :sidekiq
+    sh "bin/bundle exec sidekiq"
+  when :good_job
+    sh "bin/bundle exec good_job start"
+  when :delayed_job
+    sh "bin/rails jobs:work"
+  end
+end
+
+task :migrate do |t, args|
+  sh "bin/rails db:migrate"
+end
+
+namespace :seeds do
   task export: :environment do
     info "creating export..."
 
@@ -20,16 +39,5 @@ namespace :masks do
     seeds.import!
 
     info "imported #{seeds.stats[:imported]} records"
-  end
-
-  task jobs: :environment do
-    case Rails.application.config.active_job.queue_adapter
-    when :sidekiq
-      sh "bin/bundle exec sidekiq"
-    when :good_job
-      sh "bin/bundle exec good_job start"
-    when :delayed_job
-      sh "bin/rails jobs:work"
-    end
   end
 end

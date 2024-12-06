@@ -64,4 +64,4 @@ ENTRYPOINT ["/masks/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 1111
-CMD ["foreman", "start"]
+CMD ["/masks/masks", "start"]
