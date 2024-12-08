@@ -54,7 +54,7 @@
       loginLinkFactorExpiresIn
       passwordFactorExpiresIn
       secondFactorBackupCodeExpiresIn
-      secondFactorSmsCodeExpiresIn
+      secondFactorPhoneExpiresIn
       secondFactorTotpCodeExpiresIn
       secondFactorWebauthnExpiresIn
       internalSessionExpiresIn
@@ -123,7 +123,7 @@
   };
 
   let result = $state({ data: {} });
-  let client = $state(result?.data?.client);
+  let client = $state();
   let settings = $derived(result?.data?.install);
   let changes = $state({});
   let errors = $state();
@@ -132,12 +132,16 @@
   let theming = $state(false);
   let tab = $state(false);
 
-  query.subscribe((r) => {
-    result = r;
-    client = r?.data?.client;
-    original = original || client;
-    loading = r.fetching;
-  });
+  let subscribe = () => {
+    query.subscribe((r) => {
+      result = r;
+      client = r?.data?.client;
+      original = original || client;
+      loading = r.fetching;
+    });
+  };
+
+  subscribe();
 
   let change = (obj) => {
     changes = { ...changes, ...obj };
@@ -237,11 +241,11 @@
       <div
         style={client.bgLight}
         class="absolute top-0 left-0 right-0 bottom-0 opacity-100 z-0 dark:hidden"
-      />
+      ></div>
       <div
         style={client.bgDark}
         class="top-0 left-0 right-0 bottom-0 opacity-0 dark:opacity-100 z-0 absolute"
-      />
+      ></div>
     </div>
 
     {#if errors}
@@ -298,7 +302,7 @@
               class="bg-transparent font-mono px-1.5 -ml-1 !outline-none w-full"
               value={client.bgLight}
               oninput={(e) => change({ bgLight: e.target.value })}
-            />
+            ></textarea>
           </div>
         </div>
 
@@ -317,7 +321,7 @@
               class="bg-transparent font-mono px-1.5 -ml-1 !outline-none w-full"
               value={client.bgDark}
               oninput={(e) => change({ bgDark: e.target.value })}
-            />
+            ></textarea>
           </div>
         </div>
       </div>

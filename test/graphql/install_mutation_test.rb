@@ -20,7 +20,7 @@ class InstallMutationTest < GraphQLTestCase
               passkeys
               loginLinks
               totpCodes
-              smsCodes
+              phones
               webauthn
               backupCodes
               checks

@@ -9,13 +9,20 @@ module Types
           description: "Fetches an actor given its identifier." do
       argument :identifier,
                String,
-               required: true,
+               required: false,
                description: "identifier of the actor."
+      argument :id, ID, required: false, description: "id of the actor."
     end
 
-    def actor(identifier:)
-      actor = Masks.identify(identifier)
-      actor if actor.persisted?
+    def actor(identifier: nil, id: nil)
+      actor =
+        if identifier
+          Masks.identify(identifier)
+        else
+          Masks::Actor.find_by(key: id)
+        end
+
+      actor if actor&.persisted?
     end
 
     field :client,

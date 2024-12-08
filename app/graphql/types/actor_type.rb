@@ -25,7 +25,7 @@ module Types
     field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
     field :second_factor, Boolean
-    field :webauthn_credentials, [WebauthnCredentialType], null: true
+    field :hardware_keys, [HardwareKeyType], null: true
     field :otp_secrets, [OtpSecretType], null: true
     field :phones, [PhoneType], null: true
     field :remaining_backup_codes, Integer, null: true

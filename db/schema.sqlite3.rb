@@ -169,7 +169,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_155027) do
     t.string "login_link_factor_expires_in"
     t.string "password_factor_expires_in"
     t.string "second_factor_backup_code_expires_in"
-    t.string "second_factor_sms_code_expires_in"
+    t.string "second_factor_phone_expires_in"
     t.string "second_factor_totp_code_expires_in"
     t.string "second_factor_webauthn_expires_in"
     t.string "email_verification_expires_in"
@@ -205,6 +205,24 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_155027) do
     t.index ["actor_id"], name: "index_masks_emails_on_actor_id"
     t.index %w[address group],
             name: "index_masks_emails_on_address_and_group",
+            unique: true
+  end
+
+  create_table "masks_hardware_keys", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "aaguid"
+    t.string "external_id", null: false
+    t.string "public_key", null: false
+    t.bigint "sign_count", default: 0, null: false
+    t.integer "actor_id"
+    t.integer "device_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "verified_at"
+    t.index ["actor_id"], name: "index_masks_hardware_keys_on_actor_id"
+    t.index ["device_id"], name: "index_masks_hardware_keys_on_device_id"
+    t.index %w[external_id aaguid],
+            name: "index_masks_hardware_keys_on_external_id_and_aaguid",
             unique: true
   end
 
@@ -290,24 +308,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_05_155027) do
             name: "index_masks_sessions_on_session_id",
             unique: true
     t.index ["updated_at"], name: "index_masks_sessions_on_updated_at"
-  end
-
-  create_table "masks_webauthn_credentials", force: :cascade do |t|
-    t.string "name", null: false
-    t.string "aaguid"
-    t.string "external_id", null: false
-    t.string "public_key", null: false
-    t.bigint "sign_count", default: 0, null: false
-    t.integer "actor_id"
-    t.integer "device_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "verified_at"
-    t.index ["actor_id"], name: "index_masks_webauthn_credentials_on_actor_id"
-    t.index ["device_id"], name: "index_masks_webauthn_credentials_on_device_id"
-    t.index %w[external_id aaguid],
-            name: "index_masks_webauthn_credentials_on_external_id_and_aaguid",
-            unique: true
   end
 
   add_foreign_key "active_storage_attachments",

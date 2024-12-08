@@ -37,9 +37,6 @@
 
   let loading = $derived(props.loading);
   let actor = $state(auth?.actor);
-  let name = $state(actor?.name);
-  let nickname = $state(actor?.nickname);
-  let loginEmail = actor?.loginEmail;
   let newEmail;
   let addingEmail;
   let password;
@@ -151,7 +148,7 @@
     <input
       class="w-full"
       placeholder="Add your name..."
-      bind:value={name}
+      bind:value={actor.name}
       oninput={updateName}
     />
 
@@ -220,7 +217,7 @@
         class=""
         placeholder="..."
         disabled={actor?.nickname}
-        bind:value={nickname}
+        bind:value={actor.nickname}
       />
     </label>
   {/if}

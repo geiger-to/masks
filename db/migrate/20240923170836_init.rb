@@ -110,7 +110,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[code email_id device_id client_id], unique: true
     end
 
-    create_table :masks_webauthn_credentials do |t|
+    create_table :masks_hardware_keys do |t|
       t.string :name, null: false
       t.string :aaguid, null: true
       t.string :external_id, null: false
@@ -118,7 +118,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.bigint :sign_count, default: 0, null: false
 
       t.references :actor
-      t.references :device
       t.timestamps
       t.datetime :verified_at
 
@@ -165,7 +164,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :login_link_factor_expires_in
       t.string :password_factor_expires_in
       t.string :second_factor_backup_code_expires_in
-      t.string :second_factor_sms_code_expires_in
+      t.string :second_factor_phone_expires_in
       t.string :second_factor_totp_code_expires_in
       t.string :second_factor_webauthn_expires_in
       t.string :email_verification_expires_in

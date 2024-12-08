@@ -96,3 +96,5 @@ gem "delayed_job_active_record", "~> 4.1"
 gem "daemons", "~> 1.4"
 
 gem "rack-cors", "~> 2.0"
+
+gem "foreman", "~> 0.88.1"

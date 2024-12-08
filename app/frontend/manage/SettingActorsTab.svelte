@@ -90,6 +90,18 @@
 
   <label class="label cursor-pointer pl-0">
     <div class="flex flex-col gap-1">
+      <span class="label-text"> Phones</span>
+    </div>
+    <input
+      type="checkbox"
+      class="toggle toggle-xs"
+      checked={settings.phones.enabled}
+      onclick={(e) => change({ phones: { enabled: e.target.checked } })}
+    />
+  </label>
+
+  <label class="label cursor-pointer pl-0">
+    <div class="flex flex-col gap-1">
       <span class="label-text">
         Hardware keys <i>(Webauthn)</i>
       </span>
@@ -111,18 +123,6 @@
       class="toggle toggle-xs"
       checked={settings.totpCodes.enabled}
       onclick={(e) => change({ totpCodes: { enabled: e.target.checked } })}
-    />
-  </label>
-
-  <label class="label cursor-pointer pl-0">
-    <div class="flex flex-col gap-1">
-      <span class="label-text"> SMS verification </span>
-    </div>
-    <input
-      type="checkbox"
-      class="toggle toggle-xs"
-      checked={settings.smsCodes.enabled}
-      onclick={(e) => change({ smsCodes: { enabled: e.target.checked } })}
     />
   </label>
 </div>

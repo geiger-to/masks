@@ -159,7 +159,7 @@
       <div class="text-xs font-bold grow">Backup codes</div>
     </div>
     <div class="flex items-end gap-3 mb-3">
-      <p class="grow opacity-75 text-sm">
+      <div class="grow opacity-75 text-sm">
         {#if generating}
           Keep the following backup codes in a safe place, then press <b
             >{enableCta}</b
@@ -186,7 +186,7 @@
             <span class="text-warning">Backup codes are <b>required</b>.</span>
           {/if}
         {/if}
-      </p>
+      </div>
 
       {#if generating}
         <div class="flex flex-col items-center">

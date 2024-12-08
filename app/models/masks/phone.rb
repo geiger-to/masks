@@ -10,6 +10,10 @@ module Masks
       integration.notify
     end
 
+    def verify
+      self.verified_at = Time.now.utc
+    end
+
     def verify_code(code)
       return unless valid?
 

@@ -1,6 +1,6 @@
 require "test_helper"
 
-class SmsCodeTest < MasksTestCase
+class PhoneTest < MasksTestCase
   include AuthHelper
   include Masks::Integration
 
@@ -27,7 +27,7 @@ class SmsCodeTest < MasksTestCase
   end
 
   test "sms codes are useless when the feature is disabled" do
-    Masks.installation.modify!(sms_codes: { enabled: false })
+    Masks.installation.modify!(phones: { enabled: false })
 
     log_in "manager"
 

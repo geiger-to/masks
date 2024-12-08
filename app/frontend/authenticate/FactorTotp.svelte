@@ -211,7 +211,7 @@
       class="input-primary bg-transparent placeholder:text-primary placeholder:opacity-25 input-lg text-xl mb-1.5"
       bind:code
       bind:value
-      onComplete={() => debounceVerify(secret, value)}
+      verify={(val) => debounceVerify(secret, val)}
     />
   </Alert>
 {:else}
@@ -317,7 +317,7 @@
           length={6}
           bind:code
           bind:value
-          onComplete={(e) => debounceAdd(totp.secret.base32, e.detail.value)}
+          verify={(val) => debounceAdd(totp.secret.base32, val)}
         />
       </div>
     {:else}

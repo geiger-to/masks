@@ -297,7 +297,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_10_09_020408) do
     t.string "login_link_factor_expires_in"
     t.string "password_factor_expires_in"
     t.string "second_factor_backup_code_expires_in"
-    t.string "second_factor_sms_code_expires_in"
+    t.string "second_factor_phone_expires_in"
     t.string "second_factor_totp_code_expires_in"
     t.string "second_factor_webauthn_expires_in"
     t.string "email_verification_expires_in"
@@ -420,7 +420,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_10_09_020408) do
     t.index ["updated_at"], name: "index_masks_sessions_on_updated_at"
   end
 
-  create_table "masks_webauthn_credentials", force: :cascade do |t|
+  create_table "masks_hardware_keys", force: :cascade do |t|
     t.string "name", null: false
     t.string "aaguid"
     t.string "external_id", null: false
@@ -431,10 +431,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_10_09_020408) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "verified_at"
-    t.index ["actor_id"], name: "index_masks_webauthn_credentials_on_actor_id"
-    t.index ["device_id"], name: "index_masks_webauthn_credentials_on_device_id"
+    t.index ["actor_id"], name: "index_masks_hardware_keys_on_actor_id"
+    t.index ["device_id"], name: "index_masks_hardware_keys_on_device_id"
     t.index %w[external_id aaguid],
-            name: "index_masks_webauthn_credentials_on_external_id_and_aaguid",
+            name: "index_masks_hardware_keys_on_external_id_and_aaguid",
             unique: true
   end
 

@@ -103,7 +103,7 @@ default: &default
     login_link_factor_expires_in: "12 hours"
     password_factor_expires_in: "1 day"
     second_factor_backup_code_expires_in: "1 hour"
-    second_factor_sms_code_expires_in: "10 minutes"
+    second_factor_phone_expires_in: "10 minutes"
     second_factor_totp_code_expires_in: "10 minutes"
     second_factor_webauthn_expires_in: "10 minutes"
     email_verification_expires_in: "1 year"
@@ -137,8 +137,9 @@ default: &default
       );
   totp_codes:
     enabled: true
-  sms_codes:
+  phones:
     enabled: true
+    max_for_login: 5
   passkeys:
     enabled: true
   webauthn:

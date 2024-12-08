@@ -35,7 +35,7 @@
 
   run(() => {
     credentials = auth?.actor?.secondFactors?.filter(
-      (f) => f.__typename == "WebauthnCredential"
+      (f) => f.__typename == "HardwareKey"
     );
   });
 

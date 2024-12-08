@@ -1,3 +1,5 @@
+import daisyui from "daisyui";
+
 export default {
   content: ["./app/**/*.{svelte,js,css,html.erb}"],
   theme: {
@@ -49,7 +51,7 @@ export default {
       xl: "1280px",
     },
   },
-  plugins: [require("daisyui")],
+  plugins: [daisyui],
   daisyui: {
     themes: ["light", "dark", "luxury"],
     logs: false,

@@ -13,7 +13,7 @@ module Masks
               id: actor.webauthn_id,
               name: actor.identifier,
             },
-            exclude: actor.webauthn_credentials.pluck(:external_id),
+            exclude: actor.hardware_keys.pluck(:external_id),
           )
 
         auth.extras(webauthn: options)
@@ -26,14 +26,13 @@ module Masks
         begin
           webauthn.verify(auth_bag[:webauthn_challenge])
           credential =
-            Masks::WebauthnCredential.new(
+            Masks::HardwareKey.new(
               name: Masks::Fido.aaguid_name(webauthn.response.aaguid),
               aaguid: webauthn.response.aaguid,
               external_id: webauthn.id,
               public_key: webauthn.public_key,
               sign_count: webauthn.sign_count,
               verified_at: Time.now.utc,
-              device:,
               actor:,
             )
 
@@ -50,7 +49,7 @@ module Masks
       event "webauthn:init" do
         webauthn =
           WebAuthn::Credential.options_for_get(
-            allow: actor.webauthn_credentials.map { |c| c.external_id },
+            allow: actor.hardware_keys.map { |c| c.external_id },
           )
 
         auth.extras(webauthn:)
@@ -59,8 +58,7 @@ module Masks
 
       event "webauthn:auth" do
         webauthn = WebAuthn::Credential.from_get(updates["credential"])
-        credential =
-          actor.webauthn_credentials.find_by(external_id: webauthn.id)
+        credential = actor.hardware_keys.find_by(external_id: webauthn.id)
 
         begin
           webauthn.verify(

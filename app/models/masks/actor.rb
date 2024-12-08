@@ -23,7 +23,7 @@ module Masks
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true
-    has_many :emails, class_name: "Masks::Email"
+    has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
@@ -34,9 +34,7 @@ module Masks
              autosave: true
 
     has_many :login_links, class_name: "Masks::LoginLink", autosave: true
-    has_many :webauthn_credentials,
-             class_name: "Masks::WebauthnCredential",
-             autosave: true
+    has_many :hardware_keys, class_name: "Masks::HardwareKey", autosave: true
     has_many :otp_secrets, class_name: "Masks::OtpSecret", autosave: true
 
     has_one_attached :avatar do |attachable|
@@ -50,8 +48,10 @@ module Masks
 
     after_initialize :generate_defaults
     before_validation :reset_version, unless: :version
+    before_validation :generate_key, unless: :key, on: :create
 
     validates :identifier_type, presence: true
+    validates :key, presence: true, uniqueness: true
     validates :nickname,
               uniqueness: true,
               presence: true,
@@ -121,13 +121,11 @@ module Masks
 
     def identifier
       @identifier ||=
-        begin
-          case identifier_type
-          when EMAIL_ID
-            login_email.address
-          when NICKNAME_ID
-            nickname
-          end
+        case identifier_type
+        when EMAIL_ID
+          login_email.address
+        when NICKNAME_ID
+          nickname
         end
     end
 
@@ -144,12 +142,15 @@ module Masks
     end
 
     def identicon_id
-      @identicon_id ||=
-        (Digest::MD5.hexdigest("identicon-#{identifier}") if identifier)
+      @identicon_id ||= (Digest::MD5.hexdigest("identicon-#{key}") if key)
     end
 
     def login_email
-      persisted? ? emails.for_login.first : emails.select(&:for_login?).first
+      persisted? ? login_emails.first : emails.select(&:for_login?).first
+    end
+
+    def login_emails
+      emails.for_login
     end
 
     def version_digest
@@ -179,7 +180,7 @@ module Masks
     def second_factors
       @second_factors ||= [
         *(phones.all.to_a),
-        *(webauthn_credentials.all.to_a),
+        *(hardware_keys.all.to_a),
         *(otp_secrets.all.to_a),
       ].compact
     end
@@ -215,6 +216,11 @@ module Masks
       @new_backup_codes = false
     end
 
+    def reset_backup_codes
+      self.backup_codes = nil
+      self.saved_backup_codes_at = nil
+    end
+
     private
 
     def nickname_required?
@@ -222,8 +228,25 @@ module Masks
     end
 
     def generate_defaults
-      self.key ||= SecureRandom.uuid
       self.webauthn_id ||= WebAuthn.generate_user_id
+    end
+
+    def generate_key
+      self.key ||=
+        if identifier&.present?
+          key = identifier.parameterize
+
+          loop do
+            break if self.class.where(key:).none?
+
+            key =
+              "#{identifier.parameterize}-#{SecureRandom.hex([*1..4].sample)}"
+          end
+
+          key
+        else
+          SecureRandom.hex
+        end
     end
 
     def reset_version

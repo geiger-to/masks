@@ -10,7 +10,7 @@ module Types
     argument :login_links, GraphQL::Types::JSON, required: false
     argument :backup_codes, GraphQL::Types::JSON, required: false
     argument :totp_codes, GraphQL::Types::JSON, required: false
-    argument :sms_codes, GraphQL::Types::JSON, required: false
+    argument :phones, GraphQL::Types::JSON, required: false
     argument :webauthn, GraphQL::Types::JSON, required: false
     argument :checks, GraphQL::Types::JSON, required: false
     argument :clients, GraphQL::Types::JSON, required: false
