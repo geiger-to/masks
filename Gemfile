@@ -98,3 +98,7 @@ gem "daemons", "~> 1.4"
 gem "rack-cors", "~> 2.0"
 
 gem "foreman", "~> 0.88.1"
+
+gem "simplecov", "~> 0.22.0"
+
+gem "simplecov-cobertura", "~> 2.1"

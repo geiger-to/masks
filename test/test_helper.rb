@@ -5,6 +5,11 @@ require "database_cleaner/active_record"
 require "rails/test_help"
 require "byebug"
 require "vcr"
+require "simplecov"
+SimpleCov.start
+
+require "simplecov-cobertura"
+SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
 
 Dir[Rails.root.join("test", "helpers", "**", "*.rb")].each do |file|
   require file
