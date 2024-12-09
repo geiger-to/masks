@@ -51,3 +51,6 @@ vite.config.js.timestamp-*.mjs
 site/_site
 _site
 .yardoc
+
+# code coverage reports
+coverage
