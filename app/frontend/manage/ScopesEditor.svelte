@@ -169,7 +169,7 @@
     {/key}
   {/each}
 
-  <div class="divider my-1.5" />
+  <div class="divider my-1.5"></div>
 
   <div class="flex items-center gap-3 mb-1.5">
     <input

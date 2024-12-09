@@ -67,9 +67,9 @@ class ActorMutationTest < GraphQLTestCase
   test "passwords can be changed for any existing actor" do
     log_in "manager"
 
-    assert Masks.identify("tester").authenticate("password")
-    gql query, input: { identifier: "tester", password: "testing123" }
-    assert Masks.identify("tester").authenticate("testing123")
+    assert tester.authenticate("password")
+    gql query, input: { id: tester.key, password: "testing123" }
+    assert tester.reload.authenticate("testing123")
   end
 
   test "scopes can be changed for any existing actor" do
@@ -77,11 +77,10 @@ class ActorMutationTest < GraphQLTestCase
 
     gql query,
         input: {
-          identifier: "tester",
+          id: tester.key,
           scopes: "foobar testing baz\nbaz testing2\nbaz",
         }
-    assert_equal %w[foobar testing testing2 baz].sort,
-                 Masks.identify("tester").scopes_a
+    assert_equal %w[foobar testing testing2 baz].sort, tester.reload.scopes_a
   end
 
   test "passwords and scopes cannot be set on signup" do

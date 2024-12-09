@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Types
-  class WebauthnCredentialType < Types::BaseObject
+  class HardwareKeyType < Types::BaseObject
     field :id, ID, null: false
     field :name, String, null: true
     field :icons, IconType, null: true

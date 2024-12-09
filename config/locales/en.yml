@@ -37,6 +37,10 @@ en:
     "masks:manage": Manage masks
   activerecord:
     attributes:
+      masks/email:
+        address: Email address
+      masks/phone:
+        number: Phone number
       masks/actor:
         backup_codes: Backup codes
         identifier_type: Identifier
@@ -52,12 +56,17 @@ en:
         login_link_factor_expires_in: Login link lifetime
         password_factor_expires_in: Auth via password lifetime
         second_factor_backup_code_expires_in: 2FA with backup code
-        second_factor_sms_code_expires_in: 2FA with SMS code
+        second_factor_phone_expires_in: 2FA with SMS code
         second_factor_totp_code_expires_in: 2FA with TOTP
         second_factor_webauthn_expires_in: 2FA with Webauthn
         internal_session_expires_in: Internal session lifetime
     errors:
       models:
+        masks/email:
+          attributes:
+            base:
+              max_for_login: "Cannot add another login email (%{count} maximum)"
+              email_identifier: "Cannot remove primary email"
         masks/actor:
           attributes:
             identifier_type:

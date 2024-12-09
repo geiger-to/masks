@@ -45,7 +45,7 @@
     ...(classes[type] || []),
   ].join(" ")}
 >
-  <p class="md:mx-1 mx-0.5 mb-0.5 md:mb-1 grow w-full">
+  <p class="md:mx-1 mx-0.5 grow w-full">
     {@render children?.()}
   </p>
 

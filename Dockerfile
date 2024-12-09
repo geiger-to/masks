@@ -42,6 +42,7 @@ COPY . .
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 RUN npm install
+RUN gem install foreman
 RUN MASKS_SECRET_KEY=`bundle exec rails secret` bundle exec rails assets:precompile
 
 # Final stage for app image
@@ -50,8 +51,6 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /masks /masks
-
-RUN gem install foreman
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 masks && \

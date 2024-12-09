@@ -1,0 +1,41 @@
+require "test_helper"
+
+class HardwareKeyMutationTest < GraphQLTestCase
+  def query
+    "
+      mutation ($input: HardwareKeyInput!) {
+        hardwareKey(input: $input) {
+          hardwareKey {
+            id
+            createdAt
+          }
+
+          errors
+        }
+      }
+    "
+  end
+
+  test "masks:manage is required" do
+    log_in "manager"
+
+    manager.scopes = ""
+    manager.save!
+
+    gql query, input: { identifier: "testing", signup: true }
+
+    assert gql_errors
+    assert_not gql_result
+  end
+
+  test "managers can delete hardwareKeys" do
+    log_in "manager"
+
+    tester.hardware_keys.build.save!
+
+    gql query, input: { actorId: tester.key, id:, action: "create" }
+    assert Masks::HardwareKey.find_by(external_id: id)
+    gql query, input: { actorId: tester.key, id:, action: "delete" }
+    refute Masks::HardwareKey.find_by(external_id: id)
+  end
+end

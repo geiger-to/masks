@@ -1,6 +1,6 @@
 module Masks
-  class WebauthnCredential < ApplicationRecord
-    self.table_name = "masks_webauthn_credentials"
+  class HardwareKey < ApplicationRecord
+    self.table_name = "masks_hardware_keys"
 
     validates :name, :external_id, :public_key, :sign_count, presence: true
     validates :external_id, uniqueness: { scope: :aaguid }
@@ -12,6 +12,5 @@ module Masks
               }
 
     belongs_to :actor
-    belongs_to :device
   end
 end

@@ -29,9 +29,7 @@
   let enabled = $derived(auth?.actor?.secondFactor);
 
   let securityKeys = $derived(
-    auth?.actor?.secondFactors?.filter(
-      (f) => f.__typename == "WebauthnCredential"
-    )
+    auth?.actor?.secondFactors?.filter((f) => f.__typename == "HardwareKey")
   );
 
   let phones = $derived(

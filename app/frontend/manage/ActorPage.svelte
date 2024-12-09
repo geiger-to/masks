@@ -1,164 +1,296 @@
 <script>
+  import _ from "lodash-es";
+  import { RotateCcw, MailPlus, Trash2 as Trash, User } from "lucide-svelte";
   import Page from "./Page.svelte";
+  import Alert from "@/components/Alert.svelte";
   import Time from "@/components/Time.svelte";
   import Avatar from "@/components/Avatar.svelte";
   import Identicon from "@/components/Identicon.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
-  import { queryStore, gql, getContextClient } from "@urql/svelte";
+  import ActorPhones from "./ActorPhones.svelte";
+  import ActorEmails from "./ActorEmails.svelte";
+  import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
+  import ActorBackupCodes from "./ActorBackupCodes.svelte";
+  import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
+  import {
+    mutationStore,
+    queryStore,
+    gql,
+    getContextClient,
+  } from "@urql/svelte";
 
   let { params, ...props } = $props();
-  let client = getContextClient();
+  let graphql = getContextClient();
+  let actorFragment = gql`
+    fragment ActorFragment on Actor {
+      id
+      name
+      nickname
+      identifier
+      identifierType
+      identiconId
+      loginEmail
+      loginEmails {
+        address
+        verifiedAt
+      }
+      avatar
+      avatarCreatedAt
+      passwordChangedAt
+      passwordChangeable
+      savedBackupCodesAt
+      remainingBackupCodes
+      hardwareKeys {
+        id
+        name
+        createdAt
+        icons {
+          light
+          dark
+        }
+      }
+      phones {
+        number
+        createdAt
+        verifiedAt
+      }
+      otpSecrets {
+        id
+        name
+        createdAt
+      }
+      createdAt
+      updatedAt
+    }
+  `;
+
   let query = $derived(
     queryStore({
       client: getContextClient(),
       query: gql`
-        query ($identifier: String!) {
-          actor(identifier: $identifier) {
-            id
-            name
-            nickname
-            identifier
-            identifierType
-            identiconId
-            loginEmail
-            loginEmails {
-              address
-              verifiedAt
-              verifyLink
-            }
-            avatar
-            avatarCreatedAt
-            passwordChangedAt
-            passwordChangeable
-            secondFactor
-            savedBackupCodesAt
-            remainingBackupCodes
-            secondFactors {
-              ... on WebauthnCredential {
-                id
-                name
-                createdAt
-                icons {
-                  light
-                  dark
-                }
-              }
-              ... on Phone {
-                number
-                createdAt
-              }
-              ... on OtpSecret {
-                id
-                name
-                createdAt
-              }
-            }
+        query ($id: ID!) {
+          actor(id: $id) {
+            ...ActorFragment
           }
         }
+
+        ${actorFragment}
       `,
-      variables: { identifier: params[0] },
+      variables: { id: params[0] },
       requestPolicy: "network-only",
     })
   );
 
   let result = $state({ data: {} });
-  let actor = $derived(result?.data?.actor);
+  let actor = $state();
+  let saving = $state(false);
+  let changes = $state({});
+  let errors = $state();
+  let original = $state(false);
+  let loading = $state(true);
+  let notFound = $state(false);
 
-  query.subscribe((r) => {
-    result = r;
-  });
+  let subscribe = () => {
+    query.subscribe((r) => {
+      result = r;
+      actor = r?.data?.actor;
+      original = original || actor;
+      loading = r.fetching;
+
+      if (r.data && r.data.actor === null) {
+        notFound = true;
+        loading = false;
+      }
+
+      if (actor) {
+        query.pause();
+      }
+    });
+  };
+
+  subscribe();
+
+  let save = (updates) => {
+    updates = updates || changes;
+    saving = true;
+
+    let update = mutationStore({
+      client: graphql,
+      query: gql`
+        mutation ($input: ActorInput!) {
+          actor(input: $input) {
+            actor {
+              ...ActorFragment
+            }
+
+            errors
+          }
+        }
+
+        ${actorFragment}
+      `,
+      variables: { input: { ...updates, id: actor.id } },
+    });
+
+    update.subscribe((r) => {
+      errors = r?.data?.actor?.errors;
+      errors = errors?.length ? errors : null;
+      saving = r?.fetching;
+
+      if (!saving && !errors) {
+        changes = {};
+        original = actor = r?.data?.actor?.actor;
+        loading = false;
+      }
+    });
+  };
+
+  let saveValues = (values) => {
+    return () => {
+      save(values);
+    };
+  };
+
+  let change = (obj) => {
+    changes = { ...changes, ...obj };
+    actor = { ...actor, ...changes };
+  };
+
+  let isChanged = () => {
+    return !_.isEqual(original, actor);
+  };
+
+  let reset = () => {
+    errors = null;
+    actor = original;
+    changes = {};
+  };
+
+  let newEmail = $state("");
+
+  let resetEmail = () => {
+    newEmail = "";
+
+    change({ createEmail: null });
+  };
+
+  let addEmail = () => {
+    change({ createEmail: newEmail });
+  };
 </script>
 
-<Page {...props} loading={!actor}>
-  <div class="grow flex items-center gap-3">
-    <div class="w-12 h-12">
-      <EditableImage
-        endpoint="/upload/avatar"
-        params={{ actor_id: actor.id }}
-        src={actor?.avatar}
-        name={actor?.identiconId}
-        class="w-12 h-12"
-      />
-    </div>
-
-    <div class="grow mb-1.5">
-      <div class="font-bold text-xl flex items-center gap-1.5">
-        <span>
-          {actor.nickname}
-        </span>
+<Page {...props} loading={!actor} {notFound}>
+  <div class="flex flex-col gap-3">
+    <div class="grow flex items-start gap-3 p-1.5 rounded-lg bg-base-100">
+      <div class="w-12 h-12">
+        <EditableImage
+          endpoint="/upload/avatar"
+          params={{ actor_id: actor.id }}
+          src={actor?.avatar}
+          class="w-12 h-12"
+        />
       </div>
 
-      <div class="text-xs">
-        last login
+      <div class="grow flex flex-col truncate">
+        <div class="font-bold text-xl dark:text-white text-black truncate">
+          {original.name || original.identifier}
+        </div>
 
-        <span class="italic">
-          {#if actor.lastLoginAt}
-            <Time relative timestamp={actor.lastLoginAt} />
-          {:else}
-            never
+        <div class="flex items-center gap-1.5">
+          {#if props.actor.identifier == actor.identifier}
+            <div class="text-xs italic font-bold text-info">you</div>
           {/if}
-        </span>
+
+          <div class="text-xs">
+            last login
+
+            <span class="italic">
+              {#if actor.lastLoginAt}
+                <Time relative timestamp={actor.lastLoginAt} />
+              {:else}
+                never
+              {/if}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="min-w-6 w-6 h-6 md:w-12 md:h-12 bg-black rounded">
+        <Identicon id={actor.identiconId} />
       </div>
     </div>
 
-    {#if props.actor.identifier == actor.identifier}
-      <div class="badge text-xs italic text-info pb-0.5">you</div>
-    {/if}
+    <Alert type="neutral" class="!py-1.5 pr-0.5 pl-3">
+      <div class="flex items-center gap-3">
+        <User size="16" />
 
-    <div class="w-6 h-6 bg-black p-0.5 rounded">
-      <Identicon id={actor.identiconId} />
+        <div class="text-xs grow">
+          <span class="opacity-75">saved</span>
+          <Time timestamp={actor.updatedAt} />
+        </div>
+
+        <button
+          class="btn btn-primary btn-sm"
+          disabled={!isChanged()}
+          onclick={(e) => save(changes)}
+        >
+          save
+        </button>
+      </div>
+    </Alert>
+
+    <label class="input input-bordered flex items-center gap-3">
+      <span class="label-text-alt opacity-75">full name</span>
+
+      <input
+        type="text"
+        class="grow"
+        value={actor.name}
+        placeholder="..."
+        oninput={(e) => change({ name: e.target.value || null })}
+      />
+    </label>
+
+    <label class="input input-bordered flex items-center gap-3">
+      <span class="label-text-alt opacity-75">nickname</span>
+
+      <input
+        type="text"
+        class="grow"
+        value={actor.nickname}
+        placeholder="..."
+        oninput={(e) => change({ nickname: e.target.value || null })}
+      />
+    </label>
+
+    <div class="flex flex-col">
+      <span class="text-xs opacity-75 mb-1.5">emails</span>
+
+      <ActorEmails {actor} />
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-xs opacity-75 mb-1.5">phones</span>
+
+      <ActorPhones {actor} />
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-xs opacity-75 mb-1.5">hardware keys</span>
+
+      <ActorHardwareKeys {actor} />
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-xs opacity-75 mb-1.5">TOTP</span>
+
+      <ActorTotpSecrets {actor} />
+    </div>
+
+    <div class="flex flex-col">
+      <span class="text-xs opacity-75 mb-1.5">backup codes</span>
+
+      <ActorBackupCodes {actor} />
     </div>
   </div>
-
-  <div class="divider my-1.5" />
-
-  <div class="flex flex-col gap-3 mb-3">
-    <span class="text-xs">login email</span>
-
-    {#each actor.loginEmails as email}
-      <div class="flex items-center gap-3 text-sm">
-        <a href={`mailto:${email.address}`} class="underline font-mono grow">
-          {email.address}
-        </a>
-
-        {#if email.verifiedAt}
-          <Time timestamp={email.verifiedAt} />
-        {:else}
-          <i class="opacity-75">unverified</i>
-        {/if}
-      </div>
-    {:else}
-      <span class="opacity-75 text-xs">nothing found</span>
-    {/each}
-  </div>
-
-  <div class="divider my-1.5 opacity-75" />
-
-  <div class="flex flex-col gap-3 mb-3">
-    <span class="text-xs">phone</span>
-
-    {#each actor.phones as phone}
-      <div class="flex items-center gap-3 text-sm">
-        <PhoneInput value={phone.number} />
-      </div>
-    {:else}
-      <span class="opacity-75 text-xs">nothing found</span>
-    {/each}
-  </div>
-
-  <div class="divider my-1.5 opacity-75" />
-
-  <div class="flex flex-col gap-3 mb-3">
-    <span class="text-xs">second factor</span>
-
-    {#each actor.secondFactors as factor}
-      <div class="flex items-center gap-3 text-sm">
-        {JSON.stringify(factor)}
-      </div>
-    {:else}
-      <span class="opacity-75 text-xs">nothing found</span>
-    {/each}
-  </div>
-
-  <div class="divider my-1.5 opacity-75" />
 </Page>

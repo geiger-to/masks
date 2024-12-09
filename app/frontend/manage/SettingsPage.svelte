@@ -24,7 +24,7 @@
   let props = $props();
   let result = $state();
   let loading = $state(true);
-  let errors;
+  let errors = $state();
   let install = $state({});
   let client = getContextClient();
   let changes = $state({});
@@ -68,7 +68,7 @@
               passkeys
               loginLinks
               totpCodes
-              smsCodes
+              phones
               webauthn
               backupCodes
               checks

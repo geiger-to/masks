@@ -2,9 +2,13 @@
 
 module Types
   class ActorInputType < Types::BaseInputObject
+    argument :id, String, required: false
+    argument :identifier, String, required: false
     argument :signup, Boolean, required: false
-    argument :identifier, String, required: true
+    argument :name, String, required: false
+    argument :nickname, String, required: false
     argument :password, String, required: false
     argument :scopes, String, required: false
+    argument :reset_backup_codes, Boolean, required: false
   end
 end

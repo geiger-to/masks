@@ -18,7 +18,8 @@ module Masks
               },
               email: true
 
-    validate :within_limits
+    validate :within_limits, if: :for_login?
+    validate :validate_actor, if: :for_login?
 
     belongs_to :actor
 
@@ -46,6 +47,14 @@ module Masks
       group == LOGIN_GROUP
     end
 
+    def verify
+      self.verified_at = Time.current
+    end
+
+    def unverify
+      self.verified_at = nil
+    end
+
     def verify!
       touch(:verified_at)
     end
@@ -61,14 +70,26 @@ module Masks
     def too_many?
       return false unless actor && new_record?
 
-      actor.emails.for_login.count >=
-        Masks.setting(:email, :max_for_login, default: 5)
+      actor.emails.for_login.count >= Masks.installation.emails[:max_for_login]
     end
 
     private
 
+    def validate_actor
+      if marked_for_destruction? && actor.login_emails.length == 1 &&
+           actor.identifier == address
+        errors.add(:base, :email_identifier)
+      end
+    end
+
     def within_limits
-      errors.add(:base, "login-email-limit") if too_many?
+      if too_many?
+        errors.add(
+          :base,
+          :max_for_login,
+          count: Masks.installation.emails[:max_for_login],
+        )
+      end
     end
   end
 end

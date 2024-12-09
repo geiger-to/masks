@@ -17,7 +17,7 @@ module Types
     field :login_links, Types::CamelizedJSON, null: false
     field :backup_codes, Types::CamelizedJSON, null: false
     field :totp_codes, Types::CamelizedJSON, null: false
-    field :sms_codes, Types::CamelizedJSON, null: false
+    field :phones, Types::CamelizedJSON, null: false
     field :webauthn, Types::CamelizedJSON, null: false
     field :checks, Types::CamelizedJSON, null: false
     field :clients, Types::CamelizedJSON, null: false

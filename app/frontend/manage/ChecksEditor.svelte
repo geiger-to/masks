@@ -44,8 +44,8 @@
     secondFactorBackupCodeExpiresIn: {
       name: "2FA with backup code",
     },
-    secondFactorSmsCodeExpiresIn: {
-      name: "2FA with SMS code",
+    secondFactorPhoneExpiresIn: {
+      name: "2FA with SMS",
     },
     secondFactorTotpCodeExpiresIn: {
       name: "2FA with TOTP",
@@ -126,7 +126,7 @@
   </div>
 
   {#if editing}
-    <div class="divider my-1.5" />
+    <div class="divider my-1.5"></div>
 
     <div class="flex items-center gap-1.5 opacity-75 mb-3">
       <div class="text-xs grow pl-2.5">lifetimes</div>

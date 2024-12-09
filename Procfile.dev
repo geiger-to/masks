@@ -1,5 +1,5 @@
-web: PORT=1111 MASKS_PORT=1111 masks server
-job: masks worker
+web: PORT=1111 MASKS_PORT=1111 ./masks server
+job: ./masks worker
 vite: bin/vite dev
 docs: bin/jekyll serve --watch --livereload
 email: npm run watch:email

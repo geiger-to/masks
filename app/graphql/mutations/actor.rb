@@ -7,22 +7,27 @@ module Mutations
     field :actor, Types::ActorType, null: true
     field :errors, [String], null: true
 
+    FIELDS = %i[name nickname password scopes]
+
     def resolve(**args)
       actor =
         if args[:signup]
           Masks.signup(args[:identifier])
         else
-          Masks.identify(args[:identifier])
+          Masks::Actor.find_by(key: args[:id])
         end
 
-      if (args[:signup] && actor.new_record?) ||
-           (!args[:signup] && actor.persisted?)
-        actor.password = args[:password] if args[:password] && !args[:signup]
-        actor.scopes = args[:scopes] if args[:scopes] && !args[:signup]
-        actor.save
+      if !args[:signup] && actor
+        FIELDS.each do |field|
+          actor.assign_attributes(field => args[field]) if args[field]
+        end
       end
 
-      { actor:, errors: actor&.errors&.full_messages&.uniq&.slice(0, 1) }
+      actor.reset_backup_codes if args[:reset_backup_codes]
+
+      actor&.save
+
+      { actor:, errors: actor&.errors&.full_messages&.uniq }
     end
   end
 end

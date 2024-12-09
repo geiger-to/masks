@@ -16,7 +16,7 @@
   let form = { ...actor };
 </script>
 
-<a href={`/manage/actor/${actor.identifier}`}>
+<a href={`/manage/actor/${actor.id}`}>
   <div class="dark:bg-base-300 bg-base-200 rounded-lg p-3 px-3">
     <div class="flex items-center">
       <div class="grow flex items-center gap-3">

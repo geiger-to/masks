@@ -113,7 +113,7 @@ You can customize some of the features available to end-users depending on your 
 | passkeys.enabled       | true                   |
 | login_links.enabled    | true                   |
 | totp_codes.enabled     | true                   |
-| sms_codes.enabled      | true                   |
+| phones.enabled         | true                   |
 | webauthn.enabled       | true                   |
 | webauthn.rp_name       | `name` or `MASKS_NAME` |
 | backup_codes.min_chars | 8                      |

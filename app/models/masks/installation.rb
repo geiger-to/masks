@@ -84,12 +84,12 @@ module Masks
       (setting(:prompts) || []).map(&:constantize)
     end
 
-    def sms_codes
-      setting(:sms_codes, default: { enabled: false })
+    def phones
+      setting(:phones, default: { enabled: false })
     end
 
-    def sms_codes?
-      sms_codes["enabled"]
+    def phones?
+      phones["enabled"]
     end
 
     def totp_codes
@@ -134,7 +134,10 @@ module Masks
     end
 
     def emails
-      { enabled: emails? }
+      {
+        enabled: emails?,
+        max_for_login: Masks.setting(:emails, :max_for_login, default: 5),
+      }
     end
 
     def emails?
@@ -188,7 +191,7 @@ module Masks
           passwords:,
           passkeys:,
           totp_codes:,
-          sms_codes:,
+          phones:,
           webauthn:,
           backup_codes:,
           login_links:,

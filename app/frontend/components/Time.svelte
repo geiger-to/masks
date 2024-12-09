@@ -12,8 +12,10 @@
   let interval;
 
   function updateTime(ts) {
-    time = DateTime.fromISO(ts).toRelative({ style, base: DateTime.now() });
-    time = time.replace(/ago$/, ago || "ago");
+    if (ts) {
+      time = DateTime.fromISO(ts).toRelative({ style, base: DateTime.now() });
+      time = time.replace(/ago$/, ago || "ago");
+    }
 
     interval = time?.includes("sec") ? 1000 : 60 * 1000;
   }

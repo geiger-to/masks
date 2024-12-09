@@ -4,7 +4,7 @@ module Masks
       checks "second-factor"
 
       def enabled?
-        super && install.enabled?(:sms_codes)
+        super && install.enabled?(:phones)
       end
 
       event "phone:verify" do
@@ -13,7 +13,7 @@ module Masks
         code = updates["code"]
 
         if phone.verify_code(code)
-          checked! "second-factor", with: :sms_code
+          checked! "second-factor", with: :phone
         else
           warn! "invalid-code", code
         end

@@ -35,7 +35,13 @@
    */
 
   /** @type {Props} */
-  let { actor, children, url = "", loading = false } = $props();
+  let {
+    actor,
+    children,
+    url = "",
+    loading = false,
+    notFound = false,
+  } = $props();
   let { nickname } = actor;
   let isAddOpen = $state();
   let input = $state();
@@ -269,7 +275,7 @@
 
         <a
           use:route
-          href={`/manage/actor/${actor.identifier}`}
+          href={`/manage/actor/${actor.id}`}
           class="w-[31px] h-[31px] ml-1.5"
         >
           <Avatar {actor} />
@@ -332,7 +338,13 @@
   </div>
 
   <div class={`bg-base-300 text-base-content shadow-inner p-1.5 md:p-6 mb-6`}>
-    {#if isLoading || loading}
+    {#if notFound}
+      <div class="bold bg-base-300 rounded-lg w-prose mx-auto p-10">
+        <h1 class="text-error text-2xl font-bold">Not found</h1>
+
+        <h2 class="text-lg">The page you're looking for could not be found.</h2>
+      </div>
+    {:else if isLoading || loading}
       <div class="flex flex-col gap-4">
         <div class="flex items-center gap-4">
           <div class="skeleton h-16 w-16 shrink-0 rounded-lg"></div>

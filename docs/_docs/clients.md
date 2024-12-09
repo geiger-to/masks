@@ -78,7 +78,7 @@ following in your `masks.yml`:
 | clients.login_link_factor_expires_in         | `12 hours`          |
 | clients.password_factor_expires_in           | `1 day`             |
 | clients.second_factor_backup_code_expires_in | `1 hour`            |
-| clients.second_factor_sms_code_expires_in    | `10 minutes`        |
+| clients.second_factor_phone_expires_in       | `10 minutes`        |
 | clients.second_factor_totp_code_expires_in   | `10 minutes`        |
 | clients.second_factor_webauthn_expires_in    | `10 minutes`        |
 | clients.email_verification_expires_in        | `1 year`            |

@@ -22,7 +22,7 @@
         mutation ($input: ActorInput!) {
           actor(input: $input) {
             actor {
-              identifier
+              id
             }
 
             errors
@@ -50,7 +50,7 @@
     errors = data.errors;
 
     if (!errors?.length) {
-      return goto(`/manage/actor/${data.actor.identifier}`);
+      return goto(`/manage/actor/${data.actor.id}`);
     }
 
     loading = false;

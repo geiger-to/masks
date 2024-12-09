@@ -3,6 +3,7 @@
 module Types
   class EmailType < Types::BaseObject
     field :address, String
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: true
     field :verified_at, GraphQL::Types::ISO8601DateTime, null: true
     field :login_link, Boolean
     field :verify_link, Boolean

@@ -41,7 +41,7 @@ mutation ($input: AuthenticateInput!) {
       savedBackupCodesAt
       remainingBackupCodes
       secondFactors {
-        ... on WebauthnCredential {
+        ... on HardwareKey {
           id
           name
           createdAt

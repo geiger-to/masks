@@ -169,6 +169,7 @@
           <div class="max-w-[300px]">
             {#if auth?.settings?.lightLogoUrl}
               <img
+                alt={`${auth?.settings?.theme?.name} logo`}
                 src={auth?.settings?.lightLogoUrl}
                 class="object-scale-down h-10 rounded dark:hidden"
               />
@@ -176,6 +177,7 @@
 
             {#if auth?.settings?.darkLogoUrl}
               <img
+                alt={`${auth?.settings?.theme?.name} logo`}
                 src={auth?.settings?.darkLogoUrl}
                 class="object-scale-down h-10 rounded hidden dark:block"
               />
@@ -201,7 +203,7 @@
         {@render logo()}
       {/if}
 
-      <div class="grow" />
+      <div class="grow"></div>
     </div>
     <div class="w-full md:w-[500px] mx-auto relative rounded-b-2xl shadow-xl">
       <div
