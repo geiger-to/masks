@@ -44,7 +44,7 @@ end
 
 gem "vite_rails", "~> 3.0"
 gem "good_job", "~> 4.4"
-gem "graphql", "~> 2.3"
+gem "graphql", "~> 2.4"
 gem "bcrypt", "~> 3.1"
 gem "ulid", "~> 1.4"
 gem "chronic_duration", "~> 0.10.6"
