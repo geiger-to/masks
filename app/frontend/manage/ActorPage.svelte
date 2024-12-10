@@ -226,7 +226,10 @@
 
         <div class="text-xs grow">
           <span class="opacity-75">saved</span>
-          <Time timestamp={actor.updatedAt} />
+
+          {#key actor.updatedAt}
+            <Time timestamp={actor.updatedAt} />
+          {/key}
         </div>
 
         <button
