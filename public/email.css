@@ -4911,6 +4911,10 @@ input.tab:checked + .tab-content,
   padding: 3rem;
 }
 
+.p-2\.5 {
+  padding: 0.625rem;
+}
+
 .p-3 {
   padding: 0.75rem;
 }
@@ -4921,10 +4925,6 @@ input.tab:checked + .tab-content,
 
 .p-\[1px\] {
   padding: 1px;
-}
-
-.p-2\.5 {
-  padding: 0.625rem;
 }
 
 .\!px-3 {

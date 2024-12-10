@@ -120,7 +120,7 @@ module Masks
     end
 
     def clients
-      setting(:clients).merge(
+      setting(:clients, default: {}).merge(
         "checks" => Masks::Checks.names(setting(:clients, :checks)),
       )
     end
@@ -134,10 +134,10 @@ module Masks
     end
 
     def emails
-      {
+      setting(:emails, default: {}).merge(
         enabled: emails?,
         max_for_login: Masks.setting(:emails, :max_for_login, default: 5),
-      }
+      )
     end
 
     def emails?
@@ -186,7 +186,7 @@ module Masks
           theme:,
           timezone:,
           region:,
-          emails:,
+          emails: emails.slice(:enabled),
           nicknames:,
           passwords:,
           passkeys:,
