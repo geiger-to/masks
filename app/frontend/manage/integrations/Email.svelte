@@ -14,6 +14,30 @@
     </div>
 
     <label class="input input-sm input-bordered flex items-center gap-3">
+      <span class="label-text-alt truncate opacity-70 w-[70px]">from</span>
+      <input
+        type="text"
+        class="grow ml-3"
+        placeholder="e.g. mail@example.com..."
+        value={settings.emails.from}
+        oninput={(e) => change({ emails: { from: e.target.value } })}
+      />
+    </label>
+    <label class="input input-sm input-bordered flex items-center gap-3">
+      <span class="label-text-alt truncate opacity-70 w-[70px]">reply-to</span>
+      <input
+        type="text"
+        class="grow ml-3"
+        placeholder="e.g. no-reply@example.com..."
+        value={settings.emails.replyTo}
+        oninput={(e) => change({ emails: { replyTo: e.target.value } })}
+      />
+    </label>
+
+    <div class="flex items-center gap-2 mt-2">
+      <p class="label-text-alt opacity-75 truncate">SMTP settings</p>
+    </div>
+    <label class="input input-sm input-bordered flex items-center gap-3">
       <span class="label-text-alt truncate opacity-70 w-[70px]">address</span>
       <input
         type="text"
@@ -22,6 +46,17 @@
         value={settings.integration.smtp.address}
         oninput={(e) =>
           change({ integration: { smtp: { address: e.target.value } } })}
+      />
+    </label>
+    <label class="input input-sm input-bordered flex items-center gap-3">
+      <span class="label-text-alt truncate opacity-70 w-[70px]">domain</span>
+      <input
+        type="text"
+        class="grow ml-3"
+        placeholder="e.g. example.com..."
+        value={settings.integration.smtp.domain}
+        oninput={(e) =>
+          change({ integration: { smtp: { domain: e.target.value } } })}
       />
     </label>
     <label class="input input-sm input-bordered flex items-center gap-3">

@@ -158,6 +158,8 @@ default: &default
     enabled: true
   emails:
     enabled: true
+    from: <%= ENV['MASKS_EMAIL_FROM'] %>
+    reply_to: <%= ENV['MASKS_EMAIL_REPLY_TO'] %>
     max_for_login: 5
   integration:
     <<: *integration
@@ -174,6 +176,11 @@ development:
     nickname: manager
     email: masks@example.com
     password: password
+  emails:
+    enabled: true
+    from: masks@example.com
+    reply_to: no-reply@example.com
+    max_for_login: 5
 
 test:
   <<: *default
@@ -188,6 +195,11 @@ test:
     email: "test"
     storage: "disk"
     phone: "test"
+  emails:
+    enabled: true
+    from: masks@example.com
+    reply_to: no-reply@example.com
+    max_for_login: 5
 
 production:
   <<: *default
