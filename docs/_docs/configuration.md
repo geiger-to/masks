@@ -92,8 +92,6 @@ The first time masks boots it will populate the database with default data, incl
 | manager.nickname | `MASKS_MANAGER_NICKNAME` | manager |
 | manager.password | `MASKS_MANAGER_PASSWORD` |
 | manager.email    | `MASKS_MANAGER_EMAIL`    |
-| manager.nickname | `MASKS_MANAGER_NICKNAME` |
-| manager.password | `MASKS_MANAGER_PASSWORD` |
 
 You can disable this behaviour with the `SKIP_MIGRATIONS` environment variable.
 
@@ -201,11 +199,13 @@ notifications depend on it.
 
 | name                            | ENV var                     | default |
 | ------------------------------- | --------------------------- | ------- |
+| emails.from                     | `MASKS_EMAIL_FROM`          |
+| emails.reply_to                 | `MASKS_EMAIL_REPLY_TO`      |
 | integration.email               | `MASKS_EMAIL_INTEGRATION`   | smtp    |
 | integration.phone               | `MASKS_PHONE_INTEGRATION`   | twilio  |
+| integration.smtp.domain         | `MASKS_SMTP_DOMAIN`         |
 | integration.smtp.address        | `MASKS_SMTP_ADDRESS`        |
 | integration.smtp.port           | `MASKS_SMTP_PORT`           |
-| integration.smtp.domain         | `MASKS_SMTP_DOMAIN`         |
 | integration.smtp.user_name      | `MASKS_SMTP_USER_NAME`      |
 | integration.smtp.password       | `MASKS_SMTP_PASSWORD`       |
 | integration.smtp.authentication | `MASKS_SMTP_AUTHENTICATION` |
