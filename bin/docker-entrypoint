@@ -5,8 +5,4 @@ if [ -z "${LD_PRELOAD+x}" ] && [ -f /usr/lib/*/libjemalloc.so.2 ]; then
   export LD_PRELOAD="$(echo /usr/lib/*/libjemalloc.so.2)"
 fi
 
-if [ "${1}" == "/masks/masks" ] && [ "${2}" == "start" ] && [ -z "${SKIP_MIGRATIONS+x}" ]; then
-  ./masks db:prepare
-fi
-
 exec "${@}"
