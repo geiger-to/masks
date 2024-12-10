@@ -9,7 +9,7 @@
   <div class="flex flex-col gap-3 pr-1.5">
     <div class="flex items-center gap-2 mt-2">
       <p class="label-text-alt opacity-75 truncate">
-        Used for SMS-based verification...
+        <b>Twilio settings</b> — Used for SMS-based verification...
       </p>
     </div>
 

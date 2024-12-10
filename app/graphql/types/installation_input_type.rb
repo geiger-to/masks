@@ -3,16 +3,17 @@
 module Types
   class InstallationInputType < Types::BaseInputObject
     argument :theme, Types::CamelizedJSON, required: false
-    argument :emails, GraphQL::Types::JSON, required: false
-    argument :nicknames, GraphQL::Types::JSON, required: false
-    argument :passwords, GraphQL::Types::JSON, required: false
-    argument :passkeys, GraphQL::Types::JSON, required: false
-    argument :login_links, GraphQL::Types::JSON, required: false
-    argument :backup_codes, GraphQL::Types::JSON, required: false
-    argument :totp_codes, GraphQL::Types::JSON, required: false
-    argument :phones, GraphQL::Types::JSON, required: false
-    argument :webauthn, GraphQL::Types::JSON, required: false
-    argument :checks, GraphQL::Types::JSON, required: false
-    argument :clients, GraphQL::Types::JSON, required: false
+    argument :emails, Types::CamelizedJSON, required: false
+    argument :nicknames, Types::CamelizedJSON, required: false
+    argument :passwords, Types::CamelizedJSON, required: false
+    argument :passkeys, Types::CamelizedJSON, required: false
+    argument :login_links, Types::CamelizedJSON, required: false
+    argument :backup_codes, Types::CamelizedJSON, required: false
+    argument :totp_codes, Types::CamelizedJSON, required: false
+    argument :phones, Types::CamelizedJSON, required: false
+    argument :webauthn, Types::CamelizedJSON, required: false
+    argument :checks, Types::CamelizedJSON, required: false
+    argument :clients, Types::CamelizedJSON, required: false
+    argument :integration, Types::CamelizedJSON, required: false
   end
 end

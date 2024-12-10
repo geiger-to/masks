@@ -25,6 +25,7 @@ class InstallMutationTest < GraphQLTestCase
               backupCodes
               checks
               clients
+              integration
               createdAt
               updatedAt
             }
@@ -53,5 +54,45 @@ class InstallMutationTest < GraphQLTestCase
     gql query, input: {}
 
     assert_equal Masks.url, gql_result("install", "install", "url")
+  end
+
+  test "integration settings can be modified" do
+    log_in "manager"
+
+    gql query,
+        input: {
+          integration: {
+            smtp: {
+              address: "example.com",
+              username: "test",
+              password: "test",
+            },
+          },
+        }
+
+    assert_equal "example.com",
+                 gql_result(
+                   "install",
+                   "install",
+                   "integration",
+                   "smtp",
+                   "address",
+                 )
+    assert_equal "test",
+                 gql_result(
+                   "install",
+                   "install",
+                   "integration",
+                   "smtp",
+                   "username",
+                 )
+    assert_equal "test",
+                 gql_result(
+                   "install",
+                   "install",
+                   "integration",
+                   "smtp",
+                   "password",
+                 )
   end
 end

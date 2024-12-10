@@ -1,5 +1,12 @@
 <script>
-  import { Phone, MessageSquare, Mail, Upload, ImageUp } from "lucide-svelte";
+  import {
+    Phone,
+    Smartphone,
+    MessageSquare,
+    Mail,
+    Upload,
+    ImageUp,
+  } from "lucide-svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
   import Alert from "@/components/Alert.svelte";
   import StorageIntegration from "./integrations/Storage.svelte";
@@ -14,12 +21,12 @@
       component: StorageIntegration,
     },
     sms: {
-      name: "SMS",
-      icon: MessageSquare,
+      name: "Phones",
+      icon: Smartphone,
       component: SMSIntegration,
     },
     email: {
-      name: "Email",
+      name: "Emails",
       icon: Mail,
       component: EmailIntegration,
     },
