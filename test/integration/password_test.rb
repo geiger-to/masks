@@ -19,6 +19,17 @@ class PasswordTest < MasksTestCase
     assert_prompt "credentials"
   end
 
+  test "password:verify rejects passwords for actors with nil passwords" do
+    Masks.signup("no-password").save!
+
+    authorize
+    attempt_identifier("no-password")
+    attempt_password("invalid")
+
+    assert_warning "invalid-credentials"
+    assert_prompt "credentials"
+  end
+
   test "password:verify rejects invalid passwords for invalid actors" do
     authorize
     attempt_identifier("invalid")
