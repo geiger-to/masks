@@ -3,6 +3,7 @@ def info(*args)
 end
 
 task :start, [:formation] do |t, args|
+  sh("bin/rails db:prepare") unless ENV["SKIP_MIGRATIONS"]
   sh(["foreman", "start", args[:formation]].compact.join(" "))
 end
 
