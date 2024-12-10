@@ -24,6 +24,7 @@ module Mutations
       end
 
       actor.reset_backup_codes if args[:reset_backup_codes]
+      actor.reset_password if args[:reset_password]
 
       actor&.save
 

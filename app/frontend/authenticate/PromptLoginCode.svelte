@@ -99,6 +99,9 @@
       {label}
       {denied}
       {loading}
+      {authorize}
+      event="login-link:verify"
+      updates={{ code: value, resetPassword: reset }}
       disabled={!complete}
       class={denied ? "btn-warning" : "btn-primary"}
     />

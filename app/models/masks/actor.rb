@@ -88,11 +88,16 @@ module Masks
       emails.verified_for_login.none?
     end
 
+    def reset_password
+      self.password_digest = nil
+      self.password_changed_at = nil
+    end
+
     def change_password(v)
       return unless password_changeable?
 
       self.password = v
-      self.password_changed_at = Time.now.utc
+      self.password_changed_at = Time.current
     end
 
     def password_changeable?

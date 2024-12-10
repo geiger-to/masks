@@ -9,6 +9,7 @@
   import EditableImage from "@/components/EditableImage.svelte";
   import ActorPhones from "./ActorPhones.svelte";
   import ActorEmails from "./ActorEmails.svelte";
+  import ActorPassword from "./ActorPassword.svelte";
   import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
   import ActorBackupCodes from "./ActorBackupCodes.svelte";
   import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
@@ -26,6 +27,9 @@
       id
       name
       nickname
+      password
+      passwordChangedAt
+      passwordChangeable
       identifier
       identifierType
       identiconId
@@ -265,6 +269,8 @@
         oninput={(e) => change({ nickname: e.target.value || null })}
       />
     </label>
+
+    <ActorPassword {actor} />
 
     <div class="flex flex-col">
       <span class="text-xs opacity-75 mb-1.5">emails</span>
