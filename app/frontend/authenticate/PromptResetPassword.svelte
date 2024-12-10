@@ -68,7 +68,8 @@
 
 <div class="flex flex-col md:flex-row md:items-center md:gap-4">
   <PromptContinue
-    onClick={!changed ? changePassword : null}
+    onclick={!changed ? changePassword : null}
+    {authorize}
     label={changed ? "continue" : "change"}
     {loading}
     {denied}
@@ -80,6 +81,7 @@
     <span class="opacity-75 text-lg ml-1.5 hidden md:flex"> or </span>
 
     <PromptContinue
+      {authorize}
       event="reset-password:skip"
       class="btn-link px-0 text-base-content"
     >

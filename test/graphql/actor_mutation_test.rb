@@ -72,6 +72,23 @@ class ActorMutationTest < GraphQLTestCase
     assert tester.reload.authenticate("testing123")
   end
 
+  test "passwords can be reset for any existing actor" do
+    log_in "manager"
+
+    assert tester.authenticate("password")
+    gql query, input: { id: tester.key, resetPassword: true }
+    assert_nil tester.reload.password_digest
+  end
+
+  test "backup codes can be reset for any existing actor" do
+    log_in "manager"
+
+    tester.update_attribute!(:backup_codes, ["test"])
+    assert tester.reload.backup_codes
+    gql query, input: { id: tester.key, resetBackupCodes: true }
+    assert_nil tester.reload.backup_codes
+  end
+
   test "scopes can be changed for any existing actor" do
     log_in "manager"
 

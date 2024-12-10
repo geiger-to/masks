@@ -97,7 +97,9 @@ module Masks
     end
 
     def checks
-      Masks::Checks.names(super || [])
+      current = Masks::Checks.names(super || [])
+
+      Masks.installation.checks.select { |name| current.include?(name) }
     end
 
     def check?(cls)
