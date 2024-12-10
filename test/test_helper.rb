@@ -6,10 +6,12 @@ require "rails/test_help"
 require "byebug"
 require "vcr"
 require "simplecov"
-SimpleCov.start
-
 require "simplecov-cobertura"
+
 SimpleCov.formatter = SimpleCov::Formatter::CoberturaFormatter
+SimpleCov.start "rails" do
+  enable_coverage :branch
+end
 
 Dir[Rails.root.join("test", "helpers", "**", "*.rb")].each do |file|
   require file
