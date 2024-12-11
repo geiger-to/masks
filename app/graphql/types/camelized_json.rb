@@ -5,7 +5,7 @@ module Types
     def self.coerce_input(value, _context)
       case value
       when Hash
-        value.deep_transform_keys { |k| k.to_s.camelize(:lower) }
+        value.deep_transform_keys { |k| k.to_s.underscore }
       else
         value
       end

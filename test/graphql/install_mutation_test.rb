@@ -64,35 +64,14 @@ class InstallMutationTest < GraphQLTestCase
           integration: {
             smtp: {
               address: "example.com",
-              username: "test",
+              userName: "test",
               password: "test",
             },
           },
         }
 
-    assert_equal "example.com",
-                 gql_result(
-                   "install",
-                   "install",
-                   "integration",
-                   "smtp",
-                   "address",
-                 )
-    assert_equal "test",
-                 gql_result(
-                   "install",
-                   "install",
-                   "integration",
-                   "smtp",
-                   "username",
-                 )
-    assert_equal "test",
-                 gql_result(
-                   "install",
-                   "install",
-                   "integration",
-                   "smtp",
-                   "password",
-                 )
+    assert_equal "example.com", Masks.setting(:integration, :smtp, :address)
+    assert_equal "test", Masks.setting(:integration, :smtp, :user_name)
+    assert_equal "test", Masks.setting(:integration, :smtp, :password)
   end
 end
