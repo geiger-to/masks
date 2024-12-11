@@ -76,9 +76,9 @@
         type="text"
         class="grow ml-3"
         placeholder="..."
-        value={settings.integration.smtp.username}
+        value={settings.integration.smtp.userName}
         oninput={(e) =>
-          change({ integration: { smtp: { username: e.target.value } } })}
+          change({ integration: { smtp: { userName: e.target.value } } })}
       />
     </label>
     <PasswordInput
