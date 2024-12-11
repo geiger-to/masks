@@ -3,10 +3,7 @@
 class MasksSchema < GraphQL::Schema
   class << self
     def manager?(context)
-      context[:auth]
-        .prompt_for(Masks::Prompts::InternalSession)
-        .current_actor
-        &.masks_manager?
+      Masks::InternalSession.new(auth: context[:auth]).masks_manager?
     end
   end
 
