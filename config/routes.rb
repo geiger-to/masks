@@ -5,7 +5,14 @@ Rails.application.routes.draw do
     mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
   end
 
-  mount Sidekiq::Web => "/sidekiq", :constraints => Masks::ManagerConstraint.new
+  case Masks.env.queue_adapter
+  when :sidekiq
+    mount Sidekiq::Web => "/manage/queue",
+          :constraints => Masks::ManagerConstraint.new
+  when :good_job
+    mount GoodJob::Engine => "/manage/queue",
+          :constraints => Masks::ManagerConstraint.new
+  end
 
   post "/graphql", to: "graphql#execute"
 
