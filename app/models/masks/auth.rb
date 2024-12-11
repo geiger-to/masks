@@ -155,8 +155,6 @@ module Masks
     end
 
     def prompts
-      return [] unless locked
-
       @prompts ||= Masks.prompts.map { |cls| [cls.to_s, cls.new(self)] }.to_h
     end
   end

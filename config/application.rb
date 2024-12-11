@@ -51,14 +51,7 @@ module Masks
     config.active_storage.service = "masks"
 
     unless Rails.env.test?
-      config.active_job.queue_adapter =
-        if Masks.env.redis.url.present?
-          :sidekiq
-        elsif Masks.env.db.adapter == "postgresql"
-          :good_job
-        else
-          :delayed_job
-        end
+      config.active_job.queue_adapter = Masks.env.queue_adapter
     end
 
     # Use a custom delivery_method, which allows switching

@@ -3,7 +3,7 @@ class ApplicationController < ActionController::Base
 
   before_action :set_favicon
 
-  around_action { |controller, block| auth.session!(&block) }
+  around_action { |controller, block| internal_session.auth!(&block) }
 
   helper_method :props_json
 
@@ -14,11 +14,10 @@ class ApplicationController < ActionController::Base
   end
 
   def internal_session
-    @internal_session = auth.prompt_for(Masks::Prompts::InternalSession)
+    @internal_session ||= Masks::InternalSession.new(auth:)
   end
 
-  delegate :current_actor, to: :internal_session
-  delegate :device, to: :auth
+  delegate :current_actor, :device, to: :internal_session
 
   def props_json
     @props
