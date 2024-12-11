@@ -11,9 +11,16 @@ module Masks
     def mailer
       case install.setting(:integration, :email)
       when "sendmail"
-        Mail::Sendmail.new(install.setting(:integration, :sendmail))
+        Mail::Sendmail.new(
+          install.setting(:integration, :sendmail).symbolize_keys.compact,
+        )
       when "smtp"
-        Mail::SMTP.new(install.setting(:integration, :smtp))
+        Mail::SMTP.new(
+          install
+            .setting(:integration, :smtp, default: {})
+            .symbolize_keys
+            .compact,
+        )
       when "dev"
         LetterOpener::DeliveryMethod.new({})
       when "test"
