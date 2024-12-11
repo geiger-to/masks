@@ -170,16 +170,16 @@ development:
   private_key: "<%= Rails.root.join('config', 'private.development.key') %>"
   integration:
     <<: *integration
-    email: "dev"
+    email: <%= ENV.fetch('MASKS_INTEGRATION_EMAIL', 'dev') %>
     storage: "disk"
   manager:
-    nickname: manager
-    email: masks@example.com
-    password: password
+    email: <%= ENV.fetch('MASKS_MANAGER_EMAIL', 'masks@example.com') %>
+    nickname: <%= ENV.fetch('MASKS_MANAGER_NICKNAME', 'manager') %>
+    password: <%= ENV.fetch('MASKS_MANAGER_PASSWORD', 'password') %>
   emails:
     enabled: true
-    from: masks@example.com
-    reply_to: no-reply@example.com
+    from: <%= ENV.fetch('MASKS_EMAIL_FROM', 'from@example.com') %>
+    reply_to: <%= ENV.fetch('MASKS_EMAIL_REPLY_TO', 'reply-to@example.com') %>
     max_for_login: 5
 
 test:
