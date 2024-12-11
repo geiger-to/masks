@@ -1,0 +1,6 @@
+---
+:concurrency: <%= ENV.fetch("MASKS_THREADS", 5) %>
+:queues:
+  - high
+  - default
+  - low

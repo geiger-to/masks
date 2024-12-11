@@ -1,0 +1,23 @@
+<style>
+  .background {
+    <%= @bg_light ||Masks.setting(:light, :bg) %>
+  }
+
+@media (prefers-color-scheme: dark) {
+  .background {
+    <%= @bg_dark || Masks.setting(:dark, :bg) %>
+  }
+}
+</style>
+
+<%= content_tag :div, "", id: "app", class: 'h-full' %>
+
+<%= javascript_tag("window.APP = #{props_json}") %>
+
+<% content_for :head do %>
+  <%= vite_javascript_tag 'app' %>
+<% end %>
+
+<% content_for :styles do %>
+  <%= vite_stylesheet_tag 'app.css' %>
+<% end %>

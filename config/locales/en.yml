@@ -1,0 +1,77 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+en:
+  auth:
+    invalid_identifier: "invalid identifier"
+    invalid_credentials: "invalid credentials"
+    invalid_request: the request is malformed
+    scopes_required: "unauthorized"
+  scopes:
+    "masks:manage": Manage masks
+  activerecord:
+    attributes:
+      masks/email:
+        address: Email address
+      masks/phone:
+        number: Phone number
+      masks/actor:
+        backup_codes: Backup codes
+        identifier_type: Identifier
+        emails: Email
+      masks/client:
+        code_expires_in: Auth token lifetime
+        id_token_expires_in: Id token lifetime
+        access_token_expires_in: Access token lifetime
+        refresh_expires_in: Refresh token lifetime
+        login_link_expires_in: Login link lifetime
+        auth_attempt_expires_in: Auth attempt lifetime
+        email_verification_expires_in: Verified email lifetime
+        login_link_factor_expires_in: Login link lifetime
+        password_factor_expires_in: Auth via password lifetime
+        second_factor_backup_code_expires_in: 2FA with backup code
+        second_factor_phone_expires_in: 2FA with SMS code
+        second_factor_totp_code_expires_in: 2FA with TOTP
+        second_factor_webauthn_expires_in: 2FA with Webauthn
+        internal_session_expires_in: Internal session lifetime
+    errors:
+      models:
+        masks/email:
+          attributes:
+            base:
+              max_for_login: "Cannot add another login email (%{count} maximum)"
+              email_identifier: "Cannot remove primary email"
+        masks/actor:
+          attributes:
+            identifier_type:
+              blank: is invalid
+            backup_codes:
+              length: must be replaced by a list of exactly %{total} codes
+              too_short: must be longer than %{count} characters
+              too_long: must be shorter than %{count} characters

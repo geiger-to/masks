@@ -1,0 +1,34 @@
+# frozen_string_literal: true
+
+module Mutations
+  class Actor < BaseMutation
+    input_object_class Types::ActorInputType
+
+    field :actor, Types::ActorType, null: true
+    field :errors, [String], null: true
+
+    FIELDS = %i[name nickname password scopes]
+
+    def resolve(**args)
+      actor =
+        if args[:signup]
+          Masks.signup(args[:identifier])
+        else
+          Masks::Actor.find_by(key: args[:id])
+        end
+
+      if !args[:signup] && actor
+        FIELDS.each do |field|
+          actor.assign_attributes(field => args[field]) if args[field]
+        end
+      end
+
+      actor.reset_backup_codes if args[:reset_backup_codes]
+      actor.reset_password if args[:reset_password]
+
+      actor&.save
+
+      { actor:, errors: actor&.errors&.full_messages&.uniq }
+    end
+  end
+end

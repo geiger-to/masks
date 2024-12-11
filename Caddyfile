@@ -1,0 +1,3 @@
+masks.localhost {
+  reverse_proxy masks:1111
+}
