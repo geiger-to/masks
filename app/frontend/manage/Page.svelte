@@ -3,7 +3,6 @@
   import { run, preventDefault, stopPropagation } from "svelte/legacy";
   import Avatar from "../components/Avatar.svelte";
   import PasswordInput from "../components/PasswordInput.svelte";
-  import SettingsCard from "../components/SettingsCard.svelte";
   import DeviceCard from "../components/DeviceCard.svelte";
   import TokenCard from "../components/TokenCard.svelte";
   import CodeCard from "../components/CodeCard.svelte";
