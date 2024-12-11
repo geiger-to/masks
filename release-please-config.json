@@ -7,6 +7,8 @@
       "version-file": "lib/masks/version.rb",
       "package-name": "masks",
       "bump-minor-pre-major": true,
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
       "draft": false,
       "prerelease": false
     }

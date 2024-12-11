@@ -7,7 +7,7 @@
   },
   "files": {
     "ignoreUnknown": false,
-    "ignore": ["aaguids/**/*", "public/**/*"]
+    "ignore": ["aaguids/**/*", "public/**/*", ".release-please-manifest.json"]
   },
   "formatter": {
     "enabled": true,

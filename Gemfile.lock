@@ -167,7 +167,7 @@ GEM
     et-orbi (1.2.11)
       tzinfo
     eventmachine (1.2.7)
-    faraday (2.12.1)
+    faraday (2.12.2)
       faraday-net_http (>= 2.0, < 3.5)
       json
       logger
@@ -432,7 +432,7 @@ GEM
       psych (>= 4.0.0)
     recursive-open-struct (2.0.0)
       ostruct
-    redis-client (0.22.2)
+    redis-client (0.23.0)
       connection_pool
     regexp_parser (2.9.3)
     reline (0.5.12)
