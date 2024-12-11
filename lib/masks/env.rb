@@ -1,14 +1,18 @@
 module Masks
   class Env < RecursiveOpenStruct
+    attr_writer :queue_adapter
+
     def queue_adapter
-      if redis.url.present?
-        :sidekiq
-      elsif db_adapter == "postgresql"
-        :good_job
-      else
-        :delayed_job
-      end
+      @queue_adapter ||=
+        if redis.url.present?
+          :sidekiq
+        elsif db_adapter == "postgresql"
+          :good_job
+        else
+          :delayed_job
+        end
     end
+
     def db_adapter
       @db_adapter ||=
         begin
