@@ -31,6 +31,9 @@ integration: &integration
     container: <%= ENV['MASKS_AZURE_STORAGE_CONTAINER'] %>
   sentry:
     dsn: <%= ENV['MASKS_SENTRY_DSN'] %>
+  newrelic:
+    license_key: <%= ENV['MASKS_NEWRELIC_LICENSE_KEY'] %>
+    app: <%= ENV['MASKS_NEWRELIC_APP'] || ENV['MASKS_NAME'] || 'masks' %>
 
 default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"

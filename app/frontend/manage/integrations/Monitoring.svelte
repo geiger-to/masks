@@ -23,5 +23,35 @@
           change({ integration: { sentry: { dsn: e.target.value } } })}
       />
     </label>
+
+    <div class="flex items-center gap-2 mt-2">
+      <p class="label-text-alt opacity-75 truncate">New Relic</p>
+    </div>
+
+    <label class="input input-sm input-bordered flex items-center gap-3">
+      <span class="label-text-alt truncate opacity-70 w-[70px]">App name</span>
+      <input
+        type="text"
+        class="grow ml-3"
+        placeholder="e.g. https://public@sentry.example.com/1..."
+        value={settings.integration?.newrelic?.app}
+        oninput={(e) =>
+          change({ integration: { newrelic: { app: e.target.value } } })}
+      />
+    </label>
+
+    <label class="input input-sm input-bordered flex items-center gap-3">
+      <span class="label-text-alt truncate opacity-70 w-[70px]"
+        >License key</span
+      >
+      <input
+        type="text"
+        class="grow ml-3"
+        placeholder="e.g. https://public@sentry.example.com/1..."
+        value={settings.integration?.newrelic?.licenseKey}
+        oninput={(e) =>
+          change({ integration: { newrelic: { licenseKey: e.target.value } } })}
+      />
+    </label>
   </div>
 </div>
