@@ -34,4 +34,8 @@ class ApplicationController < ActionController::Base
   def installation
     @installation ||= Masks.installation.reload
   end
+
+  def sentry
+    @sentry ||= Masks.setting(:integration, :sentry)
+  end
 end

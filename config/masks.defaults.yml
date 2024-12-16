@@ -29,6 +29,8 @@ integration: &integration
     storage_account_name: <%= ENV['MASKS_AZURE_STORAGE_ACCOUNT_NAME'] %>
     storage_access_key: <%= ENV['MASKS_AZURE_STORAGE_ACCESS_KEY'] %>
     container: <%= ENV['MASKS_AZURE_STORAGE_CONTAINER'] %>
+  sentry:
+    dsn: <%= ENV['MASKS_SENTRY_DSN'] %>
 
 default: &default
   url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"

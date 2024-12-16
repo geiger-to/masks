@@ -37,6 +37,7 @@
     "@mateothegreat/svelte5-router": "^0.1.3",
     "@rails/actioncable": "^7.2.102",
     "@scure/base": "^1.1.9",
+    "@sentry/svelte": "^8.45.1",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@tsconfig/svelte": "^5.0.4",
     "@urql/svelte": "^4.2.1",

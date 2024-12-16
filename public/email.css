@@ -4817,6 +4817,11 @@ input.tab:checked + .tab-content,
   border-color: rgb(209 213 219 / var(--tw-border-opacity, 1));
 }
 
+.border-gray-400 {
+  --tw-border-opacity: 1;
+  border-color: rgb(156 163 175 / var(--tw-border-opacity, 1));
+}
+
 .border-green-200 {
   --tw-border-opacity: 1;
   border-color: rgb(187 247 208 / var(--tw-border-opacity, 1));
@@ -4861,19 +4866,6 @@ input.tab:checked + .tab-content,
 .border-yellow-100 {
   --tw-border-opacity: 1;
   border-color: rgb(254 249 195 / var(--tw-border-opacity, 1));
-}
-
-.border-neutral {
-  --tw-border-opacity: 1;
-  border-color: var(
-    --fallback-n,
-    oklch(var(--n) / var(--tw-border-opacity, 1))
-  );
-}
-
-.border-gray-400 {
-  --tw-border-opacity: 1;
-  border-color: rgb(156 163 175 / var(--tw-border-opacity, 1));
 }
 
 .border-opacity-50 {
@@ -5281,6 +5273,10 @@ input.tab:checked + .tab-content,
   line-height: 1;
 }
 
+.text-\[10px\] {
+  font-size: 10px;
+}
+
 .text-\[9px\] {
   font-size: 9px;
 }
@@ -5308,18 +5304,6 @@ input.tab:checked + .tab-content,
 .text-xs {
   font-size: 0.75rem;
   line-height: 1rem;
-}
-
-.text-\[10px\] {
-  font-size: 10px;
-}
-
-.text-\[11px\] {
-  font-size: 11px;
-}
-
-.text-\[0px\] {
-  font-size: 0px;
 }
 
 .font-bold {
