@@ -212,3 +212,11 @@ notifications depend on it.
 | integration.twilio.account_sid  | `MASKS_TWILIO_ACCOUNT_SID`  |
 | integration.twilio.auth_token   | `MASKS_TWILIO_AUTH_TOKEN`   |
 | integration.twilio.service_sid  | `MASKS_TWILIO_SERVICE_SID`  |
+
+### Monitoring
+
+You can monitor a running masks instance with [Sentry](https://sentry.io).
+
+| name                   | ENV var            | default |
+| ---------------------- | ------------------ | ------- |
+| integration.sentry.dsn | `MASKS_SENTRY_DSN` |

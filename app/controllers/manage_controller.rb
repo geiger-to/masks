@@ -4,6 +4,7 @@ class ManageController < ManagersController
     @props = {
       section: "Manage",
       url: params[:url] || "",
+      sentry:,
       actor:
         current_actor.slice(:identifier, :identicon_id, :avatar_url).merge(
           id: current_actor.key,

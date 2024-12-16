@@ -3,6 +3,7 @@
     Phone,
     Smartphone,
     MessageSquare,
+    SquareActivity,
     Mail,
     Upload,
     ImageUp,
@@ -12,6 +13,7 @@
   import StorageIntegration from "./integrations/Storage.svelte";
   import SMSIntegration from "./integrations/SMS.svelte";
   import EmailIntegration from "./integrations/Email.svelte";
+  import MonitoringIntegration from "./integrations/Monitoring.svelte";
   let { change, settings } = $props();
 
   let integrations = {
@@ -29,6 +31,11 @@
       name: "Emails",
       icon: Mail,
       component: EmailIntegration,
+    },
+    monitoring: {
+      name: "Monitoring",
+      icon: SquareActivity,
+      component: MonitoringIntegration,
     },
   };
 
