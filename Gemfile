@@ -73,7 +73,7 @@ gem "fido_metadata",
     git: "https://github.com/bdewater/fido_metadata",
     branch: "main"
 
-gem "twilio-ruby", "~> 7.3"
+gem "twilio-ruby", "~> 7.4"
 
 gem "dotenv", groups: %i[development test]
 

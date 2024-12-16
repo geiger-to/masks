@@ -546,7 +546,7 @@ GEM
       bindata (~> 2.4)
       openssl (> 2.0)
       openssl-signature_algorithm (~> 1.0)
-    twilio-ruby (7.3.7)
+    twilio-ruby (7.4.0)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -665,7 +665,7 @@ DEPENDENCIES
   syntax_tree (~> 6.2)
   syntax_tree-haml (~> 4.0)
   syntax_tree-rbs (~> 1.0)
-  twilio-ruby (~> 7.3)
+  twilio-ruby (~> 7.4)
   tzinfo-data
   ulid (~> 1.4)
   valid_email (~> 0.2.1)
