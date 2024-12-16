@@ -5,6 +5,10 @@ class MasksTestCase < ActionDispatch::IntegrationTest
     Masks.reset!
     Masks.seed!
 
+    @tester = nil
+    @manage_client = nil
+    @manager = nil
+
     seeds.actor!(
       nickname: "tester",
       email: "test@example.com",

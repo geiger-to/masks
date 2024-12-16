@@ -56,7 +56,7 @@ module Masks
     end
 
     def setting(*args, **opts)
-      installation.setting(*args, **opts)
+      installation&.setting(*args, **opts)
     end
 
     def prompts
@@ -125,14 +125,13 @@ module Masks
     end
 
     def reset!
-      @seeds = nil
       @scopes = nil
       @prompts = nil
       @installation = nil
       @authenticate_gql = nil
       @masks_yml = nil
       @seeds = nil
-      @key = nil
+      @keys = nil
       @env = nil
     end
 

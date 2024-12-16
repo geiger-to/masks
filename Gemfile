@@ -97,3 +97,4 @@ gem "geocoder", "~> 1.8"
 gem "stackprof"
 gem "sentry-ruby"
 gem "sentry-rails"
+gem "newrelic_rpm", require: false
