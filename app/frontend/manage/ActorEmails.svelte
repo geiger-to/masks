@@ -144,7 +144,8 @@
   {/each}
 
   <div
-    class="text-sm p-1.5 rounded-lg border-2 border-dashed border-neutral flex items-center gap-1.5"
+    class="text-sm p-1.5 rounded-lg border-2 border-dashed dark:border-neutral
+    border-gray-300 flex items-center gap-1.5"
   >
     <label class="input input-xs input-ghost flex items-center gap-3 grow">
       <span class="label-text-alt opacity-75 whitespace-nowrap">new email</span>

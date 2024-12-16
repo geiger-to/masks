@@ -26,7 +26,7 @@
         <div>
           <div class="font-bold text-lg flex items-center gap-1.5">
             <span>
-              {actor.nickname}
+              {actor.identifier}
             </span>
           </div>
 

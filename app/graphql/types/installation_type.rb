@@ -22,11 +22,37 @@ module Types
     field :checks, Types::CamelizedJSON, null: false
     field :clients, Types::CamelizedJSON, null: false
     field :integration, Types::CamelizedJSON, null: false
+    field :stats, Types::CamelizedJSON, null: false
+    field :recent_clients, [Types::ClientType], null: false
+    field :recent_actors, [Types::ActorType], null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
 
+    def recent_actors
+      Masks::Actor.limit(10).order(created_at: :desc)
+    end
+
+    def recent_clients
+      Masks::Client.limit(10).order(created_at: :desc)
+    end
+
     def favicon
       rails_storage_proxy_url(object.favicon) if object.favicon.attached?
+    end
+
+    def stats
+      tokens =
+        Masks::AuthorizationCode.count + Masks::AccessToken.count +
+          Masks::IdToken.count
+
+      {
+        actors: Masks::Actor.count,
+        emails: Masks::Email.count,
+        phones: Masks::Phone.count,
+        clients: Masks::Client.count,
+        devices: Masks::Device.count,
+        tokens:,
+      }
     end
   end
 end
