@@ -25,6 +25,12 @@ module Types
       actor if actor&.persisted?
     end
 
+    field :actors, Types::ActorType.connection_type, null: false
+
+    def actors
+      Masks::Actor.order(created_at: :desc)
+    end
+
     field :client,
           Types::ClientType,
           null: true,
@@ -37,6 +43,12 @@ module Types
       Masks::Client.find_by(key: id)
     end
 
+    field :clients, Types::ClientType.connection_type, null: false
+
+    def clients
+      Masks::Client.order(created_at: :desc)
+    end
+
     field :install,
           Types::InstallationType,
           description: "Returns the current installation",
@@ -45,6 +57,24 @@ module Types
 
     def install
       Masks.installation
+    end
+
+    field :devices, Types::DeviceType.connection_type, null: false
+
+    def devices
+      Masks::Device.order(created_at: :desc)
+    end
+
+    field :emails, Types::EmailType.connection_type, null: false
+
+    def emails
+      Masks::Email.order(created_at: :desc).includes(:actor)
+    end
+
+    field :phones, Types::PhoneType.connection_type, null: false
+
+    def phones
+      Masks::Phone.order(created_at: :desc).includes(:actor)
     end
 
     field :search, Types::SearchType, null: true, managers_only: true do

@@ -110,7 +110,7 @@
     </div>
   {:else}
     <div
-      class="flex items-center gap-3 text-sm pr-3 border-2 border-base-100 border-dashed rounded-lg p-1.5 pl-3"
+      class="flex items-center gap-3 text-sm pr-3 border-2 border-gray-300 dark:border-neutral border-dashed rounded-lg p-1.5 pl-3"
     >
       <span class="text-xs opacity-75"> none saved... </span>
     </div>

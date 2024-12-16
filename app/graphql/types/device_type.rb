@@ -14,7 +14,7 @@ module Types
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def id
-      object.session_id
+      object.public_id
     end
   end
 end

@@ -246,31 +246,33 @@
       </div>
     </Alert>
 
-    <label class="input input-bordered flex items-center gap-3">
-      <span class="label-text-alt opacity-75">full name</span>
+    <div class="flex flex-col gap-1.5 mb-1.5">
+      <label class="input input-bordered flex items-center gap-3">
+        <span class="label-text-alt opacity-75">full name</span>
 
-      <input
-        type="text"
-        class="grow"
-        value={actor.name}
-        placeholder="..."
-        oninput={(e) => change({ name: e.target.value || null })}
-      />
-    </label>
+        <input
+          type="text"
+          class="grow"
+          value={actor.name}
+          placeholder="..."
+          oninput={(e) => change({ name: e.target.value || null })}
+        />
+      </label>
 
-    <label class="input input-bordered flex items-center gap-3">
-      <span class="label-text-alt opacity-75">nickname</span>
+      <label class="input input-bordered flex items-center gap-3">
+        <span class="label-text-alt opacity-75">nickname</span>
 
-      <input
-        type="text"
-        class="grow"
-        value={actor.nickname}
-        placeholder="..."
-        oninput={(e) => change({ nickname: e.target.value || null })}
-      />
-    </label>
+        <input
+          type="text"
+          class="grow"
+          value={actor.nickname}
+          placeholder="..."
+          oninput={(e) => change({ nickname: e.target.value || null })}
+        />
+      </label>
 
-    <ActorPassword {actor} />
+      <ActorPassword {actor} />
+    </div>
 
     <div class="flex flex-col">
       <span class="text-xs opacity-75 mb-1.5">emails</span>

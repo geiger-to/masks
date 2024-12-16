@@ -20,15 +20,25 @@ mount(Router, {
     basepath: "manage",
     routes: [
       makeRoute(
+        "clients/new",
+        async () => import("../manage/NewClientPage.svelte")
+      ),
+      makeRoute(
+        "actors/new",
+        async () => import("../manage/NewActorPage.svelte")
+      ),
+      makeRoute(
         "client/(.+)",
         async () => import("../manage/ClientPage.svelte")
       ),
       makeRoute("actor/(.+)", async () => import("../manage/ActorPage.svelte")),
-      makeRoute("client", async () => import("../manage/NewClientPage.svelte")),
-      makeRoute("actor", async () => import("../manage/NewActorPage.svelte")),
       makeRoute(
         "settings",
         async () => import("../manage/SettingsPage.svelte")
+      ),
+      makeRoute(
+        "/manage/(?<tab>.*)",
+        async () => import("../manage/HomePage.svelte")
       ),
       makeRoute("", async () => import("../manage/HomePage.svelte")),
     ],

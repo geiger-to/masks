@@ -3,7 +3,6 @@
   import { run, preventDefault, stopPropagation } from "svelte/legacy";
   import Avatar from "../components/Avatar.svelte";
   import PasswordInput from "../components/PasswordInput.svelte";
-  import DeviceCard from "../components/DeviceCard.svelte";
   import TokenCard from "../components/TokenCard.svelte";
   import CodeCard from "../components/CodeCard.svelte";
   import JwtCard from "../components/JwtCard.svelte";
@@ -258,13 +257,13 @@
             >
               <a
                 use:route
-                href="/manage/actor"
+                href="/manage/actors/new"
                 class="btn btn-neutral join-item btn-xs whitespace-nowrap"
                 >new actor</a
               >
               <a
                 use:route
-                href="/manage/client"
+                href="/manage/clients/new"
                 class="btn btn-neutral join-item btn-xs whitespace-nowrap"
                 >new client</a
               >
@@ -336,7 +335,7 @@
     </div>
   </div>
 
-  <div class={`bg-base-300 text-base-content shadow-inner p-1.5 md:p-6 mb-6`}>
+  <div class={`bg-base-300 text-base-content shadow-inner p-3 md:p-6 mb-6`}>
     {#if notFound}
       <div class="bold bg-base-300 rounded-lg w-prose mx-auto p-10">
         <h1 class="text-error text-2xl font-bold">Not found</h1>
