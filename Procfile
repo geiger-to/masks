@@ -1,2 +1,2 @@
-web: PORT=1111 MASKS_PORT=1111 ./masks server
+web: ./masks server
 job: ./masks worker

@@ -114,7 +114,7 @@ jobs:
       - name: Run tests
         env:
           RAILS_ENV: test
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432
+          MASKS_DB_URL: postgres://postgres:postgres@localhost:5432
         run: |
           bin/rails db:test:prepare
           npm run build

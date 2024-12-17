@@ -1,10 +1,22 @@
 development:
-  adapter: async
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
+  <% if Masks.env.db_enabled?(:websockets) %>
+  connects_to:
+    database:
+      writing: websockets
+  <% end %>
 
 test:
   adapter: test
 
 production:
-  adapter: redis
-  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
-  channel_prefix: masks_production
+  adapter: solid_cable
+  polling_interval: 0.1.seconds
+  message_retention: 1.day
+  <% if Masks.env.db_enabled?(:websockets) %>
+  connects_to:
+    database:
+      writing: websockets
+  <% end %>

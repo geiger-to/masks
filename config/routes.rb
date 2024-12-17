@@ -1,17 +1,6 @@
-require "sidekiq/web"
-
 Rails.application.routes.draw do
   if Rails.env.development?
     mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
-  end
-
-  case Masks.env.queue_adapter
-  when :sidekiq
-    mount Sidekiq::Web => "/manage/queue",
-          :constraints => Masks::ManagerConstraint.new
-  when :good_job
-    mount GoodJob::Engine => "/manage/queue",
-          :constraints => Masks::ManagerConstraint.new
   end
 
   post "/graphql", to: "graphql#execute"

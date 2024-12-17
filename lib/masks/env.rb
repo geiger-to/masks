@@ -1,37 +1,44 @@
 module Masks
   class Env < RecursiveOpenStruct
-    attr_writer :queue_adapter
+    PRIMARY_DB_TYPE = "primary"
+    DEFAULT_DB_ADAPTER = "sqlite3"
 
-    def queue_adapter
-      @queue_adapter ||=
-        if redis.url.present?
-          :sidekiq
-        elsif db_adapter == "postgresql"
-          :good_job
-        else
-          :delayed_job
-        end
+    def db_enabled?(type)
+      return true if type.to_s == PRIMARY_DB_TYPE
+
+      db[type]&.url&.present? || db[type]&.adapter&.present?
     end
 
-    def db_adapter
-      @db_adapter ||=
-        begin
-          adapter = db.adapter&.presence
-          adapter ||= adapter_from_url(db.url&.split(":")&.first)
-          adapter ||= "sqlite3" unless db.url.present?
-          adapter
-        end
+    def multiple_dbs?
+      %w[queue cache sessions websockets].any? { |type| db_enabled?(type) }
     end
 
-    def db_name
-      return db.name if db.name&.present?
+    def db_adapter(type)
+      return unless db_enabled?(type)
 
-      return if db.url&.present?
+      config = primary_type?(type) ? db : db[type]
+      adapter = config&.adapter&.presence
+      adapter ||= adapter_from_url(config&.url)
+      adapter ||= DEFAULT_DB_ADAPTER
+      adapter
+    end
 
-      if db_adapter == "sqlite3"
-        "data/#{Rails.env}"
+    def db_name(type)
+      return unless db_enabled?(type)
+
+      config = primary_type?(type) ? db : db[type]
+
+      return config.name if config.name&.present?
+
+      env = Rails.env.production? ? nil : Rails.env
+      name = primary_type?(type) ? "masks" : type
+
+      if db_adapter(type) == "sqlite3"
+        "data/#{[env, name].compact.join(".").presence || "masks"}.sqlite3"
       else
-        "masks_#{Rails.env}"
+        ["masks", name == "masks" ? env : ([env, name])].flatten.compact.join(
+          "_",
+        )
       end
     end
 
@@ -41,6 +48,10 @@ module Masks
       return unless value&.present?
 
       value.start_with?("postgres") ? "postgresql" : "sqlite3"
+    end
+
+    def primary_type?(type)
+      type.to_s == PRIMARY_DB_TYPE
     end
   end
 end

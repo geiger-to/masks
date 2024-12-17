@@ -50,8 +50,16 @@ module Masks
     # Used for file storage—avatars, logos, and other uploads.
     config.active_storage.service = "masks"
 
+    # Replace the default in-process and non-durable queuing backend for Active Job.
     unless Rails.env.test?
-      config.active_job.queue_adapter = Masks.env.queue_adapter
+      config.active_job.queue_adapter = :solid_queue
+
+      if Masks.env.db_enabled?(:queue)
+        config.solid_queue.connects_to = { database: { writing: :queue } }
+      end
+
+      config.cache_store = :solid_cache_store
+      config.cache_store = :solid_cache_store
     end
 
     # Use a custom delivery_method, which allows switching

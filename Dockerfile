@@ -62,5 +62,5 @@ USER 1000:1000
 ENTRYPOINT ["/masks/bin/docker-entrypoint"]
 
 # Start the server by default, this can be overwritten at runtime
-EXPOSE 1111
+EXPOSE 5000
 CMD ["/masks/masks", "start"]

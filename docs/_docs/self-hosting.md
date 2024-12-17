@@ -23,7 +23,6 @@ and `masks.yml` options.
 Masks depends on the following:
 
 - A database, SQLite or PostgreSQL
-- An optional redis for caching and queuing
 - Network access, for communication with various APIs
 - SSL/TLS certificates
 
@@ -40,7 +39,7 @@ certificates or use a proxy like Caddy, traefik, or nginx with LetsEncrypt.
 
 ### docker-compose.yml
 
-The following example runs Caddy, PostgreSQL, masks, and an optional redis.
+The following example runs Caddy, PostgreSQL, and the masks web server + job workers.
 
 ```yaml
 services:
@@ -59,19 +58,16 @@ services:
   masks:
     image: masksrb/masks:latest
     ports:
-      - "1111:1111"
+      - "5000:5000"
     environment:
       MASKS_URL: https://masks.localhost
       MASKS_MANAGER_PASSWORD: password
-      DATABASE_URL: postgres://masks:masks@db:5432/masks
-    # REDIS_URL: redis://redis:6379/1
+      MASKS_DB_URL: postgres://masks:masks@db:5432/masks
     volumes:
       - ./data/masks:/masks/data
     depends_on:
       db:
         condition: service_healthy
-    # redis:
-    #   condition: service_started
 
   db:
     image: postgres:15
@@ -90,11 +86,6 @@ services:
       timeout: 60s
       retries: 5
       start_period: 80s
-# redis:
-#   image: redis:7
-#   container_name: redis
-#   ports:
-#     - "6379:6379"
 ```
 
 ## Tips & FAQ
@@ -136,8 +127,7 @@ services:
 ### Scaling
 
 Masks is write-heavy, meaning database performance will heavily impact the
-overall application performance. PostgreSQL with redis is recommended for best
-results.
+overall application performance.
 
 The official image boots a multi-threaded HTTP(s) server and workers for
 handling background jobs. By default, one masks container runs 2 processes (web

@@ -36,18 +36,33 @@ integration: &integration
     app: <%= ENV['MASKS_NEWRELIC_APP'] || ENV['MASKS_NAME'] || 'masks' %>
 
 default: &default
-  url: "<%= ENV['MASKS_URL'] || 'http://localhost:1111' %>"
+  url: "<%= ENV['MASKS_URL'] || 'http://localhost:5000' %>"
   name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   timezone: "<%= ENV['MASKS_TZ'] || 'America/New_York' %>"
   region: "<%= ENV['MASKS_REGION'] || 'US' %>"
   private_key: "<%= ENV['MASKS_PRIVATE_KEY'] || Rails.root.join('data', 'private.key') %>"
   seeds_dir: "<%= ENV['MASKS_SEEDS_DIR'] %>"
+  threads: "<%= ENV['MASKS_THREADS'] || 1 %>"
   db:
+    url: <%= ENV['MASKS_DB_URL'] %>
     adapter: <%= ENV['MASKS_DB_ADAPTER'] %>
     name: <%= ENV['MASKS_DB_NAME'] %>
-    url: <%= ENV['MASKS_DB_URL'] %>
-  redis:
-    url: "<%= ENV['REDIS_URL'] %>"
+    queue:
+      url: <%= ENV['MASKS_QUEUE_DB_URL'] %>
+      adapter: <%= ENV['MASKS_QUEUE_DB_ADAPTER'] %>
+      name: <%= ENV['MASKS_QUEUE_DB_NAME'] %>
+    cache:
+      url: <%= ENV['MASKS_CACHE_DB_URL'] %>
+      adapter: <%= ENV['MASKS_CACHE_DB_ADAPTER'] %>
+      name: <%= ENV['MASKS_CACHE_DB_NAME'] %>
+    websockets:
+      url: <%= ENV['MASKS_WEBSOCKETS_DB_URL'] %>
+      adapter: <%= ENV['MASKS_WEBSOCKETS_DB_ADAPTER'] %>
+      name: <%= ENV['MASKS_WEBSOCKETS_DB_NAME'] %>
+    sessions:
+      url: <%= ENV['MASKS_SESSIONS_DB_URL'] %>
+      adapter: <%= ENV['MASKS_SESSIONS_DB_ADAPTER'] %>
+      name: <%= ENV['MASKS_SESSIONS_DB_NAME'] %>
   theme:
     name: "<%= ENV['MASKS_NAME'] || 'masks' %>"
   checks:
@@ -171,7 +186,7 @@ default: &default
 
 development:
   <<: *default
-  url: "http://localhost:1111"
+  url: "http://localhost:5000"
   private_key: "<%= Rails.root.join('config', 'private.development.key') %>"
   integration:
     <<: *integration
