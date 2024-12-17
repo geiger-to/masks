@@ -98,3 +98,13 @@ gem "stackprof"
 gem "sentry-ruby"
 gem "sentry-rails"
 gem "newrelic_rpm", require: false
+
+gem "yabeda", "~> 0.13.1"
+gem "yabeda-rails", "~> 0.9.0"
+gem "yabeda-sidekiq", "~> 0.12.0"
+gem "yabeda-prometheus-mmap", "~> 0.4.0"
+gem "yabeda-activerecord", "~> 0.1.1"
+gem "yabeda-graphql", "~> 0.2.3"
+gem "yabeda-puma-plugin", "~> 0.7.1"
+gem "yabeda-http_requests", "~> 0.2.1"
+gem "yabeda-activejob", "~> 0.6.0"
