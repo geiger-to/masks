@@ -9,6 +9,8 @@ gem "bootsnap", require: false
 gem "solid_queue", "~> 1.1"
 gem "solid_cache", "~> 1.0"
 gem "solid_cable", "~> 3.0"
+gem "mission_control-jobs", "~> 1.0"
+gem "propshaft", "~> 1.1"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"

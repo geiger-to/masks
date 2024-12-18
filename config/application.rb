@@ -82,5 +82,8 @@ module Masks
       Masks.keys.deterministic_key&.presence || fake_key
     config.active_record.encryption.key_derivation_salt =
       Masks.keys.salt&.presence || fake_key
+
+    # Mission control
+    config.mission_control.jobs.http_basic_auth_enabled = false
   end
 end

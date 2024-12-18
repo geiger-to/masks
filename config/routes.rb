@@ -3,6 +3,10 @@ Rails.application.routes.draw do
     mount GraphiQL::Rails::Engine, at: "/graphiql", graphql_path: "/graphql"
   end
 
+  mount MissionControl::Jobs::Engine,
+        at: "/manage/jobs",
+        constraints: Masks::ManagerConstraint.new
+
   post "/graphql", to: "graphql#execute"
 
   # Image uploads
