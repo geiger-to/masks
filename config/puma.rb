@@ -20,11 +20,11 @@
 # Any libraries that use a connection pool or another resource pool should
 # be configured to provide at least as many connections as the number of
 # threads. This includes Active Record's `pool` parameter in `database.yml`.
-threads_count = ENV.fetch("MASKS_THREADS", 5)
+threads_count = ENV.fetch("MASKS_THREADS", 1)
 threads threads_count, threads_count
 
 # Specifies the `port` that Puma will listen on to receive requests; default is 3000.
-port ENV.fetch("MASKS_PORT", 1111)
+port ENV.fetch("MASKS_PORT", ENV.fetch("PORT", 5000))
 
 # Allow puma to be restarted by `bin/rails restart` command.
 plugin :tmp_restart

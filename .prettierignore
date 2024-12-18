@@ -1,3 +1,6 @@
 vendor
 .release-please-manifest.json
 CHANGELOG.md
+config/database.yml
+config/cache.yml
+config/cable.yml

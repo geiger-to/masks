@@ -32,19 +32,19 @@ There are a few settings that are only controlled with environment variables:
 | name            | description                   | default          |
 | --------------- | ----------------------------- | ---------------- |
 | `MASKS_YML`     | path to `masks.yml`           | /masks/masks.yml |
-| `MASKS_PORT`    | port for the web server       | 1111             |
-| `MASKS_THREADS` | number of threads per process | 5                |
+| `MASKS_PORT`    | port for the web server       | 5000             |
+| `MASKS_THREADS` | number of threads per process | 1                |
 
 ---
 
 ## Minimal settings
 
 At minimum, provide the name and public URL of your installation, along with
-any settings required to access dependencies like the database and redis.
+any settings required to access dependencies like the database.
 
 | name     | ENV var        | default                |
 | -------- | -------------- | ---------------------- |
-| url      | `MASKS_URL`    | https://localhost:1111 |
+| url      | `MASKS_URL`    | https://localhost:5000 |
 | name     | `MASKS_NAME`   | masks                  |
 | timezone | `MASKS_TZ`     | America/New_York       |
 | region   | `MASKS_REGION` | US                     |
@@ -67,15 +67,37 @@ The following database adapters are supported:
 - PostgreSQL: `db.adapter=postgresql`
 - SQLite: `db.adapter=sqlite3`
 
-A redis is recommended, especially if you're not using PostgreSQL. It will be
-used for caching and background work.
+While a primary database is always required, you can use separate
+databases for specific types of data: `queue`, `cache`, `websockets`,
+and `sessions`.
 
-| name       | ENV var            | default                                         |
-| ---------- | ------------------ | ----------------------------------------------- |
-| redis.url  | `REDIS_URL`        |                                                 |
-| db.url     | `DATABASE_URL`     |                                                 |
-| db.adapter | `MASKS_DB_ADAPTER` | `sqlite3` unless specified via the `url`        |
-| db.name    | `MASKS_DB_NAME`    | `masks_production` or `data/production.sqlite3` |
+| name                  | ENV var                       | default                                  |
+| --------------------- | ----------------------------- | ---------------------------------------- |
+| db.url                | `MASKS_DB_URL`                |                                          |
+| db.adapter            | `MASKS_DB_ADAPTER`            | `sqlite3` unless specified via the `url` |
+| db.name               | `MASKS_DB_NAME`               | `masks` or `data/masks.sqlite3`          |
+| db.queue.url          | `MASKS_QUEUE_DB_URL`          |                                          |
+| db.queue.adapter      | `MASKS_QUEUE_DB_ADAPTER`      |                                          |
+| db.queue.name         | `MASKS_QUEUE_DB_NAME`         |                                          |
+| db.cache.url          | `MASKS_CACHE_DB_URL`          |                                          |
+| db.cache.adapter      | `MASKS_CACHE_DB_ADAPTER`      |                                          |
+| db.cache.name         | `MASKS_CACHE_DB_NAME`         |                                          |
+| db.websockets.url     | `MASKS_WEBSOCKETS_DB_URL`     |                                          |
+| db.websockets.adapter | `MASKS_WEBSOCKETS_DB_ADAPTER` |                                          |
+| db.websockets.name    | `MASKS_WEBSOCKETS_DB_NAME`    |                                          |
+| db.sessions.url       | `MASKS_SESSIONS_DB_URL`       |                                          |
+| db.sessions.adapter   | `MASKS_SESSIONS_DB_ADAPTER`   |                                          |
+| db.sessions.name      | `MASKS_SESSIONS_DB_NAME`      |                                          |
+
+{% capture sqlite_info%}
+<span>
+<b class="text-info">Note:"</b>
+It's recommended to use separate databases if using SQLite or with
+higher-traffic instances.
+</span>
+{% endcapture %}
+
+{% include alert.html class="" content=sqlite_info %}
 
 ### Default data
 

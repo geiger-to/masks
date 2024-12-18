@@ -8,14 +8,7 @@ task :start, [:formation] do |t, args|
 end
 
 task worker: :environment do
-  case Rails.application.config.active_job.queue_adapter
-  when :sidekiq
-    sh "bin/bundle exec sidekiq"
-  when :good_job
-    sh "bin/bundle exec good_job start"
-  when :delayed_job
-    sh "bin/rails jobs:work"
-  end
+  sh "bin/jobs"
 end
 
 task :migrate do |t, args|

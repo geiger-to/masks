@@ -6,6 +6,9 @@ gem "pg", "~> 1.1"
 gem "sqlite3", "~> 2.4"
 gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
+gem "solid_queue", "~> 1.1"
+gem "solid_cache", "~> 1.0"
+gem "solid_cable", "~> 3.0"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
@@ -48,12 +51,6 @@ group :jekyll_plugins do
   gem "jekyll-postcss"
   gem "jekyll-toc", "~> 0.18.0"
 end
-
-# Queues
-gem "good_job", "~> 4.6"
-gem "sidekiq", "~> 7.3"
-gem "delayed_job_active_record", "~> 4.1"
-gem "daemons", "~> 1.4"
 
 # Frontend
 gem "vite_rails", "~> 3.0"
@@ -101,10 +98,11 @@ gem "newrelic_rpm", require: false
 
 gem "yabeda", "~> 0.13.1"
 gem "yabeda-rails", "~> 0.9.0"
-gem "yabeda-sidekiq", "~> 0.12.0"
 gem "yabeda-prometheus-mmap", "~> 0.4.0"
 gem "yabeda-activerecord", "~> 0.1.1"
 gem "yabeda-graphql", "~> 0.2.3"
 gem "yabeda-puma-plugin", "~> 0.7.1"
 gem "yabeda-http_requests", "~> 0.2.1"
 gem "yabeda-activejob", "~> 0.6.0"
+
+gem "foreman", "~> 0.88.1"

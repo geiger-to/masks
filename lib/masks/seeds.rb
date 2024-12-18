@@ -5,11 +5,6 @@ module Masks
     EXCLUDED = %w[
       schema_migrations
       ar_internal_metadata
-      good_job_batches
-      good_job_executions
-      good_job_processes
-      good_job_settings
-      good_jobs
       masks_devices
       masks_authorization_codes
       masks_id_tokens
