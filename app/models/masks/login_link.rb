@@ -94,13 +94,11 @@ module Masks
     end
 
     def set_defaults
-      return unless auth
-
       self.code ||= SecureRandom.base36(7).upcase
-      self.settings ||= { path: auth.path, params: auth.params }
-      self.device ||= auth.device
-      self.client ||= auth.client
+      self.client ||= auth&.client
+      self.device ||= auth&.device
       self.expires_at ||= client.expires_at(:login_link)
+      self.settings ||= { path: auth.path, params: auth.params } if auth
     end
   end
 end
