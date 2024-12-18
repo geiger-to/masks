@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.15.0](https://github.com/geiger-to/masks/compare/v0.14.0...v0.15.0) (2024-12-18)
+
+
+### Features
+
+* databases for cache, queues, websockets, and sessions ([7b33da2](https://github.com/geiger-to/masks/commit/7b33da24e9efb7f26b37a258709bc018461b5df7))
+* list actors, clients, devices, emails, and phones. ([7e51732](https://github.com/geiger-to/masks/commit/7e5173262bfc2661beecad976b898c7bcb59c0c0))
+* new relic monitoring ([bd00361](https://github.com/geiger-to/masks/commit/bd00361d68a3884e1904f5cd02bfdfe51b80a499))
+* plaintext emails ([9104802](https://github.com/geiger-to/masks/commit/9104802af4ab89bc77534a5421d8bb10a47da160))
+* sentry monitoring ([881916d](https://github.com/geiger-to/masks/commit/881916da5ced1fd6cd60e90b405c601c1d7b73bb))
+
 ## [0.14.0](https://github.com/geiger-to/masks/compare/masks-v0.14.0...masks/v0.14.0) (2024-12-11)
 
 
