@@ -3,7 +3,7 @@
 class MasksSchema < GraphQL::Schema
   class << self
     def manager?(context)
-      Masks::InternalSession.new(auth: context[:auth]).masks_manager?
+      context[:auth].manager&.masks_manager?
     end
   end
 

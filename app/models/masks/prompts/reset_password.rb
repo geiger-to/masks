@@ -20,7 +20,7 @@ module Masks
 
         warn! "changed-password"
 
-        auth_bag[:reset_password] = false
+        auth_bag["reset_password"] = false
 
         self.prompt = "reset-password"
       end
@@ -28,13 +28,13 @@ module Masks
       event "reset-password:skip" do
         next unless allow_reset?
 
-        auth_bag[:reset_password] = false
+        auth_bag["reset_password"] = false
       end
 
       private
 
       def allow_reset?
-        authenticated? && auth_bag[:reset_password]
+        authenticated? && auth_bag["reset_password"]
       end
     end
   end

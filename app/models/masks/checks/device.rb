@@ -2,22 +2,36 @@ module Masks
   module Checks
     class Device < Base
       def checked!(device:, **args)
-        state.rails_session[:device] = { id: device&.public_id, checked: true }
+        state.rails_session["device"] ||= {
+          "id" => device&.public_id,
+          "version" => device&.version,
+          "checked" => true,
+        }
       end
 
       def persist!(device)
-        state.rails_session[:device] ||= { id: device.public_id }
+        return unless checked?
 
-        device.save if checked?
+        if device.new_record? || device.updated_at < 1.minute.ago
+          device.updated_at = Time.current
+          device.save
+        end
       end
 
       def checked?
-        state.rails_session.dig(:device, :checked)
+        state.rails_session.dig("device", "checked")
       end
 
       def device_id
-        @device_id ||=
-          state.rails_session.dig(:device, :id) || SecureRandom.uuid
+        state.rails_session.dig("device", "id")
+      end
+
+      def device_version
+        state.rails_session.dig("device", "version")
+      end
+
+      def reset!
+        state.rails_session.delete("device")
       end
     end
   end

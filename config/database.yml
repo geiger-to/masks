@@ -41,8 +41,9 @@ default: &default
     encoding: unicode
     pool: <%= Masks.env.threads %>
     migrations_paths: db/queue
-    timeout: 15
+    timeout: 30
 <% end %>
+
 <% if Masks.env.db_enabled?(:cache) %>
   cache:
     url: <%= Masks.env.db.cache.url %>

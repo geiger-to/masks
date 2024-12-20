@@ -7,7 +7,7 @@ module Masks
             if event?("identify")
               updates["identifier"]
             else
-              attempt_bag[:identifier]
+              attempt_bag["identifier"]
             end
           )
         actor = Masks.identify(identifier) if identifier
@@ -23,7 +23,7 @@ module Masks
       end
 
       def enabled?
-        !attempt_bag&.dig(:identifier) || checking?("credentials")
+        !attempt_bag&.dig("identifier") || checking?("credentials")
       end
 
       prompt "identify" do
@@ -31,7 +31,7 @@ module Masks
       end
 
       event "identify" do
-        attempt_bag[:identifier] = updates["identifier"] if updates[
+        attempt_bag["identifier"] = updates["identifier"] if updates[
           "identifier"
         ]
       end

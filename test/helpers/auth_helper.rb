@@ -5,14 +5,6 @@ module AuthHelper
 
   attr_reader :auth_id
 
-  def user_agent
-    @user_agent ||= [
-      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)",
-      "AppleWebKit/605.1.15 (KHTML, like Gecko)",
-      "Version/17.4 Safari/605.1.15",
-    ].join(" ")
-  end
-
   def client
     @client ||= Masks::Client.find_by(key: client_id)
   end

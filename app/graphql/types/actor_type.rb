@@ -30,6 +30,7 @@ module Types
     field :phones, [PhoneType], null: true
     field :remaining_backup_codes, Integer, null: true
     field :second_factors, [Types::SecondFactorType], null: false
+    field :stats, Types::CamelizedJSON, null: false
 
     def id
       object.key
@@ -69,6 +70,16 @@ module Types
 
     def remaining_backup_codes
       object.backup_codes&.length
+    end
+
+    def stats
+      return {} unless object.persisted?
+
+      {
+        entries: object.entries.count,
+        devices: object.devices.count,
+        clients: object.clients.count,
+      }
     end
   end
 end

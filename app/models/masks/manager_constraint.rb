@@ -1,12 +1,7 @@
 module Masks
   class ManagerConstraint
     def matches?(request)
-      session =
-        Masks::InternalSession.from_request(
-          request:,
-          client: Masks::Client.manage,
-        )
-      session.masks_manager?
+      Masks::Auth.new(request:).manager&.present?
     end
   end
 end
