@@ -26,6 +26,10 @@ module Masks
                 in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name },
               }
 
+    def lifetime(key)
+      Masks.time.expires_at(setting(:lifetimes, key))
+    end
+
     def enabled?(key)
       setting(key, :enabled)
     end

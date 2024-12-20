@@ -6,15 +6,26 @@ module Types
 
     field :id, ID
     field :name, String
-    field :device_type, String
-    field :device_name, String
-    field :os_name, String
-    field :ip_address, String
+    field :type, String
+    field :os, String
+    field :ip, String
     field :user_agent, String
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
 
     def id
       object.public_id
+    end
+
+    def type
+      object.device_type
+    end
+
+    def os
+      object.os_name
+    end
+
+    def ip
+      object.ip_address
     end
   end
 end

@@ -51,6 +51,7 @@ module Types
         phones: Masks::Phone.count,
         clients: Masks::Client.count,
         devices: Masks::Device.count,
+        entries: Masks::Entry.count,
         tokens:,
       }
     end

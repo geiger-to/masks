@@ -59,10 +59,49 @@ module Types
       Masks.installation
     end
 
+    field :device,
+          Types::DeviceType,
+          null: true,
+          managers_only: true,
+          description: "Fetches a device given its id." do
+      argument :id, ID, required: true, description: "id of the device."
+    end
+
+    def device(id:)
+      Masks::Device.find_by(public_id: id)
+    end
+
     field :devices, Types::DeviceType.connection_type, null: false
 
     def devices
       Masks::Device.order(created_at: :desc)
+    end
+
+    field :entries, Types::EntryType.connection_type, null: false do
+      argument :actor, String, required: false, description: "filter by actor"
+      argument :client, String, required: false, description: "filter by actor"
+      argument :device, String, required: false, description: "filter by device"
+    end
+
+    def entries(**args)
+      scope =
+        Masks::Entry.includes(:actor, :device, :client).order(created_at: :desc)
+
+      if args[:actor]
+        actor = Masks.identify(args[:actor])
+        scope = scope.where(actor: actor.persisted? ? actor : nil)
+      end
+
+      if args[:client]
+        scope = scope.where(client: Masks::Client.find_by(key: args[:client]))
+      end
+
+      if args[:device]
+        scope =
+          scope.where(device: Masks::Device.find_by(public_id: args[:device]))
+      end
+
+      scope
     end
 
     field :emails, Types::EmailType.connection_type, null: false

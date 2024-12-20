@@ -7,10 +7,6 @@ module Mutations
     field :client, Types::ClientType, null: false
     field :errors, [String], null: true
 
-    def visible?(context)
-      context[:authorization]&.masks_manager?
-    end
-
     def resolve(**args)
       client =
         (

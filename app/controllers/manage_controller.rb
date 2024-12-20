@@ -6,8 +6,8 @@ class ManageController < ManagersController
       url: params[:url] || "",
       sentry:,
       actor:
-        current_actor.slice(:identifier, :identicon_id, :avatar_url).merge(
-          id: current_actor.key,
+        current_manager.slice(:identifier, :identicon_id, :avatar_url).merge(
+          id: current_manager.key,
         ),
     }
 

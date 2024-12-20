@@ -5,12 +5,12 @@ module Masks
     MANAGE = "masks:manage"
     PASSWORD = "masks:password"
 
-    def scopes
-      super&.strip || ""
+    def masks_manager?
+      scope?(MANAGE)
     end
 
-    def masks_manager?
-      scopes_a.include?(MANAGE)
+    def scopes
+      super&.strip || ""
     end
 
     def scopes_a

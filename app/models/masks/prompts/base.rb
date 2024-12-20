@@ -13,7 +13,6 @@ module Masks
                :actor,
                :actor=,
                :device,
-               :device=,
                :login_link,
                :login_link=,
                :authenticated?,

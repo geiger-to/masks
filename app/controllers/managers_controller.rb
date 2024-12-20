@@ -22,8 +22,4 @@ class ManagersController < ApplicationController
 
     render "app", status: 404
   end
-
-  def current_manager
-    current_actor if current_actor&.masks_manager?
-  end
 end

@@ -1,4 +1,8 @@
-Rails.application.config.session_store :active_record_store, key: "_masks"
+Rails.application.config.after_initialize do
+  Rails.application.config.session_store :active_record_store,
+                                         key: "_masks",
+                                         expire_after: Masks.lifetime(:session)
+end
 
 module Masks
   class SessionRecord < ActiveRecord::SessionStore::Session
