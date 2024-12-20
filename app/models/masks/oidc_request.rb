@@ -155,6 +155,9 @@ module Masks
           )
       end
 
+      # TODO: background job?
+      actor.entries.create!(client:, device:)
+
       res.approve!
     end
 

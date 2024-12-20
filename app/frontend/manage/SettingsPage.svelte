@@ -60,6 +60,7 @@
               region
               theme
               emails
+              needsRestart
               faviconUrl
               lightLogoUrl
               darkLogoUrl
@@ -74,6 +75,8 @@
               checks
               clients
               integration
+              lifetimes
+              needsRestart
               createdAt
               updatedAt
             }
@@ -157,13 +160,19 @@
           <div class="font-bold">{tabs[tab]?.name}</div>
           <div class="opacity-75">settings</div>
         </div>
-        {#if install.createdAt}
-          <p class="text-xs opacity-75">
-            last saved
-            <Time timestamp={install?.updatedAt} />
-          </p>
-        {/if}
+        <div class="flex items-center gap-1.5">
+          {#if install.updatedAt}
+            <p class="text-xs opacity-75">
+              last saved
+              <Time timestamp={install?.updatedAt} />
+            </p>
+          {/if}
+        </div>
       </div>
+
+      {#if install.needsRestart}
+        <p class="badge badge-warning badge-sm rounded">restart required</p>
+      {/if}
 
       <button
         class="btn btn-secondary btn-sm"

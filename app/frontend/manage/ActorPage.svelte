@@ -1,6 +1,14 @@
 <script>
   import _ from "lodash-es";
-  import { RotateCcw, MailPlus, Trash2 as Trash, User } from "lucide-svelte";
+  import {
+    MonitorSmartphone,
+    Handshake,
+    LogIn,
+    RotateCcw,
+    MailPlus,
+    Trash2 as Trash,
+    User,
+  } from "lucide-svelte";
   import Page from "./Page.svelte";
   import Alert from "@/components/Alert.svelte";
   import Time from "@/components/Time.svelte";
@@ -63,6 +71,7 @@
         name
         createdAt
       }
+      stats
       createdAt
       updatedAt
     }
@@ -224,11 +233,53 @@
       </div>
     </div>
 
-    <Alert type="neutral" class="!py-1.5 pr-0.5 pl-3">
-      <div class="flex items-center gap-3">
-        <User size="16" />
+    <Alert type="gray" class="!py-1.5 pr-0.5 pl-1.5">
+      <div class="flex items-center gap-1.5">
+        <a
+          title="Search their recent entries..."
+          href={`/manage/entries?actor=${actor.identifier}`}
+          class="btn btn-xs btn-neutral px-2"
+        >
+          <span class="flex items-center gap-1.5 relative">
+            <span>entries</span>
+            <span
+              class="badge text-[9px] badge-test badge-xs
+              left-3.5 bottom-3.5">{actor.stats.entries}</span
+            >
+          </span>
+        </a>
 
-        <div class="text-xs grow">
+        <a
+          title="Search their devices..."
+          href={`/manage/devices?actor=${actor.identifier}`}
+          class="btn btn-xs btn-neutral px-2"
+        >
+          <span class="flex items-center gap-1.5 relative">
+            devices
+            <span
+              class="badge text-[9px] badge-test badge-xs
+              left-3.5 bottom-3.5">{actor.stats.devices}</span
+            >
+          </span>
+        </a>
+
+        <a
+          title="Search their clients..."
+          href={`/manage/clients?actor=${actor.identifier}`}
+          class="btn btn-xs btn-neutral px-2"
+        >
+          <span class="flex items-center gap-1.5 relative">
+            clients
+            <span
+              class="badge text-[9px] badge-test badge-xs
+              left-3.5 bottom-3.5">{actor.stats.clients}</span
+            >
+          </span>
+        </a>
+
+        <div class="text-xs grow"></div>
+
+        <div class="text-xs pr-1.5">
           <span class="opacity-75">saved</span>
 
           {#key actor.updatedAt}

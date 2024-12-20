@@ -26,21 +26,22 @@
       <span class="opacity-75 text-xs min-w-[35px]">url</span>
       <input
         type="text"
-        class="grow"
+        class="grow placeholder:opacity-75"
+        placeholder="your site's home page..."
         value={settings.theme.url}
         oninput={(e) => change({ theme: { url: e.target.value } })}
       />
     </label>
   </div>
 
-  <div class="p-3 shadow-inner bg-base-300 rounded-lg">
+  <div class="">
     <div class="flex items-end gap-3">
       <div class="flex flex-col items-center gap-3">
         <EditableImage
           endpoint="/upload/logo?theme=light"
           src={settings.lightLogoUrl}
           name={settings.theme.name}
-          class="w-20 h-20 rounded-lg"
+          class="w-20 h-20 rounded-lg border border-neutral bg-base-200 p-0.5"
         />
         <span
           class="text-xs dark:bg-white bg-base-300 text-black opacity-75 p-0.5 px-1.5 rounded"
@@ -52,7 +53,7 @@
           endpoint="/upload/logo?theme=dark"
           src={settings.darkLogoUrl}
           name={settings.theme.name}
-          class="w-20 h-20 rounded-lg"
+          class="w-20 h-20 rounded-lg border border-neutral bg-base-200 p-0.5"
         />
         <span
           class="text-xs bg-black text-white opacity-75 p-0.5 px-1.5 rounded"
@@ -64,7 +65,7 @@
           endpoint="/upload/favicon"
           src={settings.faviconUrl}
           name={settings.theme.name}
-          class="w-12 h-12 rounded-lg"
+          class="w-12 h-12 rounded-lg border border-neutral bg-base-200 p-0.5"
         />
 
         <span
@@ -74,6 +75,31 @@
       </div>
     </div>
   </div>
+</div>
+
+<p class="label-text-alt opacity-75">lifetimes</p>
+
+<div class="grow flex flex-col gap-1.5 mb-3">
+  <label class="input input-bordered input-sm flex items-center gap-3">
+    <span class="opacity-75 text-xs min-w-[35px]">session</span>
+    <input
+      type="text"
+      class="grow placeholder:opacity-75"
+      value={settings.lifetimes.session}
+      placeholder="expires when the browser exits..."
+      oninput={(e) => change({ lifetimes: { session: e.target.value } })}
+    />
+  </label>
+  <label class="input input-bordered input-sm flex items-center gap-3 grow">
+    <span class="opacity-75 text-xs min-w-[35px]">device</span>
+    <input
+      type="text"
+      class="grow placeholder:opacity-75"
+      placeholder="expires when the browser exits..."
+      value={settings.lifetimes.device}
+      oninput={(e) => change({ lifetimes: { device: e.target.value } })}
+    />
+  </label>
 </div>
 
 <p class="label-text-alt opacity-75">environment</p>

@@ -1,5 +1,13 @@
 module Masks
   class Installation < ApplicationRecord
+    RECONFIGURATION_KEYS = [
+      %w[sentry dsn],
+      %w[newrelic license_key],
+      %w[newrelic app],
+      %w[lifetimes session],
+      %w[lifetimes device],
+    ]
+
     self.table_name = "masks_installations"
 
     serialize :settings, coder: JSON
@@ -25,6 +33,10 @@ module Masks
               inclusion: {
                 in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name },
               }
+
+    def lifetime(key)
+      Masks.time.expires_at(setting(:lifetimes, key))
+    end
 
     def enabled?(key)
       setting(key, :enabled)
@@ -152,8 +164,28 @@ module Masks
       emails? && setting(:login_links, :enabled)
     end
 
-    def modify(settings)
-      self.settings = self.settings.deep_merge(settings.deep_stringify_keys)
+    def lifetimes
+      setting(:lifetimes)
+    end
+
+    def modify(updates)
+      return unless updates
+      updates = updates.deep_stringify_keys
+
+      reconfigured =
+        RECONFIGURATION_KEYS.any? do |key|
+          exists = updates.dig(*key.slice(0...-1))&.key?(key.last)
+
+          next unless exists
+
+          current = setting(*key)
+          updated = updates.dig(*key)
+          current != updated
+        end
+
+      self.settings = self.settings.deep_merge(updates.deep_stringify_keys)
+
+      self.reconfigured_at = Time.current if reconfigured
     end
 
     def modify!(*args)
@@ -175,11 +207,16 @@ module Masks
       seeds.import!
     end
 
+    def needs_restart
+      !!reconfigured_at&.present?
+    end
+
     def public_settings
       (
         {
           name:,
           url:,
+          needs_restart:,
           light_logo_url:,
           dark_logo_url:,
           favicon_url:,

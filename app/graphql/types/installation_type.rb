@@ -9,6 +9,7 @@ module Types
     field :favicon_url, String, null: true
     field :timezone, String, null: false
     field :region, String, null: false
+    field :needs_restart, Boolean, null: true
     field :theme, Types::CamelizedJSON, null: false
     field :emails, Types::CamelizedJSON, null: false
     field :nicknames, Types::CamelizedJSON, null: false
@@ -22,6 +23,7 @@ module Types
     field :checks, Types::CamelizedJSON, null: false
     field :clients, Types::CamelizedJSON, null: false
     field :integration, Types::CamelizedJSON, null: false
+    field :lifetimes, Types::CamelizedJSON, null: false
     field :stats, Types::CamelizedJSON, null: false
     field :recent_clients, [Types::ClientType], null: false
     field :recent_actors, [Types::ActorType], null: false
@@ -51,6 +53,7 @@ module Types
         phones: Masks::Phone.count,
         clients: Masks::Client.count,
         devices: Masks::Device.count,
+        entries: Masks::Entry.count,
         tokens:,
       }
     end

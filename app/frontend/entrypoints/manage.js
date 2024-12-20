@@ -36,6 +36,10 @@ mount(Router, {
       ),
       makeRoute("actor/(.+)", async () => import("../manage/ActorPage.svelte")),
       makeRoute(
+        "device/(.+)",
+        async () => import("../manage/DevicePage.svelte")
+      ),
+      makeRoute(
         "settings",
         async () => import("../manage/SettingsPage.svelte")
       ),

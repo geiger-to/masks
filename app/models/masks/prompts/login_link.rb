@@ -11,9 +11,9 @@ module Masks
         # Ensure actors that don't exist still appear to receive a login link
         # (with a real expiration time).
         self.login_link ||=
-          unless Masks.time.expired?(auth_bag[:login_link_expires_at])
+          unless Masks.time.expired?(auth_bag["login_link_expires_at"])
             Masks::LoginLink.new(
-              expires_at: Time.parse(auth_bag[:login_link_expires_at]),
+              expires_at: Time.parse(auth_bag["login_link_expires_at"]),
             )
           end
       end
@@ -41,7 +41,7 @@ module Masks
         link.save_and_deliver if active_links&.none?
 
         if !valid_link? || link.persisted?
-          auth_bag[:login_link_expires_at] = client.expires_at(
+          auth_bag["login_link_expires_at"] = client.expires_at(
             :login_link,
           ).iso8601
         end
@@ -63,12 +63,12 @@ module Masks
       private
 
       def valid_link?
-        time = auth_bag[:login_link_expires_at]
+        time = auth_bag["login_link_expires_at"]
         expired = Masks.time.expired?(time)
 
         if time && expired
           warn!("expired-login-link")
-          auth_bag[:login_link_expires_at] = nil
+          auth_bag["login_link_expires_at"] = nil
         end
 
         !expired
@@ -87,8 +87,8 @@ module Masks
 
         checked!("credentials", with: :login_link)
 
-        auth_bag[:login_link_expires_at] = nil
-        auth_bag[:reset_password] = true if updates["resetPassword"] &&
+        auth_bag["login_link_expires_at"] = nil
+        auth_bag["reset_password"] = true if updates["resetPassword"] &&
           client.allow_passwords?
 
         true

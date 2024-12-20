@@ -1,4 +1,4 @@
-# frozen_string_literal: true
+#/ frozen_string_literal: true
 
 module Types
   class QueryType < Types::BaseObject
@@ -25,10 +25,26 @@ module Types
       actor if actor&.persisted?
     end
 
-    field :actors, Types::ActorType.connection_type, null: false
+    field :actors,
+          Types::ActorType.connection_type,
+          null: false,
+          managers_only: true do
+      argument :identifier, String, required: false
+    end
 
-    def actors
-      Masks::Actor.order(created_at: :desc)
+    def actors(**args)
+      scope = Masks::Actor.order(created_at: :desc)
+
+      if args[:identifier]
+        scope =
+          scope.joins(:emails).where(
+            "masks_emails.address LIKE :email OR nickname LIKE :nickname",
+            email: "%#{Masks::Actor.sanitize_sql_like(args[:identifier])}%",
+            nickname: "#{Masks::Actor.sanitize_sql_like(args[:identifier])}%",
+          )
+      end
+
+      scope
     end
 
     field :client,
@@ -36,17 +52,44 @@ module Types
           null: true,
           managers_only: true,
           description: "Fetches a client given its id." do
-      argument :id, String, required: true, description: "id of the client."
+      argument :id, ID, required: true, description: "id of the client."
     end
 
     def client(id:)
       Masks::Client.find_by(key: id)
     end
 
-    field :clients, Types::ClientType.connection_type, null: false
+    field :clients,
+          Types::ClientType.connection_type,
+          null: false,
+          managers_only: true do
+      argument :name, String, required: false
+      argument :actor, String, required: false
+      argument :device, String, required: false
+    end
 
-    def clients
-      Masks::Client.order(created_at: :desc)
+    def clients(**args)
+      scope = Masks::Client.includes(:actors, :devices).order(created_at: :desc)
+
+      if args[:name]
+        scope =
+          scope.where(
+            "name LIKE ?",
+            "#{Masks::Client.sanitize_sql_like(args[:name])}%",
+          )
+      end
+
+      if args[:actor]
+        actor = Masks.identify(args[:actor])
+        scope = scope.where(actors: { id: actor.id })
+      end
+
+      if args[:device]
+        device = Masks::Device.find_by(public_id: args[:device])
+        scope = scope.where(devices: { id: device&.id })
+      end
+
+      scope
     end
 
     field :install,
@@ -59,10 +102,73 @@ module Types
       Masks.installation
     end
 
-    field :devices, Types::DeviceType.connection_type, null: false
+    field :device,
+          Types::DeviceType,
+          null: true,
+          managers_only: true,
+          description: "Fetches a device given its id." do
+      argument :id, ID, required: true, description: "id of the device."
+    end
 
-    def devices
-      Masks::Device.order(created_at: :desc)
+    def device(id:)
+      Masks::Device.find_by(public_id: id)
+    end
+
+    field :devices,
+          Types::DeviceType.connection_type,
+          null: false,
+          managers_only: true do
+      argument :id, String, required: false
+      argument :actor, String, required: false
+    end
+
+    def devices(**args)
+      scope = Masks::Device.includes(:actors, :clients).order(created_at: :desc)
+
+      if args[:id]
+        scope =
+          scope.where(
+            "public_id LIKE ?",
+            "#{Masks::Device.sanitize_sql_like(args[:id])}%",
+          )
+      end
+
+      if args[:actor]
+        actor = Masks.identify(args[:actor])
+        scope = scope.where(actors: { id: actor.id })
+      end
+
+      scope
+    end
+
+    field :entries,
+          Types::EntryType.connection_type,
+          null: false,
+          managers_only: true do
+      argument :actor, String, required: false, description: "filter by actor"
+      argument :client, String, required: false, description: "filter by actor"
+      argument :device, String, required: false, description: "filter by device"
+    end
+
+    def entries(**args)
+      scope =
+        Masks::Entry.includes(:actor, :device, :client).order(created_at: :desc)
+
+      if args[:actor]
+        actor = Masks.identify(args[:actor])
+        scope = scope.where(actor: actor.persisted? ? actor : nil)
+      end
+
+      if args[:client]
+        scope = scope.where(client: Masks::Client.find_by(key: args[:client]))
+      end
+
+      if args[:device]
+        scope =
+          scope.where(device: Masks::Device.find_by(public_id: args[:device]))
+      end
+
+      scope
     end
 
     field :emails, Types::EmailType.connection_type, null: false
@@ -78,10 +184,6 @@ module Types
     end
 
     field :search, Types::SearchType, null: true, managers_only: true do
-      argument :jwts, Boolean, required: false
-      argument :tokens, Boolean, required: false
-      argument :codes, Boolean, required: false
-      argument :devices, Boolean, required: false
       argument :query,
                String,
                required: true,
@@ -89,81 +191,17 @@ module Types
     end
 
     def search(**args)
-      query, connections = parse_query(args[:query])
+      query = parse_query(args[:query])
 
       return unless query.length > 0
 
       actors = find_actors(query)
       clients = find_clients(query)
       result = { actors:, clients:, query: }
-      one_of = clients.one? || actors.one?
-
-      if one_of
-        if connections.include?("tokens") || args[:tokens]
-          result[:tokens] = connect_tokens(actors, clients)
-        end
-
-        if connections.include?("codes") || args[:codes]
-          result[:codes] = connect_codes(actors, clients)
-        end
-
-        if connections.include?("devices") || args[:devices]
-          result[:devices] = connect_devices(actors, clients)
-        end
-
-        if connections.include?("jwts") || args[:jwts]
-          result[:jwts] = connect_jwts(actors, clients)
-        end
-      end
-
       result
     end
 
     private
-
-    def connect_tokens(actors, clients)
-      if actors.any?
-        Masks::AccessToken.latest.where(actor: actors)
-      elsif clients.any?
-        Masks::AccessToken.latest.where(client: clients)
-      end
-    end
-
-    def connect_codes(actors, clients)
-      if actors.any?
-        Masks::AuthorizationCode.latest.where(actor: actors)
-      elsif clients.any?
-        Masks::AuthorizationCode.latest.where(client: clients)
-      end
-    end
-
-    def connect_jwts(actors, clients)
-      if actors.any?
-        Masks::IdToken.latest.where(actor: actors)
-      elsif clients.any?
-        Masks::IdToken.latest.where(client: clients)
-      end
-    end
-
-    def connect_devices(actors, clients)
-      if actors.any?
-        (
-          Masks::Device
-            .latest
-            .joins(:actors)
-            .where("masks_actors.id" => actors)
-            .distinct
-        )
-      elsif clients.any?
-        (
-          Masks::Device
-            .latest
-            .joins(:clients)
-            .where("masks_clients.id" => clients)
-            .distinct
-        )
-      end
-    end
 
     def find_clients(query)
       return Masks::Client.none if !query || query.start_with?("@")
@@ -187,17 +225,9 @@ module Types
     end
 
     def parse_query(query)
-      return query unless query&.present?
+      return "" unless query&.present?
 
-      parts = query.split(" ").compact
-      added = []
-
-      if parts.last.start_with?("+")
-        added = parts.last.split("+").map(&:presence).compact
-        parts = parts.slice(0..-2)
-      end
-
-      return parts.join(" "), added
+      query.strip
     end
   end
 end

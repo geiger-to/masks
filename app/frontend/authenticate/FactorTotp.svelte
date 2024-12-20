@@ -280,12 +280,6 @@
           }}
         />
 
-        <!-- QrCode
-          text={totp.toString()}
-          displayClass="mb-1.5 w-full h-full max-w-[250px] mx-auto rounded"
-          width="5"
-        /> -->
-
         <div class="max-w-[250px] mx-auto">
           {#if showSecret}
             <PasswordInput

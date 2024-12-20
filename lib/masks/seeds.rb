@@ -73,7 +73,7 @@ module Masks
     def seed!
       @install ||= Masks.installation
 
-      if !@install && !ENV["SKIP_MIGRATIONS"]
+      if !@install && !ENV["MASKS_SKIP_MIGRATIONS"]
         reset_stats!
 
         @install = Masks::Installation.create!(settings: @env)

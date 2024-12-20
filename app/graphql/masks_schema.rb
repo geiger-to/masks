@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class MasksSchema < GraphQL::Schema
+  PAGE_SIZE = 25
+
   class << self
     def manager?(context)
-      Masks::InternalSession.new(auth: context[:auth]).masks_manager?
+      context[:auth].manager&.masks_manager?
     end
   end
 
@@ -41,7 +43,8 @@ class MasksSchema < GraphQL::Schema
   # Stop validating when it encounters this many errors:
   validate_max_errors(100)
 
-  # Relay-style Object Identification:
+  # Pagination
+  default_max_page_size PAGE_SIZE
 
   # Return a string UUID for `object`
   def self.id_from_object(object, type_definition = nil, query_ctx = nil)
