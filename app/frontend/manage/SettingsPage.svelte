@@ -12,13 +12,23 @@
     AlertTriangle,
     Database,
     Blocks,
+    Phone,
+    Smartphone,
+    MessageSquare,
+    SquareActivity,
+    Upload,
+    ImageUp,
   } from "lucide-svelte";
   import Time from "@/components/Time.svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
   import SettingClientsTab from "@/manage/SettingClientsTab.svelte";
   import SettingActorsTab from "@/manage/SettingActorsTab.svelte";
   import SettingGeneralTab from "@/manage/SettingGeneralTab.svelte";
-  import SettingIntegrationTab from "@/manage/SettingIntegrationTab.svelte";
+  import SettingStorageTab from "@/manage/SettingStorageTab.svelte";
+  import SettingMonitoringTab from "@/manage/SettingMonitoringTab.svelte";
+  import SettingEmailTab from "@/manage/SettingEmailTab.svelte";
+  import SettingPhoneTab from "@/manage/SettingPhoneTab.svelte";
+  import Tabs from "./Tabs.svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
 
   let props = $props();
@@ -113,110 +123,83 @@
   let tabs = {
     general: {
       name: "General",
+      href: "/manage/settings#general",
       icon: Cog,
       component: SettingGeneralTab,
     },
-    client: {
+    clients: {
       name: "Client",
+      href: "/manage/settings#clients",
       component: SettingClientsTab,
       icon: Handshake,
     },
     actors: {
       name: "Actor",
+      href: "/manage/settings#actors",
       component: SettingActorsTab,
       icon: User,
     },
-    integration: {
-      name: "Integration",
-      component: SettingIntegrationTab,
-      icon: Blocks,
+    emails: {
+      name: "Email",
+      href: "/manage/settings#emails",
+      component: SettingEmailTab,
+      icon: Mail,
+    },
+    phones: {
+      name: "Phone",
+      href: "/manage/settings#phones",
+      component: SettingPhoneTab,
+      icon: Smartphone,
+    },
+    storage: {
+      name: "Storage",
+      href: "/manage/settings#storage",
+      component: SettingStorageTab,
+      icon: ImageUp,
+    },
+    monitoring: {
+      name: "Monitoring",
+      href: "/manage/settings#monitoring",
+      component: SettingMonitoringTab,
+      icon: SquareActivity,
     },
   };
 
   let tab = $state(window?.location?.hash.slice(1) || Object.keys(tabs)[0]);
-  let Tab = $derived(tabs[tab].component);
-
-  let changeTab = (t) => {
-    return (e) => {
-      if (loading) {
-        return;
-      }
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      tab = t;
-    };
-  };
+  let tabData = $state({});
 
   updateSettings();
 </script>
 
 <Page {...props} loading={!install?.createdAt}>
-  <div class="flex flex-col gap-3 max-w-prose mx-auto bg-base-200 rounded-lg">
-    <div class="flex items-center gap-1.5 px-3 pt-1.5">
-      <div class="grow p-1.5">
-        <div class="flex items-center gap-1.5 grow">
-          <div class="font-bold">{tabs[tab]?.name}</div>
-          <div class="opacity-75">settings</div>
-        </div>
-        <div class="flex items-center gap-1.5">
-          {#if install.updatedAt}
-            <p class="text-xs opacity-75">
-              last saved
-              <Time timestamp={install?.updatedAt} />
-            </p>
-          {/if}
-        </div>
+  <div class="flex items-center gap-1.5 px-1.5 pt-1.5 mb-3">
+    <div class="grow p-1.5">
+      <div class="flex items-center gap-1.5 grow">
+        <div class="font-bold">{tabData.name}</div>
+        <div class="opacity-75">settings</div>
       </div>
-
-      {#if install.needsRestart}
-        <p class="badge badge-warning badge-sm rounded">restart required</p>
-      {/if}
-
-      <button
-        class="btn btn-secondary btn-sm"
-        onclick={save}
-        disabled={!changed}
-      >
-        save
-      </button>
-    </div>
-
-    <div>
-      <div role="tablist" class="tabs tabs-lifted !px-3">
-        {#each Object.keys(tabs) as key}
-          {@const Icon = tabs[key].icon}
-          <a
-            href={`#${key}`}
-            onclick={changeTab(key)}
-            role="tab"
-            class={`${
-              loading
-                ? "tab tab-disabled"
-                : tab == key
-                  ? "tab tab-active p-0"
-                  : "tab opacity-75 p-0"
-            } text-xs truncate`}
-          >
-            {#if tabs[key].icon}
-              <Icon size="14" class="opacity-75 mr-1.5" />
-            {/if}
-
-            {#if tabs[key].name}
-              <span class="hidden md:inline">
-                {tabs[key].name}
-              </span>
-            {/if}
-          </a>
-        {/each}
-      </div>
-
-      <div class="bg-base-100 p-3 rounded-b-lg rounded-t">
-        <div class="p-1.5 flex flex-col gap-3">
-          <Tab {...props} {change} settings={install} {errors} {loading} />
-        </div>
+      <div class="flex items-center gap-1.5">
+        {#if install.updatedAt}
+          <p class="text-xs opacity-75">
+            last saved
+            <Time timestamp={install?.updatedAt} />
+          </p>
+        {/if}
       </div>
     </div>
+
+    {#if install.needsRestart}
+      <p class="badge badge-warning badge-sm rounded">restart required</p>
+    {/if}
+
+    <button class="btn btn-secondary btn-sm" onclick={save} disabled={!changed}>
+      save
+    </button>
   </div>
+
+  <Tabs {tab} {tabs} onchange={(t) => (tabData = t)} goto name>
+    {#snippet component(Tab)}
+      <Tab {change} settings={install} {errors} {loading} {...props} />
+    {/snippet}
+  </Tabs>
 </Page>

@@ -1,14 +1,29 @@
 <script>
-  import { Phone, MessageSquare, Mail, Upload, ImageUp } from "lucide-svelte";
+  import {
+    Phone,
+    MessageSquare,
+    Mail,
+    Upload,
+    Info,
+    ImageUp,
+  } from "lucide-svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
   import Alert from "@/components/Alert.svelte";
+  import CopyButton from "@/components/CopyButton.svelte";
 
   let { change, settings } = $props();
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="flex flex-col gap-3 pr-1.5">
-    <div class="flex items-center gap-2 mt-2">
+<Alert type="info" class="mb-3" icon={Info}>
+  Managers can view and manage background jobs at <a
+    class="underline font-mono whitespace-nowrap"
+    href="/manage/jobs">/manage/jobs</a
+  >.
+</Alert>
+
+<div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2">
       <p class="label-text-alt opacity-75 truncate">Sentry</p>
     </div>
 
