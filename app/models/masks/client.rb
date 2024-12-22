@@ -86,8 +86,16 @@ module Masks
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              inverse_of: :client
-    has_many :devices, class_name: "Masks::Device", through: :access_tokens
     has_many :login_links, class_name: "Masks::LoginLink"
+    has_many :entries, class_name: "Masks::Entry"
+    has_many :actors,
+             -> { distinct },
+             class_name: "Masks::Actor",
+             through: :entries
+    has_many :devices,
+             -> { distinct },
+             class_name: "Masks::Device",
+             through: :entries
 
     serialize :checks, coder: JSON
     serialize :scopes, coder: JSON
@@ -191,6 +199,10 @@ module Masks
       end
     end
 
+    def cookie
+      "client:#{key}"
+    end
+
     def issuer
       Masks::Engine.routes.url_helpers.openid_issuer_url(id: key, host: "TODO")
     end
@@ -243,7 +255,7 @@ module Masks
 
       return unless LIFETIME_COLUMNS.include?(column) && self[column]
 
-      Time.now + ChronicDuration.parse(self[column])
+      Masks.time.expires_at(self[column])
     end
 
     def email_verification_duration

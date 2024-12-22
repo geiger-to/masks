@@ -26,9 +26,9 @@ module Masks
     delegate :attempt_bag,
              :auth_bag,
              :actor_bag,
+             :client_bag,
              :id_bag,
              :redirect_uri,
-             :approved?,
              :settled?,
              :settled!,
              :checked!,
@@ -41,11 +41,11 @@ module Masks
     end
 
     def path
-      state.attempt_bag&.fetch(:path, nil)
+      state.attempt_bag&.fetch("path", nil)
     end
 
     def params
-      state.attempt_bag&.fetch(:params, nil)
+      state.attempt_bag&.fetch("params", nil)
     end
 
     def event?(name)
@@ -57,7 +57,15 @@ module Masks
     end
 
     def approved?
-      settled? && state.settlement[:approved]
+      settled? && state.settlement["approved"]
+    end
+
+    def manager
+      prompt_for(Masks::Prompts::InternalSession).manager
+    end
+
+    def device
+      prompt_for(Masks::Prompts::Device).device
     end
 
     def session!(&block)
@@ -110,7 +118,7 @@ module Masks
         extras:,
         scopes:,
         settings: install.public_settings,
-      }.merge(state.settlement || {})
+      }.stringify_keys.merge(state.settlement || {}).symbolize_keys
     end
 
     def warnings

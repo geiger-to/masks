@@ -93,7 +93,7 @@ services:
 ### Migrations
 
 Database migrations are run before the server boots, automatically. To disable
-this behaviour, set `SKIP_MIGRATIONS=true` and run migrations manually with
+this behaviour, set `MASKS_SKIP_MIGRATIONS=true` and run migrations manually with
 the following command:
 
 ```

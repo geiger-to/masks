@@ -1,4 +1,12 @@
 <script>
+  import {
+    LogIn,
+    User,
+    Handshake,
+    MonitorSmartphone,
+    Mail,
+    Phone,
+  } from "lucide-svelte";
   import { route } from "@mateothegreat/svelte5-router";
   import Page from "./Page.svelte";
   import Time from "@/components/Time.svelte";
@@ -6,8 +14,7 @@
   import ActorList from "./list/Actor.svelte";
   import ClientList from "./list/Client.svelte";
   import DeviceList from "./list/Device.svelte";
-  import EmailList from "./list/Email.svelte";
-  import PhoneList from "./list/Phone.svelte";
+  import EntryList from "./list/Entry.svelte";
 
   let props = $props();
   let query = $derived(
@@ -35,80 +42,90 @@
 
   subscribe();
 
-  let tab = $state(props?.params?.tab || "actors");
+  let changeTab = (key) => {
+    return (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      tab = key;
+    };
+  };
+
+  let tab = $state(props?.params?.tab || "entries");
   let table = {
+    entries: {
+      plural: "Entries",
+      singular: "Entry",
+      href: "/manage/entries",
+      component: EntryList,
+      icon: LogIn,
+    },
     actors: {
       plural: "Actors",
       singular: "Actor",
       href: "/manage/actors",
       component: ActorList,
+      icon: User,
     },
     clients: {
       plural: "Clients",
       singular: "Client",
       href: "/manage/clients",
       component: ClientList,
+      icon: Handshake,
     },
     devices: {
       plural: "Devices",
       singular: "Device",
       href: "/manage/devices",
       component: DeviceList,
-    },
-    emails: {
-      plural: "Emails",
-      singular: "Email",
-      href: "/manage/emails",
-      component: EmailList,
-    },
-    phones: {
-      plural: "Phones",
-      singular: "Phone",
-      href: "/manage/phones",
-      component: PhoneList,
+      icon: MonitorSmartphone,
     },
   };
 </script>
 
 <Page {...props}>
-  <div
-    class="flex items-center gap-1.5 overflow-auto mb-3 tabs tabs-boxed
-      tabs-xs md:tabs-sm"
-  >
-    {#each Object.entries(table) as [key, data]}
-      {@const count = stats[key]}
-      <a
-        use:route
-        href={data.href}
-        disabled={count == 0}
-        class={[
-          tab == key
-            ? "tab-active"
-            : count == 0
-              ? "tab-disabled"
-              : "tab-neutral",
-          "text-right flex items-center gap-1.5 tab flex-nowrap whitespace-nowrap",
-        ].join(" ")}
+  <div class="w-full overflow-hidden">
+    <div class="flex">
+      <div
+        class="flex flex-col gap-1.5 rounded-r rounded-l-box bg-base-100 pl-1.5 py-1.5"
       >
-        <span class={[count > 0 ? "" : "opacity-75"].join(" ")}>
-          <span>{data.plural}</span>
-        </span>
+        {#each Object.entries(table) as [key, data]}
+          {@const count = stats[key]}
+          {@const Icon = data.icon}
+          <a
+            onclick={changeTab(key)}
+            href={data.href}
+            disabled={count == 0 || tab == key}
+            class={[
+              tab == key ? "btn-neutral" : count == 0 ? "btn-disabled" : "",
+              "flex items-center justify-start gap-1.5 flex-nowrap whitespace-nowrap btn btn-sm",
+              "rounded-r-none px-1.5 pr-2.5",
+            ].join(" ")}
+          >
+            <div class="w-4 text-center flex flex-col items-end">
+              <Icon size="14" />
+            </div>
+            <span
+              class={[
+                tab == key ? "badge-info" : "badge-neutral",
+                count > 0 ? "" : "opacity-75",
+                "badge badge-xs text-[9px] text-center",
+              ].join(" ")}
+            >
+              {count || "–"}
+            </span>
+          </a>
+        {/each}
+      </div>
 
-        <span
-          class={[
-            count > 0 ? "" : "opacity-75",
-            "badge badge-xs text-[9px] text-right",
-          ].join(" ")}
-        >
-          {count || "–"}
-        </span>
-      </a>
-    {/each}
+      <div class="grow bg-neutral rounded-l rounded-r-box p-3 overflow-hidden">
+        {#if table[tab]?.component}
+          {@const Tab = table[tab].component}
+
+          <Tab />
+        {/if}
+      </div>
+    </div>
   </div>
-
-  {#if table[tab]?.component}
-    {@const Tab = table[tab].component}
-
-    <Tab />
-  {/if}
 </Page>

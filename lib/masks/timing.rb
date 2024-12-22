@@ -1,5 +1,19 @@
 module Masks
   class Timing
+    def duration(value)
+      case value
+      when String
+        ChronicDuration.parse(value) if value.present?
+      else
+        nil
+      end
+    end
+
+    def expires_at(value)
+      duration = self.duration(value)
+      Time.current + duration if duration
+    end
+
     def expired?(value)
       time =
         case value

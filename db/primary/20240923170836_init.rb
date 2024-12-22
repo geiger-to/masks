@@ -12,6 +12,7 @@ class Init < ActiveRecord::Migration[7.2]
     create_table :masks_installations do |t|
       t.text :settings
       t.datetime :expired_at
+      t.datetime :reconfigured_at
 
       t.timestamps
     end
@@ -128,7 +129,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :public_id, null: false
       t.string :user_agent
       t.string :ip_address
-      t.string :version
+      t.bigint :version
 
       t.timestamps
       t.datetime :blocked_at

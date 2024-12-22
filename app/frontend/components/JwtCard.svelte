@@ -17,7 +17,7 @@
       class="btn btn-link underline">{event.clientId}</button
     >
     <span class="text-sm" alt={event.device.userAgent}
-      >{event.device.name} on {event.device.osName}</span
+      >{event.device.name} on {event.device.os}</span
     >
     <span class="text-sm font-mono">{event.device.ipAddress}</span>
     <span class="italic"><Time relative timestamp={event.createdAt} /></span>

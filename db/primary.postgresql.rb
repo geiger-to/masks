@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -174,7 +174,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.string "public_id", null: false
     t.string "user_agent"
     t.string "ip_address"
-    t.string "version"
+    t.bigint "version"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "blocked_at"
@@ -193,6 +193,21 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.index ["actor_id"], name: "index_masks_emails_on_actor_id"
     t.index %w[address group],
             name: "index_masks_emails_on_address_and_group",
+            unique: true
+  end
+
+  create_table "masks_entries", force: :cascade do |t|
+    t.string "public_id"
+    t.bigint "actor_id"
+    t.bigint "device_id"
+    t.bigint "client_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_masks_entries_on_actor_id"
+    t.index ["client_id"], name: "index_masks_entries_on_client_id"
+    t.index ["device_id"], name: "index_masks_entries_on_device_id"
+    t.index ["public_id"],
+            name: "index_masks_entries_on_public_id",
             unique: true
   end
 
@@ -232,6 +247,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
   create_table "masks_installations", force: :cascade do |t|
     t.text "settings"
     t.datetime "expired_at"
+    t.datetime "reconfigured_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

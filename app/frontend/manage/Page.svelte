@@ -15,6 +15,10 @@
   import { queryStore, gql, getContextClient } from "@urql/svelte";
   import Time from "svelte-time";
   import {
+    ServerCog,
+    SquarePen,
+    SquarePower,
+    RotateCcw,
     PlusSquare,
     Cog,
     ListCheck,
@@ -36,6 +40,7 @@
   let {
     actor,
     children,
+    install,
     url = "",
     loading = false,
     notFound = false,
@@ -245,8 +250,12 @@
           </button>
 
           <a use:route href={"/manage/settings"}>
-            <p class={`btn btn-sm px-0 w-8 btn-ghost`}>
-              <Cog size="20" />
+            <p
+              class={`btn btn-sm btn-ghost px-0 w-8 ${
+                install?.needsRestart ? "text-warning" : ""
+              } relative`}
+            >
+              <ServerCog size="20" />
             </p>
           </a>
 

@@ -74,4 +74,24 @@ class InstallMutationTest < GraphQLTestCase
     assert_equal "test", Masks.setting(:integration, :smtp, :user_name)
     assert_equal "test", Masks.setting(:integration, :smtp, :password)
   end
+
+  test "certain settings mark the need for server restart" do
+    log_in "manager"
+
+    assert_not Masks.installation.reload.needs_restart
+
+    gql query, input: { lifetimes: { session: "30 days", device: "30 days" } }
+
+    assert Masks.installation.reload.needs_restart
+  end
+
+  test "server restart are necessary only when settings change" do
+    log_in "manager"
+
+    assert_not Masks.installation.reload.needs_restart
+
+    gql query, input: { lifetimes: { device: "400 days" } }
+
+    assert_not Masks.installation.reload.needs_restart
+  end
 end

@@ -4,14 +4,26 @@ module Masks
   class Device < ApplicationRecord
     self.table_name = "masks_devices"
 
+    attribute :request
+    attribute :check
+
     has_many :access_tokens, class_name: "Masks::AccessToken"
     has_many :authorization_codes, class_name: "Masks::AuthorizationCode"
-    has_many :clients, through: :events, class_name: "Masks::Client"
-    has_many :actors, through: :events, class_name: "Masks::Actor"
+    has_many :entries, class_name: "Masks::Entry"
+    has_many :actors,
+             -> { distinct },
+             class_name: "Masks::Actor",
+             through: :entries
+    has_many :clients,
+             -> { distinct },
+             class_name: "Masks::Client",
+             through: :entries
 
     validates :public_id, presence: true, uniqueness: true
     validates :known?, :user_agent, presence: true
     validates :ip_address, ip: true
+    validate :validate_request, on: :session
+    validate :validate_check, on: :session
 
     delegate :name,
              :device_type,
@@ -23,8 +35,16 @@ module Masks
 
     after_initialize :generate_defaults
 
+    def logout
+      self.version += 1
+    end
+
     def block
       self.blocked_at = Time.now.utc
+    end
+
+    def unblock
+      self.blocked_at = nil
     end
 
     def block!
@@ -43,7 +63,23 @@ module Masks
     end
 
     def generate_defaults
-      self.version ||= SecureRandom.uuid
+      self.version ||= 0
+    end
+
+    def validate_check
+      return errors.add(:check, :blank) unless check
+
+      return unless check.device_version&.present?
+
+      errors.add(:version, :mismatch) if check.device_version != version
+    end
+
+    def validate_request
+      return errors.add(:request, :blank) unless request
+
+      errors.add(:user_agent, :mismatch) if request.user_agent != user_agent
+
+      errors.add(:ip_address, :mismatch) if request.remote_ip != ip_address
     end
   end
 end

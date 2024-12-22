@@ -14,9 +14,10 @@
       `dark:bg-sky-950 dark:border-sky-900 dark:text-sky-200`,
       `bg-sky-50 border-sky-200 text-sky-800`,
     ],
-    neutral: [
-      `dark:bg-gray-950 dark:border-gray-900 dark:text-gray-200`,
-      `bg-gray-50 border-gray-200 text-gray-800`,
+    neutral: ["bg-neutral text-neutral-content border-neutral"],
+    gray: [
+      `dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300`,
+      `bg-gray-400 border-gray-400 text-gray-700`,
     ],
     success: [
       `dark:bg-green-950 dark:border-green-900 dark:text-green-200`,
@@ -39,7 +40,7 @@
 
 <div
   class={[
-    "px-3 py-3 border rounded-lg",
+    "px-3 py-3 border rounded-box",
     "shadow flex items-start gap-3 text-left md:text-base text-sm",
     cls,
     ...(classes[type] || []),

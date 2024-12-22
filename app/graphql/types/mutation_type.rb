@@ -12,6 +12,8 @@ module Types
     field :hardware_key, mutation: Mutations::HardwareKey, managers_only: true
     field :actor, mutation: Mutations::Actor, managers_only: true
     field :client, mutation: Mutations::Client, managers_only: true
+    field :device, mutation: Mutations::Device, managers_only: true
     field :install, mutation: Mutations::Installation, managers_only: true
+    field :deletion, mutation: Mutations::Deletion, managers_only: true
   end
 end

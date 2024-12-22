@@ -27,11 +27,15 @@ module Masks
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
     has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
-    has_many :clients, class_name: "Masks::Client", through: :events
+    has_many :entries, class_name: "Masks::Entry"
     has_many :devices,
+             -> { distinct },
              class_name: "Masks::Device",
-             through: :events,
-             autosave: true
+             through: :entries
+    has_many :clients,
+             -> { distinct },
+             class_name: "Masks::Client",
+             through: :entries
 
     has_many :login_links, class_name: "Masks::LoginLink", autosave: true
     has_many :hardware_keys, class_name: "Masks::HardwareKey", autosave: true
@@ -56,7 +60,7 @@ module Masks
               uniqueness: true,
               presence: true,
               format: {
-                with: /\A[a-z][a-z0-9\-]+\z/,
+                with: /\A[a-zA-Z][a-zA-Z0-9\-]+\z/,
               },
               if: :nickname_required?
     validates :version, presence: true

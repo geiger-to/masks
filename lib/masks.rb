@@ -67,6 +67,10 @@ module Masks
       @scopes ||= Masks::Scopes.new
     end
 
+    def lifetime(key)
+      installation&.lifetime(key)
+    end
+
     def time
       Timing.new
     end
@@ -97,6 +101,8 @@ module Masks
 
     def installation
       @installation ||= Masks::Installation.active.last
+    rescue ActiveRecord::StatementInvalid
+      nil
     end
 
     def env

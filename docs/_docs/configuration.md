@@ -115,9 +115,32 @@ The first time masks boots it will populate the database with default data, incl
 | manager.password | `MASKS_MANAGER_PASSWORD` |
 | manager.email    | `MASKS_MANAGER_EMAIL`    |
 
-You can disable this behaviour with the `SKIP_MIGRATIONS` environment variable.
+You can disable this behaviour with the `MASKS_SKIP_MIGRATIONS` environment variable.
 
 ## Advanced settings
+
+### Sessions and lifetimes
+
+Masks uses cookies to keep track of devices and sessions. You can customize the
+expiration dates for this data (along with many others).
+
+| name              | ENV var                  | default  |
+| ----------------- | ------------------------ | -------- |
+| lifetimes.session | `MASKS_SESSION_LIFETIME` |
+| lifetimes.device  | `MASKS_DEVICE_LIFETIME`  | 400 days |
+
+You can customize many more lifetimes on [a per-client basis](clients.html#defaults).
+
+{% capture lifetime_info %}
+<span>
+<b class="text-info">Note:</b> A blank value for <code>lifetimes.session</code> or
+<code>lifetimes.device</code> will expire the cookie when the browser exits.
+Most browsers have <a
+href="https://httpwg.org/http-extensions/draft-ietf-httpbis-rfc6265bis.html#section-5.5">a maximum cookie lifetime of 400 days</a>.
+</span>
+{% endcapture %}
+
+{% include alert.html class="" content=lifetime_info %}
 
 ### Feature toggles
 
