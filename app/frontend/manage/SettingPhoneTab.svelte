@@ -5,11 +5,11 @@
   let { change, settings } = $props();
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="flex flex-col gap-3 pr-1.5">
-    <div class="flex items-center gap-2 mt-2">
+<div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2 mb-1.5">
       <p class="label-text-alt opacity-75 truncate">
-        <b>Twilio settings</b> — Used for SMS-based verification...
+        Twilio settings — <i>Used for SMS-based verification...</i>
       </p>
     </div>
 

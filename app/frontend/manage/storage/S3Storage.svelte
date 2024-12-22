@@ -2,7 +2,7 @@
   let { change, settings } = $props();
 </script>
 
-<div class="flex flex-col gap-3">
+<div class="flex flex-col gap-1.5">
   <label class="input input-bordered input-sm flex items-center gap-3">
     <span class="opacity-75 text-xs min-w-[35px]">access key id</span>
     <input

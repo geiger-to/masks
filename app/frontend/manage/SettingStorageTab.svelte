@@ -2,8 +2,8 @@
   import { Phone, MessageSquare, Mail, Upload, ImageUp } from "lucide-svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
   import Alert from "@/components/Alert.svelte";
-  import DiskStorage from "./DiskStorage.svelte";
-  import S3Storage from "./S3Storage.svelte";
+  import DiskStorage from "./storage/DiskStorage.svelte";
+  import S3Storage from "./storage/S3Storage.svelte";
   let { change, settings } = $props();
 
   let services = {

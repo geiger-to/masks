@@ -5,9 +5,9 @@
   let { change, settings } = $props();
 </script>
 
-<div class="flex flex-col gap-3">
-  <div class="flex flex-col gap-3 pr-1.5">
-    <div class="flex items-center gap-2 mt-2">
+<div class="flex flex-col gap-1.5">
+  <div class="flex flex-col gap-1.5">
+    <div class="flex items-center gap-2 mb-1.5">
       <p class="label-text-alt opacity-75 truncate">
         Used for notifications and verification emails...
       </p>
@@ -34,7 +34,7 @@
       />
     </label>
 
-    <div class="flex items-center gap-2 mt-2">
+    <div class="flex items-center gap-2 mt-3 mb-1.5">
       <p class="label-text-alt opacity-75 truncate">SMTP settings</p>
     </div>
     <label class="input input-sm input-bordered flex items-center gap-3">
