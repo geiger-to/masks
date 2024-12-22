@@ -60,28 +60,21 @@
           search(query: $input) {
             actors {
               id
-              nickname
+              name
               identifier
               identiconId
-              password
-              scopes
               avatar
               lastLoginAt
               createdAt
-              updatedAt
-              passwordChangedAt
-              addedTotpSecretAt
-              savedBackupCodesAt
             }
             clients {
               id
               name
               type
               logo
-              secret
+              bgLight
+              bgDark
               redirectUris
-              scopes
-              consent
               createdAt
               updatedAt
             }
@@ -188,17 +181,17 @@
           class="input input-sm input-ghost items-center gap-3 grow w-full
                 join-item hidden md:flex group-[.is-searching]:flex"
         >
-          <div>
+          <div class="w-6 h-6 opacity-50">
             {#if isLoading}
               <span class="loading loading-spinner"></span>
             {:else}
-              <Search />
+              <Search size="24" />
             {/if}
           </div>
 
           <input
             type="text"
-            class="grow w-full"
+            class="grow w-full placeholder:opacity-75"
             placeholder="search..."
             bind:value={input}
             oninput={debounceInput}
@@ -291,54 +284,41 @@
     </div>
 
     <div
-      class={`w-full grow ${isSearching ? "animate-fade-in-fast" : "hidden"}`}
+      class={`w-full grow ${input && isSearching ? "animate-fade-in-fast" : "hidden"}`}
     >
       <div
-        class="z-50 absolute w-full shadow-xl bg-base-100 left-0 right-0 top-[48px] p-6 shadow-inner"
+        class="z-50 absolute w-full shadow-xl bg-base-100 left-0 right-0 top-[48px] p-3 shadow-inner"
       >
-        {#if !input}
-          <div
-            class="rounded-lg border-dashed border-2 dark:border-base-300 border-base-100 p-6"
-          >
-            <ul class="opacity-75 gap-3 flex flex-col text-xs md:text-base">
-              <li class="flex items-center truncate gap-3">
-                <span class="grow font-mono">...</span> find a client by its id
-              </li>
-              <li class="flex items-center truncate gap-3">
-                <span class="grow font-mono">@...</span> find an actor by nickname
-              </li>
-              <li class="flex items-center truncate gap-3">
-                <span class="grow font-mono">@example.com...</span> find an actor
-                by email domain
-              </li>
-              <li class="flex items-center truncate gap-3">
-                <span class="grow font-mono">email@example.com...</span> find an
-                actor by email
-              </li>
-            </ul>
-          </div>
-        {:else if isEmpty(result)}
-          <div
-            class="rounded-lg border-dashed border-2 border-base-300 p-6 mt-3"
-          >
+        {#if isEmpty(result)}
+          <div class="rounded-lg border-dashed border-2 border-base-300 p-6">
             nothing found
           </div>
         {:else}
-          {#key input}
-            {#if result?.actors?.length}
-              <div class="flex flex-col gap-1.5">
+          <div class="flex flex-col gap-1.5">
+            {#key input}
+              {#if result?.actors?.length}
+                <div class="mb-1.5 mt-3 pl-3 font-bold text-xs uppercase">
+                  actors
+                </div>
                 {#each result.actors as actor (actor.id)}
-                  <ActorResult {actor} />
+                  <a use:route href={`/manage/actor/${actor.id}`}>
+                    <ActorResult {actor} class="bg-base-300" disabled />
+                  </a>
                 {/each}
-              </div>
-            {/if}
-          {/key}
+              {/if}
 
-          {#if result?.clients?.length}
-            {#each result.clients as client (client.id)}
-              <ClientResult {client} />
-            {/each}
-          {/if}
+              {#if result?.clients?.length}
+                <div class="mb-1.5 mt-3 pl-3 font-bold text-xs uppercase">
+                  clients
+                </div>
+                {#each result.clients as client (client.id)}
+                  <a href={`/manage/client/${client.id}`}>
+                    <ClientResult {client} class="bg-base-200" disabled />
+                  </a>
+                {/each}
+              {/if}
+            {/key}
+          </div>
         {/if}
       </div>
     </div>

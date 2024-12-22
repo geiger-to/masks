@@ -204,24 +204,32 @@ module Types
     private
 
     def find_clients(query)
-      return Masks::Client.none if !query || query.start_with?("@")
+      return Masks::Client.none if !query
 
       Masks::Client.where(
         "key LIKE ? OR name LIKE ?",
         "#{query}%",
         "%#{query}%",
-      ).all
+      ).order(created_at: :desc)
     end
 
     def find_actors(query)
-      if !query || (!query.start_with?("@") && !query.include?("@"))
-        return Masks::Actor.none
-      end
+      return Masks::Actor.none if !query
 
-      nickname =
-        query.start_with?("@") && !query.include?(".") ? query.slice(1..) : nil
+      scope =
+        if query.include?("@")
+          Masks::Actor.joins(:emails).where(
+            "masks_emails.address LIKE ?",
+            "%#{Masks::Actor.sanitize_sql_like(query)}%",
+          )
+        else
+          Masks::Actor.where(
+            "nickname LIKE ?",
+            "#{Masks::Actor.sanitize_sql_like(query)}%",
+          )
+        end
 
-      Masks::Actor.where("nickname LIKE ?", "#{nickname}%").all
+      scope.order(created_at: :desc)
     end
 
     def parse_query(query)

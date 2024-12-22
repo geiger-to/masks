@@ -5,6 +5,7 @@
   import Time from "@/components/Time.svelte";
   import { ImageUp, Save, ChevronRight, X } from "lucide-svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
+  import CopyButton from "@/components/CopyButton.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
   import { getContext } from "svelte";
   import { mutationStore, gql, getContextClient } from "@urql/svelte";
@@ -22,106 +23,90 @@
    */
 
   /** @type {Props} */
-  let {
-    client = $bindable(),
-    editing = false,
-    isEditing = () => {},
-  } = $props();
-
-  const updateClient = (input) => {
-    result = mutationStore({
-      client: page.graphql,
-      query: gql`
-        mutation ($input: ClientInput!) {
-          client(input: $input) {
-            client {
-              id
-              name
-              type
-              logo
-              secret
-              redirectUris
-              scopes
-              consent
-              createdAt
-              updatedAt
-            }
-
-            errors
-          }
-        }
-      `,
-      variables: { input: { ...input, id: client.id } },
-    });
-  };
-
-  const save = (input) => {
-    return () => {
-      loading = true;
-
-      updateClient(
-        _.pick(input, ["type", "redirectUris", "scopes", "redirectUris"])
-      );
-    };
-  };
-
-  const handleResult = (result) => {
-    if (!result) {
-      return;
-    }
-
-    loading = true;
-    errors = null;
-
-    if (!result?.data?.client) {
-      return;
-    }
-
-    client = result?.data?.client?.client;
-    errors = result?.data?.client?.errors;
-    loading = false;
-  };
-
-  let updateName = _.debounce((value) => {
-    if (value != client.name) {
-      updateClient({ name: value });
-    }
-  }, 500);
-
-  let form = $state({ ...client });
-  let ICON_TYPES = {
-    internal: "",
-    public: "",
-    confidential: "",
-  };
-  run(() => {
-    handleResult($result);
-  });
-  run(() => {
-    updateName(form.name);
-  });
+  let { client, ...props } = $props();
 </script>
 
-<a href={`/manage/client/${client.id}`}>
-  <div class="bg-base-200 rounded-lg p-3 px-3 text-base-content">
-    <div class="flex items-center gap-3">
+<div
+  class={`h-[74px] w-full rounded-lg p-1 pl-3 relative overflow-hidden
+  ${props.class}`}
+>
+  <div class="z-10 flex items-center relative">
+    <div class="w-14 h-14 min-w-14 min-h-14">
       <EditableImage
-        disabled
+        disabled={props.disabled}
         endpoint="/upload/client"
         params={{ client_id: client.id }}
         src={client.logo}
-        class="w-12 h-12"
+        class="w-14 h-14"
       />
+    </div>
 
-      <div class="flex-grow">
-        <div class="font-bold">
-          {client.name}
-        </div>
-        <div class="font-mono text-sm flex items-center gap-1.5">
-          <span class="opacity-75">id</span>
-          {client.id}
+    <div class="w-full max-w-full overflow-auto p-1.5 grow">
+      <div class="flex flex-col">
+        {#if props.disabled}
+          <span
+            class="bg-transparent font-bold text-xl pl-1 w-full min-w-0 p-0
+          pb-1.5 !outline-none text-black dark:text-white">{client.name}</span
+          >
+        {:else}
+          <input
+            type="text"
+            value={client.name}
+            oninput={(e) => props.change?.({ name: e.target.value })}
+            class="input bg-transparent font-bold input-sm text-xl pl-1 w-full min-w-0 py-1.5 pb-2 !outline-none text-black dark:text-white"
+          />
+        {/if}
+
+        <div class="flex items-center gap-3 pl-0.5">
+          <span
+            class="text-xs opacity-75 whitespace-nowrap bg-base-100
+            p-0.5 rounded px-1.5 bg-opacity-25"
+          >
+            <Time timestamp={client.createdAt} ago="old" />.
+          </span>
+
+          {#if props.disabled}
+            <span
+              class="flex items-center gap-1.5 grow !bg-transparent truncate
+              text-neutral dark:text-base-content text-sm"
+            >
+              <span class="text-neutral dark:text-base-content opacity-75">
+                id
+              </span>
+
+              {client.id}
+            </span>
+          {:else}
+            <label
+              class="input input-xs border-none min-w-0 flex items-center gap-1.5 grow !bg-transparent"
+            >
+              <CopyButton value={client.id} />
+
+              <span class="text-neutral dark:text-base-content opacity-75">
+                id
+              </span>
+
+              <input
+                type="text"
+                bind:value={client.id}
+                disabled
+                class="min-w-0 w-auto text-neutral dark:text-base-content"
+              />
+            </label>
+          {/if}
         </div>
       </div>
     </div>
+
+    {@render props.after?.()}
   </div>
-</a>
+
+  <div
+    style={client.bgLight}
+    class="absolute top-0 left-0 right-0 bottom-0 opacity-100 z-0 dark:hidden"
+  ></div>
+  <div
+    style={client.bgDark}
+    class="top-0 left-0 right-0 bottom-0 opacity-0 dark:opacity-100 z-0 absolute"
+  ></div>
+</div>
