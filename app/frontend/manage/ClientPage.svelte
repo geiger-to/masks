@@ -12,6 +12,7 @@
   import Page from "./Page.svelte";
   import ScopesEditor from "./ScopesEditor.svelte";
   import ChecksEditor from "./ChecksEditor.svelte";
+  import ClientResult from "./ClientResult.svelte";
   import Alert from "@/components/Alert.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
@@ -67,7 +68,7 @@
     queryStore({
       client: graphql,
       query: gql`
-        query ($id: String!) {
+        query ($id: ID!) {
           client(id: $id) {
             ...ClientFragment
           }
@@ -175,78 +176,24 @@
 
 {#key client?.updatedAt}
   <Page {...props} loading={loading || !client}>
-    <div
-      class="bg-base-200 w-full rounded-lg p-1 pl-3 mb-3 relative overflow-hidden"
-    >
-      <div class="z-10 flex items-center relative">
-        <div class="w-14 h-14 min-w-14 min-h-14">
-          <EditableImage
-            endpoint="/upload/client"
-            params={{ client_id: client.id }}
-            src={client.logo}
-            class="w-14 h-14"
-          />
+    <ClientResult {client} {change} class="mb-3">
+      {#snippet after()}
+        <div class="flex flex-col items-center pr-1.5">
+          <button
+            class="btn btn-sm btn-success"
+            disabled={saving || loading || !isChanged()}
+            type="button"
+            onclick={save}><Check size="20" /></button
+          >
+          <button
+            class={`btn btn-xs text-error btn-link ${isChanged() ? "" : "opacity-0"}`}
+            type="button"
+            disabled={!isChanged()}
+            onclick={reset}>reset</button
+          >
         </div>
-
-        <div class="w-full max-w-full overflow-auto p-1.5 grow">
-          <div class="flex items-center gap-3">
-            <input
-              type="text"
-              value={client.name}
-              oninput={(e) => change({ name: e.target.value })}
-              class="input bg-transparent font-bold input-sm text-xl pl-1.5 w-full min-w-0 py-1.5 pb-2 !outline-none text-black dark:text-white"
-            />
-
-            <button
-              class="btn btn-sm btn-success"
-              disabled={saving || loading || !isChanged()}
-              type="button"
-              onclick={save}><Check size="20" /></button
-            >
-          </div>
-
-          <div class="flex items-center gap-1.5">
-            <label
-              class="input input-xs border-none min-w-0 flex items-center gap-1.5 grow !bg-transparent"
-            >
-              <span class="text-neutral dark:text-base-content opacity-75">
-                id
-              </span>
-
-              <input
-                type="text"
-                bind:value={client.id}
-                disabled
-                class="w-full text-neutral dark:text-base-content"
-              />
-            </label>
-
-            {#if isChanged()}
-              <span
-                class="text-xs opacity-75 truncate rounded-full px-1.5 py-1 opacity-50 dark:text-text-green-900 text-green-100"
-              >
-                saved
-                <Time timestamp={client.updatedAt} />
-              </span>
-              <button
-                class="btn btn-xs text-error btn-link"
-                type="button"
-                onclick={reset}>reset</button
-              >
-            {/if}
-          </div>
-        </div>
-      </div>
-
-      <div
-        style={client.bgLight}
-        class="absolute top-0 left-0 right-0 bottom-0 opacity-100 z-0 dark:hidden"
-      ></div>
-      <div
-        style={client.bgDark}
-        class="top-0 left-0 right-0 bottom-0 opacity-0 dark:opacity-100 z-0 absolute"
-      ></div>
-    </div>
+      {/snippet}
+    </ClientResult>
 
     {#if errors}
       <Alert type="error" class="mb-3" icon={AlertIcon}>
@@ -258,7 +205,7 @@
       </Alert>
     {/if}
 
-    <div class="flex items-center gap-1.5 bg-base-200 mb-3 rounded-lg pr-0.5">
+    <div class="flex items-center gap-1.5 bg-base-200 mb-3 rounded-lg pr-3">
       <div class="">
         <select
           class="select select-sm join-item rounded-r-none leading-snug"
@@ -270,10 +217,6 @@
         </select>
       </div>
 
-      <span class="text-xs opacity-50 whitespace-nowrap mx-1.5 grow">
-        <Time timestamp={client.createdAt} ago="old" />
-      </span>
-
       <button
         class="btn btn-xs btn-neutral border-none text-white mr-1 rounded-full px-1"
         type="button"
@@ -283,6 +226,13 @@
             class=""
           />{/if}</button
       >
+
+      <div class="grow"></div>
+
+      <span class="text-xs opacity-50 whitespace-nowrap">
+        saved
+        <Time timestamp={client.updatedAt} />
+      </span>
     </div>
 
     {#if tab == "theme"}
@@ -354,8 +304,7 @@
               type="checkbox"
               class="toggle toggle-xs !toggle-warning !bg-neutral"
               checked={client.autofillRedirectUri}
-              onclick={(e) =>
-                change({ autofillRedirectUris: e.target.checked })}
+              onclick={(e) => change({ autofillRedirectUri: e.target.checked })}
             />
 
             <span class="text-xs opacity-75"

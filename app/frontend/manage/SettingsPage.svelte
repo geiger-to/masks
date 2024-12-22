@@ -172,8 +172,8 @@
 </script>
 
 <Page {...props} loading={!install?.createdAt}>
-  <div class="flex items-center gap-1.5 px-1.5 pt-1.5 mb-3">
-    <div class="grow p-1.5">
+  <div class="flex items-center gap-1.5 px-1.5 mb-3">
+    <div class="grow p-1.5 pt-0">
       <div class="flex items-center gap-1.5 grow">
         <div class="font-bold">{tabData.name}</div>
         <div class="opacity-75">settings</div>

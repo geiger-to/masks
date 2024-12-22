@@ -105,7 +105,9 @@
         {:else}
           <span
             class={[
-              "flex items-center justify-center text-xl opacity-70 animate-pulse dark:border-neutral border-neutral-content border-2 border-dotted",
+              "flex items-center justify-center text-xl",
+              "dark:border-neutral border-neutral-content border-2 border-dashed",
+              "bg-base-100 bg-opacity-50",
               cls,
             ].join(" ")}
           >

@@ -21,6 +21,7 @@
   import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
   import ActorBackupCodes from "./ActorBackupCodes.svelte";
   import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
+  import ActorResult from "./ActorResult.svelte";
   import {
     mutationStore,
     queryStore,
@@ -194,44 +195,11 @@
 
 <Page {...props} loading={!actor} {notFound}>
   <div class="flex flex-col gap-3">
-    <div class="grow flex items-start gap-3 p-1.5 rounded-lg bg-base-100">
-      <div class="w-12 h-12">
-        <EditableImage
-          endpoint="/upload/avatar"
-          params={{ actor_id: actor.id }}
-          src={actor?.avatar}
-          class="w-12 h-12"
-        />
-      </div>
-
-      <div class="grow flex flex-col truncate">
-        <div class="font-bold text-xl dark:text-white text-black truncate">
-          {original.name || original.identifier}
-        </div>
-
-        <div class="flex items-center gap-1.5">
-          {#if props.actor.identifier == actor.identifier}
-            <div class="text-xs italic font-bold text-info">you</div>
-          {/if}
-
-          <div class="text-xs">
-            last login
-
-            <span class="italic">
-              {#if actor.lastLoginAt}
-                <Time relative timestamp={actor.lastLoginAt} />
-              {:else}
-                never
-              {/if}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      <div class="min-w-6 w-6 h-6 md:w-12 md:h-12 bg-black rounded">
-        <Identicon id={actor.identiconId} />
-      </div>
-    </div>
+    <ActorResult
+      actor={original}
+      isCurrent={props.actor.id == original.id}
+      class="bg-base-100"
+    />
 
     <Alert type="gray" class="!py-1.5 pr-0.5 pl-1.5">
       <div class="flex items-center gap-1.5">
