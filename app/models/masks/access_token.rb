@@ -2,9 +2,14 @@
 
 module Masks
   class AccessToken < ApplicationRecord
-    include Masks::Scoped
-
     self.table_name = "masks_access_tokens"
+
+    include Scoped
+    include Cleanable
+
+    cleanup :expires_at do
+      0.seconds
+    end
 
     scope :valid,
           -> { where("revoked_at IS NULL AND expires_at >= ?", Time.now.utc) }

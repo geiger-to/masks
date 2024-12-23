@@ -67,10 +67,6 @@ module Masks
       @scopes ||= Masks::Scopes.new
     end
 
-    def lifetime(key)
-      installation&.lifetime(key)
-    end
-
     def time
       Timing.new
     end

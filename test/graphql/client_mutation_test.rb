@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ClientMutationTest < GraphQLTestCase
-  def query
+  QUERY =
     "
         mutation ($input: ClientInput!) {
           client(input: $input) {
@@ -14,25 +14,14 @@ class ClientMutationTest < GraphQLTestCase
           }
         }
     "
-  end
 
-  test "masks:manage is required" do
-    log_in "manager"
-
-    manager.scopes = ""
-    manager.save!
-
-    gql query, input: {}
-
-    assert gql_errors
-    assert_not gql_result
-  end
+  managers_only "client", QUERY, input: {}
 
   test "managers can create clients" do
     log_in "manager"
 
     assert_changes -> { Masks::Client.count } do
-      gql query,
+      gql QUERY,
           input: {
             name: "Testing",
             type: "internal",
@@ -49,7 +38,7 @@ class ClientMutationTest < GraphQLTestCase
     log_in "manager"
 
     assert_no_changes -> { Masks::Client.count } do
-      gql query,
+      gql QUERY,
           input: {
             name: "Testing",
             type: "public",
@@ -70,7 +59,7 @@ class ClientMutationTest < GraphQLTestCase
     test "#{col} lifetime be a valid duration" do
       log_in "manager"
 
-      gql query,
+      gql QUERY,
           input: {
             :id => "manage",
             col.to_s.camelize(:lower) => "invalid",
@@ -78,7 +67,7 @@ class ClientMutationTest < GraphQLTestCase
 
       assert gql_result("client", "errors")
 
-      gql query,
+      gql QUERY,
           input: {
             :id => "manage",
             col.to_s.camelize(:lower) => "1 hour",
@@ -94,7 +83,7 @@ class ClientMutationTest < GraphQLTestCase
   test "validation errors are returned and no changes are made" do
     log_in "manager"
 
-    gql query, input: { id: "manage", type: "invalid" }
+    gql QUERY, input: { id: "manage", type: "invalid" }
 
     assert manage_client.reload.internal?
     assert gql_result("client", "errors")

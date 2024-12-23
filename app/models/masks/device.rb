@@ -4,6 +4,12 @@ module Masks
   class Device < ApplicationRecord
     self.table_name = "masks_devices"
 
+    include Cleanable
+
+    cleanup :updated_at do
+      Masks.installation.duration(:devices, :lifetime)
+    end
+
     attribute :request
     attribute :check
 

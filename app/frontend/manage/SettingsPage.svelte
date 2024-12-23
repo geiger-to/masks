@@ -85,7 +85,9 @@
               checks
               clients
               integration
-              lifetimes
+              actors
+              devices
+              sessions
               needsRestart
               createdAt
               updatedAt

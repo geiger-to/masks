@@ -4,6 +4,12 @@ module Masks
   class IdToken < ApplicationRecord
     self.table_name = "masks_id_tokens"
 
+    include Cleanable
+
+    cleanup :expires_at do
+      0.seconds
+    end
+
     belongs_to :client, class_name: "Masks::Client"
     belongs_to :device, class_name: "Masks::Device"
     belongs_to :actor, class_name: "Masks::Actor"

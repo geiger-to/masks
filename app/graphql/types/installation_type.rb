@@ -23,7 +23,9 @@ module Types
     field :checks, Types::CamelizedJSON, null: false
     field :clients, Types::CamelizedJSON, null: false
     field :integration, Types::CamelizedJSON, null: false
-    field :lifetimes, Types::CamelizedJSON, null: false
+    field :sessions, Types::CamelizedJSON, null: false
+    field :devices, Types::CamelizedJSON, null: false
+    field :actors, Types::CamelizedJSON, null: false
     field :stats, Types::CamelizedJSON, null: false
     field :recent_clients, [Types::ClientType], null: false
     field :recent_actors, [Types::ActorType], null: false

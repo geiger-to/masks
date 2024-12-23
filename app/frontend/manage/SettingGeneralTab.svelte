@@ -84,9 +84,9 @@
       <input
         type="text"
         class="grow placeholder:opacity-75"
-        value={settings.lifetimes.session}
+        value={settings.sessions.lifetime}
         placeholder="expires when the browser exits..."
-        oninput={(e) => change({ lifetimes: { session: e.target.value } })}
+        oninput={(e) => change({ sessions: { lifetime: e.target.value } })}
       />
     </label>
     <label class="input input-bordered input-sm flex items-center gap-3 grow">
@@ -95,8 +95,8 @@
         type="text"
         class="grow placeholder:opacity-75"
         placeholder="expires when the browser exits..."
-        value={settings.lifetimes.device}
-        oninput={(e) => change({ lifetimes: { device: e.target.value } })}
+        value={settings.devices.lifetime}
+        oninput={(e) => change({ devices: { lifetime: e.target.value } })}
       />
     </label>
   </div>
