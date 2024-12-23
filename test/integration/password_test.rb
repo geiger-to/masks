@@ -20,7 +20,9 @@ class PasswordTest < MasksTestCase
   end
 
   test "password:verify rejects passwords for actors with nil passwords" do
-    Masks.signup("no-password").save!
+    actor = Masks.signup("no-password").tap { |a| a.save! }
+
+    assert_nil actor.password_digest
 
     authorize
     attempt_identifier("no-password")

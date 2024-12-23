@@ -201,7 +201,10 @@
       class="bg-base-100"
     />
 
-    <Alert type="gray" class="!py-1.5 pr-0.5 pl-1.5">
+    <Alert
+      type={errors?.length > 0 ? "error" : "gray"}
+      class="!py-1.5 pr-0.5 pl-1.5"
+    >
       <div class="flex items-center gap-1.5">
         <a
           title="Search their recent entries..."
@@ -263,6 +266,17 @@
           save
         </button>
       </div>
+
+      {#if errors?.length > 0}
+        <ul
+          class="mt-1.5 p-1.5 text-sm list-disc pl-6 dark:bg-black bg-white
+          !bg-opacity-50 !dark:bg-opacity-15 rounded-lg flex flex-col gap-1.5 shadow-inner"
+        >
+          {#each errors as error}
+            <li class="ml-1.5">{error}</li>
+          {/each}
+        </ul>
+      {/if}
     </Alert>
 
     <div class="flex flex-col gap-1.5 mb-1.5">
@@ -290,7 +304,9 @@
         />
       </label>
 
-      <ActorPassword {actor} />
+      {#key actor.passwordChangedAt}
+        <ActorPassword {actor} {change} />
+      {/key}
     </div>
 
     <div class="flex flex-col">

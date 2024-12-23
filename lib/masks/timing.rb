@@ -9,9 +9,9 @@ module Masks
       end
     end
 
-    def expires_at(value)
+    def expires_at(value, after: nil)
       duration = self.duration(value)
-      Time.current + duration if duration
+      (after || Time.current) + duration if duration
     end
 
     def expired?(value)

@@ -7,7 +7,7 @@ module Mutations
     field :actor, Types::ActorType, null: true
     field :errors, [String], null: true
 
-    FIELDS = %i[name nickname password scopes]
+    FIELDS = %i[name nickname scopes]
 
     def resolve(**args)
       actor =
@@ -24,7 +24,14 @@ module Mutations
       end
 
       actor.reset_backup_codes if args[:reset_backup_codes]
-      actor.reset_password if args[:reset_password]
+
+      unless args[:signup]
+        if args[:password]
+          actor.change_password(args[:password])
+        elsif args[:reset_password]
+          actor.reset_password
+        end
+      end
 
       actor&.save
 

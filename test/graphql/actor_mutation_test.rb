@@ -1,7 +1,7 @@
 require "test_helper"
 
 class ActorMutationTest < GraphQLTestCase
-  def query
+  QUERY =
     "
       mutation ($input: ActorInput!) {
         actor(input: $input) {
@@ -13,41 +13,24 @@ class ActorMutationTest < GraphQLTestCase
         }
       }
     "
-  end
 
-  test "masks:manage is required" do
-    log_in "manager"
-
-    manager.scopes = ""
-    manager.save!
-
-    gql query, input: { identifier: "testing", signup: true }
-
-    assert gql_errors
-    assert_not gql_result
-  end
+  managers_only "actor", QUERY, input: { identifier: "testing", signup: true }
 
   test "managers can create actors" do
-    log_in "manager"
-
-    gql query, input: { identifier: "testing", signup: true }
+    gql QUERY, input: { identifier: "testing", signup: true }
 
     assert_equal "testing", gql_result("actor", "actor", "identifier")
     assert_predicate Masks.identify("testing"), :persisted?
   end
 
   test "actors are only created with the signup param" do
-    log_in "manager"
-
-    gql query, input: { identifier: "testing" }
+    gql QUERY, input: { identifier: "testing" }
 
     assert_predicate Masks.identify("testing"), :new_record?
   end
 
   test "invalid emails return an error" do
-    log_in "manager"
-
-    gql query, input: { identifier: "&&&&@%%", signup: true }
+    gql QUERY, input: { identifier: "&&&&@%%", signup: true }
 
     assert_no_changes -> { Masks::Actor.count } do
       assert_includes gql_result("actor", "errors"), "Email is invalid"
@@ -55,9 +38,7 @@ class ActorMutationTest < GraphQLTestCase
   end
 
   test "invalid nicknames return an error" do
-    log_in "manager"
-
-    gql query, input: { identifier: "&&&&", signup: true }
+    gql QUERY, input: { identifier: "&&&&", signup: true }
 
     assert_no_changes -> { Masks::Actor.count } do
       assert_includes gql_result("actor", "errors"), "Nickname is invalid"
@@ -65,34 +46,47 @@ class ActorMutationTest < GraphQLTestCase
   end
 
   test "passwords can be changed for any existing actor" do
-    log_in "manager"
-
     assert tester.authenticate("password")
-    gql query, input: { id: tester.key, password: "testing123" }
+    tester.update_attribute(:password_changed_at, nil)
+    gql QUERY, input: { id: tester.key, password: "testing123" }
     assert tester.reload.authenticate("testing123")
   end
 
-  test "passwords can be reset for any existing actor" do
-    log_in "manager"
-
+  test "passwords cannot be changed within the cooldown period" do
     assert tester.authenticate("password")
-    gql query, input: { id: tester.key, resetPassword: true }
+    tester.update_attribute(:password_changed_at, Time.current)
+    gql QUERY, input: { id: tester.key, password: "testing123" }
+    assert_includes gql_result("actor", "errors"),
+                    "Password cannot be changed. Try again in 15 minutes..."
+    travel_to 15.minutes.from_now + 1.second
+    gql QUERY, input: { id: tester.key, password: "testing123" }
+    assert_empty gql_result("actor", "errors")
+    assert tester.reload.authenticate("testing123")
+  end
+
+  test "passwords can be reset within the cooldown period" do
+    assert tester.authenticate("password")
+    tester.update_attribute(:password_changed_at, Time.current)
+    gql QUERY, input: { id: tester.key, resetPassword: true }
+    assert_nil tester.reload.password_digest
+  end
+
+  test "passwords can be reset for any existing actor" do
+    assert tester.authenticate("password")
+    tester.update_attribute(:password_changed_at, nil)
+    gql QUERY, input: { id: tester.key, resetPassword: true }
     assert_nil tester.reload.password_digest
   end
 
   test "backup codes can be reset for any existing actor" do
-    log_in "manager"
-
     tester.update_attribute!(:backup_codes, ["test"])
     assert tester.reload.backup_codes
-    gql query, input: { id: tester.key, resetBackupCodes: true }
+    gql QUERY, input: { id: tester.key, resetBackupCodes: true }
     assert_nil tester.reload.backup_codes
   end
 
   test "scopes can be changed for any existing actor" do
-    log_in "manager"
-
-    gql query,
+    gql QUERY,
         input: {
           id: tester.key,
           scopes: "foobar testing baz\nbaz testing2\nbaz",
@@ -103,7 +97,7 @@ class ActorMutationTest < GraphQLTestCase
   test "passwords and scopes cannot be set on signup" do
     log_in "manager"
 
-    gql query,
+    gql QUERY,
         input: {
           identifier: "foobar",
           password: "testing123",

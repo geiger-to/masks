@@ -73,6 +73,8 @@ en:
               email_identifier: "Cannot remove primary email"
         masks/actor:
           attributes:
+            password:
+              unchangeable: cannot be changed. Try again in %{time}...
             identifier_type:
               blank: is invalid
             backup_codes:
