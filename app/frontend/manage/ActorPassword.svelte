@@ -1,6 +1,7 @@
 <script>
   import _ from "lodash-es";
   import {
+    Info,
     Smartphone,
     MailMinus,
     MailCheck,
@@ -15,6 +16,7 @@
   import Page from "./Page.svelte";
   import Alert from "@/components/Alert.svelte";
   import Dropdown from "@/components/Dropdown.svelte";
+  import PasswordInput from "@/components/PasswordInput.svelte";
   import Time from "@/components/Time.svelte";
   import Avatar from "@/components/Avatar.svelte";
   import Identicon from "@/components/Identicon.svelte";
@@ -26,7 +28,7 @@
     getContextClient,
   } from "@urql/svelte";
 
-  let props = $props();
+  let { change, ...props } = $props();
   let graphql = getContextClient();
   let actor = $state(props.actor);
   let saving = $state(false);
@@ -69,31 +71,45 @@
   };
 
   let deletePassword = () => {
-    if (confirm("Remove password?")) {
+    if (confirm("Are you sure you want to remove their password?")) {
       save({ resetPassword: true });
     }
   };
 </script>
 
-<div
-  class="flex items-center gap-3 text-sm pr-1.5 bg-base-200 rounded-lg p-2.5
-    pl-3"
+<PasswordInput
+  onChange={(e) => change({ password: e.target.value })}
+  inputClass="placeholder:opacity-50"
+  placeholder={`enter a new password...`}
 >
-  <span class="text-xs opacity-75 pl-1.5"> password </span>
-  {#if actor.password}
-    <span class="text-sm grow">
-      {#if actor.passwordChangedAt}
-        changed
-        <Time timestamp={actor.passwordChangedAt} />
+  {#snippet before()}
+    <span class="label-text-alt opacity-75">password</span>
+  {/snippet}
+
+  {#snippet end()}
+    {#if actor.password}
+      <button class="btn btn-xs" onclick={deletePassword}>
+        <Trash size="14" />
+      </button>
+    {/if}
+  {/snippet}
+</PasswordInput>
+
+{#key actor.passwordChangedAt}
+  <div class="flex items-center gap-1.5 pl-3 pt-1.5 text-xs">
+    <Info size="12" />
+
+    <span>
+      {#if actor.password}
+        {#if actor.passwordChangedAt}
+          password last changed <Time timestamp={actor.passwordChangedAt} />...
+        {:else}
+          password never changed...
+        {/if}
       {:else}
-        never changed
+        password is currently blank. password-based login is disabled for this
+        actor.
       {/if}
     </span>
-
-    <button class="btn btn-xs" onclick={deletePassword}>
-      <Trash size="14" />
-    </button>
-  {:else}
-    <span class="text-sm grow italic"> not set </span>
-  {/if}
-</div>
+  </div>
+{/key}

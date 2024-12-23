@@ -26,8 +26,10 @@ class MasksTestCase < ActionDispatch::IntegrationTest
     Masks.signup("nick#{SecureRandom.alphanumeric(10)}").tap { |a| a.save! }
   end
 
-  def make_client
-    Masks::Client.create!(name: "client#{SecureRandom.alphanumeric(10)}")
+  def make_client(name: nil)
+    Masks::Client.create!(
+      name: name || "client#{SecureRandom.alphanumeric(10)}",
+    )
   end
 
   def make_device

@@ -128,6 +128,8 @@ module Masks
       {
         min_chars: setting("passwords", "min_chars", default: 8),
         max_chars: setting("passwords", "max_chars", default: 100),
+        cooldown:
+          setting("passwords", "change_cooldown", default: "15 minutes"),
       }
     end
 

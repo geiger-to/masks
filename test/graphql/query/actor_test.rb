@@ -72,4 +72,15 @@ class QueryActorTest < GraphQLTestCase
     assert_equal 1, gql_result.dig("actors", "nodes").length
     assert_equal "manager", gql_result["actors"]["nodes"][0]["identifier"]
   end
+
+  test "actors can be filtered by name" do
+    assert Masks::Actor.count > 1
+
+    manager.update_attribute!(:name, "foobar")
+
+    gql QUERY_ACTORS, identifier: "oba"
+
+    assert_equal 1, gql_result.dig("actors", "nodes").length
+    assert_equal "manager", gql_result["actors"]["nodes"][0]["identifier"]
+  end
 end

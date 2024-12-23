@@ -37,9 +37,10 @@ module Types
 
       if args[:identifier]
         scope =
-          scope.joins(:emails).where(
-            "masks_emails.address LIKE :email OR nickname LIKE :nickname",
+          scope.left_outer_joins(:emails).where(
+            "masks_emails.address LIKE :email OR nickname LIKE :nickname OR name LIKE :name",
             email: "%#{Masks::Actor.sanitize_sql_like(args[:identifier])}%",
+            name: "%#{Masks::Actor.sanitize_sql_like(args[:identifier])}%",
             nickname: "#{Masks::Actor.sanitize_sql_like(args[:identifier])}%",
           )
       end
@@ -195,7 +196,7 @@ module Types
 
       return unless query.length > 0
 
-      actors = find_actors(query)
+      actors = self.actors(identifier: query)
       clients = find_clients(query)
       result = { actors:, clients:, query: }
       result
@@ -224,8 +225,9 @@ module Types
           )
         else
           Masks::Actor.where(
-            "nickname LIKE ?",
+            "nickname LIKE ? OR name LIKE ?",
             "#{Masks::Actor.sanitize_sql_like(query)}%",
+            "%#{Masks::Actor.sanitize_sql_like(query)}%",
           )
         end
 

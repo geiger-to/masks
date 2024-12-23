@@ -7,7 +7,7 @@
    */
 
   /** @type {Props} */
-  let { type = "info", icon = null, children, class: cls } = $props();
+  let { type = "info", icon = null, children, class: cls, ...props } = $props();
 
   let classes = {
     info: [
@@ -46,9 +46,19 @@
     ...(classes[type] || []),
   ].join(" ")}
 >
-  <p class="md:mx-1 mx-0.5 grow w-full">
-    {@render children?.()}
-  </p>
+  {#if children}
+    <p class="md:mx-1 mx-0.5 grow w-full">
+      {@render children?.()}
+    </p>
+  {:else if props.errors?.length}
+    {#each props.errors as error}
+      <ul>
+        {#each errors as error}
+          <li>{error}</li>
+        {/each}
+      </ul>
+    {/each}
+  {/if}
 
   {#if icon}
     {@const SvelteComponent = icon}

@@ -98,20 +98,24 @@ module Masks
     end
 
     def change_password(v)
-      return unless password_changeable?
-
       self.password = v
-      self.password_changed_at = Time.current
     end
 
     def password_changeable?
-      cooldown = Masks.setting(:passwords, :change_cooldown)
+      return true unless password_changed_at && password_settings[:cooldown]
 
-      return true unless password_changed_at && cooldown
-
-      password_changed_at + ChronicDuration.parse(cooldown) < Time.now.utc
+      password_changeable_at < Time.now.utc
     rescue => e
       true
+    end
+
+    def password_changeable_at
+      return unless password_settings[:cooldown] && password_changed_at
+
+      Masks.time.expires_at(
+        password_settings[:cooldown],
+        after: password_changed_at,
+      )
     end
 
     def public_id
@@ -273,19 +277,29 @@ module Masks
     end
 
     def validates_password
-      opts = Masks.installation.passwords
+      return unless password && password_settings
 
-      return unless password && opts
+      if password_changeable?
+        self.password_changed_at = Time.current if persisted?
+      else
+        time =
+          ApplicationController.helpers.distance_of_time_in_words(
+            Time.current,
+            password_changeable_at,
+          )
+
+        errors.add(:password, :unchangeable, time:)
+      end
 
       validates_length(
         password,
         key: :password,
-        **opts.slice(:min_chars, :max_chars),
+        **password_settings.slice(:min_chars, :max_chars),
       )
     end
 
     def validates_backup_codes
-      opts = Masks.installation.backup_codes
+      opts = backup_code_settings
 
       return unless backup_codes && opts && @new_backup_codes
 
@@ -300,6 +314,14 @@ module Masks
         key: :backup_codes,
         **opts.slice(:min_chars, :max_chars),
       )
+    end
+
+    def password_settings
+      @password_settings ||= Masks.installation.passwords
+    end
+
+    def backup_code_settings
+      @backup_code_settings ||= Masks.installation.backup_codes
     end
   end
 end
