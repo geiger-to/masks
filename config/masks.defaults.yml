@@ -97,9 +97,13 @@ default: &default
   encryption_key: "<%= ENV['MASKS_ENCRYPTION_KEY'] %>"
   deterministic_key: "<%= ENV['MASKS_DETERMINISTIC_KEY'] %>"
   salt: "<%= ENV['MASKS_SALT'] %>"
-  lifetimes:
-    session: <%= ENV['MASKS_SESSION_LIFETIME'] %>
-    device: <%= ENV.fetch('MASKS_DEVICE_LIFETIME', '400 days') %>
+  actors:
+    inactive: <%= ENV['MASKS_ACTOR_INACTIVE'] %>
+  sessions:
+    lifetime: <%= ENV['MASKS_SESSION_LIFETIME'] || '90 days' %>
+    persistent: false
+  devices:
+    lifetime: <%= ENV.fetch('MASKS_DEVICE_LIFETIME', '400 days') %>
   clients:
     types:
       - internal

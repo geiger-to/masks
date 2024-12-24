@@ -80,7 +80,15 @@ class InstallMutationTest < GraphQLTestCase
 
     assert_not Masks.installation.reload.needs_restart
 
-    gql query, input: { lifetimes: { session: "30 days", device: "30 days" } }
+    gql query,
+        input: {
+          sessions: {
+            lifetime: "30 days",
+          },
+          devices: {
+            lifetime: "30 days",
+          },
+        }
 
     assert Masks.installation.reload.needs_restart
   end
@@ -90,7 +98,7 @@ class InstallMutationTest < GraphQLTestCase
 
     assert_not Masks.installation.reload.needs_restart
 
-    gql query, input: { lifetimes: { device: "400 days" } }
+    gql query, input: { devices: { lifetime: "400 days" } }
 
     assert_not Masks.installation.reload.needs_restart
   end

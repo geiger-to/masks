@@ -2,9 +2,14 @@
 
 module Masks
   class AuthorizationCode < ApplicationRecord
-    include Scoped
-
     self.table_name = "masks_authorization_codes"
+
+    include Scoped
+    include Cleanable
+
+    cleanup :expires_at do
+      0.seconds
+    end
 
     after_initialize :generate_code
 

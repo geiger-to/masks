@@ -15,6 +15,8 @@ module Types
     argument :checks, Types::CamelizedJSON, required: false
     argument :clients, Types::CamelizedJSON, required: false
     argument :integration, Types::CamelizedJSON, required: false
-    argument :lifetimes, Types::CamelizedJSON, required: false
+    argument :actors, Types::CamelizedJSON, required: false
+    argument :devices, Types::CamelizedJSON, required: false
+    argument :sessions, Types::CamelizedJSON, required: false
   end
 end

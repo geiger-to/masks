@@ -20,6 +20,12 @@ module Masks
       end
     end
 
+    include Cleanable
+
+    cleanup :last_login_at do
+      Masks.installation.duration(:actors, :inactive)
+    end
+
     has_many :authorization_codes,
              class_name: "Masks::AuthorizationCode",
              autosave: true

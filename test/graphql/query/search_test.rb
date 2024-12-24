@@ -46,7 +46,7 @@ class QuerySearchTest < GraphQLTestCase
   end
 
   test "clients filtered by name are returned" do
-    gql QUERY_SEARCH, query: "anage M"
+    gql QUERY_SEARCH, query: "anage m"
 
     assert_equal 1, gql_result.dig("search", "clients").length
   end

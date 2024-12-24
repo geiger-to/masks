@@ -57,7 +57,7 @@ module Masks
         value ||= SecureRandom.alphanumeric(255)
         request.cookie_jar.signed[COOKIE] = {
           value:,
-          expires: install.lifetime(:device),
+          expires: Masks::Device.cleanup_at,
         }
         value
       end

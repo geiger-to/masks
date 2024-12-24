@@ -4,8 +4,8 @@ module Masks
       %w[sentry dsn],
       %w[newrelic license_key],
       %w[newrelic app],
-      %w[lifetimes session],
-      %w[lifetimes device],
+      %w[sessions lifetime],
+      %w[devices lifetime],
     ]
 
     self.table_name = "masks_installations"
@@ -34,8 +34,8 @@ module Masks
                 in: ActiveSupport::TimeZone.all.map { |tz| tz.tzinfo.name },
               }
 
-    def lifetime(key)
-      Masks.time.expires_at(setting(:lifetimes, key))
+    def duration(*keys, **args)
+      Masks.time.duration(setting(*keys, **args))
     end
 
     def enabled?(key)
@@ -78,7 +78,18 @@ module Masks
       (settings.dig("authorize", "delay")&.to_i || 0)
     end
 
-    %i[name url timezone region theme storage integration].each do |key|
+    %i[
+      name
+      url
+      timezone
+      region
+      theme
+      storage
+      integration
+      sessions
+      devices
+      actors
+    ].each do |key|
       define_method key do
         setting(key)
       end
@@ -164,10 +175,6 @@ module Masks
 
     def login_links?
       emails? && setting(:login_links, :enabled)
-    end
-
-    def lifetimes
-      setting(:lifetimes)
     end
 
     def modify(updates)
