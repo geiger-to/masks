@@ -2,6 +2,8 @@
 
 module Masks
   class Actor < ApplicationRecord
+    include Cleanable
+
     self.table_name = "masks_actors"
 
     EMAIL_ID = "email"
@@ -20,15 +22,10 @@ module Masks
       end
     end
 
-    include Cleanable
-
     cleanup :last_login_at do
       Masks.installation.duration(:actors, :inactive)
     end
 
-    has_many :authorization_codes,
-             class_name: "Masks::AuthorizationCode",
-             autosave: true
     has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
@@ -57,7 +54,6 @@ module Masks
     attribute :session
 
     after_initialize :generate_defaults
-    before_validation :reset_version, unless: :version
     before_validation :generate_key, unless: :key, on: :create
 
     validates :identifier_type, presence: true
@@ -69,7 +65,6 @@ module Masks
                 with: /\A[a-zA-Z][a-zA-Z0-9\-]+\z/,
               },
               if: :nickname_required?
-    validates :version, presence: true
     validate :validates_password, if: :password
     validate :validates_backup_codes, if: :backup_codes
     validates_associated :emails
@@ -80,10 +75,6 @@ module Masks
 
     def tz
       super || Masks.installation.settings["timezone"]
-    end
-
-    def session_key
-      version
     end
 
     def onboarded!
@@ -172,12 +163,6 @@ module Masks
       emails.for_login
     end
 
-    def version_digest
-      return if new_record? || !valid?
-
-      Digest::MD5.hexdigest([version, key].join("-"))
-    end
-
     def to_param
       key
     end
@@ -202,11 +187,6 @@ module Masks
         *(hardware_keys.all.to_a),
         *(otp_secrets.all.to_a),
       ].compact
-    end
-
-    def logout_everywhere!
-      reset_version
-      save!
     end
 
     def verify_backup_code(code)
@@ -266,10 +246,6 @@ module Masks
         else
           SecureRandom.hex
         end
-    end
-
-    def reset_version
-      self.version = SecureRandom.hex
     end
 
     def validates_length(value, key:, min_chars:, max_chars:)

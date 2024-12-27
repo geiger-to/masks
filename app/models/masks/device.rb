@@ -14,7 +14,6 @@ module Masks
     attribute :check
 
     has_many :access_tokens, class_name: "Masks::AccessToken"
-    has_many :authorization_codes, class_name: "Masks::AuthorizationCode"
     has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
              -> { distinct },
@@ -41,8 +40,17 @@ module Masks
 
     after_initialize :generate_defaults
 
+    def session_key
+      [public_id, version].join("-")
+    end
+
     def logout
       self.version += 1
+    end
+
+    def logout!
+      logout
+      save!
     end
 
     def block

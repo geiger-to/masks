@@ -47,14 +47,25 @@
     }
   }
 
-  let change = (opts) => {
-    changes = _.mergeWith(changes, opts, customizer);
+  let change = (opts, { reset } = {}) => {
+    if (reset) {
+      changes = _.mergeWith({}, opts, customizer);
+    } else {
+      changes = _.mergeWith(changes, opts, customizer);
+    }
+
     install = _.mergeWith(install, changes, customizer);
     changed = !_.isEqual(original, install);
   };
 
   let save = () => {
     updateSettings(changes);
+  };
+
+  let reset = () => {
+    changed = false;
+    install = _.mergeWith({}, original);
+    changes = {};
   };
 
   let updateSettings = (input = {}) => {
@@ -182,10 +193,12 @@
       </div>
       <div class="flex items-center gap-1.5">
         {#if install.updatedAt}
-          <p class="text-xs opacity-75">
-            last saved
-            <Time timestamp={install?.updatedAt} />
-          </p>
+          {#key install.updatedAt}
+            <p class="text-xs opacity-75">
+              last saved
+              <Time timestamp={install?.updatedAt} />
+            </p>
+          {/key}
         {/if}
       </div>
     </div>
@@ -194,7 +207,13 @@
       <p class="badge badge-warning badge-sm rounded">restart required</p>
     {/if}
 
-    <button class="btn btn-secondary btn-sm" onclick={save} disabled={!changed}>
+    {#if changed}
+      <button class="btn btn-link btn-sm !text-error" onclick={reset}>
+        reset
+      </button>
+    {/if}
+
+    <button class="btn btn-success btn-sm" onclick={save} disabled={!changed}>
       save
     </button>
   </div>

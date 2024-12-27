@@ -24,7 +24,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :phone_number
       t.string :password_digest
       t.string :totp_secret
-      t.string :version
       t.string :webauthn_id
       t.string :tz
       t.text :backup_codes
@@ -143,7 +142,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :secret
       t.string :client_type
       t.string :public_url, null: true
-      t.string :version
       t.text :redirect_uris
       t.text :checks
       t.text :scopes
@@ -156,10 +154,10 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :subject_type
       t.string :sector_identifier
       t.string :pairwise_salt
-      t.string :code_expires_in
       t.string :id_token_expires_in
       t.string :access_token_expires_in
-      t.string :refresh_expires_in
+      t.string :authorization_code_expires_in
+      t.string :refresh_token_expires_in
       t.string :login_link_expires_in
       t.string :auth_attempt_expires_in
       t.string :login_link_factor_expires_in
@@ -181,54 +179,35 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[key], unique: true
     end
 
-    create_table :masks_authorization_codes do |t|
-      t.string :code, limit: 64
-      t.string :nonce
-      t.string :redirect_uri
-      t.text :scopes
+    create_table :masks_entries do |t|
+      t.string :public_id
 
       t.references :actor
       t.references :device
       t.references :client
-      t.datetime :expires_at
       t.timestamps
 
-      t.index :code, unique: true
+      t.index :public_id, unique: true
     end
 
-    create_table :masks_access_tokens do |t|
-      t.string :token, limit: 64
-      t.string :refresh_token
-      t.string :refreshed_token
+    create_table :masks_tokens do |t|
+      t.string :type
+      t.string :secret
+      t.string :nonce, null: true
+      t.string :redirect_uri, null: true
       t.text :scopes
-      t.text :data
+      t.text :settings
 
       t.references :client
-      t.references :actor
-      t.references :device
-      t.references :authorization_code, null: true
+      t.references :actor, null: true
+      t.references :device, null: true
+      t.references :entry, null: true
       t.datetime :expires_at
       t.datetime :revoked_at
       t.datetime :refreshed_at
       t.timestamps
 
-      t.index :token, unique: true
-      t.index :refresh_token, unique: true
-      t.index :refreshed_token, unique: true
-    end
-
-    create_table :masks_id_tokens do |t|
-      t.string :nonce
-
-      t.references :client
-      t.references :actor
-      t.references :device
-      t.references :authorization_code, null: true
-
-      t.datetime :expires_at
-      t.timestamps
-
-      t.index :nonce, unique: true
+      t.index :secret, unique: true
     end
   end
 end

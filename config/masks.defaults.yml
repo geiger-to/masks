@@ -123,8 +123,8 @@ default: &default
     subject_type: pairwise-uuid
     id_token_expires_in: "6 hours"
     access_token_expires_in: "6 hours"
-    code_expires_in: "10 minutes"
-    refresh_expires_in: "1 month"
+    authorization_code_expires_in: "10 minutes"
+    refresh_token_expires_in: "1 month"
     login_link_expires_in: "10 minutes"
     auth_attempt_expires_in: "1 hour"
     login_link_factor_expires_in: "12 hours"

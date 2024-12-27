@@ -24,7 +24,9 @@
 <div class="flex flex-col gap-1.5">
   <div class="flex flex-col gap-1.5">
     <div class="flex items-center gap-2">
-      <p class="label-text-alt opacity-75 truncate">Sentry</p>
+      <p class="label-text-alt text-neutral-content opacity-75 truncate">
+        Sentry
+      </p>
     </div>
 
     <label class="input input-sm input-bordered flex items-center gap-3">
@@ -40,7 +42,9 @@
     </label>
 
     <div class="flex items-center gap-2 mt-2">
-      <p class="label-text-alt opacity-75 truncate">New Relic</p>
+      <p class="label-text-alt text-neutral-content opacity-75 truncate">
+        New Relic
+      </p>
     </div>
 
     <label class="input input-sm input-bordered flex items-center gap-3">

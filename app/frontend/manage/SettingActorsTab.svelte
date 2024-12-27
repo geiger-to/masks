@@ -1,14 +1,46 @@
 <script>
   import Alert from "@/components/Alert.svelte";
+  import { UserX, Trash, CalendarX2 } from "lucide-svelte";
 
   let { settings, change, loading, errors, save, ...props } = $props();
 </script>
 
 <div class="flex flex-col gap-1.5">
-  <div class="bg-base-200 rounded-lg px-4 py-3">
-    <div class="mb-1.5">
-      <p class="label-text-alt opacity-75">Identification</p>
+  <Alert type="gray" class="mb-3">
+    <div class="flex items-center gap-0">
+      <div
+        class="bg-error rounded p-[3px] pl-[4px] text-error-content flex items-center justify-center"
+      >
+        <UserX size="14" class="" />
+      </div>
+
+      <span class="opacity-75 whitespace-nowrap text-sm pl-3"
+        >Delete inactive actors after</span
+      >
+
+      <label
+        class="input dark:input-ghost input-sm min-w-0 flex items-center
+        gap-0.5 grow ml-1 !pl-1.5 !outline-none"
+      >
+        <input
+          type="text"
+          class="!min-w-0 px-0 w-auto max-w-[170px]"
+          value={settings.actors.lifetime}
+          placeholder="e.g. 1 year..."
+          oninput={(e) => change({ actors: { lifetime: e.target.value } })}
+        />
+
+        <span class="opacity-75 w-full grow whitespace-nowrap"
+          >of inactivity...</span
+        >
+      </label>
     </div>
+  </Alert>
+  <div class="mb-1.5 pl-1.5">
+    <p class="label-text-alt text-neutral-content opacity-75">Identification</p>
+  </div>
+
+  <div class="bg-base-200 rounded-lg px-4 py-1.5 mb-3">
     <label class="label cursor-pointer px-0">
       <div class="flex flex-col gap-1">
         <span class="label-text"> Nickname </span>
@@ -46,11 +78,11 @@
     </label>
   </div>
 
-  <div class="bg-base-200 rounded-lg px-4 py-3">
-    <div class="flex flex-col gap-1 mb-3">
-      <span class="label-text-alt opacity-75">Credentials</span>
-    </div>
+  <div class="mb-1.5 pl-1.5">
+    <p class="label-text-alt text-neutral-content opacity-75">Credentials</p>
+  </div>
 
+  <div class="bg-base-200 rounded-lg px-4 py-3 mb-3">
     <div class="flex items-center gap-3 text-xs mb-1.5">
       <span class="text-sm">Passwords</span>
       <span class="text-xs truncate opacity-75">characters</span>
@@ -128,10 +160,13 @@
     </label>
   </div>
 
-  <div class="bg-base-200 rounded-lg px-4 py-3">
-    <p class="label-text-alt opacity-75 mb-3">Backup codes</p>
+  <div class="mb-1.5 pl-1.5">
+    <p class="label-text-alt opacity-75 text-neutral-content">Backup codes</p>
+  </div>
+
+  <div class="bg-base-200 rounded-lg px-4 py-3 mb-3">
     <div class="flex items-center gap-3 text-xs mb-3">
-      <span class="text-sm truncate">characters</span>
+      <span class="text-sm truncate">Characters</span>
       <label class="flex items-center gap-3">
         <input
           type="text"

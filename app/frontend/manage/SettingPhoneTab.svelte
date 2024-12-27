@@ -8,7 +8,7 @@
 <div class="flex flex-col gap-1.5">
   <div class="flex flex-col gap-1.5">
     <div class="flex items-center gap-2 mb-1.5">
-      <p class="label-text-alt opacity-75 truncate">
+      <p class="label-text-alt text-neutral-content opacity-75 truncate">
         Twilio settings — <i>Used for SMS-based verification...</i>
       </p>
     </div>

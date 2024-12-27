@@ -50,10 +50,10 @@ en:
         identifier_type: Identifier
         emails: Email
       masks/client:
-        code_expires_in: Auth token lifetime
         id_token_expires_in: Id token lifetime
         access_token_expires_in: Access token lifetime
-        refresh_expires_in: Refresh token lifetime
+        authorization_code_expires_in: Auth code lifetime
+        refresh_token_expires_in: Refresh token lifetime
         login_link_expires_in: Login link lifetime
         auth_attempt_expires_in: Auth attempt lifetime
         email_verification_expires_in: Verified email lifetime

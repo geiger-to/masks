@@ -36,6 +36,15 @@ export const EntryFragment = gql`
   ${DeviceFragment}
 `;
 
+export const LogoutMutation = gql`
+  mutation ($input: LogoutInput!) {
+    logout(input: $input) {
+      total
+      errors
+    }
+  }
+`;
+
 function redirectTimeout(cb, timeout = 300) {
   const thresholdMillis = 5000;
   const lastReloadTimestamp = parseInt(

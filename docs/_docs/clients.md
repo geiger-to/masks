@@ -71,11 +71,11 @@ following in your `masks.yml`:
 | clients.bg_dark                              |                     |
 | clients.id_token_expires_in                  | `6 hours`           |
 | clients.access_token_expires_in              | `6 hours`           |
-| clients.code_expires_in                      | `10 minutes`        |
-| clients.refresh_expires_in                   | `1 month`           |
+| clients.authorization_code_expires_in        | `10 minutes`        |
 | clients.login_link_expires_in                | `10 minutes`        |
 | clients.auth_attempt_expires_in              | `1 hour`            |
 | clients.login_link_factor_expires_in         | `12 hours`          |
+| clients.refresh_token_expires_in             | `1 month`           |
 | clients.password_factor_expires_in           | `1 day`             |
 | clients.second_factor_backup_code_expires_in | `1 hour`            |
 | clients.second_factor_phone_expires_in       | `10 minutes`        |

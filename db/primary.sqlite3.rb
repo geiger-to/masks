@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -43,35 +43,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
             unique: true
   end
 
-  create_table "masks_access_tokens", force: :cascade do |t|
-    t.string "token", limit: 64
-    t.string "refresh_token"
-    t.string "refreshed_token"
-    t.text "scopes"
-    t.text "data"
-    t.integer "client_id"
-    t.integer "actor_id"
-    t.integer "device_id"
-    t.integer "authorization_code_id"
-    t.datetime "expires_at"
-    t.datetime "revoked_at"
-    t.datetime "refreshed_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_access_tokens_on_actor_id"
-    t.index ["authorization_code_id"],
-            name: "index_masks_access_tokens_on_authorization_code_id"
-    t.index ["client_id"], name: "index_masks_access_tokens_on_client_id"
-    t.index ["device_id"], name: "index_masks_access_tokens_on_device_id"
-    t.index ["refresh_token"],
-            name: "index_masks_access_tokens_on_refresh_token",
-            unique: true
-    t.index ["refreshed_token"],
-            name: "index_masks_access_tokens_on_refreshed_token",
-            unique: true
-    t.index ["token"], name: "index_masks_access_tokens_on_token", unique: true
-  end
-
   create_table "masks_actors", force: :cascade do |t|
     t.string "key"
     t.string "name"
@@ -79,7 +50,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
     t.string "phone_number"
     t.string "password_digest"
     t.string "totp_secret"
-    t.string "version"
     t.string "webauthn_id"
     t.string "tz"
     t.text "backup_codes"
@@ -109,32 +79,12 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
     t.index ["actor_id"], name: "index_masks_addresses_on_actor_id"
   end
 
-  create_table "masks_authorization_codes", force: :cascade do |t|
-    t.string "code", limit: 64
-    t.string "nonce"
-    t.string "redirect_uri"
-    t.text "scopes"
-    t.integer "actor_id"
-    t.integer "device_id"
-    t.integer "client_id"
-    t.datetime "expires_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_authorization_codes_on_actor_id"
-    t.index ["client_id"], name: "index_masks_authorization_codes_on_client_id"
-    t.index ["code"],
-            name: "index_masks_authorization_codes_on_code",
-            unique: true
-    t.index ["device_id"], name: "index_masks_authorization_codes_on_device_id"
-  end
-
   create_table "masks_clients", force: :cascade do |t|
     t.string "name"
     t.string "key"
     t.string "secret"
     t.string "client_type"
     t.string "public_url"
-    t.string "version"
     t.text "redirect_uris"
     t.text "checks"
     t.text "scopes"
@@ -145,10 +95,10 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
     t.string "subject_type"
     t.string "sector_identifier"
     t.string "pairwise_salt"
-    t.string "code_expires_in"
     t.string "id_token_expires_in"
     t.string "access_token_expires_in"
-    t.string "refresh_expires_in"
+    t.string "authorization_code_expires_in"
+    t.string "refresh_token_expires_in"
     t.string "login_link_expires_in"
     t.string "auth_attempt_expires_in"
     t.string "login_link_factor_expires_in"
@@ -224,23 +174,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
             unique: true
   end
 
-  create_table "masks_id_tokens", force: :cascade do |t|
-    t.string "nonce"
-    t.integer "client_id"
-    t.integer "actor_id"
-    t.integer "device_id"
-    t.integer "authorization_code_id"
-    t.datetime "expires_at"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_id_tokens_on_actor_id"
-    t.index ["authorization_code_id"],
-            name: "index_masks_id_tokens_on_authorization_code_id"
-    t.index ["client_id"], name: "index_masks_id_tokens_on_client_id"
-    t.index ["device_id"], name: "index_masks_id_tokens_on_device_id"
-    t.index ["nonce"], name: "index_masks_id_tokens_on_nonce", unique: true
-  end
-
   create_table "masks_installations", force: :cascade do |t|
     t.text "settings"
     t.datetime "expired_at"
@@ -307,6 +240,29 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_19_001830) do
             name: "index_masks_sessions_on_session_id",
             unique: true
     t.index ["updated_at"], name: "index_masks_sessions_on_updated_at"
+  end
+
+  create_table "masks_tokens", force: :cascade do |t|
+    t.string "type"
+    t.string "secret"
+    t.string "nonce"
+    t.string "redirect_uri"
+    t.text "scopes"
+    t.text "settings"
+    t.integer "client_id"
+    t.integer "actor_id"
+    t.integer "device_id"
+    t.integer "entry_id"
+    t.datetime "expires_at"
+    t.datetime "revoked_at"
+    t.datetime "refreshed_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_masks_tokens_on_actor_id"
+    t.index ["client_id"], name: "index_masks_tokens_on_client_id"
+    t.index ["device_id"], name: "index_masks_tokens_on_device_id"
+    t.index ["entry_id"], name: "index_masks_tokens_on_entry_id"
+    t.index ["secret"], name: "index_masks_tokens_on_secret", unique: true
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|

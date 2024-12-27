@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <p class="label-text-alt opacity-75">lifetimes</p>
+  <p class="label-text-alt text-neutral-content opacity-75">lifetimes</p>
 
   <div class="grow flex flex-col gap-1.5 mb-3">
     <label class="input input-bordered input-sm flex items-center gap-3">
@@ -101,7 +101,7 @@
     </label>
   </div>
 
-  <p class="label-text-alt opacity-75">environment</p>
+  <p class="label-text-alt text-neutral-content opacity-75">environment</p>
 
   <div class="flex flex-col gap-1.5">
     <label class="input input-bordered input-sm flex items-center gap-3">

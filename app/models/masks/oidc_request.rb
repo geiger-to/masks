@@ -109,6 +109,8 @@ module Masks
 
       client.save if client.redirect_uris_changed?
 
+      entry = actor.entries.create!(client:, device:)
+
       response_types = Array(req.response_type)
 
       if response_types.include? :code
@@ -117,27 +119,30 @@ module Masks
             prompt.state.attempt_id
           else
             @authorization_code =
-              actor.authorization_codes.create!(
+              Masks::AuthorizationCode.create!(
+                entry:,
                 client:,
                 device:,
                 actor:,
-                redirect_uri: res.redirect_uri,
                 nonce: req.nonce,
+                redirect_uri: res.redirect_uri,
                 scopes: scopes.join(" "),
               )
 
-            authorization_code.code
+            authorization_code.secret
           end
       end
 
       if response_types.include? :token
         @access_token =
-          actor.access_tokens.create!(
+          Masks::AccessToken.create!(
+            entry:,
             client:,
             device:,
             actor:,
+            nonce: req.nonce,
+            redirect_uri: res.redirect_uri,
             scopes: scopes.join(" "),
-            authorization_code: @authorization_code,
           )
 
         res.access_token = access_token.to_bearer_token
@@ -145,7 +150,14 @@ module Masks
 
       if response_types.include? :id_token
         @id_token =
-          actor.id_tokens.create!(client:, device:, actor:, nonce: req.nonce)
+          Masks::IdToken.create!(
+            client:,
+            device:,
+            actor:,
+            nonce: req.nonce,
+            redirect_uri: res.redirect_uri,
+            entry:,
+          )
 
         res.id_token =
           id_token.to_jwt(
@@ -154,9 +166,6 @@ module Masks
               (res.respond_to?(:access_token) ? res.access_token : nil),
           )
       end
-
-      # TODO: background job?
-      actor.entries.create!(client:, device:)
 
       res.approve!
     end
