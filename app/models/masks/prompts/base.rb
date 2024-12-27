@@ -30,7 +30,6 @@ module Masks
 
       delegate :attempt_bag,
                :auth_bag,
-               :id_bag,
                :actor_bag,
                :client_bag,
                :check,

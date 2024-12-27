@@ -1,23 +1,10 @@
 # frozen_string_literal: true
 
 module Masks
-  class IdToken < ApplicationRecord
-    self.table_name = "masks_id_tokens"
-
-    include Cleanable
-
+  class IdToken < Token
     cleanup :expires_at do
       0.seconds
     end
-
-    belongs_to :client, class_name: "Masks::Client"
-    belongs_to :device, class_name: "Masks::Device"
-    belongs_to :actor, class_name: "Masks::Actor"
-
-    validates :nonce, presence: true
-    validates :expires_at, presence: true
-
-    after_initialize :generate_expires_at
 
     def to_response_object(with = {})
       subject =
@@ -42,12 +29,6 @@ module Masks
       to_response_object(with).to_jwt(client.private_key) do |jwt|
         jwt.kid = client.kid
       end
-    end
-
-    private
-
-    def generate_expires_at
-      self.expires_at ||= client.expires_at(:id_token)
     end
   end
 end

@@ -14,11 +14,11 @@
 
 <div class="flex flex-col gap-1">
   <div class="flex items-center gap-2">
-    <p class="label-text-alt opacity-75 truncate grow">
+    <p class="label-text-alt text-neutral-content opacity-75 truncate grow">
       Store avatars, logos, and other uploads in...
     </p>
     <select
-      class="select select-sm select-ghost"
+      class="select select-sm dark:select-ghost"
       onchange={(e) => change({ integration: { storage: e.target.value } })}
     >
       {#each Object.entries(services) as [key, service]}

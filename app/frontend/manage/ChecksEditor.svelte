@@ -14,13 +14,13 @@
   };
 
   let lifetimes = {
-    codeExpiresIn: {
-      name: "auth tokens",
+    authorizationCodeExpiresIn: {
+      name: "auth codes",
     },
     accessTokenExpiresIn: {
       name: "access tokens",
     },
-    refreshExpiresIn: {
+    refreshTokenExpiresIn: {
       name: "refresh tokens",
     },
     idTokenExpiresIn: {

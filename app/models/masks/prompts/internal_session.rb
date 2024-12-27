@@ -7,7 +7,6 @@ module Masks
         if auth.approved?
           auth.client_bag["current_actor"] = {
             "key" => auth.actor.key,
-            "ver" => auth.actor.version,
             "exp" => client.expires_at(:internal_session),
           }
         end
@@ -15,19 +14,16 @@ module Masks
 
       def manager
         @manager ||=
-          begin
-            find_actor(
-              client_bag(Masks::Client.manage)&.fetch("current_actor", nil),
-            )
-          end
+          find_actor(
+            client_bag(Masks::Client.manage)&.fetch("current_actor", nil),
+          )
       end
 
       def find_actor(data)
         return unless data
 
         unless Masks.time.expired?(data["exp"])
-          a = Masks::Actor.find_by(key: data["key"])
-          a if a&.version == data["ver"]
+          Masks::Actor.find_by(key: data["key"])
         end
       end
     end

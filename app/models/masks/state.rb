@@ -119,8 +119,9 @@ module Masks
       raise
     end
 
-    def id_bag
-      identifiers_bag[identifier] ||= {} if identifier
+    def device_bag
+      rails_session["devices"] ||= {}
+      rails_session["devices"][device.session_key] ||= {}
     end
 
     def attempt_bag
@@ -128,7 +129,7 @@ module Masks
     end
 
     def actor_bag
-      actors_bag[actor.session_key] ||= {} if actor&.persisted?
+      actors_bag[actor.key] ||= {} if actor&.persisted?
     end
 
     def auth_bag
@@ -141,17 +142,14 @@ module Masks
 
       return unless client
 
-      rails_session["clients"] ||= {}
-      rails_session["clients"][client.key] ||= {}
+      device_bag["clients"] ||= {}
+      device_bag["clients"][client.key] ||= {}
     end
 
     def reset!(error = nil)
-      rails_session["identifiers"] = {}
-      rails_session["attempts"] = {}
-      rails_session["actors"] = {}
-      rails_session["clients"] = {}
+      rails_session["devices"] = nil
 
-      reset_attempt!
+      reset_attempt! if device
 
       raise error if error
     end
@@ -186,26 +184,12 @@ module Masks
       )
     end
 
-    def checks_bag
-      if actor_bag
-        actor_bag["checks"] ||= {}
-      elsif id_bag
-        id_bag["checks"] ||= {}
-      else
-        @checks_bag ||= {}
-      end
-    end
-
-    def identifiers_bag
-      rails_session["identifiers"] ||= {}
-    end
-
     def attempts_bag
-      rails_session["attempts"] ||= {}
+      device_bag["attempts"] ||= {}
     end
 
     def actors_bag
-      rails_session["actors"] ||= {}
+      device_bag["actors"] ||= {}
     end
 
     def validate_state!

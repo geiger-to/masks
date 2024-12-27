@@ -27,7 +27,6 @@ module Masks
              :auth_bag,
              :actor_bag,
              :client_bag,
-             :id_bag,
              :redirect_uri,
              :settled?,
              :settled!,

@@ -62,7 +62,7 @@
 
   {#if icon}
     {@const SvelteComponent = icon}
-    <div>
+    <div class="">
       <SvelteComponent />
     </div>
   {/if}

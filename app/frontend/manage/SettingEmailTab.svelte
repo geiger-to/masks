@@ -8,7 +8,7 @@
 <div class="flex flex-col gap-1.5">
   <div class="flex flex-col gap-1.5">
     <div class="flex items-center gap-2 mb-1.5">
-      <p class="label-text-alt opacity-75 truncate">
+      <p class="label-text-alt text-neutral-content opacity-75 truncate">
         Used for notifications and verification emails...
       </p>
     </div>
@@ -35,7 +35,9 @@
     </label>
 
     <div class="flex items-center gap-2 mt-3 mb-1.5">
-      <p class="label-text-alt opacity-75 truncate">SMTP settings</p>
+      <p class="label-text-alt text-neutral-content opacity-75 truncate">
+        SMTP settings
+      </p>
     </div>
     <label class="input input-sm input-bordered flex items-center gap-3">
       <span class="label-text-alt truncate opacity-70 w-[70px]">address</span>

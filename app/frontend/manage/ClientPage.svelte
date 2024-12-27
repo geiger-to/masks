@@ -45,10 +45,10 @@
       allowLoginLinks
       autofillRedirectUri
       fuzzyRedirectUri
-      codeExpiresIn
       idTokenExpiresIn
       accessTokenExpiresIn
-      refreshExpiresIn
+      authorizationCodeExpiresIn
+      refreshTokenExpiresIn
       loginLinkExpiresIn
       authAttemptExpiresIn
       emailVerificationExpiresIn

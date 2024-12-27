@@ -5,10 +5,10 @@ module Masks
     MANAGE_KEY = "manage"
     DEFAULT_KEY = "default"
     LIFETIME_COLUMNS = %i[
-      code_expires_in
       id_token_expires_in
       access_token_expires_in
-      refresh_expires_in
+      authorization_code_expires_in
+      refresh_token_expires_in
       login_link_expires_in
       auth_attempt_expires_in
       email_verification_expires_in
@@ -59,7 +59,7 @@ module Masks
       end
     end
 
-    validates :name, :version, presence: true
+    validates :name, presence: true
 
     encrypts :secret, :pairwise_salt, :rsa_private_key
 
@@ -274,10 +274,13 @@ module Masks
       end
     end
 
+    def logout
+      nil
+    end
+
     private
 
     def generate_credentials
-      self.version ||= SecureRandom.uuid
       self.secret ||= SecureRandom.base58(64)
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
       self.checks = Masks.installation.client_checks unless checks.any?

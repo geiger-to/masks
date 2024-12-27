@@ -21,6 +21,7 @@
   import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
   import ActorBackupCodes from "./ActorBackupCodes.svelte";
   import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
+  import ActorLogout from "./ActorLogout.svelte";
   import ActorResult from "./ActorResult.svelte";
   import {
     mutationStore,
@@ -308,6 +309,8 @@
         <ActorPassword {actor} {change} />
       {/key}
     </div>
+
+    <ActorLogout {actor} {change} />
 
     <div class="flex flex-col">
       <span class="text-xs opacity-75 mb-1.5">emails</span>

@@ -171,7 +171,7 @@
       <div
         class="navbar-start group-[.is-searching]:hidden md:group-[.is-searching]:flex"
       >
-        <div class="text-lg font-bold ml-4 text-black dark:text-white">
+        <div class="text-lg font-bold ml-4 text-white">
           <a use:route href={"/manage"}>masks</a>
         </div>
       </div>

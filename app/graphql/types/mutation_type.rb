@@ -15,5 +15,6 @@ module Types
     field :device, mutation: Mutations::Device, managers_only: true
     field :install, mutation: Mutations::Installation, managers_only: true
     field :deletion, mutation: Mutations::Deletion, managers_only: true
+    field :logout, mutation: Mutations::Logout, managers_only: true
   end
 end

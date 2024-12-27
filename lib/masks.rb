@@ -95,6 +95,11 @@ module Masks
       end
     end
 
+    def find(identifier)
+      actor = identify(identifier)
+      actor if actor.persisted?
+    end
+
     def installation
       @installation ||= Masks::Installation.active.last
     rescue ActiveRecord::StatementInvalid
