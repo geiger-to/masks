@@ -3,7 +3,7 @@ source "https://rubygems.org"
 gem "rails", "~> 8.0.1"
 gem "puma", ">= 5.0"
 gem "pg", "~> 1.1"
-gem "sqlite3", "~> 2.4"
+gem "sqlite3", "~> 2.5"
 gem "tzinfo-data", platforms: %i[windows jruby]
 gem "bootsnap", require: false
 gem "solid_queue", "~> 1.1"
