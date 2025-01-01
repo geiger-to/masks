@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PublicTokenTest < ClientTestCase
+class ResponseTypeTokenTest < ClientTestCase
   test_client redirect_uri: "https://example.com",
               response_type: "token",
               nonce: SecureRandom.uuid
@@ -12,6 +12,7 @@ class PublicTokenTest < ClientTestCase
         name: "testing",
         client_type: "public",
         redirect_uris: "https://example.com",
+        response_types: ["token"],
       )
   end
 
@@ -29,5 +30,18 @@ class PublicTokenTest < ClientTestCase
     assert_prompt "invalid-response"
     assert_settled
     assert_artifacts
+  end
+
+  test "access_tokens are returned in the uri" do
+    freeze_time
+
+    log_in "manager"
+
+    redirect = assert_redirect_uri
+
+    assert_equal "bearer", redirect.dig("fragment", "token_type")
+    assert_equal "21600", redirect.dig("fragment", "expires_in")
+    assert_token secret: redirect.dig("fragment", "access_token"),
+                 type: "Masks::AccessToken"
   end
 end

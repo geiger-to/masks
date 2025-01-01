@@ -48,6 +48,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
 
   create_table "masks_actors", force: :cascade do |t|
     t.string "key"
+    t.string "uuid"
     t.string "name"
     t.string "nickname"
     t.string "phone_number"
@@ -69,6 +70,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.datetime "onboarded_at"
     t.index ["key"], name: "index_masks_actors_on_key", unique: true
     t.index ["nickname"], name: "index_masks_actors_on_nickname", unique: true
+    t.index ["uuid"], name: "index_masks_actors_on_uuid", unique: true
   end
 
   create_table "masks_addresses", force: :cascade do |t|
@@ -88,6 +90,8 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.string "secret"
     t.string "client_type"
     t.string "public_url"
+    t.text "response_types"
+    t.text "grant_types"
     t.text "redirect_uris"
     t.text "checks"
     t.text "scopes"
@@ -102,6 +106,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.string "access_token_expires_in"
     t.string "authorization_code_expires_in"
     t.string "refresh_token_expires_in"
+    t.string "client_token_expires_in"
     t.string "login_link_expires_in"
     t.string "auth_attempt_expires_in"
     t.string "login_link_factor_expires_in"
@@ -246,6 +251,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
   end
 
   create_table "masks_tokens", force: :cascade do |t|
+    t.string "key"
     t.string "type"
     t.string "secret"
     t.string "nonce"
@@ -265,6 +271,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.index ["client_id"], name: "index_masks_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_tokens_on_device_id"
     t.index ["entry_id"], name: "index_masks_tokens_on_entry_id"
+    t.index ["key"], name: "index_masks_tokens_on_key", unique: true
     t.index ["secret"], name: "index_masks_tokens_on_secret", unique: true
   end
 

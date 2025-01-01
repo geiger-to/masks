@@ -45,10 +45,6 @@ module Types
     end
 
     def stats
-      tokens =
-        Masks::AuthorizationCode.count + Masks::AccessToken.count +
-          Masks::IdToken.count
-
       {
         actors: Masks::Actor.count,
         emails: Masks::Email.count,
@@ -56,7 +52,7 @@ module Types
         clients: Masks::Client.count,
         devices: Masks::Device.count,
         entries: Masks::Entry.count,
-        tokens:,
+        tokens: Masks::Token.count,
       }
     end
   end

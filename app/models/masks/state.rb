@@ -175,6 +175,8 @@ module Masks
               response_type
               grant_type
               redirect_uri
+              code_challenge
+              code_challenge_method
               scope
               state
               nonce

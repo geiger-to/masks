@@ -114,35 +114,4 @@ class CleanupJobTest < MasksTestCase
 
     t1.reload
   end
-
-  private
-
-  def make_session
-    Masks::Session.create!(data: "", session_id: SecureRandom.uuid)
-  end
-
-  def make_auth_code
-    Masks::AuthorizationCode.create!(
-      client: make_client,
-      actor: make_actor,
-      device: make_device,
-    )
-  end
-
-  def make_access_token
-    Masks::AccessToken.create!(
-      client: make_client,
-      actor: make_actor,
-      device: make_device,
-    )
-  end
-
-  def make_id_token
-    Masks::IdToken.create!(
-      client: make_client,
-      actor: make_actor,
-      device: make_device,
-      nonce: SecureRandom.uuid,
-    )
-  end
 end

@@ -42,7 +42,7 @@ default: &default
   region: "<%= ENV['MASKS_REGION'] || 'US' %>"
   private_key: "<%= ENV['MASKS_PRIVATE_KEY'] || Rails.root.join('data', 'private.key') %>"
   seeds_dir: "<%= ENV['MASKS_SEEDS_DIR'] %>"
-  threads: "<%= ENV['MASKS_THREADS'] || 1 %>"
+  threads: <%= ENV['MASKS_THREADS'] || 1 %>
   db:
     url: <%= ENV['MASKS_DB_URL'] %>
     adapter: <%= ENV['MASKS_DB_ADAPTER'] %>
@@ -119,12 +119,25 @@ default: &default
       - public-uuid
       - public-identifier
       - pairwise-uuid
+    response_types:
+      - code
+    grant_types:
+      internal:
+        - client_credentials
+      confidential:
+        - client_credentials
+        - authorization_code
+        - refresh_token
+      public:
+        - authorization_code
+        - refresh_token
     client_type: internal
     subject_type: pairwise-uuid
     id_token_expires_in: "6 hours"
     access_token_expires_in: "6 hours"
     authorization_code_expires_in: "10 minutes"
-    refresh_token_expires_in: "1 month"
+    refresh_token_expires_in: "1 day"
+    client_token_expires_in: "12 hours"
     login_link_expires_in: "10 minutes"
     auth_attempt_expires_in: "1 hour"
     login_link_factor_expires_in: "12 hours"

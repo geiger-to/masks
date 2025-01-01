@@ -7,11 +7,8 @@ module Masks
     end
 
     def to_response_object(with = {})
-      subject =
-        (client.pairwise_subject? ? client.subject_for(actor) : actor.actor_id)
-
       claims = {
-        sub: subject,
+        sub: client.subject(actor),
         iss: client.issuer,
         aud: client.audience,
         exp: expires_at.to_i,

@@ -23,6 +23,9 @@ Rails.application.routes.draw do
   get "/authorize/:client_id", to: "authorize#new", as: :authorize
   get "/authorize", to: "authorize#new", as: :oidc
 
+  # Tokens
+  post "token", to: proc { |env| TokensController.new.call(env) }
+
   # OAuth/OpenID support
   get "/.well-known/:client/openid-configuration",
       to: "oidc/discoveries#new",

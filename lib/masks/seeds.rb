@@ -6,12 +6,9 @@ module Masks
       schema_migrations
       ar_internal_metadata
       masks_devices
-      masks_authorization_codes
-      masks_id_tokens
-      masks_access_tokens
+      masks_tokens
       masks_login_links
       masks_sessions
-      sessions
     ]
 
     def initialize(env)
@@ -52,7 +49,7 @@ module Masks
     end
 
     def manager!(**args)
-      actor!(**args, scopes: [Masks::Scoped::MANAGE])
+      actor!(**args, scopes: [Masks::Scoped::OPENID, Masks::Scoped::MANAGE])
     end
 
     def client!(key:, name:, type:, logo: nil, **attrs)

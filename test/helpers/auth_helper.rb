@@ -30,6 +30,22 @@ module AuthHelper
     assert_equal client_id, auth_result(r).dig(:client, :id)
   end
 
+  def assert_redirect_uri(r = nil)
+    redirect_uri = auth_result(r).dig(:redirectUri)
+    parsed_uri = URI.parse(redirect_uri)
+
+    {
+      uri: parsed_uri,
+      url: redirect_uri,
+      fragment: Rack::Utils.parse_nested_query(parsed_uri.fragment),
+      params: Rack::Utils.parse_nested_query(parsed_uri.query),
+    }.deep_stringify_keys
+  end
+
+  def assert_token(r = nil, type:, secret:)
+    Masks::Token.find_by!(type:, secret:)
+  end
+
   def assert_error(code, r = nil)
     assert_equal code, auth_result(r).dig(:error)
   end
@@ -122,7 +138,15 @@ module AuthHelper
     opts = self.class.auth_opts.merge(opts)
 
     params =
-      opts.slice(:redirect_uri, :scope, :response_type, :client_id, :nonce)
+      opts.slice(
+        :redirect_uri,
+        :scope,
+        :response_type,
+        :client_id,
+        :code_challenge,
+        :code_challenge_method,
+        :nonce,
+      )
     params[:client_id] = client_id unless params[:path] || params[:client_id]
 
     get "#{opts.fetch(:path, "/authorize.json")}?#{params.to_query}"

@@ -40,6 +40,52 @@ class MasksTestCase < ActionDispatch::IntegrationTest
     )
   end
 
+  def make_entry
+    Masks::Entry.create!(
+      client: make_client,
+      device: make_device,
+      actor: make_actor,
+    )
+  end
+
+  def make_session
+    Masks::Session.create!(data: "", session_id: SecureRandom.uuid)
+  end
+
+  def make_auth_code
+    entry = make_entry
+
+    Masks::AuthorizationCode.create!(
+      client: entry.client,
+      actor: entry.actor,
+      device: entry.device,
+      entry:,
+    )
+  end
+
+  def make_access_token
+    entry = make_entry
+
+    Masks::AccessToken.create!(
+      client: entry.client,
+      actor: entry.actor,
+      device: entry.device,
+      entry:,
+    )
+  end
+
+  def make_id_token
+    entry = make_entry
+
+    Masks::IdToken.create!(
+      client: entry.client,
+      actor: entry.actor,
+      device: entry.device,
+      nonce: SecureRandom.uuid,
+      entry:,
+    )
+  end
+
   def manage_client
     @manage_client ||= Masks::Client.manage
   end
