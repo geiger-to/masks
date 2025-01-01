@@ -28,8 +28,7 @@ module Masks
 
     has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :phones, class_name: "Masks::Phone", autosave: true
-    has_many :access_tokens, class_name: "Masks::AccessToken", autosave: true
-    has_many :id_tokens, class_name: "Masks::IdToken", autosave: true
+    has_many :tokens, class_name: "Masks::Token", autosave: true
     has_many :entries, class_name: "Masks::Entry"
     has_many :devices,
              -> { distinct },

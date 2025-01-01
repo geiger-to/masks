@@ -187,10 +187,13 @@
     items-center -mt-1.5 justify-center min-h-[200px] flex-col"
   >
     <p class="text-xs dark:text-neutral-content text-neutral-content font-bold">
-      Nothing found.
+      Nothing found...
     </p>
-    <button onclick={resetValues} class="btn btn-xs btn-link text-error px-0"
-      >Clear filters...</button
-    >
+
+    {#if !isEmpty(search)}
+      <button onclick={resetValues} class="btn btn-xs btn-link text-error px-0"
+        >Clear filters...</button
+      >
+    {/if}
   </div>
 {/if}

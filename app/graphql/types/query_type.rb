@@ -142,6 +142,35 @@ module Types
       scope
     end
 
+    field :tokens,
+          Types::TokenType.connection_type,
+          null: false,
+          managers_only: true do
+      argument :actor, String, required: false
+      argument :device, String, required: false
+      argument :client, String, required: false
+    end
+
+    def tokens(**args)
+      scope = Masks::Token.includes(:actor, :client).order(created_at: :desc)
+
+      if args[:actor]
+        actor = Masks.identify(args[:actor])
+        scope = scope.where(actor: actor.persisted? ? actor : nil)
+      end
+
+      if args[:client]
+        scope = scope.where(client: Masks::Client.find_by(key: args[:client]))
+      end
+
+      if args[:device]
+        scope =
+          scope.where(device: Masks::Device.find_by(public_id: args[:device]))
+      end
+
+      scope
+    end
+
     field :entries,
           Types::EntryType.connection_type,
           null: false,

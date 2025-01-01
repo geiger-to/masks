@@ -50,6 +50,11 @@ module Masks
     # Used for file storage—avatars, logos, and other uploads.
     config.active_storage.service = "masks"
 
+    # "info" includes generic and useful information about system operation, but avoids logging too much
+    # information to avoid inadvertent exposure of personally identifiable information (PII). If you
+    # want to log everything, set the level to "debug".
+    config.log_level = ENV.fetch("MASKS_LOG_LEVEL", "info")
+
     # Replace the default in-process and non-durable queuing backend for Active Job.
     unless Rails.env.test?
       config.active_job.queue_adapter = :solid_queue

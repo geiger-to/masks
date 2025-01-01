@@ -2,8 +2,13 @@
 
 module Masks
   module Scoped
+    OPENID = "openid"
     MANAGE = "masks:manage"
     PASSWORD = "masks:password"
+
+    def openid?
+      scope?(OPENID)
+    end
 
     def masks_manager?
       scope?(MANAGE)
@@ -11,6 +16,8 @@ module Masks
 
     def scopes
       super&.strip || ""
+    rescue NoMethodError
+      self[:scopes]&.strip || ""
     end
 
     def scopes_a

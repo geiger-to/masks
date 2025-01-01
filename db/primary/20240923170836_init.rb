@@ -19,6 +19,7 @@ class Init < ActiveRecord::Migration[7.2]
 
     create_table :masks_actors do |t|
       t.string :key
+      t.string :uuid
       t.string :name, null: true
       t.string :nickname
       t.string :phone_number
@@ -40,6 +41,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.datetime :onboarded_at
 
       t.index %i[nickname], unique: true
+      t.index %i[uuid], unique: true
       t.index %i[key], unique: true
     end
 
@@ -142,6 +144,8 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :secret
       t.string :client_type
       t.string :public_url, null: true
+      t.text :response_types
+      t.text :grant_types
       t.text :redirect_uris
       t.text :checks
       t.text :scopes
@@ -158,6 +162,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :access_token_expires_in
       t.string :authorization_code_expires_in
       t.string :refresh_token_expires_in
+      t.string :client_token_expires_in
       t.string :login_link_expires_in
       t.string :auth_attempt_expires_in
       t.string :login_link_factor_expires_in
@@ -191,6 +196,7 @@ class Init < ActiveRecord::Migration[7.2]
     end
 
     create_table :masks_tokens do |t|
+      t.string :key
       t.string :type
       t.string :secret
       t.string :nonce, null: true
@@ -208,6 +214,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.timestamps
 
       t.index :secret, unique: true
+      t.index :key, unique: true
     end
   end
 end

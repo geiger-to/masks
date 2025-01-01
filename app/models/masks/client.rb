@@ -2,6 +2,7 @@
 
 module Masks
   class Client < ApplicationRecord
+    CODE_CHALLENGE_METHODS = %w[S256 plain]
     MANAGE_KEY = "manage"
     DEFAULT_KEY = "default"
     LIFETIME_COLUMNS = %i[
@@ -9,6 +10,7 @@ module Masks
       access_token_expires_in
       authorization_code_expires_in
       refresh_token_expires_in
+      client_token_expires_in
       login_link_expires_in
       auth_attempt_expires_in
       email_verification_expires_in
@@ -41,6 +43,7 @@ module Masks
       *BOOLEAN_COLUMNS,
       *STRING_COLUMNS,
       :scopes,
+      :response_types,
     ]
 
     self.table_name = "masks_clients"
@@ -80,12 +83,7 @@ module Masks
               presence: true
     validate :validate_expiries
 
-    has_many :access_tokens,
-             class_name: "Masks::AccessToken",
-             inverse_of: :client
-    has_many :authorization_codes,
-             class_name: "Masks::AuthorizationCode",
-             inverse_of: :client
+    has_many :tokens, class_name: "Masks::Token", inverse_of: :client
     has_many :login_links, class_name: "Masks::LoginLink"
     has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
@@ -99,6 +97,8 @@ module Masks
 
     serialize :checks, coder: JSON
     serialize :scopes, coder: JSON
+    serialize :grant_types, coder: JSON
+    serialize :response_types, coder: JSON
 
     def scope
       @scope ||= ClientScope.new(self)
@@ -150,6 +150,10 @@ module Masks
       client_type == "internal"
     end
 
+    def pkce?
+      client_type == "public"
+    end
+
     def default_redirect_uri
       redirect_uris_a.first
     end
@@ -160,6 +164,18 @@ module Masks
 
     def redirect_uris_a
       redirect_uris.split("\n")
+    end
+
+    def valid_response_type?(value)
+      return false unless value&.present?
+
+      response_types.include?(value)
+    end
+
+    def valid_grant_type?(value)
+      return false unless value&.present?
+
+      grant_types.include?(value.to_s)
     end
 
     def valid_redirect_uri?(uri)
@@ -176,35 +192,23 @@ module Masks
       end
     end
 
+    def valid_pkce_request?(response_type:, challenge:, method:)
+      pkce_required = client_type == "public"
+      pkce_request = response_type.include?("code")
+
+      if pkce_required && pkce_request
+        challenge&.present? && CODE_CHALLENGE_METHODS.include?(method)
+      else
+        true
+      end
+    end
+
     def subject_types
       [subject_type.split("-").first] # one of pairwise or public
     end
 
-    def response_types
-      {
-        "internal" => ["code"],
-        "confidential" => ["code"],
-        "public" => ["token", "id_token", "id_token token"],
-      }.fetch(client_type, [])
-    end
-
-    def grant_types
-      case client_type
-      when "internal"
-        %w[client_credentials]
-      when "confidential"
-        %w[refresh_token authorization_code client_credentials]
-      else
-        []
-      end
-    end
-
-    def cookie
-      "client:#{key}"
-    end
-
     def issuer
-      Masks::Engine.routes.url_helpers.openid_issuer_url(id: key, host: "TODO")
+      Masks.url
     end
 
     def kid
@@ -224,7 +228,7 @@ module Masks
         when "identifier"
           actor.identifier
         when "uuid"
-          actor.uuid
+          actor.key
         end
 
       case type
@@ -278,6 +282,16 @@ module Masks
       nil
     end
 
+    def valid_secret?(secret)
+      return false unless secret&.present? && self.secret&.present?
+
+      ActiveSupport::SecurityUtils.secure_compare(secret, self.secret)
+    end
+
+    def bearer_token!(scopes:)
+      ClientToken.create!(client: self, scopes:).to_bearer_token
+    end
+
     private
 
     def generate_credentials
@@ -288,6 +302,8 @@ module Masks
       self.pairwise_salt ||= SecureRandom.hex(10)
 
       SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:clients, key) }
+
+      self.grant_types ||= Masks.setting(:clients, :grant_types, client_type)
     end
 
     def generate_key

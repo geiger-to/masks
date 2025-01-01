@@ -1,6 +1,6 @@
 require "test_helper"
 
-class InternalClientTest < ClientTestCase
+class ResponseTypeInternalTest < ClientTestCase
   test_client path: "/authorize/testing.json", redirect_uri: "/foobar"
 
   def client

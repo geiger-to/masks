@@ -5,7 +5,17 @@ class ClientTestCase < MasksTestCase
     def test_client(**opts)
       auth_opts(**opts)
 
-      prefix = "#{opts.slice(:path, :redirect_uri, :response_type).to_json}}"
+      prefix =
+        "#{
+          opts.slice(
+            :path,
+            :redirect_uri,
+            :response_type,
+            :code_challenge,
+            :code_challenge_method,
+            :nonce,
+          ).to_json
+        }}"
 
       test "#{prefix} - manage client is returned" do
         authorize
@@ -92,7 +102,7 @@ class ClientTestCase < MasksTestCase
         refute_settled
       end
 
-      test "#{prefix} - invalid_credentials for invalid passwords" do
+      test "#{prefix} - invalid-credentials for invalid passwords" do
         log_in "manager", "invalid", authorize: true
 
         assert_warning "invalid-credentials"
@@ -101,7 +111,7 @@ class ClientTestCase < MasksTestCase
         refute_settled
       end
 
-      test "#{prefix} - invalid_credentials for unknown actors" do
+      test "#{prefix} - invalid-credentials for unknown actors" do
         log_in "invalid", "invalid", authorize: true
 
         assert_warning "invalid-credentials"

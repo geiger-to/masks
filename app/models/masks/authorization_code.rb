@@ -6,6 +6,19 @@ module Masks
       0.seconds
     end
 
+    validates :code_challenge_method,
+              inclusion: {
+                in: Masks::Client::CODE_CHALLENGE_METHODS,
+              },
+              if: :code_challenge
+
+    setting :code_challenge
+    setting :code_challenge_method
+
+    def pkce?
+      code_challenge && code_challenge_method
+    end
+
     def obfuscated_code
       obfuscate(:code)
     end
@@ -18,7 +31,7 @@ module Masks
     def generate_access_token!
       return if expires_at > Time.current
 
-      Masks::AccessToken.create!(actor:, device:, client:, scopes:)
+      Masks::AccessToken.copy!(self)
     end
   end
 end

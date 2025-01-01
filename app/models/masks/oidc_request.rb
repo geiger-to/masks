@@ -55,13 +55,22 @@ module Masks
             nonce_required!
           end
 
-          if client.response_types.include?(
-               Array(req.response_type).collect(&:to_s).join(" "),
-             )
-            prompt.instance_exec(self, &@block)
-          else
+          response_type =
+            Array(req.response_type).collect(&:to_s).sort.join(" ")
+
+          unless client.valid_response_type?(response_type)
             unsupported_response_type!
           end
+
+          unless client.valid_pkce_request?(
+                   response_type:,
+                   challenge: req.try(:code_challenge),
+                   method: req.try(:code_challenge_method),
+                 )
+            pkce_required!
+          end
+
+          prompt.instance_exec(self, &@block)
         end
     end
 
@@ -126,6 +135,8 @@ module Masks
                 actor:,
                 nonce: req.nonce,
                 redirect_uri: res.redirect_uri,
+                code_challenge: req.try(:code_challenge),
+                code_challenge_method: req.try(:code_challenge_method),
                 scopes: scopes.join(" "),
               )
 
@@ -175,6 +186,11 @@ module Masks
     def nonce_required!
       self.error = "missing-nonce"
       req.invalid_request! "nonce required"
+    end
+
+    def pkce_required!
+      self.error = "invalid-pkce"
+      req.invalid_request! "invalid PKCE request"
     end
 
     def scopes_required!

@@ -1,5 +1,6 @@
 <script>
   import {
+    KeySquare,
     LogIn,
     User,
     Handshake,
@@ -15,6 +16,7 @@
   import ClientList from "./list/Client.svelte";
   import DeviceList from "./list/Device.svelte";
   import EntryList from "./list/Entry.svelte";
+  import TokenList from "./list/Token.svelte";
 
   let props = $props();
   let query = $derived(
@@ -80,6 +82,13 @@
       href: "/manage/devices",
       component: DeviceList,
       icon: MonitorSmartphone,
+    },
+    tokens: {
+      plural: "Tokens",
+      singular: "Token",
+      href: "/manage/tokens",
+      component: TokenList,
+      icon: KeySquare,
     },
   };
 </script>

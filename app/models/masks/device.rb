@@ -13,7 +13,7 @@ module Masks
     attribute :request
     attribute :check
 
-    has_many :access_tokens, class_name: "Masks::AccessToken"
+    has_many :tokens, class_name: "Masks::Token"
     has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
              -> { distinct },

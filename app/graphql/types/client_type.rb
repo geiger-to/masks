@@ -12,6 +12,7 @@ module Types
     field :logo, String
     field :public_url, String, null: true
     field :redirect_uris, String
+    field :grant_types, [String]
     field :response_types, [String]
     field :checks, [String], null: false
     field :lifetime_types, [String], null: false
