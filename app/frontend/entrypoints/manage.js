@@ -31,6 +31,10 @@ mount(Router, {
         async () => import("../manage/NewActorPage.svelte")
       ),
       makeRoute(
+        "tokens/new",
+        async () => import("../manage/NewTokenPage.svelte")
+      ),
+      makeRoute(
         "client/(.+)",
         async () => import("../manage/ClientPage.svelte")
       ),

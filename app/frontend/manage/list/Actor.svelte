@@ -41,6 +41,10 @@
       loading = !r?.data;
     });
   };
+
+  if (props.variables) {
+    subscribe(props.variables);
+  }
 </script>
 
 {#if !props.actors}
@@ -58,6 +62,7 @@
     class="mb-3"
     onquery={subscribe}
     empty={actors?.length == 0}
+    editable={!props.variables}
     {loading}
   />
 {/if}

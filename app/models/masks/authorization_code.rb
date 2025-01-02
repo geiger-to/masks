@@ -15,12 +15,12 @@ module Masks
     setting :code_challenge
     setting :code_challenge_method
 
-    def pkce?
-      code_challenge && code_challenge_method
+    def code
+      secret
     end
 
-    def obfuscated_code
-      obfuscate(:code)
+    def pkce?
+      code_challenge && code_challenge_method
     end
 
     def access_token

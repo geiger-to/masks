@@ -17,53 +17,18 @@
   import EditableImage from "@/components/EditableImage.svelte";
   import PasswordInput from "@/components/PasswordInput.svelte";
   import Time from "@/components/Time.svelte";
+  import ActorList from "./list/Actor.svelte";
+  import TokenList from "./list/Token.svelte";
   import {
     mutationStore,
     queryStore,
     gql,
     getContextClient,
   } from "@urql/svelte";
+  import { ClientFragment } from "@/util.js";
 
   let { params, grapqhl, ...props } = $props();
   let graphql = getContextClient();
-  let clientFragment = gql`
-    fragment ClientFragment on Client {
-      id
-      secret
-      checks
-      scopes
-      redirectUris
-      subjectType
-      name
-      type
-      logo
-      bgLight
-      bgDark
-      sectorIdentifier
-      pairwiseSalt
-      allowPasswords
-      allowLoginLinks
-      autofillRedirectUri
-      fuzzyRedirectUri
-      idTokenExpiresIn
-      accessTokenExpiresIn
-      authorizationCodeExpiresIn
-      refreshTokenExpiresIn
-      loginLinkExpiresIn
-      authAttemptExpiresIn
-      emailVerificationExpiresIn
-      loginLinkFactorExpiresIn
-      passwordFactorExpiresIn
-      secondFactorBackupCodeExpiresIn
-      secondFactorPhoneExpiresIn
-      secondFactorTotpCodeExpiresIn
-      secondFactorWebauthnExpiresIn
-      internalSessionExpiresIn
-      lifetimeTypes
-      createdAt
-      updatedAt
-    }
-  `;
   let query = $derived(
     queryStore({
       client: graphql,
@@ -78,7 +43,7 @@
           }
         }
 
-        ${clientFragment}
+        ${ClientFragment}
       `,
       variables: { id: params[0] },
       requestPolicy: "network-only",
@@ -195,45 +160,73 @@
       {/snippet}
     </ClientResult>
 
-    {#if errors}
-      <Alert type="error" class="mb-3" icon={AlertIcon}>
-        <ul class="list-disc ml-3">
+    <Alert
+      type={errors?.length > 0 ? "error" : "gray"}
+      class="!py-1.5 pr-0.5 pl-1.5 mb-3"
+    >
+      <div class="flex items-center gap-1.5">
+        <button
+          class="btn btn-xs btn-neutral"
+          type="button"
+          onclick={() => (tab = tab == "theme" ? null : "theme")}
+          >theme {#if tab == "theme"}<X size="14" />{:else}<Palette
+              size="14"
+              class=""
+            />{/if}</button
+        >
+        <button
+          class="btn btn-xs btn-neutral"
+          type="button"
+          onclick={() => (tab = tab == "actors" ? null : "actors")}
+        >
+          actors
+          <span
+            class="badge text-[9px] badge-test badge-xs
+            left-3.5 bottom-3.5"
+          >
+            {#if tab == "actors"}<X size="8" />{:else}
+              {client.stats.actors}
+            {/if}</span
+          >
+        </button>
+        <button
+          class="btn btn-xs btn-neutral"
+          type="button"
+          onclick={() => (tab = tab == "tokens" ? null : "tokens")}
+        >
+          tokens
+          <span
+            class="badge text-[9px] badge-test badge-xs
+            left-3.5 bottom-3.5"
+          >
+            {#if tab == "actors"}<X size="8" />{:else}
+              {client.stats.tokens}
+            {/if}</span
+          >
+        </button>
+
+        <div class="text-xs grow"></div>
+
+        <div class="text-xs pr-1.5">
+          <span class="opacity-75">saved</span>
+
+          {#key client.updatedAt}
+            <Time timestamp={client.updatedAt} />
+          {/key}
+        </div>
+      </div>
+
+      {#if errors?.length > 0}
+        <ul
+          class="mt-1.5 p-1.5 text-sm list-disc pl-6 dark:bg-black bg-white
+          !bg-opacity-50 !dark:bg-opacity-15 rounded-lg flex flex-col gap-1.5 shadow-inner"
+        >
           {#each errors as error}
             <li class="ml-1.5">{error}</li>
           {/each}
         </ul>
-      </Alert>
-    {/if}
-
-    <div class="flex items-center gap-1.5 bg-base-200 mb-3 rounded-lg pr-3">
-      <div class="">
-        <select
-          class="select select-sm join-item rounded-r-none leading-snug"
-          onchange={(e) => change({ type: e.target.value })}
-        >
-          {#each settings?.clients?.types as type}
-            <option selected={type == client?.type}>{type}</option>
-          {/each}
-        </select>
-      </div>
-
-      <button
-        class="btn btn-xs btn-neutral border-none text-white mr-1 rounded-full px-1"
-        type="button"
-        onclick={() => (tab = tab == "theme" ? null : "theme")}
-        >{#if tab == "theme"}<X size="16" />{:else}<Palette
-            size="16"
-            class=""
-          />{/if}</button
-      >
-
-      <div class="grow"></div>
-
-      <span class="text-xs opacity-50 whitespace-nowrap">
-        saved
-        <Time timestamp={client.updatedAt} />
-      </span>
-    </div>
+      {/if}
+    </Alert>
 
     {#if tab == "theme"}
       <div class="flex flex-col gap-1.5 mb-3">
@@ -275,18 +268,58 @@
           </div>
         </div>
       </div>
+    {:else if tab == "actors"}
+      <div class="bg-gray-950 p-3 rounded-lg mb-3">
+        <div class="px-1.5">
+          <ActorList variables={{ client: client.id }} />
+        </div>
+      </div>
+    {:else if tab == "tokens"}
+      <div class="bg-gray-950 p-3 rounded-lg mb-3">
+        <div class="px-1.5">
+          <TokenList variables={{ client: client.id }}>
+            {#snippet after()}
+              <a
+                href="/manage/tokens/new"
+                class="btn btn-xs btn-success btn-outline">new token</a
+              >
+            {/snippet}
+          </TokenList>
+        </div>
+      </div>
     {/if}
+
+    <div
+      class="flex items-center gap-1.5 bg-base-200 mb-3 rounded-lg px-3 border border-neutral"
+    >
+      <div class="grow flex items-center gap-3J">
+        <span class="label-text-alt opacity-70 w-[60px] px-1.5">type</span>
+        <select
+          class="select w-full rounded-l-none leading-snug grow bg-transparent"
+          onchange={(e) => change({ type: e.target.value })}
+        >
+          {#each settings?.clients?.types as type}
+            <option selected={type == client?.type}>{type}</option>
+          {/each}
+        </select>
+      </div>
+    </div>
 
     <div class="flex flex-col gap-3">
       <PasswordInput
-        label="secret"
         value={client.secret}
         onChange={(e) => change({ secret: e.target.value })}
-      />
+      >
+        {#snippet before()}
+          <span class="label-text-alt opacity-75 w-[60px]">secret</span>
+        {/snippet}
+      </PasswordInput>
 
       <div class="input input-bordered rounded-md h-auto pl-4 pr-1.5 py-3">
         <div class="flex items-start mb-3 gap-1.5">
-          <span class="label-text-alt opacity-70 w-[60px]">redirect uris</span>
+          <span class="label-text-alt opacity-70 min-w-[60px]"
+            >redirect uris</span
+          >
 
           <div class="w-full">
             <textarea

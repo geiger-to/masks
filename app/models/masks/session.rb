@@ -11,7 +11,13 @@ module Masks
     include Cleanable
 
     cleanup :updated_at do
-      Masks.installation&.duration(:sessions, :lifetime, default: "90 days")
+      Masks.installation&.duration(:sessions, :inactive)
+    end
+
+    class << self
+      def expire_after
+        Masks.installation&.duration(:sessions, :lifetime)
+      end
     end
   end
 end

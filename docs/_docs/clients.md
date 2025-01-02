@@ -72,6 +72,7 @@ following in your `masks.yml`:
 | clients.id_token_expires_in                  | `6 hours`           |
 | clients.access_token_expires_in              | `6 hours`           |
 | clients.authorization_code_expires_in        | `10 minutes`        |
+| clients.internal_token_expires_in            | `1 day`             |
 | clients.login_link_expires_in                | `10 minutes`        |
 | clients.auth_attempt_expires_in              | `1 hour`            |
 | clients.login_link_factor_expires_in         | `12 hours`          |
@@ -82,4 +83,3 @@ following in your `masks.yml`:
 | clients.second_factor_totp_code_expires_in   | `10 minutes`        |
 | clients.second_factor_webauthn_expires_in    | `10 minutes`        |
 | clients.email_verification_expires_in        | `1 year`            |
-| clients.internal_session_expires_in          | `1 day`             |

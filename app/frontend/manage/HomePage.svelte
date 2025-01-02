@@ -15,7 +15,6 @@
   import ActorList from "./list/Actor.svelte";
   import ClientList from "./list/Client.svelte";
   import DeviceList from "./list/Device.svelte";
-  import EntryList from "./list/Entry.svelte";
   import TokenList from "./list/Token.svelte";
 
   let props = $props();
@@ -53,14 +52,14 @@
     };
   };
 
-  let tab = $state(props?.params?.tab || "entries");
+  let tab = $state(props?.params?.tab || "tokens");
   let table = {
-    entries: {
-      plural: "Entries",
-      singular: "Entry",
-      href: "/manage/entries",
-      component: EntryList,
-      icon: LogIn,
+    tokens: {
+      plural: "Tokens",
+      singular: "Token",
+      href: "/manage/tokens",
+      component: TokenList,
+      icon: KeySquare,
     },
     actors: {
       plural: "Actors",
@@ -82,13 +81,6 @@
       href: "/manage/devices",
       component: DeviceList,
       icon: MonitorSmartphone,
-    },
-    tokens: {
-      plural: "Tokens",
-      singular: "Token",
-      href: "/manage/tokens",
-      component: TokenList,
-      icon: KeySquare,
     },
   };
 </script>

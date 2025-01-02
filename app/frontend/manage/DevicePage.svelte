@@ -26,7 +26,6 @@
   import Deletion from "./Deletion.svelte";
   import ActorList from "./list/Actor.svelte";
   import ClientList from "./list/Client.svelte";
-  import EntryList from "./list/Entry.svelte";
   import { EntryFragment, DeviceFragment } from "@/util.js";
   import {
     mutationStore,
@@ -41,7 +40,7 @@
     fragment DevicePageFragment on Device {
       ...DeviceFragment
 
-      entries {
+      tokens {
         actor {
           id
           name
@@ -53,6 +52,7 @@
           name
         }
         createdAt
+        expiresAt
       }
     }
 
@@ -297,9 +297,9 @@
       </div>
 
       <div class="mb-3">
-        <p class="text-sm font-bold mb-1.5 ml-1.5">Latest entries</p>
+        <p class="text-sm font-bold mb-1.5 ml-1.5">Latest tokens</p>
 
-        <EntryList entries={device.entries} {device} />
+        <TokenList tokens={device.tokens} />
       </div>
 
       <Alert type="neutral" class="mb-3">

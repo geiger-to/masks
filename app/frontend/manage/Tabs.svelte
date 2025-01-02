@@ -11,10 +11,6 @@
   import Page from "./Page.svelte";
   import Time from "@/components/Time.svelte";
   import { queryStore, gql, getContextClient } from "@urql/svelte";
-  import ActorList from "./list/Actor.svelte";
-  import ClientList from "./list/Client.svelte";
-  import DeviceList from "./list/Device.svelte";
-  import EntryList from "./list/Entry.svelte";
 
   let { component, ...props } = $props();
   let tab = $state(props.tab || Object.keys(props.tabs)[0]);

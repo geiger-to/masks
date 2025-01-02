@@ -21,7 +21,12 @@
 
   let mutating = $state();
   let client = getContextClient();
-  let mutate = () => {
+  let mutate = (vars) => {
+    let extras = vars.preventDefault && vars.stopPropagation ? {} : vars;
+    let variables = {
+      input: { ...input, ...extras },
+    };
+
     if (props.confirm && !confirm(props.confirm)) {
       return;
     }
@@ -31,13 +36,17 @@
     let update = mutationStore({
       client,
       query,
-      variables: { input },
+      variables,
     });
 
     update.subscribe((r) => {
       if (r?.data && r.data[key]) {
         props?.onmutate?.(r);
         mutating = false;
+      }
+
+      if (r?.error) {
+        window.location.reload();
       }
     });
   };

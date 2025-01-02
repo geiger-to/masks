@@ -75,11 +75,7 @@ module Types
     def stats
       return {} unless object.persisted?
 
-      {
-        entries: object.entries.count,
-        devices: object.devices.count,
-        clients: object.clients.count,
-      }
+      { devices: object.devices.count, clients: object.clients.count }
     end
   end
 end

@@ -52,7 +52,7 @@ class QueryDeviceTest < GraphQLTestCase
     assert_equal id, gql_result["devices"]["nodes"][0]["id"]
   end
 
-  test "devices can be filtered by actor (via entries)" do
+  test "devices can be filtered by actor (via tokens)" do
     3.times { make_device }
 
     gql QUERY_DEVICES, actor: "manager"
