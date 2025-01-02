@@ -1,5 +1,78 @@
 import { gql } from "@urql/svelte";
 
+export const ClientFragment = gql`
+  fragment ClientFragment on Client {
+    id
+    secret
+    checks
+    scopes
+    redirectUris
+    subjectType
+    name
+    type
+    logo
+    bgLight
+    bgDark
+    sectorIdentifier
+    pairwiseSalt
+    allowPasswords
+    allowLoginLinks
+    autofillRedirectUri
+    fuzzyRedirectUri
+    idTokenExpiresIn
+    accessTokenExpiresIn
+    authorizationCodeExpiresIn
+    refreshTokenExpiresIn
+    loginLinkExpiresIn
+    authAttemptExpiresIn
+    emailVerificationExpiresIn
+    loginLinkFactorExpiresIn
+    passwordFactorExpiresIn
+    secondFactorBackupCodeExpiresIn
+    secondFactorPhoneExpiresIn
+    secondFactorTotpCodeExpiresIn
+    secondFactorWebauthnExpiresIn
+    internalTokenExpiresIn
+    lifetimeTypes
+    stats
+    createdAt
+    updatedAt
+  }
+`;
+
+export const TokenFragment = gql`
+  fragment TokenFragment on Token {
+    id
+    type
+    secret
+    usable
+    expired
+    redirectUri
+    scopes
+    nonce
+    createdAt
+    expiresAt
+    revokedAt
+    client {
+      id
+      name
+    }
+    actor {
+      id
+      name
+      identifier
+      identiconId
+    }
+    device {
+      id
+      name
+      type
+      ip
+      os
+    }
+  }
+`;
+
 export const DeviceFragment = gql`
   fragment DeviceFragment on Device {
     id
@@ -13,27 +86,6 @@ export const DeviceFragment = gql`
     updatedAt
     blockedAt
   }
-`;
-
-export const EntryFragment = gql`
-  fragment EntryFragment on Entry {
-    actor {
-      id
-      name
-      identifier
-      identiconId
-    }
-    device {
-      ...DeviceFragment
-    }
-    client {
-      id
-      name
-    }
-    createdAt
-  }
-
-  ${DeviceFragment}
 `;
 
 export const LogoutMutation = gql`

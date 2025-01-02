@@ -51,6 +51,10 @@
         deleted = !errors;
         deleting = false;
       }
+
+      if (deleted && props.reload) {
+        window.location.reload();
+      }
     });
   };
 </script>

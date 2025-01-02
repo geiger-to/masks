@@ -6,6 +6,7 @@ module Masks
                   :response,
                   :response_type,
                   :authorization_code,
+                  :internal_token,
                   :access_token,
                   :id_token,
                   :error,
@@ -38,7 +39,7 @@ module Masks
 
           @scopes = client.scope.minimum(req.scope)
 
-          invalid_redirect_uri! unless req.redirect_uri
+          invalid_reirect_uri! unless req.redirect_uri
 
           if client.redirect_uris_a.none? && client.autofill_redirect_uri?
             client.redirect_uris = req.redirect_uri.to_s
@@ -87,6 +88,10 @@ module Masks
       req.access_denied!
     end
 
+    def token
+      internal_token || authorization_code || access_token || id_token
+    end
+
     def original_redirect_uri
       req&.redirect_uri&.to_s
     end
@@ -118,18 +123,25 @@ module Masks
 
       client.save if client.redirect_uris_changed?
 
-      entry = actor.entries.create!(client:, device:)
-
       response_types = Array(req.response_type)
 
       if response_types.include? :code
         res.code =
           if client.internal?
-            prompt.state.attempt_id
+            @internal_token =
+              Masks::InternalToken.create!(
+                client:,
+                device:,
+                actor:,
+                nonce: req.nonce,
+                redirect_uri: res.redirect_uri,
+                scopes: scopes.join(" "),
+              )
+
+            @internal_token.code
           else
             @authorization_code =
               Masks::AuthorizationCode.create!(
-                entry:,
                 client:,
                 device:,
                 actor:,
@@ -140,14 +152,13 @@ module Masks
                 scopes: scopes.join(" "),
               )
 
-            authorization_code.secret
+            @authorization_code.code
           end
       end
 
       if response_types.include? :token
         @access_token =
           Masks::AccessToken.create!(
-            entry:,
             client:,
             device:,
             actor:,
@@ -156,7 +167,7 @@ module Masks
             scopes: scopes.join(" "),
           )
 
-        res.access_token = access_token.to_bearer_token
+        res.access_token = @access_token.to_bearer_token
       end
 
       if response_types.include? :id_token
@@ -167,11 +178,11 @@ module Masks
             actor:,
             nonce: req.nonce,
             redirect_uri: res.redirect_uri,
-            entry:,
+            scopes: scopes.join(" "),
           )
 
         res.id_token =
-          id_token.to_jwt(
+          @id_token.to_jwt(
             code: (res.respond_to?(:code) ? res.code : nil),
             access_token:
               (res.respond_to?(:access_token) ? res.access_token : nil),

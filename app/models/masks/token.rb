@@ -9,10 +9,10 @@ module Masks
 
       def copy(token)
         new(
+          token: token,
           actor: token.actor,
           device: token.device,
           client: token.client,
-          entry: token.entry,
           redirect_uri: token.redirect_uri,
           scopes: token.scopes,
           nonce: token.nonce,
@@ -29,7 +29,7 @@ module Masks
     belongs_to :client, class_name: "Masks::Client"
     belongs_to :device, class_name: "Masks::Device", optional: true
     belongs_to :actor, class_name: "Masks::Actor", optional: true
-    belongs_to :entry, class_name: "Masks::Entry", optional: true
+    belongs_to :token, class_name: "Masks::Token", optional: true
 
     after_initialize :generate_token
     before_validation :generate_defaults
@@ -38,12 +38,17 @@ module Masks
     validates :secret, uniqueness: true
     validates :key, uniqueness: true
 
-    validates :device, :entry, :actor, presence: true, if: :validate_entry?
+    validates :device_id, presence: true, if: :validate_device?
+    validates :actor_id, presence: true, if: :validate_actor?
 
     serialize :settings, coder: JSON
 
+    def expired?
+      expires_at < Time.now.utc
+    end
+
     def usable?
-      !revoked_at && expires_at >= Time.now.utc
+      !revoked_at && !expired?
     end
 
     def valid_redirect_uri?(value)
@@ -51,7 +56,7 @@ module Masks
     end
 
     def obfuscated_secret
-      obfuscate(:secret)
+      StringObfuscator.obfuscate(secret, percent: 75, from: :right)
     end
 
     def public_id
@@ -59,7 +64,7 @@ module Masks
     end
 
     def public_type
-      expiry_name.dasherize
+      expiry_name.humanize
     end
 
     def self.setting(name)
@@ -74,9 +79,21 @@ module Masks
       end
     end
 
+    def revoked(value)
+      if value
+        self.revoked_at = Time.current
+      else
+        self.revoked_at = nil
+      end
+    end
+
     private
 
-    def validate_entry?
+    def validate_device?
+      true
+    end
+
+    def validate_actor?
       true
     end
 

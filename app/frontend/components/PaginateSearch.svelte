@@ -28,4 +28,6 @@
       <ChevronRight size="14" />
     </button>
   </div>
+
+  {@render props.after?.()}
 </div>

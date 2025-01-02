@@ -12,5 +12,11 @@ module Masks
         expires_in: (expires_at - Time.now.utc).to_i,
       )
     end
+
+    private
+
+    def validate_device?
+      false
+    end
   end
 end

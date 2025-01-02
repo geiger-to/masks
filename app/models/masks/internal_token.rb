@@ -1,15 +1,13 @@
 # frozen_string_literal: true
 
 module Masks
-  class ClientToken < AccessToken
+  class InternalToken < Token
     cleanup :expires_at do
       0.seconds
     end
 
-    private
-
-    def validate_actor?
-      false
+    def code
+      key
     end
   end
 end

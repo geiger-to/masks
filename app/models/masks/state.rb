@@ -30,7 +30,13 @@ module Masks
       self[:approved]
     end
 
-    def settled!(prompt:, redirect_uri: nil, error: nil, approved: false)
+    def settled!(
+      prompt:,
+      token: nil,
+      redirect_uri: nil,
+      error: nil,
+      approved: false
+    )
       auth.prompt = prompt if prompt
       auth.error = error if error
 
@@ -45,6 +51,7 @@ module Masks
         "redirect_uri" => redirect_uri,
         "approved" => approved,
         "error" => error,
+        "token" => token&.id,
       }
     end
 
@@ -53,7 +60,13 @@ module Masks
     end
 
     def settled?
-      attempt_bag&.dig("settlement")&.present?
+      return false unless attempt_bag&.dig("settlement")&.present?
+
+      token = attempt_bag&.dig("settlement", "token")
+
+      return false if token && !Masks::Token.usable.find_by(id: token)
+
+      attempt_bag.dig("settlement", "settled")
     end
 
     def check(name)

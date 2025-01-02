@@ -104,7 +104,13 @@ module Masks
     end
 
     def prompts
-      (setting(:prompts) || []).map(&:constantize)
+      (setting(:prompts) || [])
+        .map do |cls|
+          cls&.constantize
+        rescue NameError
+          nil
+        end
+        .compact
     end
 
     def phones

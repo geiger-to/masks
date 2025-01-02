@@ -20,7 +20,7 @@ module Masks
       second_factor_phone_expires_in
       second_factor_totp_code_expires_in
       second_factor_webauthn_expires_in
-      internal_session_expires_in
+      internal_token_expires_in
     ]
 
     BOOLEAN_COLUMNS = %i[
@@ -85,15 +85,14 @@ module Masks
 
     has_many :tokens, class_name: "Masks::Token", inverse_of: :client
     has_many :login_links, class_name: "Masks::LoginLink"
-    has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
              -> { distinct },
              class_name: "Masks::Actor",
-             through: :entries
+             through: :tokens
     has_many :devices,
              -> { distinct },
              class_name: "Masks::Device",
-             through: :entries
+             through: :tokens
 
     serialize :checks, coder: JSON
     serialize :scopes, coder: JSON

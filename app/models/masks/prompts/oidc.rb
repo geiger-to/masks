@@ -27,16 +27,18 @@ module Masks
           end
 
         if oidc.redirect_uri || oidc.error
-          redirect_uri =
-            client.internal? ? oidc.original_redirect_uri : oidc.redirect_uri
-          approved = oidc.approved?
-
           auth.settled!(
-            prompt: approved ? "success" : oidc.error,
-            redirect_uri:,
-            approved:,
+            redirect_uri:
+              client.internal? ? oidc.original_redirect_uri : oidc.redirect_uri,
+            prompt: oidc.approved? ? "success" : oidc.error,
+            approved: oidc.approved?,
             error: oidc.error,
+            token: oidc.token,
           )
+
+          auth.client_bag[
+            "current_token"
+          ] = oidc.internal_token.secret if oidc.internal_token
         end
       end
 
@@ -56,6 +58,24 @@ module Masks
 
       def approved!
         checked! "client-consent", approved: true
+      end
+
+      def manager
+        if manager_token&.actor&.scope?(Masks::Scoped::MANAGE)
+          manager_token&.actor
+        end
+      end
+
+      private
+
+      def manager_token
+        @manager_token ||=
+          if secret =
+               client_bag(Masks::Client.manage)&.fetch("current_token", nil)
+            token = Masks::Token.usable.find_by(secret:)
+            client_bag(Masks::Client.manage)["current_token"] = nil unless token
+            token
+          end
       end
     end
   end
