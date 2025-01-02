@@ -13,7 +13,7 @@ module Types
     field :version, String
     field :actors, [ActorType], null: false
     field :clients, [ClientType], null: false
-    field :entries, [EntryType], null: false
+    field :tokens, [TokenType], null: false
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
     field :blocked_at, GraphQL::Types::ISO8601DateTime, null: true

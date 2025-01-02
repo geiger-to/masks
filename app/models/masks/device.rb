@@ -14,15 +14,14 @@ module Masks
     attribute :check
 
     has_many :tokens, class_name: "Masks::Token"
-    has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
              -> { distinct },
              class_name: "Masks::Actor",
-             through: :entries
+             through: :tokens
     has_many :clients,
              -> { distinct },
              class_name: "Masks::Client",
-             through: :entries
+             through: :tokens
 
     validates :public_id, presence: true, uniqueness: true
     validates :known?, :user_agent, presence: true
@@ -44,13 +43,16 @@ module Masks
       [public_id, version].join("-")
     end
 
-    def logout
+    def rotate
       self.version += 1
     end
 
     def logout!
-      logout
-      save!
+      transaction do
+        rotate
+        tokens.usable.find_each(&:revoke!)
+        save!
+      end
     end
 
     def block

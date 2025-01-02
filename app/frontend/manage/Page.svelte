@@ -7,8 +7,7 @@
   import CodeCard from "../components/CodeCard.svelte";
   import JwtCard from "../components/JwtCard.svelte";
   import Identicon from "../components/Identicon.svelte";
-  import HomePage from "./HomePage.svelte";
-  import SettingsPage from "./SettingsPage.svelte";
+  import AddPage from "./AddPage.svelte";
   import ActorResult from "./ActorResult.svelte";
   import ClientResult from "./ClientResult.svelte";
   import { onMount } from "svelte";
@@ -23,6 +22,9 @@
     Cog,
     ListCheck,
     UserPlus,
+    User,
+    Handshake,
+    KeySquare,
     X,
     Plus,
     Search,
@@ -87,7 +89,6 @@
   );
 
   let search = (value) => {
-    isAddOpen = false;
     input = value;
   };
 
@@ -215,9 +216,7 @@
       <div
         class="navbar-end pr-3 flex items-center gap-1 group-[.is-searching]:hidden md:group-[.is-searching]:flex"
       >
-        <div
-          class={`dropdown ${isAddOpen ? "dropdown-open" : ""} dropdown-bottom dropdown-end md:dropdown-left flex items-center gap-1`}
-        >
+        <div class={`flex items-center gap-1`}>
           <button
             tabindex="0"
             onclick={stopPropagation(preventDefault(toggleSearch(isSearching)))}
@@ -230,17 +229,7 @@
             {/if}
           </button>
 
-          <button
-            tabindex="0"
-            onclick={stopPropagation(preventDefault(toggleMenu))}
-            class={`btn btn-sm px-0 w-8 py-0 ${isAddOpen ? "btn-success" : "btn-ghost"}`}
-          >
-            {#if isAddOpen}
-              <X size="20" />
-            {:else}
-              <PlusSquare size="20" />
-            {/if}
-          </button>
+          <AddPage />
 
           <a use:route href={"/manage/settings"}>
             <p
@@ -251,26 +240,6 @@
               <ServerCog size="20" />
             </p>
           </a>
-
-          {#if isAddOpen}
-            <div
-              class="dropdown-content mr-1.5 flex items-center p-1 gap-1
-            rounded-lg z-50 shadow-lg bg-success mt-[5px] md:mt-0"
-            >
-              <a
-                use:route
-                href="/manage/actors/new"
-                class="btn btn-neutral join-item btn-xs whitespace-nowrap"
-                >new actor</a
-              >
-              <a
-                use:route
-                href="/manage/clients/new"
-                class="btn btn-neutral join-item btn-xs whitespace-nowrap"
-                >new client</a
-              >
-            </div>
-          {/if}
         </div>
 
         <a

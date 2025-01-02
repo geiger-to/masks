@@ -1,100 +1,86 @@
 <script>
-  import {
-    Save,
-    ChevronDown,
-    X,
-    Computer,
-    Smartphone,
-    Tablet,
-    Gamepad,
-    Tv,
-    Tv2,
-    HelpCircle,
-    Car,
-    Camera,
-    Bluetooth,
-  } from "lucide-svelte";
+  import { TokenFragment, PageInfoFragment } from "@/util.js";
   import { route } from "@mateothegreat/svelte5-router";
+  import {
+    Trash2 as Trash,
+    Search,
+    ChevronDown,
+    ChevronRight,
+  } from "lucide-svelte";
   import Time from "@/components/Time.svelte";
+  import Identicon from "@/components/Identicon.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
+  import DeviceIcon from "@/components/DeviceIcon.svelte";
+  import { queryStore, gql, getContextClient } from "@urql/svelte";
   import QuerySearch from "@/components/QuerySearch.svelte";
   import PaginateSearch from "@/components/PaginateSearch.svelte";
-  import { queryStore, gql, getContextClient } from "@urql/svelte";
+  import TokenResult from "../TokenResult.svelte";
+  import Query from "@/components/Query.svelte";
 
   let props = $props();
-  let variables = $state(null);
-  let loading = $state(true);
-  let query = $derived(
-    queryStore({
-      client: getContextClient(),
-      pause: props.tokens,
-      query: gql`
-        query ($actor: String) {
-          tokens(actor: $actor) {
-            nodes {
-              id
-              token
-              scopes
-              createdAt
-              expiresAt
-              refreshedAt
-            }
-          }
+  let query = gql`
+    query (
+      $after: String
+      $before: String
+      $id: String
+      $actor: String
+      $client: String
+      $device: String
+    ) {
+      tokens(
+        after: $after
+        before: $before
+        id: $id
+        actor: $actor
+        client: $client
+        device: $device
+      ) {
+        pageInfo {
+          ...PageInfoFragment
         }
-      `,
-      variables,
-      requestPolicy: "network-only",
-    })
-  );
+        nodes {
+          ...TokenFragment
+        }
+      }
+    }
 
-  let tokens = $state([]);
-  let subscribe = (qs) => {
-    variables = qs;
+    ${TokenFragment}
+    ${PageInfoFragment}
+  `;
 
-    query.subscribe((r) => {
-      tokens = r?.data?.tokens?.nodes || [];
-      loading = !r?.data;
-    });
+  let device = (token) => {
+    return props.device || token.device;
   };
 </script>
 
-{#if !props.tokens}
-  <PaginateSearch
-    label="Tokens"
-    class="mb-3"
-    onchange={console.log}
-    count={tokens?.length}
-    {loading}
-  />
+<Query {query} key="tokens" {...props}>
+  {#snippet children({ refresh, result, loading })}
+    {#if !props.result}
+      <PaginateSearch
+        label="Tokens"
+        class="mb-3"
+        {result}
+        {refresh}
+        {loading}
+      />
 
-  <QuerySearch
-    url="/manage/tokens"
-    keys={["actor", "device", "client"]}
-    class="mb-3"
-    onquery={subscribe}
-    empty={tokens?.length == 0}
-    {loading}
-  />
-{/if}
+      {#if !props.variables}
+        <QuerySearch
+          url="/manage/tokens"
+          keys={["id", "name", "actor", "client", "device"]}
+          class="mb-3"
+          onquery={refresh}
+          empty={result?.length == 0}
+          editable={!props.variables}
+          {loading}
+        />
+      {/if}
+    {/if}
 
-{#each tokens as token}
-  <div class={"block mb-1.5 bg-base-100 rounded-lg p-3 py-1.5"}>
-    <div class="flex items-center gap-3 text-sm w-full">
-      <div class="whitespace-nowrap font-bold" alt={token.userAgent}>
-        {token.name} on {token.os}
-      </div>
-      <div class="text-xs font-mono grow">{token.ip}</div>
-
-      <div
-        class="text-[10px] font-mono opacity-75
-        truncate"
-      >
-        {token.id}
-      </div>
-
-      <div class="whitespace-nowrap text-xs opacity-75">
-        <Time relative timestamp={token.createdAt} ago="old" />
-      </div>
+    <div class="flex flex-col gap-1.5">
+      {#each props.result || result.nodes as token}
+        <TokenResult {token} {...props} />
+      {/each}
     </div>
-  </div>
-{/each}
+  {/snippet}
+</Query>

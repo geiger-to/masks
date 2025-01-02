@@ -113,7 +113,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.string "second_factor_totp_code_expires_in"
     t.string "second_factor_webauthn_expires_in"
     t.string "email_verification_expires_in"
-    t.string "internal_session_expires_in"
+    t.string "internal_token_expires_in"
     t.text "bg_light"
     t.text "bg_dark"
     t.text "rsa_private_key"
@@ -145,21 +145,6 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.index ["actor_id"], name: "index_masks_emails_on_actor_id"
     t.index %w[address group],
             name: "index_masks_emails_on_address_and_group",
-            unique: true
-  end
-
-  create_table "masks_entries", force: :cascade do |t|
-    t.string "public_id"
-    t.integer "actor_id"
-    t.integer "device_id"
-    t.integer "client_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["actor_id"], name: "index_masks_entries_on_actor_id"
-    t.index ["client_id"], name: "index_masks_entries_on_client_id"
-    t.index ["device_id"], name: "index_masks_entries_on_device_id"
-    t.index ["public_id"],
-            name: "index_masks_entries_on_public_id",
             unique: true
   end
 
@@ -249,6 +234,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
 
   create_table "masks_tokens", force: :cascade do |t|
     t.string "key"
+    t.string "name"
     t.string "type"
     t.string "secret"
     t.string "nonce"
@@ -258,7 +244,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.integer "client_id"
     t.integer "actor_id"
     t.integer "device_id"
-    t.integer "entry_id"
+    t.integer "token_id"
     t.datetime "expires_at"
     t.datetime "revoked_at"
     t.datetime "refreshed_at"
@@ -267,9 +253,9 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.index ["actor_id"], name: "index_masks_tokens_on_actor_id"
     t.index ["client_id"], name: "index_masks_tokens_on_client_id"
     t.index ["device_id"], name: "index_masks_tokens_on_device_id"
-    t.index ["entry_id"], name: "index_masks_tokens_on_entry_id"
     t.index ["key"], name: "index_masks_tokens_on_key", unique: true
     t.index ["secret"], name: "index_masks_tokens_on_secret", unique: true
+    t.index ["token_id"], name: "index_masks_tokens_on_token_id"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|

@@ -36,7 +36,7 @@
 
 <button
   class={`${props.class} ${
-    copied ? "btn-success" : copyError ? "btn-error" : ""
+    copied ? "text-success" : copyError ? "text-error" : ""
   }`}
   use:copy={{ text: props.value, onCopy, onError: onCopyError }}
 >

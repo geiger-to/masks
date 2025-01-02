@@ -52,7 +52,7 @@ en:
       masks/client:
         id_token_expires_in: Id token lifetime
         access_token_expires_in: Access token lifetime
-        authorization_code_expires_in: Auth code lifetime
+        authorization_code_expires_in: Authorization code lifetime
         refresh_token_expires_in: Refresh token lifetime
         login_link_expires_in: Login link lifetime
         auth_attempt_expires_in: Auth attempt lifetime
@@ -63,7 +63,7 @@ en:
         second_factor_phone_expires_in: 2FA with SMS code
         second_factor_totp_code_expires_in: 2FA with TOTP
         second_factor_webauthn_expires_in: 2FA with Webauthn
-        internal_session_expires_in: Internal session lifetime
+        internal_token_expires_in: Internal token lifetime
     errors:
       models:
         masks/email:
@@ -71,6 +71,10 @@ en:
             base:
               max_for_login: "Cannot add another login email (%{count} maximum)"
               email_identifier: "Cannot remove primary email"
+        masks/token:
+          attributes:
+            actor_id:
+              blank: must exist
         masks/actor:
           attributes:
             password:

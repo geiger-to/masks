@@ -87,7 +87,6 @@ default: &default
     - Masks::Prompts::Onboard
     - Masks::Prompts::VerifyEmail
     - Masks::Prompts::OIDC
-    - Masks::Prompts::InternalSession
     - Masks::Prompts::LastLogin
   manager:
     nickname: "<%= ENV['MASKS_MANAGER_NICKNAME'] || 'manager' %>"
@@ -100,8 +99,8 @@ default: &default
   actors:
     inactive: <%= ENV['MASKS_ACTOR_INACTIVE'] %>
   sessions:
-    lifetime: <%= ENV['MASKS_SESSION_LIFETIME'] || '90 days' %>
-    persistent: false
+    lifetime: <%= ENV['MASKS_SESSION_LIFETIME'] %>
+    inactive: <%= ENV['MASKS_SESSION_INACTIVE'] || '90 days' %>
   devices:
     lifetime: <%= ENV.fetch('MASKS_DEVICE_LIFETIME', '400 days') %>
   clients:
@@ -147,7 +146,7 @@ default: &default
     second_factor_totp_code_expires_in: "10 minutes"
     second_factor_webauthn_expires_in: "10 minutes"
     email_verification_expires_in: "1 year"
-    internal_session_expires_in: "1 day"
+    internal_token_expires_in: "1 day"
     allow_passwords: true
     allow_login_links: true
     autofill_redirect_uri: false

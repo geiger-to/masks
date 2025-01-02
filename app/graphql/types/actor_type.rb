@@ -76,7 +76,7 @@ module Types
       return {} unless object.persisted?
 
       {
-        entries: object.entries.count,
+        tokens: object.tokens.count,
         devices: object.devices.count,
         clients: object.clients.count,
       }

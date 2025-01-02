@@ -2,6 +2,8 @@
 
 module Masks
   class AccessToken < Token
+    validates :actor_id, presence: true, if: -> { type == "Masks::AccessToken" }
+
     cleanup :expires_at do
       0.seconds
     end

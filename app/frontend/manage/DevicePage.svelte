@@ -26,8 +26,8 @@
   import Deletion from "./Deletion.svelte";
   import ActorList from "./list/Actor.svelte";
   import ClientList from "./list/Client.svelte";
-  import EntryList from "./list/Entry.svelte";
-  import { EntryFragment, DeviceFragment } from "@/util.js";
+  import TokenList from "./list/Token.svelte";
+  import { DeviceFragment } from "@/util.js";
   import {
     mutationStore,
     queryStore,
@@ -41,7 +41,10 @@
     fragment DevicePageFragment on Device {
       ...DeviceFragment
 
-      entries {
+      tokens {
+        type
+        secret
+        scopes
         actor {
           id
           name
@@ -53,6 +56,7 @@
           name
         }
         createdAt
+        expiresAt
       }
     }
 
@@ -296,13 +300,13 @@
         </label>
       </div>
 
-      <div class="mb-3">
-        <p class="text-sm font-bold mb-1.5 ml-1.5">Latest entries</p>
+      <div class="mb-3 bg-neutral rounded-lg p-3">
+        <div class="pl-1.5 mb-3 font-bold text-xs">recent tokens</div>
 
-        <EntryList entries={device.entries} {device} />
+        <TokenList variables={{ device: device.id }} />
       </div>
 
-      <Alert type="neutral" class="mb-3">
+      <Alert type="gray" class="mb-3">
         <div class="flex flex-col gap-3">
           <div class="flex items-center gap-3 w-full">
             <Ban class="text-error" size="16" />
@@ -341,9 +345,9 @@
 
             <p class="grow text-left">
               {#if loggedOut}
-                <b>Device logged out.</b> You can try again later...
+                <b>Sessions expired.</b> You can try again later...
               {:else}
-                End all sessions associated with this device....
+                Expire all sessions associated with this device...
               {/if}
             </p>
 
@@ -353,7 +357,7 @@
               onmutate={onlogout}
               input={{
                 id: device.id,
-                logout: true,
+                rotate: true,
               }}
             >
               {#snippet children({ mutate, mutating })}
@@ -361,37 +365,35 @@
                   class="btn btn-sm"
                   onclick={mutate}
                   disabled={deleting || deleted || mutating || loggedOut}
-                  >logout</button
+                  >expire</button
                 >
               {/snippet}
             </Mutation>
           </div>
-        </div>
-      </Alert>
 
-      <Alert type="gray" class="mb-3">
-        <div class="flex items-center gap-3">
-          <Trash class={deleted ? "text-error" : "opacity-75"} size="16" />
+          <div class="flex items-center gap-3">
+            <Trash class={deleted ? "text-error" : "opacity-75"} size="16" />
 
-          <p class="grow">
-            {#if deleted}
-              <b>Device deleted.</b> Associated sessions will expire shortly...
-            {:else}
-              Delete this device and associated sessions...
-            {/if}
-          </p>
+            <p class="grow">
+              {#if deleted}
+                <b>Device deleted.</b> Associated sessions will expire shortly...
+              {:else}
+                Delete this device and associated sessions...
+              {/if}
+            </p>
 
-          <button
-            class="btn btn-sm"
-            onclick={deletion}
-            disabled={deleting || deleted}
-          >
-            {#if deleting}
-              <span class="loading loading-spinnner"></span>
-            {:else}
-              delete
-            {/if}
-          </button>
+            <button
+              class="btn btn-sm"
+              onclick={deletion}
+              disabled={deleting || deleted}
+            >
+              {#if deleting}
+                <span class="loading loading-spinnner"></span>
+              {:else}
+                delete
+              {/if}
+            </button>
+          </div>
         </div>
       </Alert>
     {/snippet}

@@ -1,5 +1,128 @@
 import { gql } from "@urql/svelte";
 
+export const ActorFragment = gql`
+  fragment ActorFragment on Actor {
+    id
+    name
+    nickname
+    password
+    passwordChangedAt
+    passwordChangeable
+    identifier
+    identifierType
+    identiconId
+    loginEmail
+    loginEmails {
+      address
+      verifiedAt
+    }
+    avatar
+    avatarCreatedAt
+    passwordChangedAt
+    passwordChangeable
+    secondFactor
+    savedBackupCodesAt
+    remainingBackupCodes
+    hardwareKeys {
+      id
+      name
+      createdAt
+      icons {
+        light
+        dark
+      }
+    }
+    phones {
+      number
+      createdAt
+      verifiedAt
+    }
+    otpSecrets {
+      id
+      name
+      createdAt
+    }
+    stats
+    createdAt
+    updatedAt
+  }
+`;
+
+export const ClientFragment = gql`
+  fragment ClientFragment on Client {
+    id
+    secret
+    checks
+    scopes
+    redirectUris
+    subjectType
+    name
+    type
+    logo
+    bgLight
+    bgDark
+    sectorIdentifier
+    pairwiseSalt
+    allowPasswords
+    allowLoginLinks
+    autofillRedirectUri
+    fuzzyRedirectUri
+    idTokenExpiresIn
+    accessTokenExpiresIn
+    authorizationCodeExpiresIn
+    refreshTokenExpiresIn
+    clientTokenExpiresIn
+    loginLinkExpiresIn
+    authAttemptExpiresIn
+    emailVerificationExpiresIn
+    loginLinkFactorExpiresIn
+    passwordFactorExpiresIn
+    secondFactorBackupCodeExpiresIn
+    secondFactorPhoneExpiresIn
+    secondFactorTotpCodeExpiresIn
+    secondFactorWebauthnExpiresIn
+    internalTokenExpiresIn
+    lifetimeTypes
+    stats
+    createdAt
+    updatedAt
+  }
+`;
+
+export const TokenFragment = gql`
+  fragment TokenFragment on Token {
+    id
+    name
+    type
+    secret
+    usable
+    expired
+    redirectUri
+    scopes
+    nonce
+    createdAt
+    expiresAt
+    revokedAt
+    client {
+      id
+      name
+    }
+    actor {
+      id
+      name
+      identifier
+      identiconId
+    }
+    device {
+      id
+      name
+      type
+      ip
+      os
+    }
+  }
+`;
+
 export const DeviceFragment = gql`
   fragment DeviceFragment on Device {
     id
@@ -15,33 +138,12 @@ export const DeviceFragment = gql`
   }
 `;
 
-export const EntryFragment = gql`
-  fragment EntryFragment on Entry {
-    actor {
-      id
-      name
-      identifier
-      identiconId
-    }
-    device {
-      ...DeviceFragment
-    }
-    client {
-      id
-      name
-    }
-    createdAt
-  }
-
-  ${DeviceFragment}
-`;
-
-export const LogoutMutation = gql`
-  mutation ($input: LogoutInput!) {
-    logout(input: $input) {
-      total
-      errors
-    }
+export const PageInfoFragment = gql`
+  fragment PageInfoFragment on PageInfo {
+    hasNextPage
+    hasPreviousPage
+    startCursor
+    endCursor
   }
 `;
 

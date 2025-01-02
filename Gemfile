@@ -109,3 +109,5 @@ gem "yabeda-http_requests", "~> 0.2.1"
 gem "yabeda-activejob", "~> 0.6.0"
 
 gem "foreman", "~> 0.88.1"
+
+gem "string-obfuscator", "~> 0.1.3"

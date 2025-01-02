@@ -172,7 +172,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :second_factor_totp_code_expires_in
       t.string :second_factor_webauthn_expires_in
       t.string :email_verification_expires_in
-      t.string :internal_session_expires_in
+      t.string :internal_token_expires_in
 
       t.text :bg_light
       t.text :bg_dark
@@ -184,19 +184,9 @@ class Init < ActiveRecord::Migration[7.2]
       t.index %i[key], unique: true
     end
 
-    create_table :masks_entries do |t|
-      t.string :public_id
-
-      t.references :actor
-      t.references :device
-      t.references :client
-      t.timestamps
-
-      t.index :public_id, unique: true
-    end
-
     create_table :masks_tokens do |t|
       t.string :key
+      t.string :name, null: true
       t.string :type
       t.string :secret
       t.string :nonce, null: true
@@ -207,7 +197,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.references :client
       t.references :actor, null: true
       t.references :device, null: true
-      t.references :entry, null: true
+      t.references :token, null: true
       t.datetime :expires_at
       t.datetime :revoked_at
       t.datetime :refreshed_at

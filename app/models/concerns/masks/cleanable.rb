@@ -12,13 +12,17 @@ module Masks
         @cleanup_column
       end
 
+      def cleanup_duration
+        @cleanup_block&.call
+      end
+
       def cleanup_at
-        duration = @cleanup_block&.call
+        duration = cleanup_duration
         Time.current + duration if duration
       end
 
       def cleanup_after
-        duration = @cleanup_block&.call
+        duration = cleanup_duration
         Time.current - duration if duration
       end
 

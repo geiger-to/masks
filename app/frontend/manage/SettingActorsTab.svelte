@@ -3,37 +3,47 @@
   import { UserX, Trash, CalendarX2 } from "lucide-svelte";
 
   let { settings, change, loading, errors, save, ...props } = $props();
+
+  let deleteInactive = $state(settings.actors.lifetime);
 </script>
 
 <div class="flex flex-col gap-1.5">
-  <Alert type="gray" class="mb-3">
+  <Alert type="gray" class="mb-3 !py-1.5">
     <div class="flex items-center gap-0">
       <div
-        class="bg-error rounded p-[3px] pl-[4px] text-error-content flex items-center justify-center"
+        class="bg-error rounded p-[3px] pl-[4px] text-error-content flex items-center justify-center m-1.5"
       >
         <UserX size="14" class="" />
       </div>
 
+      <input
+        type="checkbox"
+        class="checkbox checkbox-sm ml-3"
+        bind:checked={deleteInactive}
+      />
+
       <span class="opacity-75 whitespace-nowrap text-sm pl-3"
-        >Delete inactive actors after</span
+        >Delete inactive actors after...</span
       >
 
-      <label
-        class="input dark:input-ghost input-sm min-w-0 flex items-center
-        gap-0.5 grow ml-1 !pl-1.5 !outline-none"
-      >
-        <input
-          type="text"
-          class="!min-w-0 px-0 w-auto max-w-[170px]"
-          value={settings.actors.lifetime}
-          placeholder="e.g. 1 year..."
-          oninput={(e) => change({ actors: { lifetime: e.target.value } })}
-        />
-
-        <span class="opacity-75 w-full grow whitespace-nowrap"
-          >of inactivity...</span
+      {#if deleteInactive}
+        <label
+          class="input dark:input-ghost input-sm min-w-0 flex items-center
+          gap-0.5 grow ml-1 !pl-1.5 !outline-none"
         >
-      </label>
+          <input
+            type="text"
+            class="!min-w-0 px-0 max-w-[90px] placeholder:opacity-50"
+            value={settings.actors.lifetime}
+            placeholder="e.g. 1 year"
+            oninput={(e) => change({ actors: { lifetime: e.target.value } })}
+          />
+
+          <span class="opacity-75 w-full grow whitespace-nowrap"
+            >of inactivity...</span
+          >
+        </label>
+      {/if}
     </div>
   </Alert>
   <div class="mb-1.5 pl-1.5">

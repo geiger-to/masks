@@ -11,12 +11,12 @@ module Mutations
       device = Masks::Device.find_by(public_id: args[:id])
 
       if device
-        device.logout if args[:logout]
-
         if args[:block]
           device.block
         elsif args[:unblock]
           device.unblock
+        elsif args[:rotate]
+          device.rotate
         end
 
         device.save
