@@ -20,7 +20,7 @@ module Masks
       second_factor_phone_expires_in
       second_factor_totp_code_expires_in
       second_factor_webauthn_expires_in
-      internal_session_expires_in
+      internal_token_expires_in
     ]
 
     BOOLEAN_COLUMNS = %i[
@@ -85,15 +85,14 @@ module Masks
 
     has_many :tokens, class_name: "Masks::Token", inverse_of: :client
     has_many :login_links, class_name: "Masks::LoginLink"
-    has_many :entries, class_name: "Masks::Entry"
     has_many :actors,
              -> { distinct },
              class_name: "Masks::Actor",
-             through: :entries
+             through: :tokens
     has_many :devices,
              -> { distinct },
              class_name: "Masks::Device",
-             through: :entries
+             through: :tokens
 
     serialize :checks, coder: JSON
     serialize :scopes, coder: JSON
@@ -254,12 +253,16 @@ module Masks
       internal? || !check?("client-consent")
     end
 
-    def expires_at(type)
-      column = "#{type.to_s.delete_suffix("_expires_in")}_expires_in".to_sym
+    def expires_at(type = nil, custom: nil)
+      if custom
+        Masks.time.expires_at(custom)
+      else
+        column = "#{type.to_s.delete_suffix("_expires_in")}_expires_in".to_sym
 
-      return unless LIFETIME_COLUMNS.include?(column) && self[column]
+        return unless LIFETIME_COLUMNS.include?(column) && self[column]
 
-      Masks.time.expires_at(self[column])
+        Masks.time.expires_at(self[column])
+      end
     end
 
     def email_verification_duration
@@ -322,9 +325,9 @@ module Masks
 
     def validate_expiries
       LIFETIME_COLUMNS.each do |param|
-        unless self[param] && ChronicDuration.parse(self[param])
-          errors.add(param, :invalid)
-        end
+        raise "invalid" unless self[param] && ChronicDuration.parse(self[param])
+      rescue StandardError
+        errors.add(param, :invalid)
       end
     end
   end

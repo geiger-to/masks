@@ -35,6 +35,14 @@
       `dark:bg-indigo-950 dark:border-indigo-900 dark:text-indigo-200`,
       `bg-indigo-50 border-indigo-100 text-indigo-800`,
     ],
+    secondary: [
+      `dark:bg-pink-950 dark:border-pink-900 dark:text-pink-200`,
+      `bg-pink-50 border-pink-100 text-pink-800`,
+    ],
+    accent: [
+      `dark:bg-pink-950 dark:border-pink-900 dark:text-pink-200`,
+      `bg-pink-50 border-pink-100 text-pink-800`,
+    ],
   };
 </script>
 
@@ -51,13 +59,11 @@
       {@render children?.()}
     </p>
   {:else if props.errors?.length}
-    {#each props.errors as error}
-      <ul>
-        {#each errors as error}
-          <li>{error}</li>
-        {/each}
-      </ul>
-    {/each}
+    <ul class="grow">
+      {#each props.errors as error}
+        <li>{error}</li>
+      {/each}
+    </ul>
   {/if}
 
   {#if icon}

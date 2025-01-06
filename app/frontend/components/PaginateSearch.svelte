@@ -11,7 +11,19 @@
     ChevronUp,
   } from "lucide-svelte";
 
-  let { onchange, ...props } = $props();
+  let { result, refresh, ...props } = $props();
+
+  let goNext = () => {
+    if (result?.pageInfo?.hasNextPage) {
+      refresh({ after: result.pageInfo.endCursor });
+    }
+  };
+
+  let goPrevious = () => {
+    if (result?.pageInfo?.hasPreviousPage) {
+      refresh({ before: result.pageInfo.startCursor });
+    }
+  };
 </script>
 
 <div class={`flex items-center gap-2 ${props.class}`}>
@@ -20,11 +32,19 @@
   </p>
 
   <div class="join">
-    <button class="btn btn-xs join-item" disabled>
+    <button
+      onclick={goPrevious}
+      class="btn btn-xs btn-ghost join-item"
+      disabled={!result?.pageInfo?.hasPreviousPage}
+    >
       <ChevronLeft size="14" />
     </button>
 
-    <button class="btn btn-xs join-item" disabled>
+    <button
+      onclick={goNext}
+      class="btn btn-xs btn-ghost join-item"
+      disabled={!result?.pageInfo?.hasNextPage}
+    >
       <ChevronRight size="14" />
     </button>
   </div>

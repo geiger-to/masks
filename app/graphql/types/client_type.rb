@@ -18,6 +18,7 @@ module Types
     field :lifetime_types, [String], null: false
     field :scopes, GraphQL::Types::JSON, null: false
     field :consent, Boolean
+    field :stats, CamelizedJSON, null: false
 
     field :pairwise_salt, String, null: false
 
@@ -56,6 +57,10 @@ module Types
 
     def allow_login_links
       object.login_links?
+    end
+
+    def stats
+      { tokens: object.tokens.count, actors: object.actors.count }
     end
   end
 end

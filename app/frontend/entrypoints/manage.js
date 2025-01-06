@@ -23,14 +23,6 @@ mount(Router, {
     basepath: "manage",
     routes: [
       makeRoute(
-        "clients/new",
-        async () => import("../manage/NewClientPage.svelte")
-      ),
-      makeRoute(
-        "actors/new",
-        async () => import("../manage/NewActorPage.svelte")
-      ),
-      makeRoute(
         "client/(.+)",
         async () => import("../manage/ClientPage.svelte")
       ),

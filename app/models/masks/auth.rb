@@ -60,7 +60,7 @@ module Masks
     end
 
     def manager
-      prompt_for(Masks::Prompts::InternalSession).manager
+      prompt_for(Masks::Prompts::OIDC).manager
     end
 
     def device

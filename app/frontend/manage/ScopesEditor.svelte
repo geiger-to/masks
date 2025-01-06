@@ -3,14 +3,15 @@
   import PasswordInput from "@/components/PasswordInput.svelte";
   import Alert from "@/components/Alert.svelte";
 
-  let { client, settings, change } = $props();
-  let scopes = $derived(client.scopes || {});
+  let { client, settings, change, ...props } = $props();
+  let scopes = $derived(props.scopes || client?.scopes || {});
   let required = $derived(scopes.required || []);
   let allowed = $derived(scopes.allowed || []);
   let all = $derived(Array.from(new Set([...required, ...allowed])).sort());
   let value = $state("");
   let invalid = $derived(value && value.includes(" "));
   let valid = $derived(value && !invalid);
+  let adding = $state();
 
   let removeScope = (scope) => {
     return (e) => {
@@ -25,7 +26,7 @@
 
   let toggleScope = (scope) => {
     return (e) => {
-      if (e.target.checked) {
+      if (e.target.checked || props.required) {
         change({
           scopes: {
             required: Array.from(new Set([...required, scope])).filter(Boolean),
@@ -47,6 +48,12 @@
     change({
       scopes: { required, allowed: Array.from(new Set([...allowed, value])) },
     });
+
+    if (props.required) {
+      toggleScope(value);
+    }
+
+    value = null;
   };
 
   let requiredScope = (scope) => {
@@ -72,19 +79,26 @@
 
 <div class="bg-base-200 py-3 px-4 rounded-lg">
   <div class="flex items-center gap-3 mb-3">
-    <div class="text-xs opacity-75 grow">scopes &amp; data</div>
-    <button
-      class="btn btn-xs btn-neutral"
-      type="button"
-      onclick={() => (advanced = !advanced)}
-      >{#if advanced}<X size="16" />{:else}<Cog
-          size="16"
-          class=""
-        />{/if}</button
-    >
+    {#if all.length}
+      <div class="text-xs opacity-75 grow">
+        scopes {#if client}&amp; data{/if}
+      </div>
+    {/if}
+
+    {#if client}
+      <button
+        class="btn btn-xs btn-neutral"
+        type="button"
+        onclick={() => (advanced = !advanced)}
+        >{#if advanced}<X size="16" />{:else}<Cog
+            size="16"
+            class=""
+          />{/if}</button
+      >
+    {/if}
   </div>
 
-  {#if advanced}
+  {#if advanced && settings}
     <Alert type="neutral" class="mb-3 -mx-4 rounded-none">
       <div class="flex items-center gap-1.5 mb-1.5 -mt-1.5">
         <span class="opacity-75 text-sm grow"> ID format</span>
@@ -147,20 +161,22 @@
           {scope}
         </span>
 
-        <div class="text-xs opacity-75 italic font-sans">
-          {#if requiredScope(scope)}
-            required
-          {:else}
-            require?
-          {/if}
-        </div>
+        {#if !props.required}
+          <div class="text-xs opacity-75 italic font-sans">
+            {#if requiredScope(scope)}
+              required
+            {:else}
+              require?
+            {/if}
+          </div>
 
-        <input
-          type="checkbox"
-          class="toggle toggle-xs"
-          checked={requiredScope(scope)}
-          onchange={toggleScope(scope)}
-        />
+          <input
+            type="checkbox"
+            class="toggle toggle-xs"
+            checked={requiredScope(scope)}
+            onchange={toggleScope(scope)}
+          />
+        {/if}
 
         <button onclick={removeScope(scope)} class="btn btn-xs text-error"
           ><Trash size="14" /></button
@@ -169,7 +185,9 @@
     {/key}
   {/each}
 
-  <div class="divider my-1.5"></div>
+  {#if all.length}
+    <div class="divider my-1.5"></div>
+  {/if}
 
   <div class="flex items-center gap-3 mb-1.5">
     <input

@@ -1,6 +1,8 @@
 <script>
   import _ from "lodash-es";
   import {
+    Fingerprint,
+    KeySquare,
     MonitorSmartphone,
     Handshake,
     LogIn,
@@ -15,14 +17,12 @@
   import Avatar from "@/components/Avatar.svelte";
   import Identicon from "@/components/Identicon.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
-  import ActorPhones from "./ActorPhones.svelte";
-  import ActorEmails from "./ActorEmails.svelte";
-  import ActorPassword from "./ActorPassword.svelte";
-  import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
-  import ActorBackupCodes from "./ActorBackupCodes.svelte";
-  import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
-  import ActorLogout from "./ActorLogout.svelte";
+  import Actions from "./Actions.svelte";
+  import ActorProfile from "./ActorProfile.svelte";
+  import ActorSecondFactor from "./ActorSecondFactor.svelte";
   import ActorResult from "./ActorResult.svelte";
+  import TokenList from "./list/Token.svelte";
+  import { ActorFragment } from "@/util.js";
   import {
     mutationStore,
     queryStore,
@@ -32,52 +32,6 @@
 
   let { params, ...props } = $props();
   let graphql = getContextClient();
-  let actorFragment = gql`
-    fragment ActorFragment on Actor {
-      id
-      name
-      nickname
-      password
-      passwordChangedAt
-      passwordChangeable
-      identifier
-      identifierType
-      identiconId
-      loginEmail
-      loginEmails {
-        address
-        verifiedAt
-      }
-      avatar
-      avatarCreatedAt
-      passwordChangedAt
-      passwordChangeable
-      savedBackupCodesAt
-      remainingBackupCodes
-      hardwareKeys {
-        id
-        name
-        createdAt
-        icons {
-          light
-          dark
-        }
-      }
-      phones {
-        number
-        createdAt
-        verifiedAt
-      }
-      otpSecrets {
-        id
-        name
-        createdAt
-      }
-      stats
-      createdAt
-      updatedAt
-    }
-  `;
 
   let query = $derived(
     queryStore({
@@ -89,7 +43,7 @@
           }
         }
 
-        ${actorFragment}
+        ${ActorFragment}
       `,
       variables: { id: params[0] },
       requestPolicy: "network-only",
@@ -202,63 +156,32 @@
       class="bg-base-100"
     />
 
-    <Alert
-      type={errors?.length > 0 ? "error" : "gray"}
-      class="!py-1.5 pr-0.5 pl-1.5"
+    <Actions
+      tab="profile"
+      record={actor}
+      {errors}
+      tabs={{
+        profile: {
+          icon: User,
+          name: "Profile",
+          component: ActorProfile,
+          props: { actor, change },
+        },
+        "second-factor": {
+          icon: Fingerprint,
+          name: "2FA",
+          component: ActorSecondFactor,
+          props: { actor, change },
+        },
+        tokens: {
+          icon: KeySquare,
+          name: "Tokens",
+          component: TokenList,
+          props: { variables: { actor: actor.identifier }, hideActor: true },
+        },
+      }}
     >
-      <div class="flex items-center gap-1.5">
-        <a
-          title="Search their recent entries..."
-          href={`/manage/entries?actor=${actor.identifier}`}
-          class="btn btn-xs btn-neutral px-2"
-        >
-          <span class="flex items-center gap-1.5 relative">
-            <span>entries</span>
-            <span
-              class="badge text-[9px] badge-test badge-xs
-              left-3.5 bottom-3.5">{actor.stats.entries}</span
-            >
-          </span>
-        </a>
-
-        <a
-          title="Search their devices..."
-          href={`/manage/devices?actor=${actor.identifier}`}
-          class="btn btn-xs btn-neutral px-2"
-        >
-          <span class="flex items-center gap-1.5 relative">
-            devices
-            <span
-              class="badge text-[9px] badge-test badge-xs
-              left-3.5 bottom-3.5">{actor.stats.devices}</span
-            >
-          </span>
-        </a>
-
-        <a
-          title="Search their clients..."
-          href={`/manage/clients?actor=${actor.identifier}`}
-          class="btn btn-xs btn-neutral px-2"
-        >
-          <span class="flex items-center gap-1.5 relative">
-            clients
-            <span
-              class="badge text-[9px] badge-test badge-xs
-              left-3.5 bottom-3.5">{actor.stats.clients}</span
-            >
-          </span>
-        </a>
-
-        <div class="text-xs grow"></div>
-
-        <div class="text-xs pr-1.5">
-          <span class="opacity-75">saved</span>
-
-          {#key actor.updatedAt}
-            <Time timestamp={actor.updatedAt} />
-          {/key}
-        </div>
-
+      {#snippet after()}
         <button
           class="btn btn-primary btn-sm"
           disabled={!isChanged()}
@@ -266,80 +189,7 @@
         >
           save
         </button>
-      </div>
-
-      {#if errors?.length > 0}
-        <ul
-          class="mt-1.5 p-1.5 text-sm list-disc pl-6 dark:bg-black bg-white
-          !bg-opacity-50 !dark:bg-opacity-15 rounded-lg flex flex-col gap-1.5 shadow-inner"
-        >
-          {#each errors as error}
-            <li class="ml-1.5">{error}</li>
-          {/each}
-        </ul>
-      {/if}
-    </Alert>
-
-    <div class="flex flex-col gap-1.5 mb-1.5">
-      <label class="input input-bordered flex items-center gap-3">
-        <span class="label-text-alt opacity-75">full name</span>
-
-        <input
-          type="text"
-          class="grow"
-          value={actor.name}
-          placeholder="..."
-          oninput={(e) => change({ name: e.target.value || null })}
-        />
-      </label>
-
-      <label class="input input-bordered flex items-center gap-3">
-        <span class="label-text-alt opacity-75">nickname</span>
-
-        <input
-          type="text"
-          class="grow"
-          value={actor.nickname}
-          placeholder="..."
-          oninput={(e) => change({ nickname: e.target.value || null })}
-        />
-      </label>
-
-      {#key actor.passwordChangedAt}
-        <ActorPassword {actor} {change} />
-      {/key}
-    </div>
-
-    <ActorLogout {actor} {change} />
-
-    <div class="flex flex-col">
-      <span class="text-xs opacity-75 mb-1.5">emails</span>
-
-      <ActorEmails {actor} />
-    </div>
-
-    <div class="flex flex-col">
-      <span class="text-xs opacity-75 mb-1.5">phones</span>
-
-      <ActorPhones {actor} />
-    </div>
-
-    <div class="flex flex-col">
-      <span class="text-xs opacity-75 mb-1.5">hardware keys</span>
-
-      <ActorHardwareKeys {actor} />
-    </div>
-
-    <div class="flex flex-col">
-      <span class="text-xs opacity-75 mb-1.5">TOTP</span>
-
-      <ActorTotpSecrets {actor} />
-    </div>
-
-    <div class="flex flex-col">
-      <span class="text-xs opacity-75 mb-1.5">backup codes</span>
-
-      <ActorBackupCodes {actor} />
-    </div>
+      {/snippet}
+    </Actions>
   </div>
 </Page>

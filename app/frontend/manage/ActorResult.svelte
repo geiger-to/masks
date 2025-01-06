@@ -3,6 +3,7 @@
   import Identicon from "@/components/Identicon.svelte";
   import EditableImage from "@/components/EditableImage.svelte";
   import { Save, ChevronRight, X } from "lucide-svelte";
+  import CopyText from "@/components/CopyText.svelte";
 
   /**
    * @typedef {Object} Props
@@ -29,8 +30,16 @@
   </div>
 
   <div class="grow flex flex-col truncate px-1.5">
-    <div class="font-bold text-xl dark:text-white text-black truncate mb-1.5">
+    <div class="font-bold text-xl dark:text-white text-black truncate mb-0.5">
       {actor.name || actor.identifier}
+    </div>
+
+    <CopyText label="id" text={actor.id} />
+  </div>
+
+  <div class="flex flex-col items-end gap-1.5">
+    <div class="min-w-6 w-6 h-6 bg-black rounded">
+      <Identicon id={actor.identiconId} />
     </div>
 
     <div class="flex items-center gap-1.5">
@@ -38,7 +47,7 @@
         <div class="text-xs italic font-bold text-info">you</div>
       {/if}
 
-      <div class="text-xs">
+      <div class="text-xs whitespace-nowrap">
         last login
 
         <span class="italic">
@@ -50,9 +59,5 @@
         </span>
       </div>
     </div>
-  </div>
-
-  <div class="min-w-6 w-6 h-6 md:w-12 md:h-12 bg-black rounded">
-    <Identicon id={actor.identiconId} />
   </div>
 </div>

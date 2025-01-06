@@ -76,11 +76,11 @@
     </div>
   </div>
 
-  <p class="label-text-alt text-neutral-content opacity-75">lifetimes</p>
+  <p class="label-text-alt text-neutral-content opacity-75">sessions</p>
 
   <div class="grow flex flex-col gap-1.5 mb-3">
     <label class="input input-bordered input-sm flex items-center gap-3">
-      <span class="opacity-75 text-xs min-w-[35px]">session</span>
+      <span class="opacity-75 text-xs min-w-[35px]">cookie lifetime</span>
       <input
         type="text"
         class="grow placeholder:opacity-75"
@@ -90,13 +90,23 @@
       />
     </label>
     <label class="input input-bordered input-sm flex items-center gap-3 grow">
-      <span class="opacity-75 text-xs min-w-[35px]">device</span>
+      <span class="opacity-75 text-xs min-w-[35px]">device lifetime</span>
       <input
         type="text"
         class="grow placeholder:opacity-75"
         placeholder="expires when the browser exits..."
         value={settings.devices.lifetime}
         oninput={(e) => change({ devices: { lifetime: e.target.value } })}
+      />
+    </label>
+    <label class="input input-bordered input-sm flex items-center gap-3 grow">
+      <span class="opacity-75 text-xs min-w-[35px]">inactive after</span>
+      <input
+        type="text"
+        class="grow placeholder:opacity-75"
+        placeholder="expires when the browser exits..."
+        value={settings.sessions.inactive}
+        oninput={(e) => change({ sessions: { inactive: e.target.value } })}
       />
     </label>
   </div>

@@ -29,15 +29,14 @@ module Masks
     has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :tokens, class_name: "Masks::Token", autosave: true
-    has_many :entries, class_name: "Masks::Entry"
     has_many :devices,
              -> { distinct },
              class_name: "Masks::Device",
-             through: :entries
+             through: :tokens
     has_many :clients,
              -> { distinct },
              class_name: "Masks::Client",
-             through: :entries
+             through: :tokens
 
     has_many :login_links, class_name: "Masks::LoginLink", autosave: true
     has_many :hardware_keys, class_name: "Masks::HardwareKey", autosave: true

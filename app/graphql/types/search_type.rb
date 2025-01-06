@@ -5,9 +5,7 @@ module Types
     field :actors, [ActorType], null: true
     field :clients, [ClientType], null: true
     field :devices, [DeviceType], null: true
-    field :codes, [CodeType], null: true
     field :tokens, [TokenType], null: true
-    field :jwts, [JwtType], null: true
     field :query, String, null: false
   end
 end

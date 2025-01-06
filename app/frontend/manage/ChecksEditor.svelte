@@ -15,13 +15,19 @@
 
   let lifetimes = {
     authorizationCodeExpiresIn: {
-      name: "auth codes",
+      name: "authorization codes",
     },
     accessTokenExpiresIn: {
       name: "access tokens",
     },
     refreshTokenExpiresIn: {
       name: "refresh tokens",
+    },
+    clientTokenExpiresIn: {
+      name: "client tokens",
+    },
+    internalTokenExpiresIn: {
+      name: "internal tokens",
     },
     idTokenExpiresIn: {
       name: "id tokens",
@@ -53,9 +59,6 @@
     secondFactorWebauthnExpiresIn: {
       name: "2FA with Webauthn",
     },
-    internalSessionExpiresIn: {
-      name: "internal sessions",
-    },
   };
 
   let labels = {
@@ -85,7 +88,7 @@
     },
   };
 
-  let editing = $state();
+  let editing = $state(props.editing);
 </script>
 
 <div class="bg-base-200 py-3 px-4 rounded-lg">
@@ -94,11 +97,11 @@
 
     <div class="text-xs grow">{props.label || "checks"}</div>
 
-    {#if !disabled}
+    {#if !disabled && !props.editing}
       <button
         class="btn btn-xs btn-link text-base-content opacity-75 px-0"
         onclick={() => (editing = !editing)}
-        >{editing ? "hide" : "customize"}</button
+        >{editing ? "hide lifetimes" : "lifetimes..."}</button
       >
     {/if}
   </div>

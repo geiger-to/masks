@@ -12,6 +12,7 @@
   </Alert>
 
   <ChecksEditor
+    editing
     change={(clients) => change({ clients })}
     allowed={settings.checks}
     client={settings.clients}

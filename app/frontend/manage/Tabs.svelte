@@ -11,10 +11,6 @@
   import Page from "./Page.svelte";
   import Time from "@/components/Time.svelte";
   import { queryStore, gql, getContextClient } from "@urql/svelte";
-  import ActorList from "./list/Actor.svelte";
-  import ClientList from "./list/Client.svelte";
-  import DeviceList from "./list/Device.svelte";
-  import EntryList from "./list/Entry.svelte";
 
   let { component, ...props } = $props();
   let tab = $state(props.tab || Object.keys(props.tabs)[0]);
@@ -40,10 +36,10 @@
   }
 </script>
 
-<div class="w-full overflow-hidden">
-  <div class="flex">
+<div class="w-full">
+  <div class="md:flex">
     <div
-      class="flex flex-col gap-1.5 rounded-r rounded-l-box bg-base-100 pl-1.5 py-1.5"
+      class="flex md:flex-col gap-1.5 rounded-t-box md:rounded-r md:rounded-l-box bg-base-100 pl-1.5 py-1.5"
     >
       {#each Object.entries(props.tabs) as [key, data]}
         {@const count = props.stats ? props.stats[key] : null}
@@ -55,7 +51,7 @@
           class={[
             tab == key ? "btn-neutral" : count == 0 ? "btn-disabled" : "",
             "flex items-center justify-start gap-1.5 flex-nowrap whitespace-nowrap btn btn-sm",
-            "rounded-r-none px-1.5 pr-2.5",
+            "md:rounded-r-none px-1.5 pr-2.5",
           ].join(" ")}
         >
           <div class="w-4 text-center flex flex-col items-end">
@@ -83,7 +79,9 @@
       {/each}
     </div>
 
-    <div class="grow bg-neutral rounded-l rounded-r-box p-3 overflow-hidden">
+    <div
+      class="grow bg-neutral rounded-b-box md:rounded-l md:rounded-r-box p-3 overflow-hidden"
+    >
       {#if props.tabs[tab]?.component}
         {@const Tab = props.tabs[tab].component}
 

@@ -11,9 +11,13 @@ module Mutations
         case type
         when "Device"
           Masks::Device.find_by(public_id: id)
+        when "Token"
+          Masks::Token.find_by(key: id)
         end
 
-      record.destroy
+      record.destroy if record&.valid?(:deletion)
+
+      { errors: nil }
     end
   end
 end

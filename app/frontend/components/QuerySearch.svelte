@@ -83,63 +83,69 @@
 </script>
 
 <div class={props.class}>
-  <form class={`flex items-center w-full join`} onsubmit={updateValue}>
-    <label
-      class={`input dark:input-bordered input-ghost input-sm !outline-none flex items-center gap-3 grow
-      w-full
-      join-item ${isEmpty(search) ? "" : "rounded-b-none"}`}
-    >
-      <button
-        type="submit"
-        class={`btn btn-xs rounded-lg -ml-2 ${
-          value ? "btn-accent" : "btn-neutral"
-        }`}
+  {#if props.editable}
+    <form class={`flex items-center w-full join`} onsubmit={updateValue}>
+      <label
+        class={`input dark:input-bordered input-ghost input-sm !outline-none flex items-center gap-3 grow
+        w-full
+        join-item ${isEmpty(search) ? "" : "rounded-b-none"}`}
       >
-        <Search size="14" />
-      </button>
+        <button
+          type="submit"
+          class={`btn btn-xs rounded-lg -ml-2 ${
+            value ? "btn-accent" : "btn-neutral"
+          }`}
+        >
+          <Search size="14" />
+        </button>
 
-      <input
-        type="text"
-        class="grow min-w-0"
-        bind:value
-        placeholder={props.placeholder || "Filter..."}
-      />
+        <input
+          type="text"
+          class="grow min-w-0"
+          bind:value
+          placeholder={props.placeholder || "Filter..."}
+        />
 
-      <Dropdown value={key} dropdownClass="-ml-1.5 !mt-0.5 rounded">
-        {#snippet summary({ value, open })}
-          <summary
-            class="badge badge-neutral rounded text-xs flex items-center gap-1
-            -mr-1.5"
-          >
-            <span class="opacity-75">by</span>
-            {value}
+        <Dropdown
+          value={key}
+          class="dropdown-end"
+          dropdownClass="-mr-3 !mt-1.5 rounded"
+        >
+          {#snippet summary({ value, open })}
+            <summary
+              class="badge badge-neutral rounded text-xs flex items-center gap-1
+              -mr-1.5"
+            >
+              <span class="opacity-75">by</span>
+              {value}
 
-            {#if open}
-              <ChevronUp size="14" />
-            {:else if keys?.length > 1}
-              <ChevronDown size="14" />
-            {/if}
-          </summary>
-        {/snippet}
-
-        {#snippet dropdown({ setValue, value })}
-          <div class="flex flex-col items-start gap-1.5 m-1.5 min-w-[88px]">
-            {#each keys as k}
-              {#if value != k}
-                <button
-                  onclick={updateKey(k, setValue)}
-                  type="button"
-                  class="badge rounded text-xs
-                whitespace-nowrap w-full flex items-center gap-1
-                justify-start"><span class="opacity-75">by</span> {k}</button
-                >
+              {#if open}
+                <ChevronUp size="14" />
+              {:else if keys?.length > 1}
+                <ChevronDown size="14" />
               {/if}
-            {/each}
-          </div>
-        {/snippet}
-      </Dropdown>
-    </label>
-  </form>
+            </summary>
+          {/snippet}
+
+          {#snippet dropdown({ setValue, value })}
+            <div class="flex flex-col items-start gap-1.5 m-1.5 min-w-[88px]">
+              {#each keys as k}
+                {#if value != k}
+                  <button
+                    onclick={updateKey(k, setValue)}
+                    type="button"
+                    class="badge rounded text-xs
+                  whitespace-nowrap w-full flex items-center gap-1
+                  justify-start"><span class="opacity-75">by</span> {k}</button
+                  >
+                {/if}
+              {/each}
+            </div>
+          {/snippet}
+        </Dropdown>
+      </label>
+    </form>
+  {/if}
 
   {#if !isEmpty(search)}
     <div
