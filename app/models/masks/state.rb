@@ -190,6 +190,8 @@ module Masks
               redirect_uri
               code_challenge
               code_challenge_method
+              login_hint
+              prompt
               scope
               state
               nonce

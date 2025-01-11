@@ -58,6 +58,7 @@ en:
         auth_attempt_expires_in: Auth attempt lifetime
         email_verification_expires_in: Verified email lifetime
         login_link_factor_expires_in: Login link lifetime
+        sso_factor_expires_in: Single sign-on lifetime
         password_factor_expires_in: Auth via password lifetime
         second_factor_backup_code_expires_in: 2FA with backup code
         second_factor_phone_expires_in: 2FA with SMS code

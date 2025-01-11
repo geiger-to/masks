@@ -93,6 +93,15 @@ module Types
       scope
     end
 
+    field :providers,
+          Types::ProviderType.connection_type,
+          null: false,
+          managers_only: true
+
+    def providers(**args)
+      Masks::Provider.order(created_at: :desc)
+    end
+
     field :install,
           Types::InstallationType,
           description: "Returns the current installation",

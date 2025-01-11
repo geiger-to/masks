@@ -61,6 +61,11 @@ mutation ($input: AuthenticateInput!) {
         }
       }
     }
+    providers {
+      id
+      name
+      type
+    }
     client {
       id
       name

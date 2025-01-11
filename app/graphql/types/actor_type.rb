@@ -27,6 +27,7 @@ module Types
     field :second_factor, Boolean
     field :hardware_keys, [HardwareKeyType], null: true
     field :otp_secrets, [OtpSecretType], null: true
+    field :single_sign_ons, [SingleSignOnType], null: true
     field :phones, [PhoneType], null: true
     field :remaining_backup_codes, Integer, null: true
     field :second_factors, [Types::SecondFactorType], null: false

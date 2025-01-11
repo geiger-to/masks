@@ -44,6 +44,9 @@
     loginLinkFactorExpiresIn: {
       name: "auth via login link",
     },
+    ssoFactorExpiresIn: {
+      name: "auth via single sign-on",
+    },
     passwordFactorExpiresIn: {
       name: "auth via password",
     },

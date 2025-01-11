@@ -55,7 +55,7 @@ class ClientMutationTest < GraphQLTestCase
     assert_not manage_client.reload.internal?
   end
 
-  Masks::Client::LIFETIME_COLUMNS.each do |col|
+  Masks::Client::LIFETIME_SETTINGS.each do |col|
     test "#{col} lifetime be a valid duration" do
       log_in "manager"
 
@@ -75,7 +75,7 @@ class ClientMutationTest < GraphQLTestCase
 
       freeze_time
 
-      assert_equal "1 hour", manage_client.reload[col]
+      assert_equal "1 hour", manage_client.reload.setting(col)
       assert_equal 1.hour.from_now, manage_client.reload.expires_at(col)
     end
   end

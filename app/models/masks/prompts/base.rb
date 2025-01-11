@@ -32,6 +32,7 @@ module Masks
                :auth_bag,
                :actor_bag,
                :client_bag,
+               :device_bag,
                :check,
                :checked!,
                :checked?,

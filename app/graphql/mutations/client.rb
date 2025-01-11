@@ -23,11 +23,8 @@ module Mutations
       client.redirect_uris = args[:redirect_uris] if args[:redirect_uris]
       client.pairwise_salt = args[:pairwise_salt] if args[:pairwise_salt]
       client.checks = args[:checks] if args[:checks]
-
-      Masks::Client::SETTING_COLUMNS.each do |col|
-        client[col] = args[col] if args[col]
-      end
-
+      client.scopes = args[:scopes] if args[:scopes]
+      client.merge_settings(args)
       client.save
 
       { client:, errors: client.errors.full_messages }

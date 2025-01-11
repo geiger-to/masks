@@ -92,30 +92,7 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.text "redirect_uris"
     t.text "checks"
     t.text "scopes"
-    t.boolean "allow_passwords"
-    t.boolean "allow_login_links"
-    t.boolean "autofill_redirect_uri"
-    t.boolean "fuzzy_redirect_uri"
-    t.string "subject_type"
-    t.string "sector_identifier"
-    t.string "pairwise_salt"
-    t.string "id_token_expires_in"
-    t.string "access_token_expires_in"
-    t.string "authorization_code_expires_in"
-    t.string "refresh_token_expires_in"
-    t.string "client_token_expires_in"
-    t.string "login_link_expires_in"
-    t.string "auth_attempt_expires_in"
-    t.string "login_link_factor_expires_in"
-    t.string "password_factor_expires_in"
-    t.string "second_factor_backup_code_expires_in"
-    t.string "second_factor_phone_expires_in"
-    t.string "second_factor_totp_code_expires_in"
-    t.string "second_factor_webauthn_expires_in"
-    t.string "email_verification_expires_in"
-    t.string "internal_token_expires_in"
-    t.text "bg_light"
-    t.text "bg_dark"
+    t.text "settings"
     t.text "rsa_private_key"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -221,6 +198,30 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
     t.index ["number"], name: "index_masks_phones_on_number", unique: true
   end
 
+  create_table "masks_provider_clients", force: :cascade do |t|
+    t.integer "provider_id"
+    t.integer "client_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_id"], name: "index_masks_provider_clients_on_client_id"
+    t.index %w[provider_id client_id],
+            name: "index_masks_provider_clients_on_provider_id_and_client_id",
+            unique: true
+    t.index ["provider_id"], name: "index_masks_provider_clients_on_provider_id"
+  end
+
+  create_table "masks_providers", force: :cascade do |t|
+    t.string "key"
+    t.string "name"
+    t.string "type"
+    t.boolean "common"
+    t.text "settings"
+    t.datetime "disabled_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["key"], name: "index_masks_providers_on_key", unique: true
+  end
+
   create_table "masks_sessions", force: :cascade do |t|
     t.string "session_id", null: false
     t.text "data"
@@ -230,6 +231,20 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_17_195743) do
             name: "index_masks_sessions_on_session_id",
             unique: true
     t.index ["updated_at"], name: "index_masks_sessions_on_updated_at"
+  end
+
+  create_table "masks_single_sign_ons", force: :cascade do |t|
+    t.string "key"
+    t.text "settings"
+    t.integer "provider_id"
+    t.integer "actor_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_masks_single_sign_ons_on_actor_id"
+    t.index %w[key provider_id],
+            name: "index_masks_single_sign_ons_on_key_and_provider_id",
+            unique: true
+    t.index ["provider_id"], name: "index_masks_single_sign_ons_on_provider_id"
   end
 
   create_table "masks_tokens", force: :cascade do |t|

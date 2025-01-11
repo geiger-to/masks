@@ -2,7 +2,9 @@ module Masks
   module Prompts
     class Identifier < Base
       before_auth do
-        identifier =
+        next if self.actor && self.identifier
+
+        id =
           (
             if event?("identify")
               updates["identifier"]
@@ -10,9 +12,9 @@ module Masks
               attempt_bag["identifier"]
             end
           )
-        actor = Masks.identify(identifier) if identifier
+        actor = Masks.identify(id) if id
 
-        self.identifier = identifier
+        self.identifier = id
         self.actor = actor
 
         if actor&.new_record? && !actor&.valid?

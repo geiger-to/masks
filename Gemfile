@@ -11,6 +11,7 @@ gem "solid_cache", "~> 1.0"
 gem "solid_cable", "~> 3.0"
 gem "mission_control-jobs", "~> 1.0"
 gem "propshaft", "~> 1.1"
+gem "foreman", "~> 0.88.1"
 
 group :development, :test do
   gem "debug", platforms: %i[mri windows], require: "debug/prelude"
@@ -76,6 +77,8 @@ gem "device_detector", "~> 1.1"
 gem "openid_connect", "~> 2.3"
 gem "bcrypt", "~> 3.1"
 gem "fuzzyurl", "~> 0.9.0"
+gem "string-obfuscator", "~> 0.1.3"
+gem "addressable", "~> 2.8"
 
 # Phones and OTP
 gem "rotp", "~> 6.3"
@@ -108,6 +111,10 @@ gem "yabeda-puma-plugin", "~> 0.7.1"
 gem "yabeda-http_requests", "~> 0.2.1"
 gem "yabeda-activejob", "~> 0.6.0"
 
-gem "foreman", "~> 0.88.1"
-
-gem "string-obfuscator", "~> 0.1.3"
+# SSO
+gem "omniauth", "~> 2.1"
+gem "omniauth-github", "~> 2.0"
+gem "omniauth-facebook", "~> 10.0"
+gem "omniauth-twitter", "~> 1.4"
+gem "omniauth-google-oauth2", "~> 1.2"
+gem "omniauth-apple", "~> 1.3"

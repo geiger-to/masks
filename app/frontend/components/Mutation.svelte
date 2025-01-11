@@ -1,5 +1,6 @@
 <script>
   import _ from "lodash-es";
+  import Error from "./Error.svelte";
   import { copy } from "svelte-copy";
   import {
     ClipboardX,
@@ -62,22 +63,6 @@
 
 {@render children({ mutating, mutate })}
 
-<dialog id="my_modal_1" class="modal bg-gray-900" bind:this={modal}>
-  <div class="modal-box bg-gray-950 p-10 shadow-2xl">
-    <h3 class="text-4xl text-error font-bold mb-6">An error occurred...</h3>
-    <p class="text-xl">
-      You can ignore the error or <button
-        class="underline"
-        onclick={() => window.location.reload()}>refresh the page</button
-      > to continue.
-    </p>
-    <div class="block bg-black p-3 font-mono rounded text-green-200 my-3">
-      {error}
-    </div>
-    <div class="modal-action">
-      <form method="dialog">
-        <button class="btn">Close</button>
-      </form>
-    </div>
-  </div>
-</dialog>
+{#if error}
+  <Error {error} />
+{/if}

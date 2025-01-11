@@ -7,6 +7,7 @@ module Mutations
     field :id, String, null: true
     field :request_id, String, null: true
     field :client, Types::ClientType, null: true
+    field :providers, [Types::ProviderType], null: true
     field :actor, Types::ActorType, null: true
     field :login_link, Types::LoginLinkType, null: true
     field :identicon_id, String, null: true

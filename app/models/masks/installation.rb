@@ -1,5 +1,7 @@
 module Masks
   class Installation < ApplicationRecord
+    include SettingsColumn
+
     RECONFIGURATION_KEYS = [
       %w[sentry dsn],
       %w[newrelic license_key],
@@ -10,7 +12,6 @@ module Masks
 
     self.table_name = "masks_installations"
 
-    serialize :settings, coder: JSON
     encrypts :settings
 
     has_one_attached :light_logo
@@ -69,13 +70,14 @@ module Masks
       setting(:theme, :dark_logo_url)
     end
 
-    def setting(*names, default: nil)
-      setting = settings.dig(*names.map(&:to_s))
-      setting || default
-    end
-
     def authorize_delay
       (settings.dig("authorize", "delay")&.to_i || 0)
+    end
+
+    def provider_types
+      setting(:providers, default: Masks::Provider::CLASS_MAP.keys).map do |cls|
+        cls.constantize.new
+      end
     end
 
     %i[
@@ -198,7 +200,7 @@ module Masks
           current != updated
         end
 
-      self.settings = self.settings.deep_merge(updates.deep_stringify_keys)
+      merge_settings(updates)
 
       self.reconfigured_at = Time.current if reconfigured
     end
@@ -206,10 +208,6 @@ module Masks
     def modify!(*args)
       modify(*args)
       save!
-    end
-
-    def settings
-      super || {}
     end
 
     def env

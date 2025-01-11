@@ -10,28 +10,40 @@
   let { actor, change } = $props();
 </script>
 
-<div class="flex flex-col gap-1.5 mb-1.5">
-  <Alert type={actor.secondFactor ? "info" : "warn"} class="mb-3">
-    Secondary credentials are <b
-      >{actor.secondFactor
-        ? "enabled for this actor"
-        : "not set up for this actor"}</b
-    >.
-  </Alert>
+<div class="flex flex-col gap-1.5 mb-1.5 dark">
+  <div class="flex items-center gap-3 mb-1.5">
+    <p class="grow font-bold">Secondary credentials</p>
 
-  <span class="text-xs opacity-75">phones</span>
+    <div
+      class={`badge badge-sm ${actor.secondFactor ? "badge-success" : "badge-warning"}`}
+    >
+      {actor.secondFactor ? "enabled" : "not set up"}
+    </div>
+  </div>
 
-  <ActorPhones {actor} />
+  <div class="flex flex-col gap-3">
+    {#if !actor.savedBackupCodesAt && !actor.secondFactors.length}
+      <div
+        class="border-2 border-dashed rounded-lg border-neutral text-xs text-center opacity-75 p-6"
+      >
+        There are no secondary credentials set up for this actor...
+      </div>
+    {/if}
 
-  <span class="text-xs opacity-75 mt-3">hardware keys</span>
+    {#if actor.phones?.length}
+      <ActorPhones {actor} />
+    {/if}
 
-  <ActorHardwareKeys {actor} />
+    {#if actor.hardwareKeys?.length}
+      <ActorHardwareKeys {actor} />
+    {/if}
 
-  <span class="text-xs opacity-75 mt-3">TOTP</span>
+    {#if actor.otpSecrets?.length}
+      <ActorTotpSecrets {actor} />
+    {/if}
 
-  <ActorTotpSecrets {actor} />
-
-  <span class="text-xs opacity-75 mt-3">backup codes</span>
-
-  <ActorBackupCodes {actor} />
+    {#if actor.savedBackupCodesAt}
+      <ActorBackupCodes {actor} />
+    {/if}
+  </div>
 </div>

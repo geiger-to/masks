@@ -20,6 +20,11 @@ Rails.application.routes.draw do
   get "/manage/*url", to: "manage#index"
 
   # Authorize (including using the OIDC spec)
+  match "/sso/:provider_id",
+        via: %w[get post],
+        to: "providers#callback",
+        as: :callback
+
   get "/authorize/:client_id", to: "authorize#new", as: :authorize
   get "/authorize", to: "authorize#new", as: :oidc
 

@@ -14,6 +14,10 @@ if manager = seeds.stats[:manager]
   log "created manager with #{manager.map { |k, v| "#{k}=#{v}" }.join(" ")}"
 end
 
+if providers = seeds.stats[:providers]&.any?
+  log "created providers: #{seeds.stats[:providers].map(&:name).join(", ")}"
+end
+
 log "created default client for managing masks..." if seeds.stats[:manage]
 
 log "installed #{seeds.install.name} #{time_ago(seeds.install.created_at)} ago..."

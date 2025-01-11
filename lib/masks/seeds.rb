@@ -81,6 +81,7 @@ module Masks
 
         ensure_manager
         ensure_manage_client
+        ensure_providers
       end
 
       @install
@@ -176,6 +177,24 @@ module Masks
     def ensure_dir(path)
       FileUtils.mkdir_p(path)
       path
+    end
+
+    def ensure_providers
+      providers = @install.setting(:sso, :providers)
+      providers.each do |key, attrs|
+        attrs = { type: key, name: key.humanize, key: }.merge(
+          attrs.deep_symbolize_keys,
+        )
+        cls = Masks::Provider::TYPE_MAP[attrs[:type]]
+
+        next unless cls
+
+        provider = cls.constantize.new(attrs.merge(type: cls))
+        provider.save if provider.setup?
+
+        stats[:providers] ||= []
+        stats[:providers] << provider if provider.persisted?
+      end
     end
 
     def ensure_manager

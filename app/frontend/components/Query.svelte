@@ -1,4 +1,5 @@
 <script>
+  import Error from "./Error.svelte";
   import { copy } from "svelte-copy";
   import _ from "lodash-es";
   import {
@@ -21,6 +22,7 @@
   let { key, children, ...props } = $props();
 
   let loading = $state(true);
+  let error = $state();
   let variables = $state();
   let query = $derived(
     queryStore({
@@ -39,20 +41,21 @@
     }
 
     query.subscribe((r) => {
-      result = _.get(r?.data || {}, key, []);
+      result = key ? _.get(r?.data || {}, key, []) : r?.data;
       loading = !r?.data;
-
-      if (r?.error) {
-        window.location.reload();
-      }
+      error = r?.error;
     });
 
     query.resume();
   };
 
-  if (props.variables) {
+  if (props.variables || props.autoquery) {
     subscribe(props.variables);
   }
 </script>
 
-{@render children({ result, loading, refresh: subscribe })}
+{@render children({ result, loading, error, refresh: subscribe })}
+
+{#if error}
+  <Error {error} />
+{/if}

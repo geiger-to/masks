@@ -43,7 +43,7 @@
             class="w-20 h-20 rounded-lg border border-neutral bg-base-200 p-0.5"
           />
           <span
-            class="text-xs dark:bg-white bg-base-300 text-black opacity-75 p-0.5 px-1.5 rounded"
+            class="text-xs bg-white bg-base-300 text-black opacity-75 p-0.5 px-1.5 rounded"
             >light logo</span
           >
         </div>
@@ -76,7 +76,7 @@
     </div>
   </div>
 
-  <p class="label-text-alt text-neutral-content opacity-75">sessions</p>
+  <p class="label-text-alt text-neutral-content opacity-75">Sessions</p>
 
   <div class="grow flex flex-col gap-1.5 mb-3">
     <label class="input input-bordered input-sm flex items-center gap-3">
@@ -111,7 +111,7 @@
     </label>
   </div>
 
-  <p class="label-text-alt text-neutral-content opacity-75">environment</p>
+  <p class="label-text-alt text-neutral-content opacity-75">Environment</p>
 
   <div class="flex flex-col gap-1.5">
     <label class="input input-bordered input-sm flex items-center gap-3">

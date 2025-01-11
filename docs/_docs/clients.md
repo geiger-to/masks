@@ -76,6 +76,7 @@ following in your `masks.yml`:
 | clients.login_link_expires_in                | `10 minutes`        |
 | clients.auth_attempt_expires_in              | `1 hour`            |
 | clients.login_link_factor_expires_in         | `12 hours`          |
+| clients.sso_factor_expires_in                | `3 hours`           |
 | clients.refresh_token_expires_in             | `1 month`           |
 | clients.password_factor_expires_in           | `1 day`             |
 | clients.second_factor_backup_code_expires_in | `1 hour`            |

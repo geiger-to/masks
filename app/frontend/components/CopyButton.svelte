@@ -40,11 +40,15 @@
   }`}
   use:copy={{ text: props.value, onCopy, onError: onCopyError }}
 >
-  {#if copied}
-    <ClipboardCheck size="14" />
-  {:else if copyError}
-    <ClipboardX size="14" />
-  {:else}
-    <ClipboardCopy size="14" />
-  {/if}
+  <span>
+    {#if copied}
+      <ClipboardCheck size="14" />
+    {:else if copyError}
+      <ClipboardX size="14" />
+    {:else}
+      <ClipboardCopy size="14" />
+    {/if}
+  </span>
+
+  {@render props?.after?.()}
 </button>

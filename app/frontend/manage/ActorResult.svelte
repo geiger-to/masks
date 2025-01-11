@@ -30,7 +30,7 @@
   </div>
 
   <div class="grow flex flex-col truncate px-1.5">
-    <div class="font-bold text-xl dark:text-white text-black truncate mb-0.5">
+    <div class="font-bold text-xl text-white text-black truncate mb-0.5">
       {actor.name || actor.identifier}
     </div>
 

@@ -63,6 +63,10 @@ module Masks
       @prompts ||= env.prompts.map(&:constantize)
     end
 
+    def providers
+      @providers ||= env.providers.map(&:constantize)
+    end
+
     def scopes
       @scopes ||= Masks::Scopes.new
     end
@@ -134,6 +138,7 @@ module Masks
     def reset!
       @scopes = nil
       @prompts = nil
+      @providers = nil
       @installation = nil
       @authenticate_gql = nil
       @masks_yml = nil

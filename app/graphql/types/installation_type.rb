@@ -10,6 +10,7 @@ module Types
     field :timezone, String, null: false
     field :region, String, null: false
     field :needs_restart, Boolean, null: true
+    field :provider_types, [Types::ProviderType], null: false
     field :theme, Types::CamelizedJSON, null: false
     field :emails, Types::CamelizedJSON, null: false
     field :nicknames, Types::CamelizedJSON, null: false

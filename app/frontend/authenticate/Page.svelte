@@ -8,6 +8,10 @@
   import PromptDevice from "./PromptDevice.svelte";
   import PromptIdentify from "./PromptIdentify.svelte";
   import PromptCredentials from "./PromptCredentials.svelte";
+  import PromptSSO from "./PromptSSO.svelte";
+  import PromptSSOError from "./PromptSSOError.svelte";
+  import PromptSSOAccept from "./PromptSSOAccept.svelte";
+  import PromptSSOLink from "./PromptSSOLink.svelte";
   import PromptSecondFactor from "./PromptSecondFactor.svelte";
   import PromptResetPassword from "./PromptResetPassword.svelte";
   import PromptVerifyEmail from "./PromptVerifyEmail.svelte";
@@ -15,6 +19,7 @@
   import PromptLoginCode from "./PromptLoginCode.svelte";
   import PromptLoading from "./PromptLoading.svelte";
   import PromptLoadingError from "./PromptLoadingError.svelte";
+  import PromptError from "./PromptError.svelte";
   import PromptSuccess from "./PromptSuccess.svelte";
   import PromptAccessDenied from "./PromptAccessDenied.svelte";
   import PromptMissingScopes from "./PromptMissingScopes.svelte";
@@ -29,7 +34,7 @@
   import Time from "svelte-time";
   import AuthenticateQuery from "../authenticate.graphql?raw";
 
-  let { auth = $bindable() } = $props();
+  let { backend, auth = $bindable() } = $props();
 
   let consumer = createConsumer();
   let client = getContextClient();
@@ -67,6 +72,7 @@
   let identifier = $state();
   let password = $state();
   let updates = $state();
+  let settings = $derived(auth?.settings || backend?.settings);
 
   const startOver = () => {
     auth.identifier = identifier = null;
@@ -104,6 +110,10 @@
     identify: PromptIdentify,
     device: PromptDevice,
     credentials: PromptCredentials,
+    sso: PromptSSO,
+    "sso:error": PromptSSOError,
+    "sso:accept": PromptSSOAccept,
+    "sso:link": PromptSSOLink,
     "second-factor": PromptSecondFactor,
     "login-code": PromptLoginCode,
     "login-link": PromptLoginLink,
@@ -122,8 +132,12 @@
 
   let loadingError = $state();
 
-  let computePrompt = (auth, loading, loadingError) => {
-    if (loadingError) {
+  let computePrompt = (backend, auth, loading, error) => {
+    if (prompts[backend?.prompt]) {
+      return prompts[backend?.prompt];
+    }
+
+    if (error) {
       return PromptLoadingError;
     }
 
@@ -139,13 +153,9 @@
     defaultEvent = name;
   };
 
-  let hasLogo = $derived(
-    auth?.settings?.lightLogoUrl || auth?.settings?.darkLogoUrl
-  );
+  let hasLogo = $derived(settings?.lightLogoUrl || settings?.darkLogoUrl);
 
-  $inspect(hasLogo);
-
-  const SvelteComponent = $derived(computePrompt(auth, loading, loadingError));
+  const Prompt = $derived(computePrompt(backend, auth, loading, loadingError));
 </script>
 
 <div
@@ -154,31 +164,25 @@
   <div class="w-full md:w-[500px] mx-auto rounded-b-2xl shadow-2xl">
     <div
       class={`bg-white dark:bg-black !bg-opacity-85 h-[25px] md:h-[32px] rounded-t-2xl w-full relative border-t border-white dark:border-opacity-20 border-opacity-50`}
-    >
-      <div class="animate-fade-in-slow w-full h-[50px] absolute blur-xl">
-        <div
-          class={`rainbow h-full w-full transition-opacity duration-1000 ${loading ? "opacity-15" : "opacity-[.02]"}`}
-        ></div>
-      </div>
-    </div>
+    ></div>
     <div
       class="md:w-[500px] bg-white dark:bg-black !bg-opacity-85 w-full md:px-8 pb-5 px-5"
     >
       {#snippet logo()}
         {#if hasLogo}
           <div class="max-w-[300px]">
-            {#if auth?.settings?.lightLogoUrl}
+            {#if settings?.lightLogoUrl}
               <img
-                alt={`${auth?.settings?.theme?.name} logo`}
-                src={auth?.settings?.lightLogoUrl}
+                alt={`${settings?.theme?.name} logo`}
+                src={settings?.lightLogoUrl}
                 class="object-scale-down h-10 rounded dark:hidden"
               />
             {/if}
 
-            {#if auth?.settings?.darkLogoUrl}
+            {#if settings?.darkLogoUrl}
               <img
-                alt={`${auth?.settings?.theme?.name} logo`}
-                src={auth?.settings?.darkLogoUrl}
+                alt={`${settings?.theme?.name} logo`}
+                src={settings?.darkLogoUrl}
                 class="object-scale-down h-10 rounded hidden dark:block"
               />
             {/if}
@@ -187,14 +191,14 @@
           <p
             class="font-bold grow text-left text-lg md:text-xl group-hover:underline group-focus:underline"
           >
-            {auth?.settings?.theme?.name}
+            {settings?.theme?.name}
           </p>
         {/if}
       {/snippet}
 
-      {#if auth?.settings?.theme?.url}
+      {#if settings?.theme?.url}
         <a
-          href={auth?.settings?.theme?.url}
+          href={settings?.theme?.url}
           class="flex items-center gap-4 group !outline-none"
         >
           {@render logo()}
@@ -210,7 +214,9 @@
         class="bg-white dark:bg-black !bg-opacity-85 w-full min-h-[200px] md:w-[500px] mx-auto"
       >
         <div class="px-5 md:px-8">
-          <SvelteComponent
+          <Prompt
+            {settings}
+            {backend}
             {auth}
             {startOver}
             {authorize}

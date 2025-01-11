@@ -1,4 +1,34 @@
 import { gql } from "@urql/svelte";
+import { Github, ShieldQuestion } from "lucide-svelte";
+
+export const iconifyProvider = (provider) => {
+  let type = provider?.type || "generic";
+
+  return {
+    apple: "logos:apple",
+    github: "logos:github-octocat",
+    google: "logos:google-icon",
+    facebook: "logos:facebook",
+    twitter: "logos:twitter",
+    generic: "material-symbols-light:handshake-outline-rounded",
+  }[type];
+};
+
+export const ProviderFragment = gql`
+  fragment ProviderFragment on Provider {
+    id
+    name
+    type
+    setup
+    disabled
+    common
+    settings
+    callbackUri
+    createdAt
+    updatedAt
+    disabledAt
+  }
+`;
 
 export const ActorFragment = gql`
   fragment ActorFragment on Actor {
@@ -23,6 +53,17 @@ export const ActorFragment = gql`
     secondFactor
     savedBackupCodesAt
     remainingBackupCodes
+    secondFactors {
+      ... on HardwareKey {
+        id
+      }
+      ... on Phone {
+        number
+      }
+      ... on OtpSecret {
+        id
+      }
+    }
     hardwareKeys {
       id
       name
@@ -41,6 +82,15 @@ export const ActorFragment = gql`
       id
       name
       createdAt
+    }
+    singleSignOns {
+      identifier
+      createdAt
+
+      provider {
+        type
+        name
+      }
     }
     stats
     createdAt
@@ -76,6 +126,7 @@ export const ClientFragment = gql`
     authAttemptExpiresIn
     emailVerificationExpiresIn
     loginLinkFactorExpiresIn
+    ssoFactorExpiresIn
     passwordFactorExpiresIn
     secondFactorBackupCodeExpiresIn
     secondFactorPhoneExpiresIn
@@ -156,7 +207,7 @@ function redirectTimeout(cb, timeout = 300) {
   const currentTimestamp = Date.now();
 
   if (currentTimestamp - lastReloadTimestamp < thresholdMillis) {
-    return;
+    return cb(true);
   }
 
   localStorage.setItem("lastReloadTimestamp", currentTimestamp.toString());

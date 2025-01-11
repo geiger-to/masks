@@ -2,10 +2,9 @@
 
 module Masks
   class Client < ApplicationRecord
-    CODE_CHALLENGE_METHODS = %w[S256 plain]
-    MANAGE_KEY = "manage"
-    DEFAULT_KEY = "default"
-    LIFETIME_COLUMNS = %i[
+    include SettingsColumn
+
+    LIFETIME_SETTINGS = %i[
       id_token_expires_in
       access_token_expires_in
       authorization_code_expires_in
@@ -15,6 +14,7 @@ module Masks
       auth_attempt_expires_in
       email_verification_expires_in
       login_link_factor_expires_in
+      sso_factor_expires_in
       password_factor_expires_in
       second_factor_backup_code_expires_in
       second_factor_phone_expires_in
@@ -23,28 +23,23 @@ module Masks
       internal_token_expires_in
     ]
 
-    BOOLEAN_COLUMNS = %i[
-      allow_passwords
-      allow_login_links
-      autofill_redirect_uri
-      fuzzy_redirect_uri
-    ]
+    LIFETIME_SETTINGS.each { |k| settings(k => Types::String) }
 
-    STRING_COLUMNS = %i[
-      client_type
-      sector_identifier
-      subject_type
-      bg_light
-      bg_dark
-    ]
+    settings(
+      sector_identifier: Types::String,
+      subject_type: Types::String,
+      bg_light: Types::String,
+      bg_dark: Types::String,
+      pairwise_salt: Types::String,
+      allow_passwords: Types::Boolean,
+      allow_login_links: Types::Boolean,
+      autofill_redirect_uri: Types::Boolean,
+      fuzzy_redirect_uri: Types::Boolean,
+    )
 
-    SETTING_COLUMNS = [
-      *LIFETIME_COLUMNS,
-      *BOOLEAN_COLUMNS,
-      *STRING_COLUMNS,
-      :scopes,
-      :response_types,
-    ]
+    CODE_CHALLENGE_METHODS = %w[S256 plain]
+    MANAGE_KEY = "manage"
+    DEFAULT_KEY = "default"
 
     self.table_name = "masks_clients"
 
@@ -64,10 +59,11 @@ module Masks
 
     validates :name, presence: true
 
-    encrypts :secret, :pairwise_salt, :rsa_private_key
+    encrypts :settings, :secret, :rsa_private_key
 
     after_initialize :generate_credentials
-    before_validation :generate_key, unless: :key, on: :create
+
+    generate_key from: :name
 
     validates :key, :secret, presence: true
     validates :key, uniqueness: true
@@ -94,10 +90,33 @@ module Masks
              class_name: "Masks::Device",
              through: :tokens
 
+    serialize :response_types, coder: JSON
+    serialize :grant_types, coder: JSON
     serialize :checks, coder: JSON
     serialize :scopes, coder: JSON
-    serialize :grant_types, coder: JSON
-    serialize :response_types, coder: JSON
+
+    has_many :provider_clients, class_name: "Masks::ProviderClient"
+
+    def sso?
+      providers.any?
+    end
+
+    def provider(key)
+      p = all_providers.find_by(key:)
+      p if p&.setup?
+    end
+
+    def providers
+      all_providers.filter(&:setup?)
+    end
+
+    def all_providers
+      Masks::Provider
+        .includes(:clients)
+        .enabled
+        .where(masks_clients: { id: })
+        .or(Masks::Provider.enabled.where(common: true))
+    end
 
     def scope
       @scope ||= ClientScope.new(self)
@@ -137,10 +156,6 @@ module Masks
       "client:#{key}"
     end
 
-    def setting(*args)
-      nil
-    end
-
     def to_param
       key
     end
@@ -157,12 +172,8 @@ module Masks
       redirect_uris_a.first
     end
 
-    def redirect_uris
-      super || ""
-    end
-
     def redirect_uris_a
-      redirect_uris.split("\n")
+      redirect_uris&.split("\n") || []
     end
 
     def valid_response_type?(value)
@@ -257,11 +268,9 @@ module Masks
       if custom
         Masks.time.expires_at(custom)
       else
-        column = "#{type.to_s.delete_suffix("_expires_in")}_expires_in".to_sym
-
-        return unless LIFETIME_COLUMNS.include?(column) && self[column]
-
-        Masks.time.expires_at(self[column])
+        Masks.time.expires_at(
+          setting("#{type.to_s.delete_suffix("_expires_in")}_expires_in"),
+        )
       end
     end
 
@@ -298,36 +307,43 @@ module Masks
     private
 
     def generate_credentials
+      return if persisted?
+
+      defaults =
+        self
+          .class
+          .settings
+          .keys
+          .map do |key|
+            value = Masks.setting(:clients, key)
+            [key, value] if value
+          end
+          .compact
+          .to_h
+
+      merge_settings(defaults)
+
+      self.client_type ||= Masks.setting(:clients, :client_type)
       self.secret ||= SecureRandom.base58(64)
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
       self.checks = Masks.installation.client_checks unless checks.any?
       self.sector_identifier ||= Masks.url
       self.pairwise_salt ||= SecureRandom.hex(10)
-
-      SETTING_COLUMNS.each { |key| self[key] ||= Masks.setting(:clients, key) }
-
+      self.scopes ||= Masks.setting(:clients, :scopes)
       self.grant_types ||= Masks.setting(:clients, :grant_types, client_type)
-    end
-
-    def generate_key
-      return unless name
-
-      key = name.parameterize
-
-      loop do
-        break if self.class.where(key:).none?
-
-        key = "#{name.parameterize}-#{SecureRandom.hex([*1..4].sample)}"
-      end
-
-      self.key = key
+      self.response_types ||=
+        Masks.setting(:clients, :response_types, client_type)
     end
 
     def validate_expiries
-      LIFETIME_COLUMNS.each do |param|
-        raise "invalid" unless self[param] && ChronicDuration.parse(self[param])
+      self.class.settings.keys.each do |key|
+        next unless key.end_with?("_expires_in")
+
+        value = setting(key)
+
+        raise "invalid" unless value && ChronicDuration.parse(value)
       rescue StandardError
-        errors.add(param, :invalid)
+        errors.add(key, :invalid)
       end
     end
   end

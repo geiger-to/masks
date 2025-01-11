@@ -1,4 +1,7 @@
 class AuthorizeController < ApplicationController
+  include FrontendController
+  include AuthController
+
   def new
     gql =
       MasksSchema.execute(
@@ -14,10 +17,6 @@ class AuthorizeController < ApplicationController
 
     auth = gql.as_json.dig("data", "authenticate").with_indifferent_access
 
-    @props = { section: "Authorize", auth:, sentry: }
-    @bg_dark = client&.bg_dark
-    @bg_light = client&.bg_light
-
     headers["X-Masks-Auth-Id"] = auth[:id] unless auth[:error]
 
     status =
@@ -27,6 +26,8 @@ class AuthorizeController < ApplicationController
       else
         400
       end
+
+    props(section: "Authorize", auth:)
 
     respond_to do |format|
       format.html { render "app", status: }

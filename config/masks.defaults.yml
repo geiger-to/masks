@@ -74,6 +74,7 @@ default: &default
     - verified-email
   prompts:
     - Masks::Prompts::Device
+    - Masks::Prompts::Provider
     - Masks::Prompts::Identifier
     - Masks::Prompts::LoginLink
     - Masks::Prompts::Password
@@ -119,7 +120,12 @@ default: &default
       - public-identifier
       - pairwise-uuid
     response_types:
-      - code
+      internal:
+        - code
+      confidential:
+        - code
+      public:
+        - code
     grant_types:
       internal:
         - client_credentials
@@ -141,6 +147,7 @@ default: &default
     auth_attempt_expires_in: "1 hour"
     login_link_factor_expires_in: "12 hours"
     password_factor_expires_in: "1 day"
+    sso_factor_expires_in: "3 hours"
     second_factor_backup_code_expires_in: "1 hour"
     second_factor_phone_expires_in: "10 minutes"
     second_factor_totp_code_expires_in: "10 minutes"
@@ -200,6 +207,35 @@ default: &default
     from: <%= ENV['MASKS_EMAIL_FROM'] %>
     reply_to: <%= ENV['MASKS_EMAIL_REPLY_TO'] %>
     max_for_login: 5
+  sso:
+    enabled: true
+    providers:
+      github:
+        common: true
+        settings:
+          client_id: <%= ENV['MASKS_GITHUB_CLIENT_ID'] %>
+          client_secret: <%= ENV['MASKS_GITHUB_CLIENT_SECRET'] %>
+      google:
+        common: true
+        settings:
+          client_id: <%= ENV['MASKS_GOOGLE_CLIENT_ID'] %>
+          client_secret: <%= ENV['MASKS_GOOGLE_CLIENT_SECRET'] %>
+      apple:
+        common: true
+        settings:
+          client_id: <%= ENV['MASKS_APPLE_CLIENT_ID'] %>
+          client_secret: <%= ENV['MASKS_APPLE_CLIENT_SECRET'] %>
+      facebook:
+        common: true
+        settings:
+          client_id: <%= ENV['MASKS_FACEBOOK_CLIENT_ID'] %>
+          client_secret: <%= ENV['MASKS_FACEBOOK_CLIENT_SECRET'] %>
+      twitter:
+        common: true
+        settings:
+          client_id: <%= ENV['MASKS_TWITTER_CLIENT_ID'] %>
+          client_secret: <%= ENV['MASKS_TWITTER_CLIENT_SECRET'] %>
+
   integration:
     <<: *integration
 

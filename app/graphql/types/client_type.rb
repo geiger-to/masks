@@ -14,17 +14,14 @@ module Types
     field :redirect_uris, String
     field :grant_types, [String]
     field :response_types, [String]
+    field :providers, [ProviderType]
     field :checks, [String], null: false
     field :lifetime_types, [String], null: false
     field :scopes, GraphQL::Types::JSON, null: false
     field :consent, Boolean
     field :stats, CamelizedJSON, null: false
 
-    field :pairwise_salt, String, null: false
-
-    Masks::Client::LIFETIME_COLUMNS.each { |col| field col, String }
-    Masks::Client::STRING_COLUMNS.each { |col| field col, String }
-    Masks::Client::BOOLEAN_COLUMNS.each { |col| field col, Boolean }
+    Masks::Client.settings.each { |key, type| field key, type }
 
     field :created_at, GraphQL::Types::ISO8601DateTime, null: false
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
@@ -52,7 +49,7 @@ module Types
     end
 
     def lifetime_types
-      Masks::Client::LIFETIME_COLUMNS.map { |c| c.to_s.camelize(:lower) }
+      Masks::Client::LIFETIME_SETTINGS.map { |c| c.to_s.camelize(:lower) }
     end
 
     def allow_login_links
@@ -61,6 +58,10 @@ module Types
 
     def stats
       { tokens: object.tokens.count, actors: object.actors.count }
+    end
+
+    def providers
+      object.providers
     end
   end
 end

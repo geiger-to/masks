@@ -313,7 +313,9 @@
         <div class="skeleton h-8 w-full"></div>
       </div>
     {:else}
-      {@render children?.()}
+      <div class="max-w-[850px] mx-auto">
+        {@render children?.()}
+      </div>
     {/if}
   </div>
 </div>

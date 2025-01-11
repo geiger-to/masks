@@ -66,6 +66,7 @@
 
   {#if visible}
     <input
+      {disabled}
       minlength={min}
       maxlength={max}
       type="text"
@@ -76,6 +77,7 @@
     />
   {:else}
     <input
+      {disabled}
       minlength={min}
       maxlength={max}
       type="password"

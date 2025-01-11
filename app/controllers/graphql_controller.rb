@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class GraphqlController < ApplicationController
+  include AuthController
+
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]

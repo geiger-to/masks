@@ -27,6 +27,7 @@ module Masks
              :auth_bag,
              :actor_bag,
              :client_bag,
+             :device_bag,
              :redirect_uri,
              :settled?,
              :settled!,
@@ -101,14 +102,19 @@ module Masks
       request.session
     end
 
+    def id
+      state&.attempt_id
+    end
+
     def as_json
       @json ||= {
-        id: state.attempt_id,
+        id:,
         settled: settled?,
         prompt: error || prompt || "identify",
         error:,
         client:,
         identifier:,
+        providers: client&.providers,
         actor: leak_actor? ? actor : nil,
         avatar: actor&.avatar_url,
         identicon_id: actor&.identicon_id,

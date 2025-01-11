@@ -3,6 +3,8 @@
   import Page from "./Page.svelte";
 
   import {
+    LogIn,
+    Lock,
     User,
     Share2,
     Handshake,
@@ -140,17 +142,17 @@
       icon: Cog,
       component: SettingGeneralTab,
     },
+    login: {
+      name: "Login",
+      href: "/manage/settings#login",
+      component: SettingActorsTab,
+      icon: LogIn,
+    },
     clients: {
-      name: "Client",
+      name: "Clients",
       href: "/manage/settings#clients",
       component: SettingClientsTab,
       icon: Handshake,
-    },
-    actors: {
-      name: "Actor",
-      href: "/manage/settings#actors",
-      component: SettingActorsTab,
-      icon: User,
     },
     emails: {
       name: "Email",

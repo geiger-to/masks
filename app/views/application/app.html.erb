@@ -1,11 +1,11 @@
 <style>
   .background {
-    <%= @bg_light ||Masks.setting(:light, :bg) %>
+    <%= @props[:bg_light] %>
   }
 
 @media (prefers-color-scheme: dark) {
   .background {
-    <%= @bg_dark || Masks.setting(:dark, :bg) %>
+    <%= @props[:bg_dark] %>
   }
 }
 </style>

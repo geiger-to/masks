@@ -13,7 +13,9 @@
   import { queryStore, gql, getContextClient } from "@urql/svelte";
 
   let { component, ...props } = $props();
-  let tab = $state(props.tab || Object.keys(props.tabs)[0]);
+  let tab = $state(
+    props.tab && props.tabs[props.tab] ? props.tab : Object.keys(props.tabs)[0]
+  );
   let changeTab = (key) => {
     return (e) => {
       e.preventDefault();

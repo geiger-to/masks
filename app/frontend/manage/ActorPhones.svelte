@@ -121,25 +121,4 @@
       </button>
     </div>
   {/each}
-
-  <div
-    class="text-sm p-1.5 rounded-lg border-2 border-dashed border-gray-300 dark:border-neutral flex items-center gap-1.5"
-  >
-    <label class="input input-xs input-ghost flex items-center gap-3 grow">
-      <span class="label-text-alt opacity-75 whitespace-nowrap">new phone</span>
-
-      <div class="grow">
-        <input
-          type="text"
-          class="w-full grow"
-          placeholder="..."
-          bind:value={number}
-        />
-      </div>
-    </label>
-
-    <button class="btn btn-xs btn-primary" onclick={addPhone}>
-      <MailPlus size="14" />
-    </button>
-  </div>
 </div>

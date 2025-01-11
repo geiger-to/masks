@@ -1,0 +1,18 @@
+# frozen_string_literal: true
+
+module Types
+  class SingleSignOnType < Types::BaseObject
+    implements GraphQL::Types::Relay::Node
+
+    field :id, ID, null: true
+    field :identifier, String, null: true
+    field :actor, ActorType, null: true
+    field :provider, ProviderType, null: true
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: true
+
+    def id
+      object.key
+    end
+  end
+end

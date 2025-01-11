@@ -144,44 +144,52 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :secret
       t.string :client_type
       t.string :public_url, null: true
+
       t.text :response_types
       t.text :grant_types
       t.text :redirect_uris
       t.text :checks
       t.text :scopes
-
-      t.boolean :allow_passwords
-      t.boolean :allow_login_links
-      t.boolean :autofill_redirect_uri
-      t.boolean :fuzzy_redirect_uri
-
-      t.string :subject_type
-      t.string :sector_identifier
-      t.string :pairwise_salt
-      t.string :id_token_expires_in
-      t.string :access_token_expires_in
-      t.string :authorization_code_expires_in
-      t.string :refresh_token_expires_in
-      t.string :client_token_expires_in
-      t.string :login_link_expires_in
-      t.string :auth_attempt_expires_in
-      t.string :login_link_factor_expires_in
-      t.string :password_factor_expires_in
-      t.string :second_factor_backup_code_expires_in
-      t.string :second_factor_phone_expires_in
-      t.string :second_factor_totp_code_expires_in
-      t.string :second_factor_webauthn_expires_in
-      t.string :email_verification_expires_in
-      t.string :internal_token_expires_in
-
-      t.text :bg_light
-      t.text :bg_dark
+      t.text :settings
 
       t.text :rsa_private_key
 
       t.timestamps
 
       t.index %i[key], unique: true
+    end
+
+    create_table :masks_single_sign_ons do |t|
+      t.string :key
+      t.text :settings
+
+      t.references :provider
+      t.references :actor
+
+      t.timestamps
+
+      t.index %i[key provider_id], unique: true
+    end
+
+    create_table :masks_providers do |t|
+      t.string :key
+      t.string :name, null: true
+      t.string :type
+      t.boolean :common
+      t.text :settings
+
+      t.datetime :disabled_at
+      t.timestamps
+
+      t.index :key, unique: true
+    end
+
+    create_table :masks_provider_clients do |t|
+      t.references :provider
+      t.references :client
+      t.timestamps
+
+      t.index %i[provider_id client_id], unique: true
     end
 
     create_table :masks_tokens do |t|

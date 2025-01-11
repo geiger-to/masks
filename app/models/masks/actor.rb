@@ -26,6 +26,8 @@ module Masks
       Masks.installation.duration(:actors, :inactive)
     end
 
+    generate_key from: :identifier
+
     has_many :emails, class_name: "Masks::Email", autosave: true
     has_many :phones, class_name: "Masks::Phone", autosave: true
     has_many :tokens, class_name: "Masks::Token", autosave: true
@@ -41,6 +43,7 @@ module Masks
     has_many :login_links, class_name: "Masks::LoginLink", autosave: true
     has_many :hardware_keys, class_name: "Masks::HardwareKey", autosave: true
     has_many :otp_secrets, class_name: "Masks::OtpSecret", autosave: true
+    has_many :single_sign_ons, class_name: "Masks::SingleSignOn", autosave: true
 
     has_one_attached :avatar do |attachable|
       attachable.variant :preview, resize_to_limit: [350, 350]
@@ -52,7 +55,6 @@ module Masks
     attribute :session
 
     after_initialize :generate_defaults
-    before_validation :generate_key, unless: :key, on: :create
 
     validates :identifier_type, presence: true
     validates :key, presence: true, uniqueness: true
@@ -226,24 +228,6 @@ module Masks
 
     def generate_defaults
       self.webauthn_id ||= WebAuthn.generate_user_id
-    end
-
-    def generate_key
-      self.key ||=
-        if identifier&.present?
-          key = identifier.parameterize
-
-          loop do
-            break if self.class.where(key:).none?
-
-            key =
-              "#{identifier.parameterize}-#{SecureRandom.hex([*1..4].sample)}"
-          end
-
-          key
-        else
-          SecureRandom.hex
-        end
     end
 
     def validates_length(value, key:, min_chars:, max_chars:)

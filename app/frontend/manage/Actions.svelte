@@ -22,11 +22,7 @@
       e.preventDefault();
       e.stopPropagation();
 
-      if (tab == key) {
-        tab = null;
-      } else {
-        tab = key;
-      }
+      tab = key;
     };
   };
 
@@ -35,7 +31,7 @@
   }
 </script>
 
-<Alert type="gray">
+<div class="p-3 py-1.5 rounded-lg bg-black">
   <div class="flex items-center gap-1.5">
     {#each Object.entries(props.tabs) as [key, data]}
       {@const count = record?.stats ? record?.stats[key] : null}
@@ -107,4 +103,4 @@
       {/if}
     </div>
   {/if}
-</Alert>
+</div>

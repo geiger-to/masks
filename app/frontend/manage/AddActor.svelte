@@ -69,7 +69,7 @@
         </button>
       </div>
 
-      {#if errors}
+      {#if errors?.length}
         <Alert
           class="my-3"
           icon={AlertTriangle}
