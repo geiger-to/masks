@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .dim {
+    @apply opacity-75;
+  }
+
+  .row {
+    @apply flex items-center;
+  }
+
+  .cols-1.5 {
+    @apply flex items-center gap-1.5;
+  }
+
+  .cols-3 {
+    @apply flex items-center gap-3;
+  }
+
+  .col {
+    @apply flex flex-col;
+  }
+
+  .col-1.5 {
+    @apply flex flex-col gap-3;
+  }
+
+  .col-3 {
+    @apply flex flex-col gap-3;
+  }
+
+  .label-xs {
+    opacity: 0.75;
+    @apply text-xs;
+  }
+
+  .label-sm {
+    opacity: 0.75;
+    @apply text-sm;
+  }
+}

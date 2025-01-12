@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "../tailwind.css";
 
 input.no-inc[type="number"]::-webkit-outer-spin-button,
 input.no-inc[type="number"]::-webkit-inner-spin-button {
