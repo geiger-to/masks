@@ -62,7 +62,7 @@ en:
         password_factor_expires_in: Auth via password lifetime
         second_factor_backup_code_expires_in: 2FA with backup code
         second_factor_phone_expires_in: 2FA with SMS code
-        second_factor_totp_code_expires_in: 2FA with TOTP
+        second_factor_otp_expires_in: 2FA with OTP
         second_factor_webauthn_expires_in: 2FA with Webauthn
         internal_token_expires_in: Internal token lifetime
     errors:

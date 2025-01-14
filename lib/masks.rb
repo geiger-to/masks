@@ -10,6 +10,10 @@ require_relative "masks/mailer"
 require_relative "masks/private_key"
 require_relative "masks/seeds"
 require_relative "masks/env"
+require_relative "masks/shims/oauth_request"
+require_relative "masks/internal/session"
+require_relative "masks/internal/middleware"
+require_relative "masks/internal/tracking"
 
 # Top-level module for masks.
 module Masks
@@ -80,22 +84,18 @@ module Masks
     end
 
     def signup(identifier)
-      if identifier.include?("@") && installation.emails?
+      if identifier.include?("@")
         Actor.with_login_email(identifier)
-      elsif installation.nicknames?
-        Actor.new(nickname: identifier)
       else
-        Actor.new(identifier: identifier)
+        Actor.new(nickname: identifier)
       end
     end
 
     def identify(identifier)
-      if identifier.include?("@") && installation.emails?
+      if identifier.include?("@")
         Actor.from_login_email(identifier)
-      elsif installation.nicknames?
-        Actor.find_or_initialize_by(nickname: identifier)
       else
-        Actor.new(identifier: identifier)
+        Actor.find_or_initialize_by(nickname: identifier)
       end
     end
 
@@ -149,7 +149,9 @@ module Masks
 
     def authenticate_gql
       @authenticate_gql ||=
-        File.read(Rails.root.join("app", "frontend", "authenticate.graphql"))
+        File.read(
+          Rails.root.join("app", "frontend", "lib", "authenticate.graphql"),
+        )
     end
   end
 end

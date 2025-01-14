@@ -2,7 +2,7 @@
   let { value, class: cls, summary, dropdown, ...props } = $props();
 
   let element;
-  let setValue = (v, cb) => {
+  let setValue = (v, cb, e) => {
     value = v;
 
     if (element) {
@@ -28,7 +28,7 @@
   {@render summary?.({ value, open })}
   <div
     class={`dropdown-content dark:bg-black bg-neutral rounded-lg shadow-xl
-      mt-1.5 z-20
+      z-20
       ${props.dropdownClass || ""}`}
   >
     {@render dropdown?.({ value, setValue })}

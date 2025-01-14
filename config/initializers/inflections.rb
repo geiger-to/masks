@@ -15,4 +15,8 @@ ActiveSupport::Inflector.inflections(:en) do |inflect|
   inflect.acronym "OIDC"
   inflect.acronym "JSON"
   inflect.acronym "SSO"
+  inflect.acronym "OAuth"
+
+  inflect.uncountable "oauth"
+  inflect.uncountable "oidc"
 end

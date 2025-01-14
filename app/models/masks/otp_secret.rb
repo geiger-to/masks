@@ -9,10 +9,10 @@ module Masks
 
     after_initialize :generate_defaults
 
-    def verify_totp(code)
+    def verify_otp(code)
       return false unless valid?
 
-      verified = totp.verify(code, after: verified_at)
+      verified = otp.verify(code, after: verified_at)
 
       if verified
         self.verified_at = Time.now.utc
@@ -27,12 +27,12 @@ module Masks
       end
     end
 
-    def totp
+    def otp
       ROTP::TOTP.new(secret, issuer: Masks.name) if secret
     end
 
     def uri
-      totp.provisioning_uri(actor.uuid) if totp && actor
+      otp.provisioning_uri(actor.uuid) if otp && actor
     end
 
     private

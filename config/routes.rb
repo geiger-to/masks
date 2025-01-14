@@ -25,8 +25,8 @@ Rails.application.routes.draw do
         to: "providers#callback",
         as: :callback
 
-  get "/authorize/:client_id", to: "authorize#new", as: :authorize
-  get "/authorize", to: "authorize#new", as: :oidc
+  get "/auth/:client_id", to: "authorize#new", as: :authorize
+  get "/auth", to: "authorize#new", as: :oidc
 
   # Tokens
   post "token", to: proc { |env| TokensController.new.call(env) }

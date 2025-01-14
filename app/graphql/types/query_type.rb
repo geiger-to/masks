@@ -2,6 +2,21 @@
 
 module Types
   class QueryType < Types::BaseObject
+    field :auth,
+          Types::AuthType,
+          null: true,
+          description: "Returns information about the current auth attempt" do
+      argument :id, ID, required: true
+    end
+
+    def auth(**args)
+      context[:auth].resume!(args[:id]) if args[:id]
+
+      return unless context[:auth].trusted?
+
+      context[:auth]
+    end
+
     field :actor,
           Types::ActorType,
           null: true,

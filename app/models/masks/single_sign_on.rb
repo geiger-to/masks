@@ -19,6 +19,14 @@ module Masks
         settings.dig("info", "email")
     end
 
+    def deletable?
+      actor.password || actor.login_emails.any?
+    end
+
+    def permanently_delete
+      destroy if deletable?
+    end
+
     private
 
     def generate_key

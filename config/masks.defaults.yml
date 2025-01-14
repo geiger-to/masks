@@ -43,11 +43,18 @@ default: &default
   private_key: "<%= ENV['MASKS_PRIVATE_KEY'] || Rails.root.join('data', 'private.key') %>"
   seeds_dir: "<%= ENV['MASKS_SEEDS_DIR'] %>"
   threads: <%= ENV['MASKS_THREADS'] || 1 %>
+  routes:
+    "/up":
+      skip: true
+    "/favicon.ico":
+      skip: true
+    "/manifest.json":
+      skip: true
   db:
     url: <%= ENV['MASKS_DB_URL'] %>
     adapter: <%= ENV['MASKS_DB_ADAPTER'] %>
     name: <%= ENV['MASKS_DB_NAME'] %>
-    queue:
+    auth.queue:
       url: <%= ENV['MASKS_QUEUE_DB_URL'] %>
       adapter: <%= ENV['MASKS_QUEUE_DB_ADAPTER'] %>
       name: <%= ENV['MASKS_QUEUE_DB_NAME'] %>
@@ -70,24 +77,23 @@ default: &default
     - credentials
     - second-factor
     - client-consent
-    - onboarded
-    - verified-email
+    - profile
   prompts:
     - Masks::Prompts::Device
-    - Masks::Prompts::Provider
+    # - Masks::Prompts::SingleSignOn
     - Masks::Prompts::Identifier
     - Masks::Prompts::LoginLink
     - Masks::Prompts::Password
-    - Masks::Prompts::Credentials
+    - Masks::Prompts::FirstFactor
     - Masks::Prompts::Phone
     - Masks::Prompts::Webauthn
-    - Masks::Prompts::Totp
+    - Masks::Prompts::OneTimePassword
     - Masks::Prompts::BackupCode
     - Masks::Prompts::SecondFactor
-    - Masks::Prompts::ResetPassword
-    - Masks::Prompts::Onboard
-    - Masks::Prompts::VerifyEmail
+    # - Masks::Prompts::Email
     - Masks::Prompts::OIDC
+    - Masks::Prompts::ResetPassword
+    - Masks::Prompts::Profile
     - Masks::Prompts::LastLogin
   manager:
     nickname: "<%= ENV['MASKS_MANAGER_NICKNAME'] || 'manager' %>"
@@ -112,9 +118,6 @@ default: &default
     scopes:
       required: []
       allowed: []
-    checks:
-      - device
-      - credentials
     subject_types:
       - public-uuid
       - public-identifier
@@ -143,19 +146,30 @@ default: &default
     authorization_code_expires_in: "10 minutes"
     refresh_token_expires_in: "1 day"
     client_token_expires_in: "12 hours"
+    authorization_expires_in: "1 hour"
     login_link_expires_in: "10 minutes"
-    auth_attempt_expires_in: "1 hour"
-    login_link_factor_expires_in: "12 hours"
-    password_factor_expires_in: "1 day"
-    sso_factor_expires_in: "3 hours"
-    second_factor_backup_code_expires_in: "1 hour"
-    second_factor_phone_expires_in: "10 minutes"
-    second_factor_totp_code_expires_in: "10 minutes"
-    second_factor_webauthn_expires_in: "10 minutes"
-    email_verification_expires_in: "1 year"
+    login_link_code_expires_in: "10 minutes"
+    first_factor_login_link_expires_in: "12 hours"
+    first_factor_password_expires_in: "1 day"
+    first_factor_sso_expires_in: "3 hours"
+    second_factor_backup_code_expires_in: "3 hours"
+    second_factor_phone_expires_in: "2 hours"
+    second_factor_otp_expires_in: "2 hours"
+    second_factor_webauthn_expires_in: "2 hours"
     internal_token_expires_in: "1 day"
+    email_verification_expires_in: "1 year"
+    onboarding_expires_in: "1 year"
+    allow_nicknames: true
+    allow_emails: true
     allow_passwords: true
     allow_login_links: true
+    allow_otp: true
+    allow_phones: true
+    allow_webauthn: true
+    allow_backup_codes: true
+    allow_sso: true
+    allow_profiles: true
+    allow_approval: true
     autofill_redirect_uri: false
     bg_dark: |
       background: radial-gradient(
@@ -181,34 +195,13 @@ default: &default
         #233a5a,
         #1f2937
       );
-  totp_codes:
-    enabled: true
-  phones:
-    enabled: true
-    max_for_login: 5
-  passkeys:
-    enabled: true
-  webauthn:
-    enabled: true
-  backup_codes:
-    min_chars: 8
-    max_chars: 100
-    total: 10
-  login_links:
-    enabled: true
-  passwords:
-    min_chars: 8
-    max_chars: 100
-    change_cooldown: "15 minutes"
-  nicknames:
-    enabled: true
   emails:
-    enabled: true
     from: <%= ENV['MASKS_EMAIL_FROM'] %>
     reply_to: <%= ENV['MASKS_EMAIL_REPLY_TO'] %>
     max_for_login: 5
+  webauthn:
+    rp_name: <%= ENV['MASKS_WEBAUTHN_NAME'] %>
   sso:
-    enabled: true
     providers:
       github:
         common: true

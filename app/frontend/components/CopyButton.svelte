@@ -50,5 +50,5 @@
     {/if}
   </span>
 
-  {@render props?.after?.()}
+  {@render props?.after?.({ copied })}
 </button>

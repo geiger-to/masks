@@ -1,41 +1,33 @@
 module Masks
   module Prompts
-    class Identifier < Base
-      before_auth do
-        next if self.actor && self.identifier
+    class Identifier
+      include Masks::Prompt
+
+      UPDATE_EVENT = "identify"
+
+      match { true }
+
+      before_entry do
+        next if actor && identifier
 
         id =
-          (
-            if event?("identify")
-              updates["identifier"]
-            else
-              attempt_bag["identifier"]
-            end
-          )
-        actor = Masks.identify(id) if id
+          if event?(UPDATE_EVENT) && !checked?(Entry::FACTOR1)
+            updates["identifier"]
+          else
+            session.bag(:entries)[:identifier]
+          end
 
-        self.identifier = id
-        self.actor = actor
+        session.bag(:entries)[:identifier] = id if id
+        session.bag(:identifiers).current = id if id
+        session.bag(:actors).current = Masks.identify(id) if id
 
         if actor&.new_record? && !actor&.valid?
-          self.identifier = nil
-
           warn!("invalid-identifier", prompt: "identify")
         end
       end
 
-      def enabled?
-        !attempt_bag&.dig("identifier") || checking?("credentials")
-      end
-
       prompt "identify" do
         !identifier
-      end
-
-      event "identify" do
-        attempt_bag["identifier"] = updates["identifier"] if updates[
-          "identifier"
-        ]
       end
     end
   end

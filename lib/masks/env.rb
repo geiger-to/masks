@@ -3,6 +3,10 @@ module Masks
     PRIMARY_DB_TYPE = "primary"
     DEFAULT_DB_ADAPTER = "sqlite3"
 
+    def prompts
+      self[:prompts]&.map(&:constantize)
+    end
+
     def db_enabled?(type)
       return true if type.to_s == PRIMARY_DB_TYPE
 

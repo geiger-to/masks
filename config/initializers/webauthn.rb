@@ -4,7 +4,7 @@ WebAuthn.configure do |config|
   config.origin = Masks.url
 
   # Relying Party name for display purposes
-  config.rp_name = Masks.env.webauthn.rp_name || Masks.name
+  config.rp_name = Masks.env.webauthn&.rp_name || Masks.name
 
   # Optionally configure a client timeout hint, in milliseconds.
   # This hint specifies how long the browser should wait for any

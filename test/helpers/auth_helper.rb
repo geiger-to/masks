@@ -102,11 +102,11 @@ module AuthHelper
     attempt_authorize if authorize
   end
 
-  def setup_totp(*args)
+  def setup_otp(*args)
     travel_to Time.parse("2024-11-17T19:57:11+0000") do
       log_in *args
 
-      attempt event: "totp:verify",
+      attempt event: "otp:verify",
               updates: {
                 secret: "JBSWY3DPEHPK3PXP",
                 code: "247086",

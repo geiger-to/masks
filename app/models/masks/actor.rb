@@ -53,6 +53,7 @@ module Masks
 
     attribute :signup
     attribute :session
+    attribute :new_password
 
     after_initialize :generate_defaults
 
@@ -60,18 +61,22 @@ module Masks
     validates :key, presence: true, uniqueness: true
     validates :nickname,
               uniqueness: true,
-              presence: true,
               format: {
                 with: /\A[a-zA-Z][a-zA-Z0-9\-]+\z/,
               },
-              if: :nickname_required?
-    validate :validates_password, if: :password
+              if: :nickname
+    validate :validates_password,
+             if: -> { password || password_challenge || new_password }
     validate :validates_backup_codes, if: :backup_codes
     validates_associated :emails
 
     serialize :backup_codes, coder: JSON
 
     include Scoped
+
+    def session_key
+      key
+    end
 
     def tz
       super || Masks.installation.settings["timezone"]
@@ -94,7 +99,14 @@ module Masks
       self.password_changed_at = nil
     end
 
-    def change_password(v)
+    def change_password(v, challenge:)
+      return unless password_changeable?
+
+      self.password_challenge = challenge || ""
+      self.new_password = v
+    end
+
+    def overwrite_password(v)
       self.password = v
     end
 
@@ -120,9 +132,9 @@ module Masks
     end
 
     def identifier_type
-      if Masks.installation.nicknames? && nickname
+      if nickname
         NICKNAME_ID
-      elsif Masks.installation.emails? && login_email&.valid?
+      elsif login_email&.valid?
         EMAIL_ID
       end
     end
@@ -222,10 +234,6 @@ module Masks
 
     private
 
-    def nickname_required?
-      nickname || (Masks.installation.nicknames? && !Masks.installation.emails?)
-    end
-
     def generate_defaults
       self.webauthn_id ||= WebAuthn.generate_user_id
     end
@@ -240,26 +248,47 @@ module Masks
       end
     end
 
-    def validates_password
-      return unless password && password_settings
+    def validates_nickname
+      return unless nickname
 
-      if password_changeable?
-        self.password_changed_at = Time.current if persisted?
-      else
+      validates_length(
+        nickname,
+        key: :nicknaje,
+        **nickname_settings.slice(:min_chars, :max_chars),
+      )
+
+      if nickname_settings["format"]
+      end
+    end
+
+    def validates_password
+      if password_challenge && !authenticate(password_challenge)
+        return errors.add(:password_challenge, :invalid)
+      end
+
+      self.password = self.new_password if new_password && password_challenge
+
+      return unless password
+
+      if password_settings
+        validates_length(
+          password,
+          key: :password,
+          **password_settings.slice(:min_chars, :max_chars),
+        )
+      end
+
+      if !password_changeable?
         time =
           ApplicationController.helpers.distance_of_time_in_words(
             Time.current,
             password_changeable_at,
           )
 
-        errors.add(:password, :unchangeable, time:)
+        return errors.add(:password, :unchangeable, time:)
       end
 
-      validates_length(
-        password,
-        key: :password,
-        **password_settings.slice(:min_chars, :max_chars),
-      )
+      self.password_changed_at = Time.current if persisted?
     end
 
     def validates_backup_codes
@@ -278,6 +307,10 @@ module Masks
         key: :backup_codes,
         **opts.slice(:min_chars, :max_chars),
       )
+    end
+
+    def nickname_settings
+      @nickname_settings ||= Masks.installation.passwords
     end
 
     def password_settings

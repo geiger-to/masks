@@ -35,6 +35,7 @@ export default {
       },
       animation: {
         "fade-in-fast": "fadeIn 100ms ease-in",
+        "fade-in-medium": "fadeIn 250ms ease-in",
         "fade-in-slow": "fadeIn 5s linear",
         "fade-in-1s": "fadeIn 1s linear",
         "fade-in": "fadeIn 500ms ease-in",
@@ -54,9 +55,18 @@ export default {
   plugins: [daisyui],
   daisyui: {
     themes: [
-      "light",
-      "dark",
-      "luxury",
+      {
+        light: {
+          ...require("daisyui/src/theming/themes").light,
+          secondary: "#a855f7",
+        },
+      },
+      {
+        dark: {
+          ...require("daisyui/src/theming/themes").dark,
+          secondary: "#a855f7",
+        },
+      },
       {
         manage: {
           primary: "oklch(65.69% 0.196 275.75)",

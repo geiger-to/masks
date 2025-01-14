@@ -1,13 +1,13 @@
 class ProvidersController < ApplicationController
+  include Masks::InternalController
   include FrontendController
-  include AuthController
 
   def callback
     provider = Masks::Provider.enabled.find_by(key: params[:provider_id])
 
     raise "invalid-sso" unless provider
 
-    state = auth.prompt_for(Masks::Prompts::Provider).state_bag
+    state = auth.prompt_for(Masks::Prompts::SingleSignOn).state_bag
 
     raise "invalid-sso" unless state && state["provider"] == provider.key
 
@@ -24,7 +24,7 @@ class ProvidersController < ApplicationController
   rescue => e
     render_error(
       status: 404,
-      prompt: "sso:error",
+      prompt: "sso-error",
       error: e.to_s,
       origin: state&.dig("origin"),
       provider:

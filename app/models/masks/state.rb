@@ -78,6 +78,8 @@ module Masks
 
     def checked!(name, **args)
       check(name).checked!(**args)
+
+      true
     end
 
     def checking?(name)
@@ -133,6 +135,8 @@ module Masks
     end
 
     def device_bag
+      return @device_bag ||= {} unless device
+
       rails_session["devices"] ||= {}
       rails_session["devices"][device.session_key] ||= {}
     end

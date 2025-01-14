@@ -25,7 +25,7 @@ class BackupCodeTest < MasksTestCase
 
   test "backup codes can be used in lieu of other 2fa options" do
     codes = Array.new(10) { SecureRandom.uuid }
-    setup_totp "manager"
+    setup_otp "manager"
     manager.save_backup_codes(codes)
     log_in "manager"
 
@@ -35,7 +35,7 @@ class BackupCodeTest < MasksTestCase
   end
 
   test "backup codes not in the actor's list are ignored" do
-    setup_totp "manager"
+    setup_otp "manager"
     log_in "manager"
 
     attempt event: "backup-code:verify", updates: { code: "invalid-code" }
@@ -45,7 +45,7 @@ class BackupCodeTest < MasksTestCase
 
   test "backup codes must be replaced after using the last one" do
     codes = Array.new(10) { SecureRandom.uuid }
-    setup_totp "manager"
+    setup_otp "manager"
     actor = manager.reload
     actor.save_backup_codes(codes)
     actor.update(backup_codes: [actor.backup_codes.first])

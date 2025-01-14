@@ -8,6 +8,8 @@ module Masks
 
     def send_code
       integration.notify
+    rescue => e
+      false
     end
 
     def verify

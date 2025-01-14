@@ -130,7 +130,7 @@ export const ClientFragment = gql`
     passwordFactorExpiresIn
     secondFactorBackupCodeExpiresIn
     secondFactorPhoneExpiresIn
-    secondFactorTotpCodeExpiresIn
+    secondFactorOtpExpiresIn
     secondFactorWebauthnExpiresIn
     internalTokenExpiresIn
     lifetimeTypes

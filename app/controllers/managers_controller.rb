@@ -1,6 +1,6 @@
 class ManagersController < ApplicationController
+  include Masks::InternalController
   include FrontendController
-  include AuthController
 
   before_action :render_404, unless: :client
   before_action :redirect_to_login, unless: :current_manager

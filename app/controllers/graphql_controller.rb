@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 class GraphqlController < ApplicationController
-  include AuthController
+  include Masks::InternalController
 
   def execute
     variables = prepare_variables(params[:variables])
     query = params[:query]
     operation_name = params[:operationName]
-    context = { request:, auth:, resume: true }
+    context = { session: masks_session }
     result =
       MasksSchema.execute(
         query,

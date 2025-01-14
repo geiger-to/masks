@@ -11,14 +11,19 @@ module Masks
     end
 
     class_methods do
-      def settings(**config)
+      def settings(settings = nil, **config)
+        if !settings
+          settings = config
+          config = {}
+        end
+
         @settings ||= {}
         @settings[self.name] ||= {}
-        @settings[self.name].merge!(config.stringify_keys)
+        @settings[self.name].merge!(settings.stringify_keys)
 
-        config.keys.each do |key|
+        settings.keys.each do |key|
           define_method key do
-            setting(key)
+            setting(key, default: config[:default])
           end
 
           define_method "#{key}=" do |value|
@@ -27,7 +32,7 @@ module Masks
           end
 
           define_method "#{key}?" do
-            !!setting(key)&.present?
+            !!send(key)
           end
         end
 

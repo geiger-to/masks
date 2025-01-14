@@ -101,10 +101,6 @@ module Masks
       Masks::Checks.names(setting(:checks))
     end
 
-    def client_checks
-      Masks::Checks.names(setting(:clients, :checks))
-    end
-
     def prompts
       (setting(:prompts) || [])
         .map do |cls|
@@ -115,31 +111,24 @@ module Masks
         .compact
     end
 
-    def phones
-      setting(:phones, default: { enabled: false })
-    end
-
-    def phones?
-      phones["enabled"]
-    end
-
-    def totp_codes
-      setting(:totp_codes, default: { enabled: false })
-    end
-
-    def passkeys
-      setting(:passkeys, default: { enabled: false })
-    end
-
-    def webauthn
-      setting(:webauthn, default: { enabled: false })
-    end
-
     def backup_codes
       {
         min_chars: setting("backup_codes", "min_chars", default: 8),
         max_chars: setting("backup_codes", "max_chars", default: 100),
         total: setting("backup_codes", "total", default: 10),
+      }
+    end
+
+    def nicknames
+      {
+        min_chars: setting("nicknames", "min_chars", default: 4),
+        max_chars: setting("nicknames", "max_chars", default: 20),
+        format:
+          setting(
+            "nicknames",
+            "format",
+            default: '/\A[a-zA-Z][a-zA-Z0-9\-]+\z/',
+          ),
       }
     end
 
@@ -158,37 +147,16 @@ module Masks
       )
     end
 
-    def nicknames
-      { enabled: nicknames? }
-    end
-
-    def nicknames?
-      setting("nicknames", "enabled")
-    end
-
     def emails
       setting(:emails, default: {}).merge(
-        enabled: emails?,
         max_for_login: Masks.setting(:emails, :max_for_login, default: 5),
       )
     end
 
-    def emails?
-      setting(:emails, :enabled)
-    end
-
-    def login_links
-      { enabled: login_links? }
-    end
-
-    def login_links?
-      emails? && setting(:login_links, :enabled)
-    end
-
     def modify(updates)
       return unless updates
-      updates = updates.deep_stringify_keys
 
+      updates = updates.deep_stringify_keys
       reconfigured =
         RECONFIGURATION_KEYS.any? do |key|
           exists = updates.dig(*key.slice(0...-1))&.key?(key.last)
@@ -236,19 +204,11 @@ module Masks
           theme:,
           timezone:,
           region:,
-          emails: emails.slice(:enabled),
           nicknames:,
           passwords:,
-          passkeys:,
-          totp_codes:,
-          phones:,
-          webauthn:,
           backup_codes:,
-          login_links:,
-          prompts:,
-          checks:,
         }
-      ).deep_transform_keys { |k| k.to_s.camelize(:lower) }
+      )
     end
   end
 end

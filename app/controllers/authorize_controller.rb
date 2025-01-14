@@ -1,44 +1,23 @@
 class AuthorizeController < ApplicationController
+  include Masks::InternalController
   include FrontendController
-  include AuthController
+
+  rescue_from Masks::MissingClientError do
+    render_error status: 404, prompt: "missing-client"
+  end
 
   def new
-    gql =
-      MasksSchema.execute(
-        Masks.authenticate_gql,
-        variables: {
-          input: {
-          },
-        },
-        context: {
-          auth:,
-        },
-      )
+    entry = Masks::Entries::Authorization.new(session: masks_session, params:)
 
-    auth = gql.as_json.dig("data", "authenticate").with_indifferent_access
+    frontend_props(**entry.to_gql)
 
-    headers["X-Masks-Auth-Id"] = auth[:id] unless auth[:error]
+    headers["X-Masks-Entry-Id"] = entry.id
 
-    status =
-      case auth[:error]
-      when nil
-        200
-      else
-        400
-      end
-
-    props(section: "Authorize", auth:)
+    status = entry.error ? 400 : 200
 
     respond_to do |format|
       format.html { render "app", status: }
-      format.json { render json: auth, status: }
+      format.json { render json:, status: }
     end
-  end
-
-  private
-
-  def client
-    @client ||=
-      (Masks::Client.find_by(key: params[:client_id]) if params[:client_id])
   end
 end

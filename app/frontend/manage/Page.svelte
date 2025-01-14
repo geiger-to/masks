@@ -1,35 +1,11 @@
 <script>
   import { route } from "@mateothegreat/svelte5-router";
-  import { run, preventDefault, stopPropagation } from "svelte/legacy";
   import Avatar from "../components/Avatar.svelte";
-  import PasswordInput from "../components/PasswordInput.svelte";
-  import TokenCard from "../components/TokenCard.svelte";
-  import CodeCard from "../components/CodeCard.svelte";
-  import JwtCard from "../components/JwtCard.svelte";
-  import Identicon from "../components/Identicon.svelte";
   import AddPage from "./AddPage.svelte";
   import ActorResult from "./ActorResult.svelte";
   import ClientResult from "./ClientResult.svelte";
-  import { onMount } from "svelte";
   import { queryStore, gql, getContextClient } from "@urql/svelte";
-  import Time from "svelte-time";
-  import {
-    ServerCog,
-    SquarePen,
-    SquarePower,
-    RotateCcw,
-    PlusSquare,
-    Cog,
-    ListCheck,
-    UserPlus,
-    User,
-    Handshake,
-    KeySquare,
-    X,
-    Plus,
-    Search,
-    ChevronLeft,
-  } from "lucide-svelte";
+  import { ServerCog, X, Search } from "lucide-svelte";
   import _ from "lodash-es";
 
   /**
@@ -47,13 +23,11 @@
     loading = false,
     notFound = false,
   } = $props();
-  let { nickname } = actor;
   let isAddOpen = $state();
   let input = $state();
   let variables = $state({ input: "" });
   let result = $state();
   let isLoading = $state();
-  let client = getContextClient();
   let query = $derived(
     queryStore({
       client: getContextClient(),
@@ -87,18 +61,6 @@
       requestPolicy: "network-only",
     })
   );
-
-  let search = (value) => {
-    input = value;
-  };
-
-  let toggleMenu = () => {
-    if (isAddOpen) {
-      isAddOpen = false;
-    } else {
-      isAddOpen = true;
-    }
-  };
 
   let isSearching = $state();
 
@@ -203,8 +165,9 @@
 
           {#if isSearching}
             <button
+              type="button"
               tabindex="0"
-              onclick={stopPropagation(preventDefault(closeSearch))}
+              onclick={closeSearch}
               class={`btn btn-xs px-0 w-6 py-0 -mr-1.5`}
             >
               <X size="20" />
@@ -218,8 +181,9 @@
       >
         <div class={`flex items-center gap-1`}>
           <button
+            type="button"
             tabindex="0"
-            onclick={stopPropagation(preventDefault(toggleSearch(isSearching)))}
+            onclick={toggleSearch(isSearching)}
             class={`btn btn-sm px-0 w-8 py-0 md:hidden`}
           >
             {#if isAddOpen}

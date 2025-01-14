@@ -4,32 +4,20 @@ module Mutations
   class Authenticate < BaseMutation
     input_object_class Types::AuthenticateInputType
 
-    field :id, String, null: true
-    field :request_id, String, null: true
-    field :client, Types::ClientType, null: true
-    field :providers, [Types::ProviderType], null: true
-    field :actor, Types::ActorType, null: true
-    field :login_link, Types::LoginLinkType, null: true
-    field :identicon_id, String, null: true
-    field :identifier, String, null: true
-    field :nickname, String, null: true
-    field :avatar, String, null: true
-    field :settled, Boolean, null: true
-    field :redirect_uri, String, null: true
-    field :error, String, null: true
-    field :warnings, [String], null: false
-    field :scopes, [Types::ScopeType], null: true
-    field :prompt, String, null: false
-    field :settings, GraphQL::Types::JSON, null: true
-    field :extras, GraphQL::Types::JSON, null: true
+    field :entry, Types::EntryType, null: false
 
     def resolve(**args)
-      auth = context[:auth]
-      auth.update!(**args.merge(resume: context[:resume]))
+      entry =
+        if context[:entry]
+          context[:entry]
+        else
+          Masks::Entries::Authentication.new(
+            session: context[:session],
+            params: args,
+          )
+        end
 
-      result = auth.as_json
-      result[:request_id] = SecureRandom.uuid
-      result
+      { entry: }
     end
   end
 end

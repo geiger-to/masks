@@ -1,5 +1,9 @@
 module Masks
   class LoginLink < ApplicationRecord
+    include SettingsColumn
+
+    settings(path: Types::String, params: ::Types::CamelizedJSON)
+
     self.table_name = "masks_login_links"
 
     scope :active,
@@ -18,8 +22,6 @@ module Masks
 
     after_initialize :set_defaults
 
-    serialize :settings, coder: JSON
-
     validates :code,
               presence: true,
               uniqueness: {
@@ -29,6 +31,10 @@ module Masks
 
     def chars
       code.length
+    end
+
+    def deliverable?
+      valid?
     end
 
     def save_and_deliver
@@ -85,7 +91,7 @@ module Masks
     end
 
     def accept_url
-      origin_url(login_code: code)
+      origin_url(login_link: code)
     end
 
     def origin_url(**extras)
@@ -95,9 +101,7 @@ module Masks
 
     def set_defaults
       self.code ||= SecureRandom.base36(7).upcase
-      self.client ||= auth&.client
-      self.device ||= auth&.device
-      self.expires_at ||= client.expires_at(:login_link)
+      self.expires_at ||= client&.expires_at(:login_link_code)
       self.settings ||= { path: auth.path, params: auth.params } if auth
     end
   end

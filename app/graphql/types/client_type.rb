@@ -19,7 +19,10 @@ module Types
     field :lifetime_types, [String], null: false
     field :scopes, GraphQL::Types::JSON, null: false
     field :consent, Boolean
+
     field :stats, CamelizedJSON, null: false
+
+    bool :second_factor, prefix: "allow"
 
     Masks::Client.settings.each { |key, type| field key, type }
 
@@ -50,10 +53,6 @@ module Types
 
     def lifetime_types
       Masks::Client::LIFETIME_SETTINGS.map { |c| c.to_s.camelize(:lower) }
-    end
-
-    def allow_login_links
-      object.login_links?
     end
 
     def stats

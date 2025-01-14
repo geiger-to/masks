@@ -8,6 +8,8 @@ import { sentry } from "../sentry.js";
 const target = document.getElementById("app");
 const props = { ...window.APP, Component };
 
+console.log(window.APP);
+
 sentry(props.sentry);
 
 mount(App, {

@@ -36,6 +36,8 @@
     end,
     inputClass,
     class: cls,
+    autofocus = false,
+    ...props
   } = $props();
 
   let min = $state();
@@ -48,7 +50,7 @@
 
     if (!disabled && min && max) {
       valid = value && value.length >= min && value.length <= max;
-      info = `(${min} to ${max} characters)`;
+      info = props.noinfo ? "" : `(${min} to ${max} characters)`;
     } else {
       valid = true;
     }
@@ -85,6 +87,7 @@
       class={`placeholder:text-sm md:placeholder:text-base min-w-0 grow ${inputClass}`}
       bind:value
       oninput={onChange}
+      {autofocus}
     />
   {/if}
 

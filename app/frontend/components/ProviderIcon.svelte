@@ -5,4 +5,10 @@
   let { provider, ...props } = $props();
 </script>
 
-<Icon icon={iconifyProvider(provider)} />
+{#if props.bg}
+  <div class={`rounded-lg ${props.class}`}>
+    <Icon icon={iconifyProvider(provider)} width="100%" height="100%" />
+  </div>
+{:else}
+  <Icon icon={iconifyProvider(provider)} />
+{/if}

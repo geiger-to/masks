@@ -5,7 +5,7 @@
   import ActorPhones from "./ActorPhones.svelte";
   import ActorHardwareKeys from "./ActorHardwareKeys.svelte";
   import ActorBackupCodes from "./ActorBackupCodes.svelte";
-  import ActorTotpSecrets from "./ActorTotpSecrets.svelte";
+  import ActorOtpSecrets from "./ActorOtpSecrets.svelte";
 
   let { actor, change } = $props();
 </script>
@@ -39,7 +39,7 @@
     {/if}
 
     {#if actor.otpSecrets?.length}
-      <ActorTotpSecrets {actor} />
+      <ActorOtpSecrets {actor} />
     {/if}
 
     {#if actor.savedBackupCodesAt}

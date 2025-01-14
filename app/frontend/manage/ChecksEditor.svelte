@@ -56,7 +56,7 @@
     secondFactorPhoneExpiresIn: {
       name: "2FA with SMS",
     },
-    secondFactorTotpCodeExpiresIn: {
+    secondFactorOtpCodeExpiresIn: {
       name: "2FA with TOTP",
     },
     secondFactorWebauthnExpiresIn: {

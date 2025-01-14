@@ -15,6 +15,10 @@
       `bg-sky-50 border-sky-200 text-sky-800`,
     ],
     neutral: ["bg-neutral text-neutral-content border-neutral"],
+    secondary: [
+      `dark:bg-purple-950 dark:border-purple-900 dark:text-purple-200`,
+      `bg-purple-50 border-purple-100 text-purple-800`,
+    ],
     gray: [
       `dark:bg-gray-950 dark:border-gray-900 dark:text-gray-300`,
       `bg-gray-400 border-gray-400 text-gray-700`,
@@ -35,20 +39,31 @@
       `dark:bg-indigo-950 dark:border-indigo-900 dark:text-indigo-200`,
       `bg-indigo-50 border-indigo-100 text-indigo-800`,
     ],
-    secondary: [
-      `dark:bg-pink-950 dark:border-pink-900 dark:text-pink-200`,
-      `bg-pink-50 border-pink-100 text-pink-800`,
-    ],
     accent: [
-      `dark:bg-pink-950 dark:border-pink-900 dark:text-pink-200`,
-      `bg-pink-50 border-pink-100 text-pink-800`,
+      `dark:bg-teal-950 dark:border-teal-900 dark:text-teal-200`,
+      `bg-teal-50 border-teal-100 text-teal-800`,
+    ],
+    emerald: [
+      `dark:bg-emerald-950 dark:border-emerald-900 dark:text-emerald-200`,
+      `bg-emerald-50 border-emerald-100 text-emerald-800`,
+    ],
+    webauthn: [
+      `dark:bg-webauthn-950 dark:border-webauthn-900 dark:text-webauthn-200`,
+      `bg-webauthn-50 border-webauthn-100 text-webauthn-800`,
     ],
   };
 </script>
 
 <div
+  class="
+ dark:bg-webauthn-950 dark:border-webauthn-900 dark:text-webauthn-200
+ bg-webauthn-50 border-webauthn-100 text-webauthn-800
+"
+></div>
+
+<div
   class={[
-    "px-3 py-3 border rounded-box",
+    "px-3 py-3 border rounded-lg",
     "shadow flex items-start gap-3 text-left md:text-base text-sm",
     cls,
     ...(classes[type] || []),

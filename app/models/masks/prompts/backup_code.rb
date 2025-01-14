@@ -1,26 +1,18 @@
 module Masks
   module Prompts
-    class BackupCode < SecondFactor
-      checks "second-factor"
+    class BackupCode
+      include Masks::Prompt
 
-      event "backup-codes:replace" do
-        next unless actor
+      match { client.allow_backup_codes? && changeable_2fa? }
 
+      event "backup-codes:replace", if: :change_2fa? do
         unless actor.save_backup_codes(updates["codes"])
           actor.errors.full_messages.each { |error| warn! error }
         end
       end
 
-      event "backup-code:verify" do
-        code = updates["code"]
-
-        next unless actor && code
-
-        if actor.verify_backup_code(code)
-          checked! "second-factor", with: :backup_code
-        else
-          warn! "invalid-code", code
-        end
+      event "backup-code:verify", if: :on_2fa? do
+        verify_backup_code
       end
     end
   end

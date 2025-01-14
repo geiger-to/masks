@@ -2,6 +2,8 @@
 
 module Masks
   class Device < ApplicationRecord
+    COOKIE = "masks_device"
+
     self.table_name = "masks_devices"
 
     include Cleanable
@@ -11,7 +13,6 @@ module Masks
     end
 
     attribute :request
-    attribute :check
 
     has_many :tokens, class_name: "Masks::Token"
     has_many :actors,
@@ -26,8 +27,6 @@ module Masks
     validates :public_id, presence: true, uniqueness: true
     validates :known?, :user_agent, presence: true
     validates :ip_address, ip: true
-    validate :validate_request, on: :session
-    validate :validate_check, on: :session
 
     delegate :name,
              :device_type,
@@ -72,6 +71,14 @@ module Masks
       blocked_at && Masks.time.expired?(blocked_at)
     end
 
+    def valid_request?(request)
+      validate
+
+      errors.add(:user_agent, :mismatch) if request.user_agent != user_agent
+      errors.add(:ip_address, :mismatch) if request.remote_ip != ip_address
+      errors.none?
+    end
+
     private
 
     def detected
@@ -82,20 +89,7 @@ module Masks
       self.version ||= 0
     end
 
-    def validate_check
-      return errors.add(:check, :blank) unless check
-
-      return unless check.device_version&.present?
-
-      errors.add(:version, :mismatch) if check.device_version != version
-    end
-
     def validate_request
-      return errors.add(:request, :blank) unless request
-
-      errors.add(:user_agent, :mismatch) if request.user_agent != user_agent
-
-      errors.add(:ip_address, :mismatch) if request.remote_ip != ip_address
     end
   end
 end

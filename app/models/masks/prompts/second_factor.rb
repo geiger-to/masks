@@ -1,21 +1,21 @@
 module Masks
   module Prompts
-    class SecondFactor < Base
-      checks "second-factor"
+    class SecondFactor
+      include Masks::Prompt
 
-      def enabled?
-        super && second_factor_enabled?
+      match :on_2fa?
+
+      prompt "profile" do
+        if !actor.second_factor? && client.second_factor?
+          extras(second_factor_required: true)
+        end
       end
 
       prompt "second-factor" do
-        checking?("second-factor") || !actor.second_factor? ||
-          actor.review_second_factor?
+        !checked?(Entry::FACTOR2)
       end
 
-      event "second-factor:enable" do
-        # only allowed when first enabling second factor options, atm
-        return if actor.second_factor?
-
+      event "second-factor:enable", if: -> { !actor.second_factor? } do
         actor.enable_second_factor!
       end
     end

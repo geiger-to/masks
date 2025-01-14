@@ -10,12 +10,34 @@ module Types
     field :login_link, Boolean
     field :verify_link, Boolean
 
+    bool :deletable
+
     def verify_link
-      object.login_links.active.for_verification.any?
+      if context[:auth]&.device
+        object
+          .login_links
+          .active
+          .for_verification
+          .where(device: context[:auth].device)
+          .any?
+      else
+        object.login_links.active.for_verification.any?
+      end
     end
 
     def login_link
-      object.for_login? && object.login_links.active.for_login.any?
+      return false unless object.for_login?
+
+      if context[:auth]&.device
+        object
+          .login_links
+          .active
+          .for_login
+          .where(device: context[:auth].device)
+          .any?
+      else
+        object.login_links.active.for_login.any?
+      end
     end
 
     def log_in

@@ -4,21 +4,11 @@
 
   import {
     LogIn,
-    Lock,
-    User,
-    Share2,
     Handshake,
-    Palette,
     Cog,
     Mail,
-    AlertTriangle,
-    Database,
-    Blocks,
-    Phone,
     Smartphone,
-    MessageSquare,
     SquareActivity,
-    Upload,
     ImageUp,
   } from "lucide-svelte";
   import Time from "@/components/Time.svelte";
@@ -82,25 +72,20 @@
               timezone
               region
               theme
-              emails
               needsRestart
               faviconUrl
               lightLogoUrl
               darkLogoUrl
-              nicknames
-              passwords
-              passkeys
-              loginLinks
-              totpCodes
-              phones
-              webauthn
-              backupCodes
               checks
               clients
               integration
               actors
               devices
               sessions
+              emails
+              nicknames
+              passwords
+              backupCodes
               needsRestart
               createdAt
               updatedAt

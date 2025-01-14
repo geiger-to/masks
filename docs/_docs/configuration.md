@@ -153,7 +153,6 @@ You can customize some of the features available to end-users depending on your 
 | emails.max_for_login   | 5                      |
 | passwords.min_chars    | 8                      |
 | passwords.max_chars    | 100                    |
-| passkeys.enabled       | true                   |
 | login_links.enabled    | true                   |
 | totp_codes.enabled     | true                   |
 | phones.enabled         | true                   |

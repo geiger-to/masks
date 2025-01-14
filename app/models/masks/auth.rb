@@ -4,10 +4,11 @@ module Masks
 
     include ActiveSupport::Callbacks
 
-    define_callbacks :session, :auth
+    define_callbacks :auth
 
-    attribute :locked
     attribute :request
+    attribute :session
+    attribute :device
     attribute :device
     attribute :client
     attribute :auth_id
@@ -22,7 +23,6 @@ module Masks
     attribute :scopes
     attribute :error
 
-    delegate :session, to: :request
     delegate :attempt_bag,
              :auth_bag,
              :actor_bag,
@@ -35,6 +35,12 @@ module Masks
              :checked?,
              :check,
              to: :state
+
+    def begin!
+    end
+
+    def load!(id)
+    end
 
     def state
       @state ||= Masks::State.new(auth: self)
@@ -64,16 +70,10 @@ module Masks
       prompt_for(Masks::Prompts::OIDC).manager
     end
 
-    def device
-      prompt_for(Masks::Prompts::Device).device
-    end
+    def resume!(id)
+      state.resume!(id)
 
-    def session!(&block)
-      return if locked
-
-      lock!
-
-      run_callbacks(:session, &block)
+      run_callbacks(:auth)
     end
 
     def update!(id: nil, event: nil, upload: nil, updates: {}, resume: false)
@@ -110,6 +110,7 @@ module Masks
       @json ||= {
         id:,
         settled: settled?,
+        trusted: trusted?,
         prompt: error || prompt || "identify",
         error:,
         client:,
@@ -134,6 +135,7 @@ module Masks
       warnings << keys.compact.join(":")
       @warnings.uniq!
       self.prompt = prompt if prompt
+      false
     end
 
     def extras(**additions)
@@ -142,8 +144,18 @@ module Masks
       @extras
     end
 
+    def trusted?
+      return false if error || !actor&.persisted?
+
+      if client.second_factor?
+        checked?("credentials", "second-factor")
+      else
+        checked?("credentials")
+      end
+    end
+
     def authenticated?
-      return false if error || !actor&.persisted? || !client.checks&.any?
+      return false if error || !actor&.persisted?
       return false if prompt && APPROVED_PROMPTS.exclude?(prompt)
 
       checked?(*client.checks)
@@ -158,14 +170,6 @@ module Masks
     end
 
     private
-
-    def lock!
-      raise if locked
-
-      self.locked = true
-
-      raise InvalidPromptError unless prompts.any?
-    end
 
     def prompts
       @prompts ||= Masks.prompts.map { |cls| [cls.to_s, cls.new(self)] }.to_h

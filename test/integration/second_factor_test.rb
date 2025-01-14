@@ -18,7 +18,7 @@ class SecondFactorTest < MasksTestCase
               codes: Array.new(10) { SecureRandom.uuid },
             }
     refute_settled
-    attempt event: "totp:verify",
+    attempt event: "otp:verify",
             updates: {
               secret: "JBSWY3DPEHPK3PXP",
               code: "247086",

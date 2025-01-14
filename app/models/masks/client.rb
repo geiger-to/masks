@@ -5,34 +5,45 @@ module Masks
     include SettingsColumn
 
     LIFETIME_SETTINGS = %i[
+      authorization_expires_in
       id_token_expires_in
       access_token_expires_in
       authorization_code_expires_in
       refresh_token_expires_in
       client_token_expires_in
       login_link_expires_in
-      auth_attempt_expires_in
+      login_link_code_expires_in
       email_verification_expires_in
-      login_link_factor_expires_in
-      sso_factor_expires_in
-      password_factor_expires_in
+      first_factor_login_link_expires_in
+      first_factor_sso_expires_in
+      first_factor_password_expires_in
       second_factor_backup_code_expires_in
       second_factor_phone_expires_in
-      second_factor_totp_code_expires_in
+      second_factor_otp_expires_in
       second_factor_webauthn_expires_in
       internal_token_expires_in
+      onboarding_expires_in
     ]
 
     LIFETIME_SETTINGS.each { |k| settings(k => Types::String) }
 
     settings(
+      allow_passwords: Types::Boolean,
+      allow_login_links: Types::Boolean,
+      allow_otp: Types::Boolean,
+      allow_backup_codes: Types::Boolean,
+      allow_webauthn: Types::Boolean,
+      allow_phones: Types::Boolean,
+      allow_emails: Types::Boolean,
+      allow_nicknames: Types::Boolean,
+      allow_sso: Types::Boolean,
+      allow_profiles: Types::Boolean,
+      allow_approval: Types::Boolean,
       sector_identifier: Types::String,
       subject_type: Types::String,
       bg_light: Types::String,
       bg_dark: Types::String,
       pairwise_salt: Types::String,
-      allow_passwords: Types::Boolean,
-      allow_login_links: Types::Boolean,
       autofill_redirect_uri: Types::Boolean,
       fuzzy_redirect_uri: Types::Boolean,
     )
@@ -92,13 +103,12 @@ module Masks
 
     serialize :response_types, coder: JSON
     serialize :grant_types, coder: JSON
-    serialize :checks, coder: JSON
     serialize :scopes, coder: JSON
 
     has_many :provider_clients, class_name: "Masks::ProviderClient"
 
-    def sso?
-      providers.any?
+    def second_factor?
+      allow_otp? || allow_phones? || allow_backup_codes? || allow_webauthn?
     end
 
     def provider(key)
@@ -123,25 +133,7 @@ module Masks
     end
 
     def checks
-      current = Masks::Checks.names(super || [])
-
-      Masks.installation.checks.select { |name| current.include?(name) }
-    end
-
-    def check?(cls)
-      checks.include?(Masks::Checks.to_name(cls))
-    end
-
-    def remove_check!(name)
-      name = Masks::Checks.to_name(name)
-
-      self.checks = checks.filter { |c| c != name }
-
-      save!
-    end
-
-    def add_check!(name)
-      update!(checks: [*checks, Masks::Checks.to_name(name)])
+      Masks.installation.checks
     end
 
     def logo_url
@@ -256,12 +248,8 @@ module Masks
       key
     end
 
-    def login_links?
-      allow_login_links? && Masks.installation.login_links?
-    end
-
     def auto_consent?
-      internal? || !check?("client-consent")
+      internal? || !allow_approval?
     end
 
     def expires_at(type = nil, custom: nil)
@@ -278,12 +266,12 @@ module Masks
       ChronicDuration.parse(email_verification_expires_in)
     end
 
-    def authorize_params(params)
-      params = params.merge(scope: scope.minimum(params[:scope]).join(" "))
+    def oidc_params(params)
+      params = params.merge("scope" => scope.minimum(params[:scope]).join(" "))
 
       if internal?
-        { redirect_uri: default_redirect_uri }.merge(params).merge(
-          response_type: "code",
+        { "redirect_uri" => default_redirect_uri }.merge(params).merge(
+          "response_type" => "code",
         )
       else
         params
@@ -326,7 +314,6 @@ module Masks
       self.client_type ||= Masks.setting(:clients, :client_type)
       self.secret ||= SecureRandom.base58(64)
       self.rsa_private_key ||= OpenSSL::PKey::RSA.generate(2048).to_pem
-      self.checks = Masks.installation.client_checks unless checks.any?
       self.sector_identifier ||= Masks.url
       self.pairwise_salt ||= SecureRandom.hex(10)
       self.scopes ||= Masks.setting(:clients, :scopes)

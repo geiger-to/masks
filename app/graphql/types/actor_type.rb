@@ -16,13 +16,12 @@ module Types
     field :scopes, String
     field :avatar, String, null: true
     field :avatar_created_at, GraphQL::Types::ISO8601DateTime, null: true
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: true
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: true
     field :last_login_at, GraphQL::Types::ISO8601DateTime, null: true
     field :password, Boolean
     field :password_changeable, Boolean
     field :password_changed_at, GraphQL::Types::ISO8601DateTime, null: true
-    field :added_totp_secret_at, GraphQL::Types::ISO8601DateTime, null: true
     field :saved_backup_codes_at, GraphQL::Types::ISO8601DateTime, null: true
     field :second_factor, Boolean
     field :hardware_keys, [HardwareKeyType], null: true
@@ -30,8 +29,9 @@ module Types
     field :single_sign_ons, [SingleSignOnType], null: true
     field :phones, [PhoneType], null: true
     field :remaining_backup_codes, Integer, null: true
-    field :second_factors, [Types::SecondFactorType], null: false
-    field :stats, Types::CamelizedJSON, null: false
+    field :second_factors, [Types::SecondFactorType], null: true
+    field :devices, DeviceType.connection_type, null: true
+    field :stats, Types::CamelizedJSON, null: true
 
     def id
       object.key

@@ -1,5 +1,13 @@
 @import "../tailwind.css";
 
+details > summary::-webkit-details-marker {
+  display: none;
+}
+
+details > summary {
+  list-style: none;
+}
+
 input.no-inc[type="number"]::-webkit-outer-spin-button,
 input.no-inc[type="number"]::-webkit-inner-spin-button {
   -webkit-appearance: none;

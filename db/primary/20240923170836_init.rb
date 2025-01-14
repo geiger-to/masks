@@ -24,7 +24,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.string :nickname
       t.string :phone_number
       t.string :password_digest
-      t.string :totp_secret
       t.string :webauthn_id
       t.string :tz
       t.text :backup_codes
@@ -33,9 +32,7 @@ class Init < ActiveRecord::Migration[7.2]
       t.timestamps
       t.datetime :last_login_at
       t.datetime :password_changed_at
-      t.datetime :added_phone_number_at
       t.datetime :enabled_second_factor_at
-      t.datetime :added_totp_secret_at
       t.datetime :saved_backup_codes_at
       t.datetime :notified_inactive_at
       t.datetime :onboarded_at
@@ -148,7 +145,6 @@ class Init < ActiveRecord::Migration[7.2]
       t.text :response_types
       t.text :grant_types
       t.text :redirect_uris
-      t.text :checks
       t.text :scopes
       t.text :settings
 

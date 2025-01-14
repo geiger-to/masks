@@ -3,14 +3,14 @@ module FrontendController
 
   included do
     before_action :default_props
-    helper_method :props_json
+    helper_method :frontend_json
   end
 
   private
 
   def render_error(status:, **opts)
     settings = installation&.public_settings || {}
-    props(backend: { settings: }.merge(opts))
+    frontend_props(backend: { settings:, prompt: "error" }.merge(opts))
 
     render "app", status:
   end
@@ -29,17 +29,17 @@ module FrontendController
     bg_light =
       try(:client)&.bg_light || installation.setting(:clients, :bg_light)
 
-    props sentry:, bg_dark:, bg_light:, favicon:
+    frontend_props sentry:, bg_dark:, bg_light:, favicon:
   end
 
-  def props(**updates)
-    @props ||= {}
-    @props.merge!(updates) if updates
-    @props
+  def frontend_props(**updates)
+    @frontend_props ||= {}
+    @frontend_props.merge!(updates) if updates
+    @frontend_props
   end
 
-  def props_json
-    @props
+  def frontend_json
+    @frontend_props
       .deep_transform_keys do |key|
         key.to_s == "__typename" ? key : key.to_s.camelize(:lower)
       end

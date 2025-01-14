@@ -1,40 +1,56 @@
 module Masks
   module Prompts
-    class ResetPassword < Base
-      def enabled?
-        client.allow_passwords? && auth_bag
+    class ResetPassword
+      include Masks::Prompt
+
+      KEY = "reset-password"
+
+      match { client.allow_passwords? && trusted? && allow_reset? }
+
+      event "password:reset" do
+        actor.password = updates["reset"] if updates["reset"]
+
+        next warn! "invalid-password" unless updates["reset"] && actor.save
+
+        warn! "changed-password"
+
+        session.bag(:entries)[KEY] = false
+
+        self.prompt = "reset-password"
+      end
+
+      event "password:skip-reset" do
+        next unless allow_reset?
+
+        session.bag(:entries)[KEY] = false
+      end
+
+      event "password:skip" do
+        next unless allow_reset?
+
+        sibling(:profile).requested! if updates["profile"]
+
+        session.bag(:entries)[KEY] = false
+      end
+
+      event "password:skip" do
+        next unless allow_reset?
+
+        session.bag(:entries)[KEY] = false
       end
 
       prompt "reset-password" do
         allow_reset?
       end
 
-      event "reset-password" do
-        next unless allow_reset?
-
-        actor.password = updates["newPassword"] if updates["newPassword"]
-
-        unless updates["newPassword"] && actor.save
-          next warn! "invalid-password"
-        end
-
-        warn! "changed-password"
-
-        auth_bag["reset_password"] = false
-
-        self.prompt = "reset-password"
-      end
-
-      event "reset-password:skip" do
-        next unless allow_reset?
-
-        auth_bag["reset_password"] = false
+      def requested!
+        session.bag(:entries)[KEY] = true
       end
 
       private
 
       def allow_reset?
-        authenticated? && auth_bag["reset_password"]
+        session.bag(:entries)[KEY]
       end
     end
   end

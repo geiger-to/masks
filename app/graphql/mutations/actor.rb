@@ -27,7 +27,7 @@ module Mutations
 
       unless args[:signup]
         if args[:password]
-          actor.change_password(args[:password])
+          actor.overwrite_password(args[:password])
         elsif args[:reset_password]
           actor.reset_password
         end

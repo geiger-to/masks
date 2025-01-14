@@ -17,9 +17,8 @@ class InstallMutationTest < GraphQLTestCase
               darkLogoUrl
               nicknames
               passwords
-              passkeys
               loginLinks
-              totpCodes
+              otpCodes
               phones
               webauthn
               backupCodes
